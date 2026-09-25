@@ -14,6 +14,7 @@ import {
   output,
   untracked,
 } from '@angular/core';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { UiIconButton } from '@vplans/ui-kit/button';
 import { UI_LABELS } from '@vplans/ui-kit/core';
 import {
@@ -83,14 +84,14 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
           [aria-label]="labels().itemsPerPage"
           [value]="pageSize()"
           [disabled]="disabled()"
-          (valueChange)="changePageSize($event)"
+          (valueChange)="onPageSize($event)"
         >
           @for (option of pageSizeOptions(); track option) {
             <ui-option [value]="option">{{ option }}</ui-option>
           }
         </ui-select>
       }
-      <span class="ui-pagination__range" aria-live="polite">{{ range() }}</span>
+      <span class="ui-pagination__range">{{ range() }}</span>
     </div>
 
     <div class="ui-pagination__pages">
@@ -100,7 +101,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
           size="sm"
           [label]="labels().firstPage"
           [disabled]="disabled() || isFirst()"
-          (click)="goTo(0, true)"
+          (click)="onPage(0, true)"
         >
           <ui-icon [icon]="icons.first" flipRtl />
         </button>
@@ -110,7 +111,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
         size="sm"
         [label]="labels().previousPage"
         [disabled]="disabled() || isFirst()"
-        (click)="goTo(current() - 1, true)"
+        (click)="onPage(current() - 1, true)"
       >
         <ui-icon [icon]="icons.previous" flipRtl />
       </button>
@@ -124,7 +125,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
             [attr.aria-current]="item.index === current() ? 'page' : null"
             [attr.aria-label]="labels().pageLabel(item.index + 1)"
             [disabled]="disabled()"
-            (click)="goTo(item.index)"
+            (click)="onPage(item.index)"
           >
             {{ item.index + 1 }}
           </button>
@@ -138,7 +139,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
         size="sm"
         [label]="labels().nextPage"
         [disabled]="disabled() || isLast()"
-        (click)="goTo(current() + 1, true)"
+        (click)="onPage(current() + 1, true)"
       >
         <ui-icon [icon]="icons.next" flipRtl />
       </button>
@@ -148,7 +149,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
           size="sm"
           [label]="labels().lastPage"
           [disabled]="disabled() || isLast()"
-          (click)="goTo(pageCount() - 1, true)"
+          (click)="onPage(pageCount() - 1, true)"
         >
           <ui-icon [icon]="icons.last" flipRtl />
         </button>
@@ -165,6 +166,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
 })
 export class UiPagination {
   protected readonly labels = inject(UI_LABELS);
+  private readonly announcer = inject(LiveAnnouncer);
   private readonly injector = inject(Injector);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   protected readonly icons = {
@@ -204,8 +206,9 @@ export class UiPagination {
   );
   protected readonly range = computed(() => {
     const length = this.length();
-    const start = length === 0 ? 0 : this.current() * this.pageSize() + 1;
-    const end = Math.min(length, (this.current() + 1) * this.pageSize());
+    const size = Math.max(1, this.pageSize());
+    const start = length === 0 ? 0 : this.current() * size + 1;
+    const end = Math.min(length, (this.current() + 1) * size);
     return this.labels().pageRange(start, end, length);
   });
 
@@ -241,7 +244,24 @@ export class UiPagination {
     }
   }
 
-  protected changePageSize(size: number | null): void {
+  /** A page button: go there and say the new range (not for data refreshes or code). */
+  protected onPage(index: number, keepFocus = false): void {
+    const before = this.current();
+    this.goTo(index, keepFocus);
+    if (this.current() !== before) this.announceRange();
+  }
+
+  protected onPageSize(size: number | null): void {
+    const before = this.pageSize();
+    this.changePageSize(size);
+    if (this.pageSize() !== before) this.announceRange();
+  }
+
+  private announceRange(): void {
+    void this.announcer.announce(this.range(), 'polite');
+  }
+
+  private changePageSize(size: number | null): void {
     if (size == null || size === this.pageSize()) return;
     const previous = this.current();
     // Keep the first item of the current page visible.

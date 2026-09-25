@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiPageEvent, UiPageItem, UiPagination, uiPageItems } from './pagination';
 
@@ -62,8 +63,16 @@ describe('UiPagination', () => {
     fixture.detectChanges();
   };
 
+  let announce: ReturnType<typeof vi.fn>;
+
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideUiLabels(UI_LABELS_EN)] });
+    announce = vi.fn(() => Promise.resolve());
+    TestBed.configureTestingModule({
+      providers: [
+        provideUiLabels(UI_LABELS_EN),
+        { provide: LiveAnnouncer, useValue: { announce } },
+      ],
+    });
     fixture = TestBed.createComponent(Host);
     host = fixture.componentInstance;
     await settle();
@@ -78,9 +87,8 @@ describe('UiPagination', () => {
     expect(root().querySelectorAll('[aria-current]')).toHaveLength(1);
   });
 
-  it('shows and announces the range', async () => {
+  it('shows the range', async () => {
     expect(range()).toBe('1–10 of 95');
-    expect(root().querySelector('.ui-pagination__range')!.getAttribute('aria-live')).toBe('polite');
     host.pageIndex.set(9);
     await settle();
     expect(range()).toBe('91–95 of 95');
@@ -88,6 +96,22 @@ describe('UiPagination', () => {
     await settle();
     expect(range()).toBe('0–0 of 0');
     expect(pages()).toEqual(['1']);
+  });
+
+  it('announces the range only when the user changes the page', async () => {
+    host.length.set(120);
+    host.pageIndex.set(2);
+    await settle();
+    expect(announce).not.toHaveBeenCalled();
+    button('Next page').click();
+    await settle();
+    expect(announce).toHaveBeenCalledWith('31–40 of 120', 'polite');
+  });
+
+  it('keeps the range sensible for a page size of 0', async () => {
+    host.pageSize.set(0);
+    await settle();
+    expect(range()).toBe('1–1 of 95');
   });
 
   it('navigates with the buttons, updates the model and emits page', async () => {
