@@ -19,6 +19,13 @@ const meta: Meta<TooltipArgs> = {
   argTypes: {
     placement: { control: 'inline-radio', options: ['top', 'bottom', 'start', 'end'] },
   },
+};
+
+export default meta;
+type Story = StoryObj<TooltipArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: {
     text: 'Delete the plan',
     placement: 'top',
@@ -46,17 +53,15 @@ const meta: Meta<TooltipArgs> = {
   }),
 };
 
-export default meta;
-type Story = StoryObj<TooltipArgs>;
-
-export const Default: Story = {};
-export const Bottom: Story = { args: { placement: 'bottom' } };
-export const Start: Story = { args: { placement: 'start' } };
-export const End: Story = { args: { placement: 'end' } };
-export const Disabled: Story = { args: { off: true } };
+export const Bottom: Story = { ...Default, args: { ...Default.args, placement: 'bottom' } };
+export const Start: Story = { ...Default, args: { ...Default.args, placement: 'start' } };
+export const End: Story = { ...Default, args: { ...Default.args, placement: 'end' } };
+export const Disabled: Story = { ...Default, args: { ...Default.args, off: true } };
 
 export const LongText: Story = {
+  ...Default,
   args: {
+    ...Default.args,
     text: 'The plan is locked while the owner signs it. You can edit it again once it is signed or returned.',
   },
 };
