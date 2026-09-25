@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { FormField, form, readonly } from '@angular/forms/signals';
 import { UiSwitch } from './switch';
 
@@ -126,5 +126,25 @@ describe('UiSwitch readonly', () => {
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelector('input')!.getAttribute('aria-label')).toBe('Alerts');
     expect(root.querySelector('ui-switch')!.hasAttribute('aria-label')).toBe(false);
+  });
+});
+
+@Component({
+  imports: [FormsModule, UiSwitch],
+  template: `<ui-switch name="consent" required [(ngModel)]="consent">Consent</ui-switch>`,
+})
+class RequiredSwitchHost {
+  readonly consent = signal(false);
+  readonly ngModel = viewChild.required(NgModel);
+}
+
+describe('UiSwitch required', () => {
+  it('is invalid with ngModel + required until switched on', async () => {
+    const fixture = TestBed.createComponent(RequiredSwitchHost);
+    await settle(fixture);
+    expect(fixture.componentInstance.ngModel().hasError('required')).toBe(true);
+    (fixture.nativeElement as HTMLElement).querySelector('input')!.click();
+    await settle(fixture);
+    expect(fixture.componentInstance.ngModel().valid).toBe(true);
   });
 });

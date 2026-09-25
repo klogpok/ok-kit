@@ -4,19 +4,23 @@ import {
   ElementRef,
   booleanAttribute,
   computed,
+  effect,
   forwardRef,
   inject,
   input,
   model,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
+  UiCheckedValidator,
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  provideUiCheckedValidator,
 } from '@vplans/ui-kit/core';
 
 /**
@@ -56,7 +60,10 @@ import {
   `,
   styleUrl: './switch.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSwitch) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSwitch) },
+    provideUiCheckedValidator(),
+  ],
   host: {
     class: 'ui-switch',
     '[class]': '"ui-switch--" + size()',
@@ -89,6 +96,17 @@ export class UiSwitch extends UiFormControlBase<boolean> implements UiFormFieldC
   readonly controlId = computed(() => `${this.id()}-input`);
   // model() has no transform, so a static `checked` attribute arrives as '': coerce on read.
   protected readonly isChecked = computed(() => coerceBooleanProperty(this.checked()));
+
+  constructor() {
+    super();
+    // Reactive / template forms: a required switch must be checked.
+    const validator = inject(UiCheckedValidator);
+    validator.required = this.isRequired;
+    effect(() => {
+      this.isRequired();
+      untracked(() => validator.requiredChanged());
+    });
+  }
 
   writeValue(value: boolean | null | undefined): void {
     this.checked.set(!!value);
