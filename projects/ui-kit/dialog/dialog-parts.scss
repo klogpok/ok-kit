@@ -1,0 +1,54 @@
+// Shared by the dialog parts; each rule matches only its own host class.
+
+:host(.ui-dialog-header) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ui-space-md);
+  padding-inline: var(--ui-dialog-padding);
+}
+
+.ui-dialog-header__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+  min-inline-size: 0;
+}
+
+// Pull the ghost button into the corner without shifting the title.
+.ui-dialog-header__close {
+  margin-block-start: calc(var(--ui-space-2xs) * -1);
+  margin-inline-end: calc(var(--ui-space-xs) * -1);
+}
+
+:host(.ui-dialog-title) {
+  margin: 0;
+  color: var(--ui-color-text);
+  font-size: var(--ui-dialog-title-font-size);
+  font-weight: var(--ui-dialog-title-font-weight);
+  line-height: var(--ui-line-height-tight);
+}
+
+:host(.ui-dialog-content) {
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  padding-inline: var(--ui-dialog-padding);
+  overflow-y: auto;
+  color: var(--ui-color-text);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-normal);
+}
+
+:host(.ui-dialog-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ui-space-sm);
+  padding-inline: var(--ui-dialog-padding);
+}
+
+:host(.ui-dialog-actions--start) {
+  justify-content: flex-start;
+}

@@ -228,23 +228,24 @@ providers: [
 
 ## Components
 
-| Entry point                 | Exports                                                                                       |
-| --------------------------- | --------------------------------------------------------------------------------------------- |
-| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                    |
-| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                       |
-| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                                                            |
-| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                                  |
-| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                     |
-| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                    |
-| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                   |
-| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                   |
-| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                      |
-| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`    |
-| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                           |
-| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                              |
-| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                   |
-| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                              |
-| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection` |
+| Entry point                 | Exports                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                                                            |
+| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                                                               |
+| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                                                                                                    |
+| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                                                                          |
+| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                                                             |
+| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                                                            |
+| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                                                           |
+| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                                                           |
+| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                                                              |
+| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                            |
+| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                                                                   |
+| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
+| `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
+| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
+| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
+| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`                                         |
 
 ## Tokens
 
@@ -480,6 +481,17 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-tooltip-font-size`            | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
 | `--ui-tooltip-max-width`            | component | `20em`                                                                       | `20em`                                                                 |
 | `--ui-tooltip-offset`               | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
+| `--ui-dialog-bg`                    | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
+| `--ui-dialog-radius`                | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-dialog-shadow`                | component | `var(--ui-shadow-lg)`                                                        | `var(--ui-shadow-lg)`                                                  |
+| `--ui-dialog-backdrop`              | component | `var(--ui-color-backdrop)`                                                   | `var(--ui-color-backdrop)`                                             |
+| `--ui-dialog-padding`               | component | `var(--ui-space-xl)`                                                         | `var(--ui-space-xl)`                                                   |
+| `--ui-dialog-gap`                   | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-dialog-width-sm`              | component | `25rem`                                                                      | `25rem`                                                                |
+| `--ui-dialog-width-md`              | component | `35rem`                                                                      | `35rem`                                                                |
+| `--ui-dialog-width-lg`              | component | `50rem`                                                                      | `50rem`                                                                |
+| `--ui-dialog-title-font-size`       | component | `var(--ui-font-size-xl)`                                                     | `var(--ui-font-size-xl)`                                               |
+| `--ui-dialog-title-font-weight`     | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 
 <!-- tokens:end -->
 

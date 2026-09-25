@@ -2130,5 +2130,71 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-space-xs)",
     "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-dialog-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-raised)",
+    "dark": "var(--ui-color-surface-raised)"
+  },
+  {
+    "name": "--ui-dialog-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-dialog-shadow",
+    "layer": "component",
+    "light": "var(--ui-shadow-lg)",
+    "dark": "var(--ui-shadow-lg)"
+  },
+  {
+    "name": "--ui-dialog-backdrop",
+    "layer": "component",
+    "light": "var(--ui-color-backdrop)",
+    "dark": "var(--ui-color-backdrop)"
+  },
+  {
+    "name": "--ui-dialog-padding",
+    "layer": "component",
+    "light": "var(--ui-space-xl)",
+    "dark": "var(--ui-space-xl)"
+  },
+  {
+    "name": "--ui-dialog-gap",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-dialog-width-sm",
+    "layer": "component",
+    "light": "25rem",
+    "dark": "25rem"
+  },
+  {
+    "name": "--ui-dialog-width-md",
+    "layer": "component",
+    "light": "35rem",
+    "dark": "35rem"
+  },
+  {
+    "name": "--ui-dialog-width-lg",
+    "layer": "component",
+    "light": "50rem",
+    "dark": "50rem"
+  },
+  {
+    "name": "--ui-dialog-title-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-xl)",
+    "dark": "var(--ui-font-size-xl)"
+  },
+  {
+    "name": "--ui-dialog-title-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
   }
 ];
