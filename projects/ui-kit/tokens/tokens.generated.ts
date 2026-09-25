@@ -1408,8 +1408,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-color-focus-ring",
     "layer": "semantic",
-    "light": "#2490ed",
-    "dark": "#4aa3ef"
+    "light": "#1a74c9",
+    "dark": "#72b8f2"
   },
   {
     "name": "--ui-color-backdrop",

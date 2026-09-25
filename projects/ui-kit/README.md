@@ -455,7 +455,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-info-contrast`              | semantic  | `#ffffff`                                                                    | `#111723`                                                              |
 | `--ui-color-info-subtle`                | semantic  | `#e9f4fc`                                                                    | `#0a2747`                                                              |
 | `--ui-color-info-text`                  | semantic  | `#004b9e`                                                                    | `#72b8f2`                                                              |
-| `--ui-color-focus-ring`                 | semantic  | `#2490ed`                                                                    | `#4aa3ef`                                                              |
+| `--ui-color-focus-ring`                 | semantic  | `#1a74c9`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-backdrop`                   | semantic  | `rgb(15 23 42 / 0.5)`                                                        | `rgb(0 0 0 / 0.6)`                                                     |
 | `--ui-shadow-sm`                        | semantic  | `0 1px 2px 0 rgb(15 23 42 / 0.06)`                                           | `0 1px 2px 0 rgb(0 0 0 / 0.4)`                                         |
 | `--ui-shadow-md`                        | semantic  | `0 4px 8px -2px rgb(15 23 42 / 0.10), 0 2px 4px -2px rgb(15 23 42 / 0.06)`   | `0 4px 8px -2px rgb(0 0 0 / 0.5)`                                      |
