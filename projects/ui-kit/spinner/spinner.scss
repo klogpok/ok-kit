@@ -1,0 +1,54 @@
+:host {
+  display: inline-block;
+  flex-shrink: 0;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  color: inherit;
+  vertical-align: middle;
+}
+
+:host(.ui-spinner--sm) {
+  --_size: var(--ui-icon-size-sm);
+}
+
+:host(.ui-spinner--md) {
+  --_size: var(--ui-icon-size-md);
+}
+
+:host(.ui-spinner--lg) {
+  --_size: var(--ui-icon-size-lg);
+}
+
+.ui-spinner__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  animation: ui-spinner-rotate calc(var(--ui-motion-duration-slow) * 3) linear infinite;
+}
+
+circle {
+  fill: none;
+  stroke-width: calc(var(--ui-spinner-stroke-width) * 1.25);
+}
+
+.ui-spinner__track {
+  stroke: var(--ui-spinner-track-color);
+}
+
+.ui-spinner__arc {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-dasharray: 30 70;
+}
+
+@keyframes ui-spinner-rotate {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-spinner__svg {
+    animation-duration: calc(var(--ui-motion-duration-slow) * 8);
+  }
+}
