@@ -3,8 +3,6 @@ import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiOption, UiOptionGroup } from './option';
 import { UiSelect } from './select';
 
-const COORDINATORS = ['Dana Levi', 'David Cohen', 'Yael Mizrahi', 'Yossi Peretz', 'Noa Friedman'];
-
 type SelectArgs = UiSelect<string> & { label: string; hint: string };
 
 const meta: Meta<SelectArgs> = {
@@ -12,6 +10,13 @@ const meta: Meta<SelectArgs> = {
   component: UiSelect,
   decorators: [moduleMetadata({ imports: [UiOption, UiOptionGroup, UiFormField] })],
   argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
+};
+
+export default meta;
+type Story = StoryObj<SelectArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: {
     label: 'Coordinator',
     hint: 'Approves the plan before signing',
@@ -23,7 +28,7 @@ const meta: Meta<SelectArgs> = {
     searchable: false,
   },
   render: ({ label, hint, ...args }) => ({
-    props: { ...args, coordinators: COORDINATORS },
+    props: args,
     template: `
       <div style="max-inline-size:320px">
         <ui-form-field [label]="'${label}'" [hint]="'${hint}'">
@@ -35,7 +40,7 @@ const meta: Meta<SelectArgs> = {
             [invalid]="invalid"
             [searchable]="searchable"
           >
-            @for (name of coordinators; track name) {
+            @for (name of ['Dana Levi', 'David Cohen', 'Yael Mizrahi', 'Yossi Peretz', 'Noa Friedman']; track name) {
               <ui-option [value]="name">{{ name }}</ui-option>
             }
           </ui-select>
@@ -43,15 +48,13 @@ const meta: Meta<SelectArgs> = {
       </div>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<SelectArgs>;
-
-export const Default: Story = {};
-export const WithValue: Story = { args: { value: 'Yael Mizrahi' } };
-export const Searchable: Story = { args: { searchable: true } };
-export const Disabled: Story = { args: { disabled: true, value: 'Dana Levi' } };
-export const Invalid: Story = { args: { invalid: true } };
+export const WithValue: Story = { ...Default, args: { ...Default.args, value: 'Yael Mizrahi' } };
+export const Searchable: Story = { ...Default, args: { ...Default.args, searchable: true } };
+export const Disabled: Story = {
+  ...Default,
+  args: { ...Default.args, disabled: true, value: 'Dana Levi' },
+};
+export const Invalid: Story = { ...Default, args: { ...Default.args, invalid: true } };
 
 export const Sizes: Story = {
   render: () => ({
