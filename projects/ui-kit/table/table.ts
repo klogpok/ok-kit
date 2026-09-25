@@ -1,13 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
+  Signal,
   ViewEncapsulation,
+  afterNextRender,
   booleanAttribute,
   computed,
   inject,
   input,
   numberAttribute,
+  signal,
 } from '@angular/core';
 import { UiSkeleton } from '@vplans/ui-kit/skeleton';
 
@@ -65,6 +69,28 @@ function countColumns(row: HTMLElement): number {
   );
 }
 
+/**
+ * Column count of the table around the host row. Read live on first render, then updated when
+ * header cells are added or removed (e.g. columns toggled with `@if`).
+ */
+function injectColumnCount(): Signal<number> {
+  const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  const observed = signal<number | null>(null);
+  let observer: MutationObserver | undefined;
+  afterNextRender(() => {
+    const table = host.closest('table');
+    if (!table || typeof MutationObserver === 'undefined') return;
+    observer = new MutationObserver(() => observed.set(countColumns(host)));
+    observer.observe(table.tHead ?? table, {
+      childList: true,
+      subtree: true,
+      attributeFilter: ['colspan'],
+    });
+  });
+  inject(DestroyRef).onDestroy(() => observer?.disconnect());
+  return computed(() => observed() ?? countColumns(host));
+}
+
 const optionalNumber = (value: unknown): number | undefined =>
   value == null || value === '' ? undefined : numberAttribute(value);
 
@@ -86,9 +112,9 @@ const optionalNumber = (value: unknown): number | undefined =>
   host: { class: 'ui-table-message' },
 })
 export class UiTableMessage {
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly columnCount = injectColumnCount();
   readonly colspan = input<number | undefined, unknown>(undefined, { transform: optionalNumber });
-  protected readonly span = computed(() => this.colspan() ?? countColumns(this.host));
+  protected readonly span = computed(() => this.colspan() ?? this.columnCount());
 }
 
 const SKELETON_WIDTHS = ['70%', '90%', '55%', '80%'];
@@ -113,11 +139,11 @@ const SKELETON_WIDTHS = ['70%', '90%', '55%', '80%'];
   host: { class: 'ui-table-skeleton', 'aria-hidden': 'true' },
 })
 export class UiTableSkeleton {
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly columnCount = injectColumnCount();
   readonly columns = input<number | undefined, unknown>(undefined, { transform: optionalNumber });
 
   protected readonly widths = computed(() => {
-    const count = this.columns() ?? countColumns(this.host);
+    const count = this.columns() ?? this.columnCount();
     return Array.from({ length: count }, (_, i) => SKELETON_WIDTHS[i % SKELETON_WIDTHS.length]);
   });
 }

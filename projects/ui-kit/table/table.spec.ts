@@ -59,6 +59,9 @@ describe('uiSortData', () => {
           <th scope="col" ui-sort-header="name">Name</th>
           <th scope="col" ui-sort-header="units" class="ui-table-numeric">Units</th>
           <th scope="col">Owner</th>
+          @if (showStatus()) {
+            <th scope="col">Status</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -88,6 +91,7 @@ class Host {
   readonly clearable = signal(true);
   readonly loading = signal(false);
   readonly density = signal<UiTableDensity>('default');
+  readonly showStatus = signal(false);
   readonly rows = computed(() => uiSortData(this.data(), this.sort()));
 }
 
@@ -172,6 +176,16 @@ describe('UiTable', () => {
     const cell = table().querySelector('tr.ui-table-message > td')!;
     expect(cell.textContent!.trim()).toBe('No plans yet');
     expect(cell.getAttribute('colspan')).toBe('3');
+  });
+
+  it('follows header cells added later', async () => {
+    host.data.set([]);
+    await settle();
+    host.showStatus.set(true);
+    await settle();
+    await settle();
+    const cell = table().querySelector('tr.ui-table-message > td')!;
+    expect(cell.getAttribute('colspan')).toBe('4');
   });
 
   it('marks the table busy and renders hidden skeleton rows while loading', async () => {
