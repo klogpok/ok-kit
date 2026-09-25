@@ -50,6 +50,8 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
     '[class.ui-select--readonly]': 'readonly()',
     '[class.ui-select--invalid]': 'showError()',
     '[attr.id]': 'id()',
+    // The native control carries the label; a static attribute would also stay on the host.
+    '[attr.aria-label]': 'null',
   },
 })
 export abstract class UiSelectBase<T, V>

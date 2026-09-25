@@ -495,6 +495,8 @@ describe('UiSelect readonly', () => {
   it('does not open under a Signal Forms readonly rule and stays focusable', async () => {
     expect(control().getAttribute('aria-readonly')).toBe('true');
     expect((control() as HTMLButtonElement).disabled).toBe(false);
+    expect(control().getAttribute('aria-label')).toBe('Coordinator');
+    expect(control().closest('ui-select')!.hasAttribute('aria-label')).toBe(false);
     control().click();
     keydown(control(), 'ArrowDown');
     await settle(fixture);
