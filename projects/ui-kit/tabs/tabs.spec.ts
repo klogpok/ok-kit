@@ -42,7 +42,9 @@ describe('UiTabGroup', () => {
   const tabs = () => [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   const panels = () => [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
   const key = async (target: HTMLElement, name: string) => {
-    target.dispatchEvent(new KeyboardEvent('keydown', { key: name, keyCode: KEY_CODES[name], bubbles: true }));
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', { key: name, keyCode: KEY_CODES[name], bubbles: true }),
+    );
     fixture.detectChanges();
     await fixture.whenStable();
   };

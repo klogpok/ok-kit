@@ -57,8 +57,7 @@ export const Disabled: Story = { args: { off: true } };
 
 export const LongText: Story = {
   args: {
-    text:
-      'The plan is locked while the owner signs it. You can edit it again once it is signed or returned.',
+    text: 'The plan is locked while the owner signs it. You can edit it again once it is signed or returned.',
   },
 };
 
