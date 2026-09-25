@@ -3,11 +3,13 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  Injectable,
   Signal,
   ViewEncapsulation,
   afterNextRender,
   booleanAttribute,
   computed,
+  forwardRef,
   inject,
   input,
   numberAttribute,
@@ -44,6 +46,7 @@ export type UiTableDensity = 'default' | 'compact';
   // Styles must reach the projected rows and cells; selectors are scoped under `.ui-table`.
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [forwardRef(() => UiTableColumns)],
   host: {
     class: 'ui-table',
     '[class]': '"ui-table--" + density()',
@@ -70,11 +73,45 @@ function countColumns(row: HTMLElement): number {
 }
 
 /**
+ * Header changes of a `table[ui-table]`, watched once for all its message and skeleton rows.
+ * Internal.
+ */
+@Injectable()
+class UiTableColumns {
+  private readonly version = signal(0);
+
+  constructor() {
+    const table = inject<ElementRef<HTMLTableElement>>(ElementRef).nativeElement;
+    let observer: MutationObserver | undefined;
+    afterNextRender(() => {
+      if (typeof MutationObserver === 'undefined') return;
+      observer = new MutationObserver(() => this.version.update((v) => v + 1));
+      observer.observe(table.tHead ?? table, {
+        childList: true,
+        subtree: true,
+        attributeFilter: ['colspan'],
+      });
+    });
+    inject(DestroyRef).onDestroy(() => observer?.disconnect());
+  }
+
+  countFor(row: HTMLElement): Signal<number> {
+    return computed(() => {
+      this.version();
+      return countColumns(row);
+    });
+  }
+}
+
+/**
  * Column count of the table around the host row. Read live on first render, then updated when
  * header cells are added or removed (e.g. columns toggled with `@if`).
  */
 function injectColumnCount(): Signal<number> {
   const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  const shared = inject(UiTableColumns, { optional: true });
+  if (shared) return shared.countFor(host);
+  // A row in a plain table (not `table[ui-table]`) watches the header itself.
   const observed = signal<number | null>(null);
   let observer: MutationObserver | undefined;
   afterNextRender(() => {

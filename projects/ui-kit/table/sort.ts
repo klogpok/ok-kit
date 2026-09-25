@@ -98,15 +98,20 @@ export class UiSortHeader {
   });
 }
 
-const isEmpty = (value: unknown): boolean => value == null || value === '';
+const isEmpty = (value: unknown): boolean =>
+  value == null ||
+  value === '' ||
+  (typeof value === 'number' && Number.isNaN(value)) ||
+  (value instanceof Date && Number.isNaN(value.getTime()));
 
 /**
  * Returns a sorted copy of `data`. Numbers, dates and booleans compare by value, everything else
  * as text with `Intl.Collator` (numeric, so "Plan 2" comes before "Plan 10"). Empty values
- * (`null`, `undefined`, `''`) always go last. The sort is stable.
+ * (`null`, `undefined`, `''`, `NaN`, an Invalid Date) always go last. The sort is stable.
  *
  * @param accessor Reads the value of a column; defaults to `item[column]`.
- * @param locale Collation locale; defaults to the runtime locale.
+ * @param locale Collation locale; defaults to the runtime locale. Pass `labels().locale`
+ *   (`inject(UI_LABELS)`) to sort like the rest of the kit.
  *
  * @example readonly rows = computed(() => uiSortData(this.plans(), this.sort()));
  */

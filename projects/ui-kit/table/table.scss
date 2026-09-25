@@ -124,6 +124,13 @@
   opacity: 1;
 }
 
+// Touch screens have no hover: show a faint icon so sortable columns can be recognised.
+@media (hover: none) {
+  .ui-table .ui-sort-header__button:not(:disabled) .ui-sort-header__icon {
+    opacity: 0.5;
+  }
+}
+
 .ui-table .ui-sort-header--active {
   color: var(--ui-table-text);
 

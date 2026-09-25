@@ -34,6 +34,18 @@ describe('uiSortData', () => {
     expect(names(uiSortData(PLANS, { active: 'units', direction: 'desc' }))).toEqual([3, 1, 2]);
   });
 
+  it('puts NaN and Invalid Date last like empty values', () => {
+    const rows = [{ v: Number.NaN }, { v: 2 }, { v: 1 }];
+    expect(uiSortData(rows, { active: 'v', direction: 'asc' }).map((r) => r.v)).toEqual([
+      1,
+      2,
+      Number.NaN,
+    ]);
+    const dates = [{ v: new Date('x') }, { v: new Date(2026, 0, 2) }, { v: new Date(2026, 0, 1) }];
+    const sorted = uiSortData(dates, { active: 'v', direction: 'desc' });
+    expect(sorted.map((r) => r.v.getDate())).toEqual([2, 1, Number.NaN]);
+  });
+
   it('sorts dates and supports a custom accessor', () => {
     const rows = [{ at: new Date(2026, 5, 1) }, { at: new Date(2025, 0, 1) }];
     expect(uiSortData(rows, { active: 'at', direction: 'asc' })[0]).toBe(rows[1]);
@@ -200,5 +212,28 @@ describe('UiTable', () => {
     host.loading.set(false);
     await settle();
     expect(table().hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('watches the header once for all message and skeleton rows', async () => {
+    const Original = globalThis.MutationObserver;
+    let created = 0;
+    globalThis.MutationObserver = class extends Original {
+      constructor(callback: MutationCallback) {
+        super(callback);
+        created++;
+      }
+    };
+    try {
+      const other = TestBed.createComponent(Host);
+      other.componentInstance.loading.set(true);
+      other.detectChanges();
+      await other.whenStable();
+      expect(other.nativeElement.querySelectorAll('tr.ui-table-skeleton').length).toBeGreaterThan(
+        1,
+      );
+      expect(created).toBe(1);
+    } finally {
+      globalThis.MutationObserver = Original;
+    }
   });
 });
