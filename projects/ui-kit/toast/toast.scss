@@ -33,6 +33,11 @@
   animation: ui-toast-enter var(--ui-motion-duration-normal) var(--ui-motion-easing-enter);
 }
 
+// Moving the stack to the top of the top layer re-shows it; do not animate toasts in again.
+.ui-toast--entered {
+  animation: none;
+}
+
 .ui-toast--info {
   --_accent: var(--ui-toast-info-accent);
 }

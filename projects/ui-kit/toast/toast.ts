@@ -167,7 +167,13 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
   imports: [UiIcon, UiButton, UiIconButton],
   template: `
     @for (toast of toasts.active(); track toast.ref.id) {
-      <div class="ui-toast" [class]="'ui-toast--' + toast.tone" [attr.data-toast-id]="toast.ref.id">
+      <div
+        class="ui-toast"
+        [class]="'ui-toast--' + toast.tone"
+        [class.ui-toast--entered]="entered().has(toast.ref.id)"
+        [attr.data-toast-id]="toast.ref.id"
+        (animationend)="markEntered(toast.ref.id)"
+      >
         <span class="ui-toast__icon"><ui-icon size="md" [icon]="icons[toast.tone]" /></span>
         <div class="ui-toast__body">
           @if (toast.title) {
@@ -243,6 +249,13 @@ export class UiToastContainer {
     this.control.pause('focus');
   }
 
+  /** Toasts whose entry animation ended; moving the stack to the top must not replay it. */
+  protected readonly entered = signal<ReadonlySet<number>>(new Set());
+
+  protected markEntered(id: number): void {
+    this.entered.update((ids) => new Set(ids).add(id));
+  }
+
   protected triggerAction(toast: UiToastItem): void {
     triggerAction(toast.ref);
   }
@@ -316,10 +329,17 @@ export class UiToast {
   private readonly pausedBy = new Set<'pointer' | 'focus'>();
   private overlayRef: OverlayRef | null = null;
   private nextId = 0;
+  /** Popovers opened after the stack, which cover it in the top layer. */
+  private readonly coveredBy = new Set<EventTarget>();
 
   constructor() {
     // The announcer element relies on `.cdk-visually-hidden`, which CDK only loads with FocusTrap.
     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+    const onBeforeToggle = (event: Event): void => this.trackCover(event);
+    this.document.addEventListener('beforetoggle', onBeforeToggle, true);
+    inject(DestroyRef).onDestroy(() =>
+      this.document.removeEventListener('beforetoggle', onBeforeToggle, true),
+    );
   }
 
   /** Toasts currently shown, oldest first. */
@@ -417,6 +437,7 @@ export class UiToast {
     this.items.update((items) => items.filter((item) => item.ref !== ref));
     if (!this.items().length) {
       this.overlayRef?.detach();
+      this.coveredBy.clear();
       // The stack is gone, so nothing can hold the pause any more.
       this.pausedBy.clear();
     }
@@ -438,12 +459,28 @@ export class UiToast {
     overlayRef.updatePosition();
   }
 
-  /** Moves the stack above overlays opened after it (e.g. a dialog) in the top layer. */
+  /** Remembers popovers (dialogs, menus, …) opened after the stack while it is shown. */
+  private trackCover(event: Event): void {
+    const host = this.overlayRef?.hostElement;
+    if (!host || event.target === host || !this.overlayRef?.hasAttached()) return;
+    const { newState } = event as Event & { newState?: string };
+    if (newState === 'open') this.coveredBy.add(event.target!);
+    else if (newState === 'closed') this.coveredBy.delete(event.target!);
+  }
+
+  /**
+   * Moves the stack above overlays opened after it (e.g. a dialog) in the top layer. Only when
+   * one of them is still open: showing the popover again replays animations and drops focus.
+   */
   private raise(host: HTMLElement): void {
-    if (host.hasAttribute('popover') && host.matches(':popover-open')) {
-      host.hidePopover();
-      host.showPopover();
-    }
+    const covered = [...this.coveredBy].some((el) => (el as Node).isConnected);
+    this.coveredBy.clear();
+    if (!covered || !host.hasAttribute('popover')) return;
+    const active = this.document.activeElement;
+    host.hidePopover();
+    host.showPopover();
+    if (active instanceof HTMLElement && host.contains(active))
+      active.focus({ preventScroll: true });
   }
 
   private createOverlay(): OverlayRef {

@@ -217,6 +217,44 @@ describe('UiToast', () => {
     expect(reasons).toEqual(['overflow']);
   });
 
+  it('moves the stack to the top only after a later overlay covered it', () => {
+    toast.show('One');
+    render();
+    const host = container()!.closest<HTMLElement>('.cdk-global-overlay-wrapper')!;
+    host.setAttribute('popover', 'manual');
+    const hide = vi.fn();
+    const show = vi.fn();
+    Object.assign(host, { hidePopover: hide, showPopover: show });
+    const opened = (target: Element, newState: 'open' | 'closed') =>
+      target.dispatchEvent(Object.assign(new Event('beforetoggle'), { newState }));
+
+    toast.show('Two');
+    expect(hide).not.toHaveBeenCalled();
+
+    const dialog = document.createElement('div');
+    document.body.appendChild(dialog);
+    opened(dialog, 'open');
+    opened(dialog, 'closed');
+    toast.show('Three');
+    expect(hide).not.toHaveBeenCalled();
+
+    opened(dialog, 'open');
+    toast.show('Four');
+    expect(hide).toHaveBeenCalledTimes(1);
+    expect(show).toHaveBeenCalledTimes(1);
+    toast.show('Five');
+    expect(hide).toHaveBeenCalledTimes(1);
+    dialog.remove();
+  });
+
+  it('does not replay the entry animation of toasts that have entered', () => {
+    toast.show('One');
+    render();
+    items()[0].dispatchEvent(new Event('animationend', { bubbles: true }));
+    render();
+    expect(items()[0].classList).toContain('ui-toast--entered');
+  });
+
   it('hides the close button when not dismissible', () => {
     toast.show({ message: 'Syncing', dismissible: false });
     render();
