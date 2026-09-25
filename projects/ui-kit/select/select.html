@@ -52,7 +52,10 @@
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
     >
-      <span class="ui-select__value" [class.ui-select__value--placeholder]="!selectedOption()">
+      <span
+        class="ui-select__value"
+        [class.ui-select__value--placeholder]="!selectedOptions().length"
+      >
         {{ displayLabel() || placeholder() }}
       </span>
     </button>
@@ -77,6 +80,7 @@
     [id]="panelId()"
     [attr.aria-label]="ariaLabel() || null"
     [attr.aria-labelledby]="listLabelledBy()"
+    [attr.aria-multiselectable]="multiple || null"
     (mousedown)="$event.preventDefault()"
   >
     <ng-content />
