@@ -91,6 +91,34 @@ class ServerSearchHost {
   }
 }
 
+@Component({
+  imports: [UiSelect, UiOption],
+  template: `
+    <ui-select aria-label="Status" [(value)]="value">
+      <ui-option value="draft">{{ draftLabel() }}</ui-option>
+    </ui-select>
+  `,
+})
+class DynamicLabelHost {
+  readonly value = signal<string | null>('draft');
+  readonly draftLabel = signal('Draft');
+}
+
+describe('UiSelect option labels', () => {
+  it('updates the trigger when the option text changes', async () => {
+    const fixture = TestBed.createComponent(DynamicLabelHost);
+    const root = fixture.nativeElement as HTMLElement;
+    await settle(fixture);
+    const control = root.querySelector<HTMLElement>('.ui-select__control')!;
+    expect(control.textContent).toContain('Draft');
+
+    fixture.componentInstance.draftLabel.set('טיוטה');
+    await settle(fixture);
+    await settle(fixture);
+    expect(control.textContent).toContain('טיוטה');
+  });
+});
+
 describe('UiSelect with server-side search', () => {
   it('activates the first new result instead of a removed option', async () => {
     const fixture = TestBed.createComponent(ServerSearchHost);

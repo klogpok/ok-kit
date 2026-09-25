@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   InjectionToken,
   booleanAttribute,
@@ -69,7 +70,10 @@ export class UiOption<T = unknown> implements Highlightable {
 
   readonly value = input.required<T>();
   readonly isDisabled = input(false, { alias: 'disabled', transform: booleanAttribute });
-  /** Text shown in the trigger and used for typeahead and search. Defaults to the content text. */
+  /**
+   * Text shown in the trigger and used for typeahead and search. Defaults to the content text,
+   * which is tracked when it changes.
+   */
   readonly label = input('');
 
   readonly id = inject(_IdGenerator).getId('ui-option-');
@@ -78,6 +82,18 @@ export class UiOption<T = unknown> implements Highlightable {
   readonly selected = computed(() => this.parent.isSelected(this.value()));
   readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel()));
   protected readonly checkIcon = uiIconCheck;
+  /** Content text after the first DOM change; `null` until then (read live). */
+  private readonly observedText = signal<string | null>(null);
+
+  constructor() {
+    // The content text is not a signal. Watch it so the trigger, search and typeahead follow
+    // text changes such as a runtime language switch.
+    if (typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver(() => this.observedText.set(this.readText()));
+      observer.observe(this.element, { childList: true, characterData: true, subtree: true });
+      inject(DestroyRef).onDestroy(() => observer.disconnect());
+    }
+  }
 
   /** For the CDK key manager. */
   get disabled(): boolean {
@@ -85,7 +101,11 @@ export class UiOption<T = unknown> implements Highlightable {
   }
 
   getLabel(): string {
-    return this.label() || (this.element.textContent ?? '').trim();
+    return this.label() || (this.observedText() ?? this.readText());
+  }
+
+  private readText(): string {
+    return (this.element.textContent ?? '').trim();
   }
 
   setActiveStyles(): void {
