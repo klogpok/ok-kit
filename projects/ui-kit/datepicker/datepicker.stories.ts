@@ -10,7 +10,7 @@ import { UiDatepicker } from './datepicker';
 
 interface DatepickerArgs {
   label: string;
-  hint: string;
+  hintText: string;
   disabledArg: boolean;
   invalidArg: boolean;
   controlSize: 'sm' | 'md' | 'lg';
@@ -28,7 +28,7 @@ const meta: Meta<DatepickerArgs> = {
   argTypes: { controlSize: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
   args: {
     label: 'תאריך חתימה',
-    hint: 'אפשר להקליד או לבחור מהלוח',
+    hintText: 'אפשר להקליד או לבחור מהלוח',
     disabledArg: false,
     invalidArg: false,
     controlSize: 'md',
@@ -37,7 +37,7 @@ const meta: Meta<DatepickerArgs> = {
     props: { ...args, value: null },
     template: `
       <div dir="rtl" lang="he" style="max-inline-size:320px;min-block-size:26rem">
-        <ui-form-field [label]="label" [hint]="hint">
+        <ui-form-field [label]="label" [hint]="hintText">
           <ui-datepicker
             [(value)]="value"
             [disabled]="disabledArg"
