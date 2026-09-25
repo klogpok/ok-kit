@@ -310,7 +310,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/select`     | `UiSelect`, `UiOption`, `UiOptionGroup`                                                                                               |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
-| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`                                         |
+| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`, `provideUiLiveDirectionality`          |
 
 ## Tokens
 
