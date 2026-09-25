@@ -1,11 +1,14 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { UiBadge } from '@vplans/ui-kit/badge';
+import { UiTabLink, UiTabNav } from './tab-nav';
 import { UiTab, UiTabContent, UiTabGroup, UiTabLabel } from './tabs';
 
 const meta: Meta<UiTabGroup> = {
   title: 'Navigation/Tabs',
   component: UiTabGroup,
-  decorators: [moduleMetadata({ imports: [UiTab, UiTabLabel, UiTabContent, UiBadge] })],
+  decorators: [
+    moduleMetadata({ imports: [UiTab, UiTabLabel, UiTabContent, UiBadge, UiTabNav, UiTabLink] }),
+  ],
   argTypes: { activation: { control: 'inline-radio', options: ['automatic', 'manual'] } },
   args: { selectedIndex: 0, activation: 'automatic' },
   render: (args) => ({
@@ -76,5 +79,21 @@ export const ManyTabs: Story = {
           }
         </ui-tab-group>
       </div>`,
+  }),
+};
+
+/** Tabs as page navigation (`nav[ui-tab-nav]`). In an app, use `routerLink` + `routerLinkActive`. */
+export const Navigation: Story = {
+  render: () => ({
+    props: { current: 'details' },
+    template: `
+      <nav ui-tab-nav aria-label="Plan pages">
+        @for (page of ['details', 'documents', 'history']; track page) {
+          <a ui-tab-link [href]="'#' + page" [active]="current === page" (click)="current = page">
+            {{ page }}
+          </a>
+        }
+        <a ui-tab-link href="#billing" disabled>billing</a>
+      </nav>`,
   }),
 };

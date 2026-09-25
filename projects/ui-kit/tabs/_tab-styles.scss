@@ -1,0 +1,76 @@
+// Shared look of ui-tab-group tabs and ui-tab-nav links.
+@use '../styles/mixins';
+
+@mixin list {
+  display: flex;
+  gap: var(--ui-tabs-gap);
+  border-block-end: var(--ui-border-width-default) solid var(--ui-tabs-border);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/// A tab. `$disabled` is the selector of the disabled state (`:disabled` or `[aria-disabled]`).
+@mixin tab($disabled) {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  box-sizing: border-box;
+  min-block-size: var(--ui-tabs-height);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--ui-tabs-padding-inline);
+  border: 0;
+  background: none;
+  color: var(--ui-tabs-text);
+  font: inherit;
+  font-size: var(--ui-tabs-font-size);
+  font-weight: var(--ui-tabs-font-weight);
+  line-height: var(--ui-line-height-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  @include mixins.transition(color);
+  @include mixins.focus-visible(calc(var(--ui-focus-ring-width) * -1));
+
+  // Active indicator: sits on the list border.
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: var(--ui-tabs-indicator-thickness);
+    border-start-start-radius: var(--ui-tabs-indicator-thickness);
+    border-start-end-radius: var(--ui-tabs-indicator-thickness);
+    background-color: transparent;
+    @include mixins.transition(background-color);
+  }
+
+  &:hover:not(#{$disabled}) {
+    color: var(--ui-tabs-text-hover);
+  }
+
+  &#{$disabled} {
+    color: var(--ui-color-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+@mixin selected {
+  color: var(--ui-tabs-text-selected);
+
+  &:hover {
+    color: var(--ui-tabs-text-selected);
+  }
+
+  &::after {
+    background-color: var(--ui-tabs-indicator);
+  }
+
+  @media (forced-colors: active) {
+    &::after {
+      background-color: Highlight;
+    }
+  }
+}

@@ -301,7 +301,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/divider`    | `UiDivider`                                                                                                                           |
 | `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                                                              |
 | `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                            |
-| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                                                                   |
+| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                          |
 | `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |

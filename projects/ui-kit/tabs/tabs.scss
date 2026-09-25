@@ -1,4 +1,5 @@
 @use '../styles/mixins';
+@use 'tab-styles';
 
 :host {
   display: flex;
@@ -9,68 +10,15 @@
 }
 
 .ui-tabs__list {
-  display: flex;
-  gap: var(--ui-tabs-gap);
-  border-block-end: var(--ui-border-width-default) solid var(--ui-tabs-border);
-  overflow-x: auto;
-  scrollbar-width: thin;
+  @include tab-styles.list;
 }
 
 .ui-tabs__tab {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  min-block-size: var(--ui-tabs-height);
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--ui-tabs-padding-inline);
-  border: 0;
-  background: none;
-  color: var(--ui-tabs-text);
-  font: inherit;
-  font-size: var(--ui-tabs-font-size);
-  font-weight: var(--ui-tabs-font-weight);
-  line-height: var(--ui-line-height-tight);
-  white-space: nowrap;
-  cursor: pointer;
-  @include mixins.transition(color);
-  @include mixins.focus-visible(calc(var(--ui-focus-ring-width) * -1));
-
-  // Active indicator: sits on the list border.
-  &::after {
-    content: '';
-    position: absolute;
-    inset-inline: 0;
-    inset-block-end: 0;
-    block-size: var(--ui-tabs-indicator-thickness);
-    border-start-start-radius: var(--ui-tabs-indicator-thickness);
-    border-start-end-radius: var(--ui-tabs-indicator-thickness);
-    background-color: transparent;
-    @include mixins.transition(background-color);
-  }
-
-  &:hover:not(:disabled) {
-    color: var(--ui-tabs-text-hover);
-  }
-
-  &:disabled {
-    color: var(--ui-color-text-disabled);
-    cursor: not-allowed;
-  }
+  @include tab-styles.tab(':disabled');
 }
 
 .ui-tabs__tab--selected {
-  color: var(--ui-tabs-text-selected);
-
-  &:hover:not(:disabled) {
-    color: var(--ui-tabs-text-selected);
-  }
-
-  &::after {
-    background-color: var(--ui-tabs-indicator);
-  }
+  @include tab-styles.selected;
 }
 
 .ui-tabs__panel {
@@ -79,11 +27,5 @@
 
   &[hidden] {
     display: none;
-  }
-}
-
-@media (forced-colors: active) {
-  .ui-tabs__tab--selected::after {
-    background-color: Highlight;
   }
 }

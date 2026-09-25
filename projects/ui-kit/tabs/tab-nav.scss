@@ -1,0 +1,15 @@
+// Shared by ui-tab-nav and ui-tab-link; each rule matches only its own host class.
+@use 'tab-styles';
+
+:host(.ui-tab-nav) {
+  font-family: var(--ui-font-family-sans);
+  @include tab-styles.list;
+}
+
+:host(.ui-tab-link) {
+  @include tab-styles.tab('[aria-disabled="true"]');
+}
+
+:host(.ui-tab-link--active) {
+  @include tab-styles.selected;
+}
