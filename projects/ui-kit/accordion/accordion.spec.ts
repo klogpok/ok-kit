@@ -152,3 +152,40 @@ describe('UiAccordion', () => {
     expect(expanded()).toEqual(['false', 'false', 'false']);
   });
 });
+
+@Component({
+  imports: [UiAccordion, UiAccordionItem],
+  template: `
+    <ui-accordion>
+      <div><ui-accordion-item id="a" label="A" /></div>
+      <ui-accordion-item id="b" label="B" [expanded]="true">
+        <ui-accordion>
+          <ui-accordion-item id="nested" label="Nested" />
+        </ui-accordion>
+      </ui-accordion-item>
+      <section><ui-accordion-item id="c" label="C" /></section>
+    </ui-accordion>
+  `,
+})
+class WrappedHost {}
+
+describe('UiAccordion with wrapped and nested items', () => {
+  it('moves between its own items, also inside wrappers, and skips nested accordions', () => {
+    const fixture = TestBed.createComponent(WrappedHost);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    const trigger = (id: string) =>
+      (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(`#${id} button`)!;
+    const press = (target: HTMLElement) =>
+      target.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', keyCode: 40, bubbles: true }),
+      );
+
+    trigger('a').focus();
+    press(trigger('a'));
+    expect(document.activeElement).toBe(trigger('b'));
+    press(trigger('b'));
+    expect(document.activeElement).toBe(trigger('c'));
+    (fixture.nativeElement as HTMLElement).remove();
+  });
+});

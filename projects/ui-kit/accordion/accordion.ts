@@ -8,6 +8,7 @@ import {
   Injector,
   Signal,
   TemplateRef,
+  computed,
   contentChild,
   contentChildren,
   inject,
@@ -39,9 +40,23 @@ const HEADER_KEYS = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End']);
 class UiAccordionNavigation {
   private readonly injector = inject(Injector);
   private keyManager: FocusKeyManager<FocusableOption> | null = null;
+  /** Items of this accordion, not of an accordion nested in one of them. */
+  private readonly own = new Set<FocusableOption>();
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.keyManager?.destroy());
+  }
+
+  register(item: FocusableOption): void {
+    this.own.add(item);
+  }
+
+  unregister(item: FocusableOption): void {
+    this.own.delete(item);
+  }
+
+  owns(item: FocusableOption): boolean {
+    return this.own.has(item);
   }
 
   setItems(items: Signal<readonly FocusableOption[]>): void {
@@ -139,7 +154,11 @@ export class UiAccordionItem implements FocusableOption {
 
   constructor() {
     const sub = this.item.opened.subscribe(() => this.rendered.set(true));
-    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
+    this.accordion?.register(this);
+    inject(DestroyRef).onDestroy(() => {
+      sub.unsubscribe();
+      this.accordion?.unregister(this);
+    });
   }
 
   get expanded(): boolean {
@@ -199,10 +218,15 @@ export class UiAccordionItem implements FocusableOption {
 })
 export class UiAccordion {
   private readonly cdkAccordion = inject(CdkAccordion);
-  private readonly items = contentChildren(UiAccordionItem);
+  private readonly navigation = inject(UiAccordionNavigation);
+  // Items may sit in wrapper elements; items of nested accordions belong to those.
+  private readonly allItems = contentChildren(UiAccordionItem, { descendants: true });
+  private readonly items = computed(() =>
+    this.allItems().filter((item) => this.navigation.owns(item)),
+  );
 
   constructor() {
-    inject(UiAccordionNavigation).setItems(this.items);
+    this.navigation.setItems(this.items);
   }
 
   /** Opens every enabled item. Only works with `multi`. */
