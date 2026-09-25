@@ -1,0 +1,117 @@
+<h2 class="ui-heading-3">Phase 3</h2>
+
+<section aria-labelledby="plans-table-title">
+  <h3 id="plans-table-title" class="ui-heading-4">Plans table</h3>
+  <div class="row">
+    <button ui-button variant="secondary" [loading]="loading()" (click)="reload()">Reload</button>
+    <ui-switch [(checked)]="empty">No results</ui-switch>
+  </div>
+  <div class="scroll">
+    <table ui-table uiSort [(sort)]="sort" [loading]="loading()" density="compact">
+      <caption class="ui-visually-hidden">
+        Plans
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col" ui-sort-header="name">Name</th>
+          <th scope="col" ui-sort-header="owner">Owner</th>
+          <th scope="col" ui-sort-header="units" class="ui-table-numeric">Units</th>
+          <th scope="col">Status</th>
+          <th scope="col"><span class="ui-visually-hidden">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading() && !page().length) {
+          @for (row of [1, 2, 3]; track row) {
+            <tr ui-table-skeleton></tr>
+          }
+        } @else {
+          @for (plan of page(); track plan.id) {
+            <tr>
+              <td>{{ plan.name }}</td>
+              <td>{{ plan.owner }}</td>
+              <td class="ui-table-numeric">{{ plan.units }}</td>
+              <td>
+                <ui-badge [tone]="plan.tone">{{ plan.status }}</ui-badge>
+              </td>
+              <td class="ui-table-numeric">
+                <button
+                  ui-icon-button
+                  size="sm"
+                  [label]="'Actions for ' + plan.name"
+                  [uiMenuTriggerFor]="actions"
+                  [uiMenuTriggerData]="{ plan }"
+                >
+                  <ui-icon icon="more-horizontal" />
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr ui-table-message>
+              No plans match the filter
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (rows().length) {
+    <ui-pagination
+      [length]="rows().length"
+      [(pageIndex)]="pageIndex"
+      [(pageSize)]="pageSize"
+      [pageSizeOptions]="[5, 10, 25]"
+    />
+  }
+
+  <ng-template #actions let-plan="plan">
+    <ui-menu>
+      <button ui-menu-item (triggered)="act('Open', plan)"><ui-icon icon="eye" /> Open</button>
+      <button ui-menu-item [uiMenuTriggerFor]="send" [uiMenuTriggerData]="{ plan }">Send to</button>
+      <ui-divider />
+      <button ui-menu-item danger (triggered)="act('Delete', plan)">
+        <ui-icon icon="trash" /> Delete
+      </button>
+    </ui-menu>
+  </ng-template>
+  <ng-template #send let-plan="plan">
+    <ui-menu>
+      <button ui-menu-item (triggered)="act('Sent to the coordinator', plan)">Coordinator</button>
+      <button ui-menu-item (triggered)="act('Sent to the owner', plan)">Owner</button>
+    </ui-menu>
+  </ng-template>
+</section>
+
+<div class="grid">
+  <section aria-labelledby="schedule-title">
+    <h3 id="schedule-title" class="ui-heading-4">Schedule a meeting (Signal Forms)</h3>
+    <ui-form-field label="Recipients">
+      <ui-multi-select placeholder="Choose recipients" searchable [formField]="schedule.recipients">
+        @for (owner of owners; track owner) {
+          <ui-option [value]="owner">{{ owner }}</ui-option>
+        }
+      </ui-multi-select>
+    </ui-form-field>
+    <ui-form-field label="Meeting date" hint="Sunday to Thursday">
+      <ui-datepicker [formField]="schedule.meeting" [dateFilter]="workdays" />
+    </ui-form-field>
+    <pre dir="ltr">{{ model() | json }}</pre>
+  </section>
+
+  <section aria-labelledby="details-title">
+    <h3 id="details-title" class="ui-heading-4">Plan details</h3>
+    <ui-accordion>
+      <ui-accordion-item label="Owner and address" headingLevel="4" expanded>
+        Dana Levi, 12 Herzl St., Haifa.
+      </ui-accordion-item>
+      <ui-accordion-item label="Documents" headingLevel="4">
+        <ng-template uiAccordionContent>Drawings, permits and signed forms.</ng-template>
+      </ui-accordion-item>
+      <ui-accordion-item label="History" headingLevel="4">
+        <div aria-busy="true" aria-label="Loading the history">
+          <ui-skeleton lines="3" />
+        </div>
+      </ui-accordion-item>
+    </ui-accordion>
+  </section>
+</div>

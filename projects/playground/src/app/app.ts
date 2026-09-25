@@ -24,6 +24,7 @@ import { UiTab, UiTabGroup, UiTabLabel } from '@vplans/ui-kit/tabs';
 import { ThemeService } from '@vplans/ui-kit/theme';
 import { UiToast } from '@vplans/ui-kit/toast';
 import { UiTooltip } from '@vplans/ui-kit/tooltip';
+import { PhaseThree } from './phase-three';
 
 interface Plan {
   name: string;
@@ -61,6 +62,7 @@ interface Plan {
     UiTab,
     UiTabLabel,
     UiTooltip,
+    PhaseThree,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
