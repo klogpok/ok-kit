@@ -74,13 +74,15 @@ export class UiTooltipPanel {
   }
 }
 
-/**
- * Tells the host component whether the tooltip is active, kept out of the public `UiTooltip`
- * API. `UiTooltip` sets `active` in its constructor, before any host binding reads it. Internal.
- */
+/** Tells the host component whether the tooltip is active, kept out of the public `UiTooltip` API. Internal. */
 @Injectable()
 class UiTooltipHostState implements UiTooltipHost {
-  active: Signal<boolean> = signal(false);
+  private readonly message = signal<Signal<string>>(signal(''));
+  readonly active = computed(() => !!this.message()());
+
+  connect(message: Signal<string>): void {
+    this.message.set(message);
+  }
 }
 
 /**
@@ -137,7 +139,7 @@ export class UiTooltip {
   private describedMessage = '';
 
   constructor() {
-    inject(UiTooltipHostState).active = computed(() => !!this.effectiveMessage());
+    inject(UiTooltipHostState).connect(this.effectiveMessage);
 
     // Keeps aria-describedby and an open tooltip in sync with the message.
     effect(() => {
