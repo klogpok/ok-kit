@@ -208,6 +208,9 @@ theme.setMode('dark'); // persisted in localStorage
 theme.toggle();
 ```
 
+`provideUiTheme()` applies the stored mode when the app starts. Without it, the mode is applied only
+once something injects `ThemeService`.
+
 Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
 `:root`, on every `[data-theme]` element and on `.ui-theme-scope`, so they follow the theme of
 the nearest scope:

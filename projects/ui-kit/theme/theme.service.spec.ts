@@ -46,6 +46,14 @@ describe('ThemeService', () => {
     expect(root.getAttribute('data-theme')).toBe('dark');
   });
 
+  it('applies the persisted mode on startup without injecting the service', () => {
+    localStorage.setItem('ui-theme', 'dark');
+    TestBed.configureTestingModule({ providers: [provideUiTheme({})] });
+    TestBed.inject(DOCUMENT);
+    TestBed.tick();
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+
   it('ignores invalid persisted values', () => {
     localStorage.setItem('ui-theme', 'purple');
     expect(create().mode()).toBe('system');

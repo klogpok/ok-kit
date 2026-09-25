@@ -8,6 +8,7 @@ import {
   effect,
   inject,
   makeEnvironmentProviders,
+  provideEnvironmentInitializer,
   signal,
 } from '@angular/core';
 
@@ -26,9 +27,16 @@ export const UI_THEME_OPTIONS = new InjectionToken<UiThemeOptions>('UiThemeOptio
   factory: () => ({}),
 });
 
-/** Configures the ThemeService. Optional: the service works with defaults without it. */
-export function provideUiTheme(options: UiThemeOptions): EnvironmentProviders {
-  return makeEnvironmentProviders([{ provide: UI_THEME_OPTIONS, useValue: options }]);
+/**
+ * Configures the ThemeService and applies the stored mode on startup, so the theme is right even
+ * when nothing injects the service until later (e.g. only a settings page does). Without it the
+ * service still works with defaults, but applies the mode only once it is first injected.
+ */
+export function provideUiTheme(options: UiThemeOptions = {}): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    { provide: UI_THEME_OPTIONS, useValue: options },
+    provideEnvironmentInitializer(() => inject(ThemeService)),
+  ]);
 }
 
 const MODES: readonly UiThemeMode[] = ['light', 'dark', 'system'];
