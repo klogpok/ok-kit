@@ -10,7 +10,9 @@
   background-color: var(--ui-card-bg);
   color: var(--ui-color-text);
   font-family: var(--ui-font-family-sans);
-  overflow: hidden;
+  // Clips the content to the radius without creating a scroll container, so a sticky table
+  // header inside still sticks to the page.
+  overflow: clip;
 }
 
 :host(.ui-card--elevated) {
