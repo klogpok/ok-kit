@@ -150,6 +150,48 @@ describe('UiToast', () => {
     outside.remove();
   });
 
+  it('keeps the timers running after a mouse click closes a toast', () => {
+    toast.show('First');
+    toast.show('Second');
+    render();
+    const [first, second] = items().map((item) =>
+      item.querySelector<HTMLElement>('.ui-toast__close')!,
+    );
+    first.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, buttons: 1, detail: 1 }));
+    first.focus();
+    first.click();
+    render();
+    expect(document.activeElement).not.toBe(second);
+    vi.advanceTimersByTime(1000);
+    expect(toast.active()).toHaveLength(0);
+  });
+
+  it('keeps keyboard focus when the focused toast is dropped beyond the maximum', () => {
+    toast.show('One');
+    toast.show('Two');
+    render();
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    const [one, two] = items().map((item) => item.querySelector<HTMLElement>('.ui-toast__close')!);
+    one.focus();
+    toast.show('Three');
+    render();
+    expect(document.activeElement).toBe(two);
+  });
+
+  it('returns focus to where it came from when all toasts are dismissed', () => {
+    const outside = document.createElement('button');
+    document.body.appendChild(outside);
+    toast.show('One');
+    toast.show('Two');
+    render();
+    outside.focus();
+    items()[1].querySelector<HTMLElement>('.ui-toast__close')!.focus();
+    toast.dismissAll();
+    render();
+    expect(document.activeElement).toBe(outside);
+    outside.remove();
+  });
+
   it('runs the action and then dismisses', () => {
     const onAction = vi.fn();
     const reasons: UiToastDismissReason[] = [];

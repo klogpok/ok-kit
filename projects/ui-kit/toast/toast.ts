@@ -2,16 +2,18 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  DestroyRef,
   ElementRef,
   EnvironmentProviders,
   Injectable,
   InjectionToken,
   Injector,
+  afterNextRender,
   inject,
   makeEnvironmentProviders,
   signal,
 } from '@angular/core';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { InputModalityDetector, LiveAnnouncer } from '@angular/cdk/a11y';
 import { OverlayRef, createGlobalPositionStrategy, createOverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { _CdkPrivateStyleLoader, _VisuallyHiddenLoader } from '@angular/cdk/private';
@@ -124,11 +126,13 @@ function finish(ref: UiToastRef, reason: UiToastDismissReason): void {
   state.actions.complete();
 }
 
-/** What the container may do with the stack, kept out of the public `UiToast` API. */
+/** Links between the stack and its container, kept out of the public `UiToast` API. */
 interface UiToastControl {
   close(ref: UiToastRef): void;
   pause(source: 'pointer' | 'focus'): void;
   resume(source: 'pointer' | 'focus'): void;
+  /** Set by the container: called before a toast leaves the DOM, for any reason. */
+  beforeRemove?: (ref: UiToastRef) => void;
 }
 
 const UI_TOAST_CONTROL = new InjectionToken<UiToastControl>('UiToastControl');
@@ -162,8 +166,8 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
   selector: 'ui-toast-container',
   imports: [UiIcon, UiButton, UiIconButton],
   template: `
-    @for (toast of toasts.active(); track toast.ref.id; let index = $index) {
-      <div class="ui-toast" [class]="'ui-toast--' + toast.tone">
+    @for (toast of toasts.active(); track toast.ref.id) {
+      <div class="ui-toast" [class]="'ui-toast--' + toast.tone" [attr.data-toast-id]="toast.ref.id">
         <span class="ui-toast__icon"><ui-icon size="md" [icon]="icons[toast.tone]" /></span>
         <div class="ui-toast__body">
           @if (toast.title) {
@@ -179,7 +183,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
                 variant="ghost"
                 size="sm"
                 class="ui-toast__action"
-                (click)="dismiss(toast, index, 'action')"
+                (click)="triggerAction(toast)"
               >
                 {{ toast.action }}
               </button>
@@ -191,7 +195,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
                 size="sm"
                 class="ui-toast__close"
                 [label]="labels().close"
-                (click)="dismiss(toast, index, 'close')"
+                (click)="control.close(toast.ref)"
               >
                 <ui-icon size="sm" [icon]="closeIcon" />
               </button>
@@ -223,8 +227,15 @@ export class UiToastContainer {
   protected readonly closeIcon = uiIconX;
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly document = inject(DOCUMENT);
+  private readonly modality = inject(InputModalityDetector);
+  private readonly injector = inject(Injector);
   /** Where focus came from when it entered the stack. */
   private returnTo: HTMLElement | null = null;
+
+  constructor() {
+    this.control.beforeRemove = (ref) => this.keepFocus(ref);
+    inject(DestroyRef).onDestroy(() => (this.control.beforeRemove = undefined));
+  }
 
   protected onFocusIn(event: FocusEvent): void {
     const from = event.relatedTarget;
@@ -232,22 +243,50 @@ export class UiToastContainer {
     this.control.pause('focus');
   }
 
+  protected triggerAction(toast: UiToastItem): void {
+    triggerAction(toast.ref);
+  }
+
   /**
-   * Keeps keyboard focus when the focused toast goes away: it moves to the neighbouring toast,
-   * or back to where it came from when this was the last one.
+   * Keeps keyboard focus when the focused toast goes away (closed, dropped beyond the maximum or
+   * dismissed in code): it moves to the neighbouring toast, or back to where it came from when
+   * this was the last one. After a mouse or touch close, focus just leaves the stack, so the
+   * other toasts do not stay paused.
    */
-  protected dismiss(toast: UiToastItem, index: number, reason: 'action' | 'close'): void {
-    if (this.host.contains(this.document.activeElement)) {
-      const items = this.host.querySelectorAll<HTMLElement>('.ui-toast');
-      const neighbour = items[index + 1] ?? items[index - 1];
-      const target =
-        neighbour?.querySelector<HTMLElement>('.ui-toast__close') ??
-        neighbour?.querySelector<HTMLElement>('button') ??
-        (this.returnTo?.isConnected ? this.returnTo : null);
-      target?.focus();
+  private keepFocus(ref: UiToastRef): void {
+    const toast = this.host.querySelector<HTMLElement>(`[data-toast-id="${ref.id}"]`);
+    const active = this.document.activeElement;
+    if (!toast || !(active instanceof HTMLElement) || !toast.contains(active)) return;
+    const pointer = this.modality.mostRecentModality;
+    if (pointer === 'mouse' || pointer === 'touch') {
+      active.blur();
+      return;
     }
-    if (reason === 'action') triggerAction(toast.ref);
-    else this.control.close(toast.ref);
+    // The next toast, else the previous one, among those that stay (dismissAll removes in turn).
+    const staying = new Set(this.toasts.active().map((item) => item.ref.id));
+    staying.delete(ref.id);
+    const all = [...this.host.querySelectorAll<HTMLElement>('.ui-toast')];
+    const index = all.indexOf(toast);
+    const sibling = [...all.slice(index + 1), ...all.slice(0, index).reverse()].find((el) =>
+      staying.has(Number(el.dataset['toastId'])),
+    );
+    const target =
+      sibling?.querySelector<HTMLElement>('.ui-toast__close') ??
+      sibling?.querySelector<HTMLElement>('button') ??
+      (this.returnTo?.isConnected ? this.returnTo : null);
+    if (!target) {
+      active.blur();
+      return;
+    }
+    target.focus();
+    // Rendering the new list may move the target's toast in the DOM, which drops focus.
+    afterNextRender(
+      () => {
+        const now = this.document.activeElement;
+        if (target.isConnected && (!now || now === this.document.body)) target.focus();
+      },
+      { injector: this.injector },
+    );
   }
 
   protected onFocusOut(event: FocusEvent): void {
@@ -372,6 +411,7 @@ export class UiToast {
 
   private remove(ref: UiToastRef, reason: UiToastDismissReason): void {
     if (!this.items().some((item) => item.ref === ref)) return;
+    this.control.beforeRemove?.(ref);
     clearTimeout(this.timers.get(ref)?.handle);
     this.timers.delete(ref);
     this.items.update((items) => items.filter((item) => item.ref !== ref));
