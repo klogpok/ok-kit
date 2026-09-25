@@ -71,17 +71,18 @@ export class ThemeService {
       const root = this.document.documentElement;
       if (mode === 'system') root.removeAttribute('data-theme');
       else root.setAttribute('data-theme', mode);
-      this.writeStored(mode);
     });
   }
 
+  /** Sets and stores the mode. Until then nothing is stored, so a new `defaultMode` applies. */
   setMode(mode: UiThemeMode): void {
     this.modeState.set(mode);
+    this.writeStored(mode);
   }
 
   /** Toggles between light and dark, leaving `system` mode. */
   toggle(): void {
-    this.modeState.set(this.theme() === 'dark' ? 'light' : 'dark');
+    this.setMode(this.theme() === 'dark' ? 'light' : 'dark');
   }
 
   private readStored(): UiThemeMode | null {

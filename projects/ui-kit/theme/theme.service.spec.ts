@@ -24,6 +24,12 @@ describe('ThemeService', () => {
     expect(root.hasAttribute('data-theme')).toBe(false);
   });
 
+  it('stores nothing until the mode is chosen, so a new default applies', () => {
+    create({ defaultMode: 'light' });
+    expect(localStorage.getItem('ui-theme')).toBeNull();
+    expect(root.getAttribute('data-theme')).toBe('light');
+  });
+
   it('applies and persists an explicit mode', () => {
     const service = create();
     service.setMode('dark');
