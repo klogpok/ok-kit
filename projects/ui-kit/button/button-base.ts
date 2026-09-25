@@ -5,10 +5,12 @@ import {
   afterEveryRender,
   booleanAttribute,
   computed,
+  effect,
   inject,
   input,
 } from '@angular/core';
-import { UiSize, UiVariant } from '@vplans/ui-kit/core';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { UI_LABELS, UiSize, UiVariant } from '@vplans/ui-kit/core';
 
 /** Shared behavior of `ui-button` and `ui-icon-button` on `<button>` and `<a>` hosts. */
 @Directive({
@@ -38,7 +40,8 @@ export abstract class UiButtonBase {
   readonly disabledInteractive = input(false, { transform: booleanAttribute });
   /**
    * Shows a spinner and blocks activation while keeping the button focusable
-   * (`aria-disabled` + `aria-busy`) so screen reader users keep their place.
+   * (`aria-disabled` + `aria-busy`) so screen reader users keep their place. The `loading`
+   * label is announced when it starts.
    */
   readonly loading = input(false, { transform: booleanAttribute });
 
@@ -75,6 +78,16 @@ export abstract class UiButtonBase {
       for (const type of types) {
         this.host.removeEventListener(type, blockWhileInert, { capture: true });
       }
+    });
+
+    // Screen readers ignore aria-busy on a button, so say that the action started.
+    const announcer = inject(LiveAnnouncer);
+    const labels = inject(UI_LABELS);
+    let wasLoading = false;
+    effect(() => {
+      const loading = this.loading();
+      if (loading && !wasLoading) void announcer.announce(labels().loading, 'polite');
+      wasLoading = loading;
     });
 
     // An inert link has no href, so Ctrl+click and "Open in new tab" do not navigate either.

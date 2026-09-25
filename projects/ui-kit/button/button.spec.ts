@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { UiVariant } from '@vplans/ui-kit/core';
 import { UiButton } from './button';
 import { UiIconButton } from './icon-button';
@@ -181,5 +182,24 @@ describe('UiIconButton', () => {
     expect(btn.classList).toContain('ui-button--icon');
     expect(btn.classList).toContain('ui-button--ghost');
     expect(btn.classList).toContain('ui-button--sm');
+  });
+});
+
+describe('UiButton loading announcement', () => {
+  it('announces the loading label when loading starts', async () => {
+    const announce = vi.fn(() => Promise.resolve());
+    TestBed.configureTestingModule({
+      providers: [{ provide: LiveAnnouncer, useValue: { announce } }],
+    });
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    expect(announce).not.toHaveBeenCalled();
+    fixture.componentInstance.loading.set(true);
+    await fixture.whenStable();
+    expect(announce).toHaveBeenCalledTimes(1);
+    expect(announce).toHaveBeenCalledWith('טוען', 'polite');
+    fixture.componentInstance.loading.set(false);
+    await fixture.whenStable();
+    expect(announce).toHaveBeenCalledTimes(1);
   });
 });
