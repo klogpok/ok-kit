@@ -20,6 +20,13 @@ const meta: Meta<PaginationArgs> = {
     size: { control: 'inline-radio', options: [10, 25, 50] },
     siblings: { control: { type: 'number', min: 0, max: 3 } },
   },
+};
+
+export default meta;
+type Story = StoryObj<PaginationArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: { total: 237, index: 0, size: 10, siblings: 1, firstLast: true, isDisabled: false },
   render: (args) => ({
     props: args,
@@ -36,31 +43,31 @@ const meta: Meta<PaginationArgs> = {
   }),
 };
 
-export default meta;
-type Story = StoryObj<PaginationArgs>;
+export const MiddlePage: Story = { ...Default, args: { ...Default.args, index: 11 } };
 
-export const Default: Story = {};
+export const FewPages: Story = { ...Default, args: { ...Default.args, total: 42 } };
 
-export const MiddlePage: Story = { args: { index: 11 } };
+export const Empty: Story = { ...Default, args: { ...Default.args, total: 0 } };
 
-export const FewPages: Story = { args: { total: 42 } };
-
-export const Empty: Story = { args: { total: 0 } };
-
-export const Disabled: Story = { args: { index: 3, isDisabled: true } };
+export const Disabled: Story = {
+  ...Default,
+  args: { ...Default.args, index: 3, isDisabled: true },
+};
 
 /** Without the page size select and the first/last buttons. */
 export const Compact: Story = {
-  render: () => ({
-    props: { index: 4 },
+  args: { index: 4 },
+  render: (args) => ({
+    props: args,
     template: `<ui-pagination [length]="120" [(pageIndex)]="index" [showFirstLast]="false" />`,
   }),
 };
 
 /** The kit defaults to Hebrew texts; chevrons point the other way in RTL. */
 export const Hebrew: Story = {
-  render: () => ({
-    props: { index: 2, size: 25 },
+  args: { index: 2, size: 25 },
+  render: (args) => ({
+    props: args,
     template: `
       <div dir="rtl" lang="he">
         <ui-pagination [length]="480" [(pageIndex)]="index" [(pageSize)]="size" [pageSizeOptions]="[25, 50, 100]" />
