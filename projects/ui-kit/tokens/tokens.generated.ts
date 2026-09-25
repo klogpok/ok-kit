@@ -782,52 +782,10 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "0 12px 24px -6px rgb(0 0 0 / 0.6)"
   },
   {
-    "name": "--ui-ref-z-base",
-    "layer": "primitive",
-    "light": "0",
-    "dark": "0"
-  },
-  {
-    "name": "--ui-ref-z-raised",
-    "layer": "primitive",
-    "light": "10",
-    "dark": "10"
-  },
-  {
-    "name": "--ui-ref-z-dropdown",
-    "layer": "primitive",
-    "light": "1000",
-    "dark": "1000"
-  },
-  {
     "name": "--ui-ref-z-sticky",
     "layer": "primitive",
     "light": "1100",
     "dark": "1100"
-  },
-  {
-    "name": "--ui-ref-z-overlay",
-    "layer": "primitive",
-    "light": "1200",
-    "dark": "1200"
-  },
-  {
-    "name": "--ui-ref-z-modal",
-    "layer": "primitive",
-    "light": "1300",
-    "dark": "1300"
-  },
-  {
-    "name": "--ui-ref-z-toast",
-    "layer": "primitive",
-    "light": "1400",
-    "dark": "1400"
-  },
-  {
-    "name": "--ui-ref-z-tooltip",
-    "layer": "primitive",
-    "light": "1500",
-    "dark": "1500"
   },
   {
     "name": "--ui-ref-duration-instant",
@@ -1244,46 +1202,10 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "2.5em"
   },
   {
-    "name": "--ui-z-raised",
-    "layer": "semantic",
-    "light": "10",
-    "dark": "10"
-  },
-  {
-    "name": "--ui-z-dropdown",
-    "layer": "semantic",
-    "light": "1000",
-    "dark": "1000"
-  },
-  {
     "name": "--ui-z-sticky",
     "layer": "semantic",
     "light": "1100",
     "dark": "1100"
-  },
-  {
-    "name": "--ui-z-overlay",
-    "layer": "semantic",
-    "light": "1200",
-    "dark": "1200"
-  },
-  {
-    "name": "--ui-z-modal",
-    "layer": "semantic",
-    "light": "1300",
-    "dark": "1300"
-  },
-  {
-    "name": "--ui-z-toast",
-    "layer": "semantic",
-    "light": "1400",
-    "dark": "1400"
-  },
-  {
-    "name": "--ui-z-tooltip",
-    "layer": "semantic",
-    "light": "1500",
-    "dark": "1500"
   },
   {
     "name": "--ui-motion-duration-instant",
@@ -1388,12 +1310,6 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#a7acaf"
   },
   {
-    "name": "--ui-color-text-subtle",
-    "layer": "semantic",
-    "light": "#636d7e",
-    "dark": "#a7acaf"
-  },
-  {
     "name": "--ui-color-text-disabled",
     "layer": "semantic",
     "light": "#a7acaf",
@@ -1464,12 +1380,6 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "semantic",
     "light": "#e9f4fc",
     "dark": "#0a2747"
-  },
-  {
-    "name": "--ui-color-primary-subtle-hover",
-    "layer": "semantic",
-    "light": "#d3e9fa",
-    "dark": "#0d3d6e"
   },
   {
     "name": "--ui-color-primary-text",
@@ -1566,24 +1476,6 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "semantic",
     "light": "#155ea6",
     "dark": "#4aa3ef"
-  },
-  {
-    "name": "--ui-color-info-contrast",
-    "layer": "semantic",
-    "light": "#ffffff",
-    "dark": "#111723"
-  },
-  {
-    "name": "--ui-color-info-subtle",
-    "layer": "semantic",
-    "light": "#e9f4fc",
-    "dark": "#0a2747"
-  },
-  {
-    "name": "--ui-color-info-text",
-    "layer": "semantic",
-    "light": "#004b9e",
-    "dark": "#72b8f2"
   },
   {
     "name": "--ui-color-focus-ring",
@@ -1768,8 +1660,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-input-placeholder",
     "layer": "component",
-    "light": "var(--ui-color-text-subtle)",
-    "dark": "var(--ui-color-text-subtle)"
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
   },
   {
     "name": "--ui-input-border",
@@ -2908,8 +2800,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-table-sort-icon",
     "layer": "component",
-    "light": "var(--ui-color-text-subtle)",
-    "dark": "var(--ui-color-text-subtle)"
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
   },
   {
     "name": "--ui-table-sort-icon-active",

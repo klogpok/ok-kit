@@ -10,6 +10,10 @@ so versions mark review points rather than releases.
 - **radio:** `compareWith` is called as `compareWith(option, selected)`, like `ui-select` and
   `ui-multi-select`. It was `(selected, option)`. It is typed `(option: T, selected: T) => boolean`
   on all three controls and is never called with `null`: a `null` value matches only `null`.
+- **tokens:** unused tokens are removed: `--ui-color-text-subtle` (use `--ui-color-text-muted`, the
+  same value), `--ui-color-primary-subtle-hover`, `--ui-color-info-contrast`,
+  `--ui-color-info-subtle`, `--ui-color-info-text`, and every `--ui-z-*` except `--ui-z-sticky`
+  (overlays use the browser top layer, so z-index does not order them).
 
 ### Changed behavior
 

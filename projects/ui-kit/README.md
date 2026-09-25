@@ -268,7 +268,6 @@ the nearest scope:
   --ui-color-primary-hover: var(--ui-ref-color-green-800);
   --ui-color-primary-active: var(--ui-ref-color-green-900);
   --ui-color-primary-subtle: var(--ui-ref-color-green-50);
-  --ui-color-primary-subtle-hover: var(--ui-ref-color-green-100);
   --ui-color-primary-text: var(--ui-ref-color-green-800);
 }
 ```
@@ -489,13 +488,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-em-6`                             | semantic  | `6em`                                                                        | `6em`                                                                  |
 | `--ui-em-0-8`                           | semantic  | `0.8em`                                                                      | `0.8em`                                                                |
 | `--ui-em-2-5`                           | semantic  | `2.5em`                                                                      | `2.5em`                                                                |
-| `--ui-z-raised`                         | semantic  | `10`                                                                         | `10`                                                                   |
-| `--ui-z-dropdown`                       | semantic  | `1000`                                                                       | `1000`                                                                 |
 | `--ui-z-sticky`                         | semantic  | `1100`                                                                       | `1100`                                                                 |
-| `--ui-z-overlay`                        | semantic  | `1200`                                                                       | `1200`                                                                 |
-| `--ui-z-modal`                          | semantic  | `1300`                                                                       | `1300`                                                                 |
-| `--ui-z-toast`                          | semantic  | `1400`                                                                       | `1400`                                                                 |
-| `--ui-z-tooltip`                        | semantic  | `1500`                                                                       | `1500`                                                                 |
 | `--ui-motion-duration-instant`          | semantic  | `50ms`                                                                       | `50ms`                                                                 |
 | `--ui-motion-duration-fast`             | semantic  | `120ms`                                                                      | `120ms`                                                                |
 | `--ui-motion-duration-normal`           | semantic  | `200ms`                                                                      | `200ms`                                                                |
@@ -513,7 +506,6 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-surface-emphasis`           | semantic  | `#cdd2db`                                                                    | `#4a5466`                                                              |
 | `--ui-color-text`                       | semantic  | `#1d2535`                                                                    | `#f8f9fb`                                                              |
 | `--ui-color-text-muted`                 | semantic  | `#636d7e`                                                                    | `#a7acaf`                                                              |
-| `--ui-color-text-subtle`                | semantic  | `#636d7e`                                                                    | `#a7acaf`                                                              |
 | `--ui-color-text-disabled`              | semantic  | `#a7acaf`                                                                    | `#636d7e`                                                              |
 | `--ui-color-text-inverse`               | semantic  | `#ffffff`                                                                    | `#1d2535`                                                              |
 | `--ui-color-border`                     | semantic  | `#e4e7ed`                                                                    | `#4a5466`                                                              |
@@ -526,7 +518,6 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-primary-active`             | semantic  | `#004b9e`                                                                    | `#a8d3f6`                                                              |
 | `--ui-color-primary-contrast`           | semantic  | `#ffffff`                                                                    | `#111723`                                                              |
 | `--ui-color-primary-subtle`             | semantic  | `#e9f4fc`                                                                    | `#0a2747`                                                              |
-| `--ui-color-primary-subtle-hover`       | semantic  | `#d3e9fa`                                                                    | `#0d3d6e`                                                              |
 | `--ui-color-primary-text`               | semantic  | `#155ea6`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-danger`                     | semantic  | `#dc2626`                                                                    | `#f87171`                                                              |
 | `--ui-color-danger-hover`               | semantic  | `#b91c1c`                                                                    | `#fca5a5`                                                              |
@@ -543,9 +534,6 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-warning-subtle`             | semantic  | `#faf8e8`                                                                    | `#29230a`                                                              |
 | `--ui-color-warning-text`               | semantic  | `#554c1a`                                                                    | `#d4c65a`                                                              |
 | `--ui-color-info`                       | semantic  | `#155ea6`                                                                    | `#4aa3ef`                                                              |
-| `--ui-color-info-contrast`              | semantic  | `#ffffff`                                                                    | `#111723`                                                              |
-| `--ui-color-info-subtle`                | semantic  | `#e9f4fc`                                                                    | `#0a2747`                                                              |
-| `--ui-color-info-text`                  | semantic  | `#004b9e`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-focus-ring`                 | semantic  | `#1a74c9`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-backdrop`                   | semantic  | `rgb(15 23 42 / 0.5)`                                                        | `rgb(0 0 0 / 0.6)`                                                     |
 | `--ui-shadow-sm`                        | semantic  | `0 1px 2px 0 rgb(15 23 42 / 0.06)`                                           | `0 1px 2px 0 rgb(0 0 0 / 0.4)`                                         |
@@ -576,7 +564,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-input-bg`                         | component | `var(--ui-color-control-bg)`                                                 | `var(--ui-color-control-bg)`                                           |
 | `--ui-input-bg-disabled`                | component | `var(--ui-color-control-bg-disabled)`                                        | `var(--ui-color-control-bg-disabled)`                                  |
 | `--ui-input-text`                       | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
-| `--ui-input-placeholder`                | component | `var(--ui-color-text-subtle)`                                                | `var(--ui-color-text-subtle)`                                          |
+| `--ui-input-placeholder`                | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-input-border`                     | component | `var(--ui-color-border-control)`                                             | `var(--ui-color-border-control)`                                       |
 | `--ui-input-border-hover`               | component | `var(--ui-color-border-control-hover)`                                       | `var(--ui-color-border-control-hover)`                                 |
 | `--ui-input-border-focus`               | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
@@ -766,7 +754,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-cell-padding-block-compact` | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
 | `--ui-table-message-padding`            | component | `var(--ui-space-2xl)`                                                        | `var(--ui-space-2xl)`                                                  |
 | `--ui-table-message-text`               | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
-| `--ui-table-sort-icon`                  | component | `var(--ui-color-text-subtle)`                                                | `var(--ui-color-text-subtle)`                                          |
+| `--ui-table-sort-icon`                  | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-sort-icon-active`           | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
 | `--ui-calendar-cell-size`               | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
 | `--ui-calendar-cell-radius`             | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |

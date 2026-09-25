@@ -129,14 +129,7 @@
   --ui-ref-shadow-dark-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --ui-ref-shadow-dark-md: 0 4px 8px -2px rgb(0 0 0 / 0.5);
   --ui-ref-shadow-dark-lg: 0 12px 24px -6px rgb(0 0 0 / 0.6);
-  --ui-ref-z-base: 0;
-  --ui-ref-z-raised: 10;
-  --ui-ref-z-dropdown: 1000;
   --ui-ref-z-sticky: 1100;
-  --ui-ref-z-overlay: 1200;
-  --ui-ref-z-modal: 1300;
-  --ui-ref-z-toast: 1400;
-  --ui-ref-z-tooltip: 1500;
   --ui-ref-duration-instant: 50ms;
   --ui-ref-duration-fast: 120ms;
   --ui-ref-duration-normal: 200ms;
@@ -206,13 +199,7 @@
   --ui-em-6: var(--ui-ref-em-6);
   --ui-em-0-8: var(--ui-ref-em-0-8);
   --ui-em-2-5: var(--ui-ref-em-2-5);
-  --ui-z-raised: var(--ui-ref-z-raised);
-  --ui-z-dropdown: var(--ui-ref-z-dropdown);
   --ui-z-sticky: var(--ui-ref-z-sticky);
-  --ui-z-overlay: var(--ui-ref-z-overlay);
-  --ui-z-modal: var(--ui-ref-z-modal);
-  --ui-z-toast: var(--ui-ref-z-toast);
-  --ui-z-tooltip: var(--ui-ref-z-tooltip);
   --ui-motion-duration-instant: var(--ui-ref-duration-instant);
   --ui-motion-duration-fast: var(--ui-ref-duration-fast);
   --ui-motion-duration-normal: var(--ui-ref-duration-normal);
@@ -235,7 +222,6 @@
   --ui-color-surface-emphasis: var(--ui-ref-color-gray-300);
   --ui-color-text: var(--ui-ref-color-gray-900);
   --ui-color-text-muted: var(--ui-ref-color-gray-600);
-  --ui-color-text-subtle: var(--ui-ref-color-gray-600);
   --ui-color-text-disabled: var(--ui-ref-color-gray-400);
   --ui-color-text-inverse: var(--ui-ref-color-white);
   --ui-color-border: var(--ui-ref-color-gray-200);
@@ -248,7 +234,6 @@
   --ui-color-primary-active: var(--ui-ref-color-brand-800);
   --ui-color-primary-contrast: var(--ui-ref-color-white);
   --ui-color-primary-subtle: var(--ui-ref-color-brand-50);
-  --ui-color-primary-subtle-hover: var(--ui-ref-color-brand-100);
   --ui-color-primary-text: var(--ui-ref-color-brand-700);
   --ui-color-danger: var(--ui-ref-color-red-600);
   --ui-color-danger-hover: var(--ui-ref-color-red-700);
@@ -265,9 +250,6 @@
   --ui-color-warning-subtle: var(--ui-ref-color-olive-50);
   --ui-color-warning-text: var(--ui-ref-color-olive-800);
   --ui-color-info: var(--ui-ref-color-brand-700);
-  --ui-color-info-contrast: var(--ui-ref-color-white);
-  --ui-color-info-subtle: var(--ui-ref-color-brand-50);
-  --ui-color-info-text: var(--ui-ref-color-brand-800);
   --ui-color-focus-ring: var(--ui-ref-color-brand-600);
   --ui-color-backdrop: var(--ui-ref-color-scrim-light);
   --ui-shadow-sm: var(--ui-ref-shadow-sm);
@@ -289,7 +271,6 @@
     --ui-color-surface-emphasis: var(--ui-ref-color-gray-700);
     --ui-color-text: var(--ui-ref-color-gray-50);
     --ui-color-text-muted: var(--ui-ref-color-gray-400);
-    --ui-color-text-subtle: var(--ui-ref-color-gray-400);
     --ui-color-text-disabled: var(--ui-ref-color-gray-600);
     --ui-color-text-inverse: var(--ui-ref-color-gray-900);
     --ui-color-border: var(--ui-ref-color-gray-700);
@@ -302,7 +283,6 @@
     --ui-color-primary-active: var(--ui-ref-color-brand-200);
     --ui-color-primary-contrast: var(--ui-ref-color-gray-950);
     --ui-color-primary-subtle: var(--ui-ref-color-brand-950);
-    --ui-color-primary-subtle-hover: var(--ui-ref-color-brand-900);
     --ui-color-primary-text: var(--ui-ref-color-brand-300);
     --ui-color-danger: var(--ui-ref-color-red-400);
     --ui-color-danger-hover: var(--ui-ref-color-red-300);
@@ -319,9 +299,6 @@
     --ui-color-warning-subtle: var(--ui-ref-color-olive-950);
     --ui-color-warning-text: var(--ui-ref-color-olive-300);
     --ui-color-info: var(--ui-ref-color-brand-400);
-    --ui-color-info-contrast: var(--ui-ref-color-gray-950);
-    --ui-color-info-subtle: var(--ui-ref-color-brand-950);
-    --ui-color-info-text: var(--ui-ref-color-brand-300);
     --ui-color-focus-ring: var(--ui-ref-color-brand-300);
     --ui-color-backdrop: var(--ui-ref-color-scrim-dark);
     --ui-shadow-sm: var(--ui-ref-shadow-dark-sm);
@@ -342,7 +319,6 @@
   --ui-color-surface-emphasis: var(--ui-ref-color-gray-700);
   --ui-color-text: var(--ui-ref-color-gray-50);
   --ui-color-text-muted: var(--ui-ref-color-gray-400);
-  --ui-color-text-subtle: var(--ui-ref-color-gray-400);
   --ui-color-text-disabled: var(--ui-ref-color-gray-600);
   --ui-color-text-inverse: var(--ui-ref-color-gray-900);
   --ui-color-border: var(--ui-ref-color-gray-700);
@@ -355,7 +331,6 @@
   --ui-color-primary-active: var(--ui-ref-color-brand-200);
   --ui-color-primary-contrast: var(--ui-ref-color-gray-950);
   --ui-color-primary-subtle: var(--ui-ref-color-brand-950);
-  --ui-color-primary-subtle-hover: var(--ui-ref-color-brand-900);
   --ui-color-primary-text: var(--ui-ref-color-brand-300);
   --ui-color-danger: var(--ui-ref-color-red-400);
   --ui-color-danger-hover: var(--ui-ref-color-red-300);
@@ -372,9 +347,6 @@
   --ui-color-warning-subtle: var(--ui-ref-color-olive-950);
   --ui-color-warning-text: var(--ui-ref-color-olive-300);
   --ui-color-info: var(--ui-ref-color-brand-400);
-  --ui-color-info-contrast: var(--ui-ref-color-gray-950);
-  --ui-color-info-subtle: var(--ui-ref-color-brand-950);
-  --ui-color-info-text: var(--ui-ref-color-brand-300);
   --ui-color-focus-ring: var(--ui-ref-color-brand-300);
   --ui-color-backdrop: var(--ui-ref-color-scrim-dark);
   --ui-shadow-sm: var(--ui-ref-shadow-dark-sm);
@@ -415,7 +387,7 @@
   --ui-input-bg: var(--ui-color-control-bg);
   --ui-input-bg-disabled: var(--ui-color-control-bg-disabled);
   --ui-input-text: var(--ui-color-text);
-  --ui-input-placeholder: var(--ui-color-text-subtle);
+  --ui-input-placeholder: var(--ui-color-text-muted);
   --ui-input-border: var(--ui-color-border-control);
   --ui-input-border-hover: var(--ui-color-border-control-hover);
   --ui-input-border-focus: var(--ui-color-primary);
@@ -605,7 +577,7 @@
   --ui-table-cell-padding-block-compact: var(--ui-space-xs);
   --ui-table-message-padding: var(--ui-space-2xl);
   --ui-table-message-text: var(--ui-color-text-muted);
-  --ui-table-sort-icon: var(--ui-color-text-subtle);
+  --ui-table-sort-icon: var(--ui-color-text-muted);
   --ui-table-sort-icon-active: var(--ui-color-primary-text);
   --ui-calendar-cell-size: var(--ui-control-height-md);
   --ui-calendar-cell-radius: var(--ui-radius-full);
