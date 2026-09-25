@@ -73,19 +73,44 @@ describe('UiToast', () => {
     expect(toast.active()).toHaveLength(0);
   });
 
+  const pointer = (type: string, pointerType: string) =>
+    Object.assign(new MouseEvent(type), { pointerType });
+
   it('pauses the timers while hovered', () => {
     toast.show('Saved');
     render();
     vi.advanceTimersByTime(600);
-    container()!.dispatchEvent(new MouseEvent('mouseenter'));
+    container()!.dispatchEvent(pointer('pointerenter', 'mouse'));
     vi.advanceTimersByTime(5000);
     expect(toast.active()).toHaveLength(1);
 
-    container()!.dispatchEvent(new MouseEvent('mouseleave'));
+    container()!.dispatchEvent(pointer('pointerleave', 'mouse'));
     vi.advanceTimersByTime(399);
     expect(toast.active()).toHaveLength(1);
     vi.advanceTimersByTime(1);
     expect(toast.active()).toHaveLength(0);
+  });
+
+  it('does not pause for a touch, which has no leave to resume', () => {
+    toast.show('Saved');
+    render();
+    container()!.dispatchEvent(pointer('pointerenter', 'touch'));
+    vi.advanceTimersByTime(1000);
+    expect(toast.active()).toHaveLength(0);
+  });
+
+  it('pauses while the browser tab is hidden', () => {
+    toast.show('Saved');
+    render();
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    document.dispatchEvent(new Event('visibilitychange'));
+    vi.advanceTimersByTime(5000);
+    expect(toast.active()).toHaveLength(1);
+    hidden.mockReturnValue(false);
+    document.dispatchEvent(new Event('visibilitychange'));
+    vi.advanceTimersByTime(1000);
+    expect(toast.active()).toHaveLength(0);
+    hidden.mockRestore();
   });
 
   it('hides on resume when it was paused after its time was up', () => {
@@ -94,8 +119,8 @@ describe('UiToast', () => {
     render();
     // The main thread was busy: the clock passed the duration but the timer has not run yet.
     vi.setSystemTime(Date.now() + 1500);
-    container()!.dispatchEvent(new MouseEvent('mouseenter'));
-    container()!.dispatchEvent(new MouseEvent('mouseleave'));
+    container()!.dispatchEvent(pointer('pointerenter', 'mouse'));
+    container()!.dispatchEvent(pointer('pointerleave', 'mouse'));
     expect(reasons).toEqual(['timeout']);
   });
 

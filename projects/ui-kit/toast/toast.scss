@@ -8,6 +8,8 @@
   inline-size: min(var(--ui-toast-width), 100vw);
   padding: var(--ui-toast-offset);
   font-family: var(--ui-font-family-sans);
+  // The offset and the gaps between toasts let clicks through to the page.
+  pointer-events: none;
 }
 
 :host([class*='ui-toast-container--top']) {
@@ -28,6 +30,7 @@
   font-size: var(--ui-font-size-sm);
   line-height: var(--ui-line-height-snug);
   animation: ui-toast-enter var(--ui-motion-duration-normal) var(--ui-motion-easing-enter);
+  pointer-events: auto;
 }
 
 // Moving the stack to the top of the top layer re-shows it; do not animate toasts in again.

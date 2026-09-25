@@ -126,11 +126,14 @@ function finish(ref: UiToastRef, reason: UiToastDismissReason): void {
   state.actions.complete();
 }
 
+/** What holds the timers: the mouse or focus on the stack, or a hidden browser tab. */
+type PauseSource = 'pointer' | 'focus' | 'hidden';
+
 /** Links between the stack and its container, kept out of the public `UiToast` API. */
 interface UiToastControl {
   close(ref: UiToastRef): void;
-  pause(source: 'pointer' | 'focus'): void;
-  resume(source: 'pointer' | 'focus'): void;
+  pause(source: PauseSource): void;
+  resume(source: PauseSource): void;
   /** Set by the container: called before a toast leaves the DOM, for any reason. */
   beforeRemove?: (ref: UiToastRef) => void;
 }
@@ -218,8 +221,8 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
     role: 'region',
     '[class]': '"ui-toast-container--" + position',
     '[attr.aria-label]': 'labels().notifications',
-    '(mouseenter)': 'control.pause("pointer")',
-    '(mouseleave)': 'control.resume("pointer")',
+    '(pointerenter)': 'onPointer($event, true)',
+    '(pointerleave)': 'onPointer($event, false)',
     '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'onFocusOut($event)',
   },
@@ -241,6 +244,13 @@ export class UiToastContainer {
   constructor() {
     this.control.beforeRemove = (ref) => this.keepFocus(ref);
     inject(DestroyRef).onDestroy(() => (this.control.beforeRemove = undefined));
+  }
+
+  /** A mouse over a toast pauses it. A tap has no leave that would resume it, so it does not. */
+  protected onPointer(event: PointerEvent, entered: boolean): void {
+    if (event.pointerType === 'touch') return;
+    if (entered) this.control.pause('pointer');
+    else this.control.resume('pointer');
   }
 
   protected onFocusIn(event: FocusEvent): void {
@@ -326,7 +336,7 @@ export class UiToast {
 
   private readonly items = signal<readonly UiToastItem[]>([]);
   private readonly timers = new Map<UiToastRef, Timer>();
-  private readonly pausedBy = new Set<'pointer' | 'focus'>();
+  private readonly pausedBy = new Set<PauseSource>();
   private overlayRef: OverlayRef | null = null;
   private nextId = 0;
   /** Popovers opened after the stack, which cover it in the top layer. */
@@ -336,10 +346,15 @@ export class UiToast {
     // The announcer element relies on `.cdk-visually-hidden`, which CDK only loads with FocusTrap.
     inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
     const onBeforeToggle = (event: Event): void => this.trackCover(event);
+    // Toasts must not time out unseen in a background tab.
+    const onVisibility = (): void =>
+      this.document.hidden ? this.pause('hidden') : this.resume('hidden');
     this.document.addEventListener('beforetoggle', onBeforeToggle, true);
-    inject(DestroyRef).onDestroy(() =>
-      this.document.removeEventListener('beforetoggle', onBeforeToggle, true),
-    );
+    this.document.addEventListener('visibilitychange', onVisibility);
+    inject(DestroyRef).onDestroy(() => {
+      this.document.removeEventListener('beforetoggle', onBeforeToggle, true);
+      this.document.removeEventListener('visibilitychange', onVisibility);
+    });
   }
 
   /** Toasts currently shown, oldest first. */
@@ -399,7 +414,7 @@ export class UiToast {
   };
 
   /** Pauses all timers while the pointer or focus is on the stack. */
-  private pause(source: 'pointer' | 'focus'): void {
+  private pause(source: PauseSource): void {
     if (!this.pausedBy.size) {
       for (const timer of this.timers.values()) {
         clearTimeout(timer.handle);
@@ -410,7 +425,7 @@ export class UiToast {
     this.pausedBy.add(source);
   }
 
-  private resume(source: 'pointer' | 'focus'): void {
+  private resume(source: PauseSource): void {
     this.pausedBy.delete(source);
     if (!this.pausedBy.size) this.timers.forEach((_, ref) => this.startTimer(ref));
   }
@@ -438,15 +453,20 @@ export class UiToast {
     if (!this.items().length) {
       this.overlayRef?.detach();
       this.coveredBy.clear();
-      // The stack is gone, so nothing can hold the pause any more.
+      // The stack is gone, so only a hidden tab can still hold the pause.
+      const hidden = this.pausedBy.has('hidden');
       this.pausedBy.clear();
+      if (hidden) this.pausedBy.add('hidden');
     }
     finish(ref, reason);
   }
 
   private attach(): void {
     const overlayRef = (this.overlayRef ??= this.createOverlay());
-    overlayRef.setDirection(resolveDirection(this.document.documentElement));
+    // Like dialogs: the direction around the focused element, e.g. an app root with `dir`.
+    overlayRef.setDirection(
+      resolveDirection(this.document.activeElement ?? this.document.documentElement),
+    );
     if (!overlayRef.hasAttached()) {
       const injector = Injector.create({
         providers: [{ provide: UI_TOAST_CONTROL, useValue: this.control }],
