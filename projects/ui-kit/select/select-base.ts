@@ -1,4 +1,5 @@
 import {
+  DestroyRef,
   Directive,
   ElementRef,
   Injector,
@@ -69,6 +70,7 @@ export abstract class UiSelectBase<T, V>
 
   readonly placeholder = input('');
   readonly size = input<UiSize>('md');
+  /** `name` of the trigger button. The search field of a `searchable` select has none. */
   readonly name = input('');
   /** Host id; the trigger gets `${id}-control`. */
   readonly id = input(inject(_IdGenerator).getId('ui-select-'));
@@ -160,10 +162,11 @@ export abstract class UiSelectBase<T, V>
     this.keyManager.change.subscribe(() =>
       this.activeId.set(this.keyManager.activeItem?.id ?? null),
     );
-    // A list opened before the control became readonly must not stay open.
+    // A list opened before the control became readonly or disabled must not stay open.
     effect(() => {
-      if (this.readonly()) untracked(() => this.close());
+      if (this.readonly() || this.isDisabled()) untracked(() => this.close());
     });
+    inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
     // The key manager keeps an active option that was removed (e.g. new server-side results).
     effect(() => {
       const options = this.options();
@@ -235,8 +238,10 @@ export abstract class UiSelectBase<T, V>
 
   // --- Template handlers ----------------------------------------------------------------
 
-  protected toggle(): void {
-    if (this.isOpen() && !this.searchable()) this.close();
+  protected toggle(event: MouseEvent): void {
+    // Clicks in the search text keep the list open; the chevron always toggles it.
+    const onChevron = !!(event.target as Element).closest('.ui-select__chevron');
+    if (this.isOpen() && (!this.searchable() || onChevron)) this.close();
     else this.open();
     this.focus();
   }
@@ -278,6 +283,12 @@ export abstract class UiSelectBase<T, V>
       if (opens) {
         event.preventDefault();
         this.open();
+      } else if (key === 'Home' || key === 'End') {
+        // APG: open the list at the first or last option.
+        event.preventDefault();
+        this.open();
+        if (key === 'Home') this.keyManager.setFirstItemActive();
+        else this.keyManager.setLastItemActive();
       } else if (!searchable && key.length === 1 && !event.ctrlKey && !event.metaKey) {
         // Typeahead on a closed select opens it at the matching option.
         this.open();
@@ -312,7 +323,7 @@ export abstract class UiSelectBase<T, V>
 
   /** Selects an option the user chose, unless the value cannot change. */
   private pick(value: unknown): void {
-    if (this.readonly()) return;
+    if (this.readonly() || this.isDisabled()) return;
     // Server-side search may replace the options in the same tick (closing resets the search).
     const option = this.options().find((item) => this.matches(item.value(), value));
     if (option) this.knownLabels.update((known) => [...known, [value, option.getLabel()]]);

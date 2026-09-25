@@ -46,7 +46,9 @@ const listbox = () => document.querySelector<HTMLElement>('[role="listbox"]');
     <ui-form-field label="Coordinator" hint="Approves the plan">
       <ui-select
         [(value)]="value"
+        name="coordinator"
         placeholder="Choose"
+        [disabled]="disabled()"
         [searchable]="searchable()"
         (searchChange)="searches.push($event)"
       >
@@ -63,6 +65,7 @@ const listbox = () => document.querySelector<HTMLElement>('[role="listbox"]');
 class Host {
   readonly value = signal<string | null>(null);
   readonly searchable = signal(false);
+  readonly disabled = signal(false);
   readonly searches: string[] = [];
   readonly select = viewChild.required(UiSelect);
 }
@@ -260,6 +263,24 @@ describe('UiSelect', () => {
     expect(control().hasAttribute('aria-activedescendant')).toBe(false);
   });
 
+  it('closes an open list when it becomes disabled', async () => {
+    await open();
+    fixture.componentInstance.disabled.set(true);
+    await settle(fixture);
+    expect(listbox()).toBeNull();
+  });
+
+  it('opens at the first or last option with Home and End', async () => {
+    keydown(control(), 'Home');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[0].id);
+    keydown(control(), 'Escape');
+    await settle(fixture);
+    keydown(control(), 'End');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[3].id);
+  });
+
   it('keeps keys pressed before the list rendered', async () => {
     control().focus();
     keydown(control(), 'ArrowDown');
@@ -328,6 +349,18 @@ describe('UiSelect', () => {
       input.dispatchEvent(new Event('input'));
       await settle(fixture);
     };
+
+    it('closes an open list from the chevron', async () => {
+      await type('y');
+      expect(listbox()).not.toBeNull();
+      root.querySelector<HTMLElement>('.ui-select__chevron')!.click();
+      await settle(fixture);
+      expect(listbox()).toBeNull();
+    });
+
+    it('does not submit the search text under the name', () => {
+      expect(control().hasAttribute('name')).toBe(false);
+    });
 
     it('renders a text combobox with list autocomplete', () => {
       const input = control();

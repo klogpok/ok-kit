@@ -5,7 +5,7 @@
   cdkOverlayOrigin
   #origin="cdkOverlayOrigin"
   (mousedown)="onTriggerMousedown($event)"
-  (click)="toggle()"
+  (click)="toggle($event)"
 >
   @if (searchable()) {
     <input
@@ -21,7 +21,6 @@
       [placeholder]="displayLabel() || placeholder()"
       [disabled]="isDisabled()"
       [readOnly]="readonly()"
-      [attr.name]="name() || null"
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-readonly]="readonly() ? 'true' : null"
       [attr.aria-expanded]="isOpen()"
