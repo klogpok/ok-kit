@@ -438,9 +438,12 @@ describe('UiDatepicker with Signal Forms', () => {
     await settle(fixture);
     expect(input().value).toBe('');
     expect(input().getAttribute('aria-invalid')).toBeNull();
-    expect(fixture.componentInstance.f.date().errors().map((e) => e.kind)).not.toContain(
-      'uiDateParse',
-    );
+    expect(
+      fixture.componentInstance.f
+        .date()
+        .errors()
+        .map((e) => e.kind),
+    ).not.toContain('uiDateParse');
   });
 
   it('takes min from minDate() in the schema', async () => {
