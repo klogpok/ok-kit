@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, minDate, required } from '@angular/forms/signals';
+import { FormField, form, minDate, readonly, required } from '@angular/forms/signals';
 import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiDatepicker } from './datepicker';
 
@@ -434,5 +434,34 @@ describe('UiDatepicker with Signal Forms', () => {
     await settle(fixture);
     expect(fixture.componentInstance.model().date).toBeNull();
     expect(input().getAttribute('aria-invalid')).toBe('true');
+  });
+});
+
+@Component({
+  imports: [UiDatepicker, FormField],
+  template: `<ui-datepicker aria-label="Date" [formField]="f.date" />`,
+})
+class ReadonlyHost {
+  readonly model = signal<{ date: Date | null }>({ date: new Date(2026, 3, 1) });
+  readonly f = form(this.model, (p) => {
+    readonly(p.date);
+  });
+}
+
+describe('UiDatepicker readonly', () => {
+  it('makes the text readonly and does not open the calendar', async () => {
+    const fixture = TestBed.createComponent(ReadonlyHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    const input = root.querySelector('input')!;
+    const toggle = root.querySelector<HTMLButtonElement>('.ui-datepicker__toggle')!;
+    expect(input.readOnly).toBe(true);
+    expect(input.disabled).toBe(false);
+    expect(toggle.disabled).toBe(true);
+    keydown(input, 'ArrowDown', { altKey: true });
+    await settle(fixture);
+    expect(dialog()).toBeNull();
+    root.remove();
   });
 });

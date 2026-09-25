@@ -88,6 +88,7 @@ interface Draft {
         [value]="text()"
         [placeholder]="placeholder() || hint()"
         [disabled]="isDisabled()"
+        [readOnly]="readonly()"
         [attr.name]="name() || null"
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-required]="isRequired() ? 'true' : null"
@@ -104,7 +105,7 @@ interface Draft {
         size="sm"
         aria-haspopup="dialog"
         [label]="labels().chooseDate"
-        [disabled]="isDisabled()"
+        [disabled]="isDisabled() || readonly()"
         [attr.aria-expanded]="isOpen()"
         (click)="toggle()"
       >
@@ -147,6 +148,7 @@ interface Draft {
     class: 'ui-datepicker',
     '[class]': '"ui-datepicker--" + size()',
     '[class.ui-datepicker--disabled]': 'isDisabled()',
+    '[class.ui-datepicker--readonly]': 'readonly()',
     '[class.ui-datepicker--invalid]': 'invalidState()',
     '[attr.id]': 'id()',
     '(focusout)': 'onFocusOut($event)',
@@ -291,7 +293,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   }
 
   open(): void {
-    if (this.isOpen() || this.isDisabled()) return;
+    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
     this.commitDraft();
     this.isOpen.set(true);
     this.opened.emit();
