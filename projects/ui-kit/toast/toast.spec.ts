@@ -88,6 +88,17 @@ describe('UiToast', () => {
     expect(toast.active()).toHaveLength(0);
   });
 
+  it('hides on resume when it was paused after its time was up', () => {
+    const reasons: UiToastDismissReason[] = [];
+    toast.show('Saved').afterDismissed.subscribe((r) => reasons.push(r));
+    render();
+    // The main thread was busy: the clock passed the duration but the timer has not run yet.
+    vi.setSystemTime(Date.now() + 1500);
+    container()!.dispatchEvent(new MouseEvent('mouseenter'));
+    container()!.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(reasons).toEqual(['timeout']);
+  });
+
   it('pauses while focus is inside and resumes when it leaves', () => {
     toast.show('Saved');
     render();

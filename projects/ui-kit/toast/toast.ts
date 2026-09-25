@@ -321,9 +321,14 @@ export class UiToast {
 
   private startTimer(ref: UiToastRef): void {
     const timer = this.timers.get(ref);
-    if (!timer || timer.remaining <= 0 || timer.handle !== undefined) return;
+    if (!timer || timer.handle !== undefined) return;
     const item = this.items().find((i) => i.ref === ref);
     if (!item?.duration) return;
+    // Paused after the time was up but before the late timer callback ran.
+    if (timer.remaining <= 0) {
+      this.remove(ref, 'timeout');
+      return;
+    }
     timer.startedAt = Date.now();
     timer.handle = setTimeout(() => this.remove(ref, 'timeout'), timer.remaining);
   }
