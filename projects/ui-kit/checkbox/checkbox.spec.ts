@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormField, form, readonly, required } from '@angular/forms/signals';
 import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiCheckbox } from './checkbox';
@@ -234,5 +234,37 @@ describe('UiCheckbox readonly', () => {
     expect(bound.getAttribute('aria-readonly')).toBe('true');
     expect(plain.getAttribute('aria-readonly')).toBe('true');
     expect(bound.disabled).toBe(false);
+  });
+});
+
+@Component({
+  imports: [FormsModule, ReactiveFormsModule, UiCheckbox],
+  template: `
+    <ui-checkbox name="terms" required [(ngModel)]="terms">Terms</ui-checkbox>
+    <ui-checkbox [formControl]="privacy">Privacy</ui-checkbox>
+  `,
+})
+class RequiredHost {
+  readonly terms = signal(false);
+  readonly privacy = new FormControl(false, Validators.required);
+  readonly ngModel = viewChild.required(NgModel);
+}
+
+describe('UiCheckbox required', () => {
+  it('is invalid until checked with ngModel + required or Validators.required', async () => {
+    const fixture = TestBed.createComponent(RequiredHost);
+    await settle(fixture);
+    const host = fixture.componentInstance;
+    const [terms, privacy] = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('input'),
+    );
+    expect(host.ngModel().invalid).toBe(true);
+    expect(host.privacy.hasError('required')).toBe(true);
+
+    terms.click();
+    privacy.click();
+    await settle(fixture);
+    expect(host.ngModel().valid).toBe(true);
+    expect(host.privacy.valid).toBe(true);
   });
 });

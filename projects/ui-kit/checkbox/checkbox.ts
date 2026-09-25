@@ -3,19 +3,23 @@ import {
   Component,
   ElementRef,
   computed,
+  effect,
   forwardRef,
   inject,
   input,
   model,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
+  UiCheckedValidator,
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  provideUiCheckedValidator,
 } from '@vplans/ui-kit/core';
 
 /**
@@ -30,7 +34,10 @@ import {
   templateUrl: './checkbox.html',
   styleUrl: './checkbox.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiCheckbox) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiCheckbox) },
+    provideUiCheckedValidator(),
+  ],
   host: {
     class: 'ui-checkbox',
     '[class]': '"ui-checkbox--" + size()',
@@ -62,6 +69,17 @@ export class UiCheckbox extends UiFormControlBase<boolean> implements UiFormFiel
   // model() has no transform, so a static `checked` attribute arrives as '': coerce on read.
   protected readonly isChecked = computed(() => coerceBooleanProperty(this.checked()));
   protected readonly isIndeterminate = computed(() => coerceBooleanProperty(this.indeterminate()));
+
+  constructor() {
+    super();
+    // Reactive / template forms: a required checkbox must be checked.
+    const validator = inject(UiCheckedValidator);
+    validator.required = this.isRequired;
+    effect(() => {
+      this.isRequired();
+      untracked(() => validator.requiredChanged());
+    });
+  }
 
   writeValue(value: boolean | null | undefined): void {
     this.checked.set(!!value);
