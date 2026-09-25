@@ -22,6 +22,7 @@ export const Default: Story = {
     checked: false,
     disabled: false,
     invalid: false,
+    readonly: false,
     size: 'md',
     labelPosition: 'end',
     fullWidth: false,
@@ -36,6 +37,11 @@ export const Disabled: Story = { ...Default, args: { ...Default.args, disabled: 
 export const DisabledChecked: Story = {
   ...Default,
   args: { ...Default.args, disabled: true, checked: true },
+};
+export const Invalid: Story = { ...Default, args: { ...Default.args, invalid: true } };
+export const Readonly: Story = {
+  ...Default,
+  args: { ...Default.args, readonly: true, checked: true },
 };
 export const LabelStart: Story = { ...Default, args: { ...Default.args, labelPosition: 'start' } };
 

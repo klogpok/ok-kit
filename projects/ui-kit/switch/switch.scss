@@ -103,6 +103,11 @@
 :host(.ui-switch--invalid) .ui-switch__input {
   outline: var(--ui-border-width-strong) solid var(--ui-switch-invalid-outline);
   outline-offset: var(--ui-border-width-default);
+
+  // The invalid outline would otherwise hide the focus ring (this rule is more specific).
+  &:focus-visible {
+    @include mixins.focus-ring;
+  }
 }
 
 :host(.ui-switch--readonly) .ui-switch__label {
