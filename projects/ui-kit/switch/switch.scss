@@ -1,0 +1,133 @@
+@use '../styles/mixins';
+
+:host {
+  display: inline-flex;
+  font-family: var(--ui-font-family-sans);
+  color: var(--ui-color-text);
+}
+
+:host(.ui-switch--sm) {
+  --_track-w: calc(var(--ui-switch-track-width) * 0.8);
+  --_track-h: calc(var(--ui-switch-track-height) * 0.8);
+  --_font-size: var(--ui-font-size-sm);
+}
+
+:host(.ui-switch--md) {
+  --_track-w: var(--ui-switch-track-width);
+  --_track-h: var(--ui-switch-track-height);
+  --_font-size: var(--ui-font-size-sm);
+}
+
+:host(.ui-switch--lg) {
+  --_track-w: calc(var(--ui-switch-track-width) * 1.2);
+  --_track-h: calc(var(--ui-switch-track-height) * 1.2);
+  --_font-size: var(--ui-font-size-md);
+}
+
+.ui-switch__label {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--ui-space-sm);
+  font-size: var(--_font-size);
+  line-height: var(--ui-line-height-snug);
+  cursor: pointer;
+}
+
+:host(.ui-switch--label-start) .ui-switch__label {
+  flex-direction: row;
+}
+
+:host(.ui-switch--full-width) {
+  display: flex;
+
+  .ui-switch__label {
+    flex: 1;
+    justify-content: space-between;
+  }
+}
+
+.ui-switch__track {
+  --_pad: calc(var(--ui-border-width-strong));
+  --_thumb: calc(var(--_track-h) - var(--_pad) * 2);
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  inline-size: var(--_track-w);
+  block-size: var(--_track-h);
+}
+
+.ui-switch__input {
+  margin: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-switch-track-bg);
+  appearance: none;
+  cursor: inherit;
+  @include mixins.transition(background-color);
+  @include mixins.focus-visible;
+
+  &:checked {
+    background-color: var(--ui-switch-track-checked-bg);
+  }
+
+  &:disabled {
+    background-color: var(--ui-color-control-bg-disabled);
+    outline: var(--ui-border-width-default) solid var(--ui-color-border);
+    outline-offset: calc(var(--ui-border-width-default) * -1);
+  }
+}
+
+.ui-switch__thumb {
+  position: absolute;
+  inset-block-start: var(--_pad);
+  inset-inline-start: var(--_pad);
+  inline-size: var(--_thumb);
+  block-size: var(--_thumb);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-switch-thumb-bg);
+  box-shadow: var(--ui-shadow-sm);
+  pointer-events: none;
+  @include mixins.transition(translate);
+}
+
+:host(.ui-switch--checked) .ui-switch__thumb {
+  translate: calc(var(--_track-w) - var(--_thumb) - var(--_pad) * 2) 0;
+}
+
+:host(.ui-switch--checked) .ui-switch__thumb:dir(rtl) {
+  translate: calc((var(--_track-w) - var(--_thumb) - var(--_pad) * 2) * -1) 0;
+}
+
+:host(.ui-switch--invalid) .ui-switch__input {
+  outline: var(--ui-border-width-strong) solid var(--ui-switch-invalid-outline);
+  outline-offset: var(--ui-border-width-default);
+}
+
+:host(.ui-switch--disabled) {
+  color: var(--ui-color-text-disabled);
+
+  .ui-switch__label {
+    cursor: not-allowed;
+  }
+
+  .ui-switch__thumb {
+    background-color: var(--ui-color-text-disabled);
+    box-shadow: none;
+  }
+}
+
+.ui-switch__text:empty {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  .ui-switch__input {
+    border: var(--ui-border-width-default) solid CanvasText;
+  }
+
+  .ui-switch__thumb {
+    background-color: CanvasText;
+  }
+}
