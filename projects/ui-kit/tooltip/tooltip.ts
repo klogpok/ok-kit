@@ -89,8 +89,8 @@ export class UiTooltipPanel {
   selector: '[uiTooltip]',
   exportAs: 'uiTooltip',
   host: {
-    '(mouseenter)': 'onMouseEnter()',
-    '(mouseleave)': 'onMouseLeave()',
+    '(pointerenter)': 'onPointerEnter($event)',
+    '(pointerleave)': 'onPointerLeave($event)',
     '(keydown.escape)': 'onEscape($event)',
   },
 })
@@ -205,6 +205,8 @@ export class UiTooltip {
     const preferred = this.position();
     this.placement = preferred;
     overlayRef.setDirection(resolveDirection(this.host));
+    // The margin token may change with the theme or the root font size.
+    this.positionStrategy!.withViewportMargin(this.viewportMargin());
     this.positionStrategy!.withPositions([
       { ...POSITIONS[preferred], panelClass: `ui-tooltip-pane--${preferred}` },
       { ...POSITIONS[OPPOSITE[preferred]], panelClass: `ui-tooltip-pane--${OPPOSITE[preferred]}` },
@@ -225,7 +227,9 @@ export class UiTooltip {
     this.panel = null;
   }
 
-  protected onMouseEnter(): void {
+  /** Touch gets no tooltip: a tap has no leave, so the bubble would stay until the next tap. */
+  protected onPointerEnter(event: PointerEvent): void {
+    if (event.pointerType === 'touch') return;
     this.hostHovered = true;
     clearTimeout(this.hideTimer);
     if (this.isOpen) return;
@@ -233,7 +237,8 @@ export class UiTooltip {
     this.showTimer = setTimeout(() => this.show(), this.showDelay());
   }
 
-  protected onMouseLeave(): void {
+  protected onPointerLeave(event: PointerEvent): void {
+    if (event.pointerType === 'touch') return;
     this.hostHovered = false;
     this.scheduleHide();
   }
@@ -278,7 +283,11 @@ export class UiTooltip {
       .withViewportMargin(this.viewportMargin());
     const overlayRef = createOverlayRef(this.injector, {
       positionStrategy: strategy,
-      scrollStrategy: createRepositionScrollStrategy(this.injector, { scrollThrottle: 20 }),
+      // autoClose: hide when the host scrolls out of view instead of pinning to the edge.
+      scrollStrategy: createRepositionScrollStrategy(this.injector, {
+        scrollThrottle: 20,
+        autoClose: true,
+      }),
       panelClass: 'ui-tooltip-pane',
     });
 
@@ -294,6 +303,8 @@ export class UiTooltip {
         this.hide();
       }
     });
+
+    overlayRef.detachments().subscribe(() => (this.panel = null));
 
     this.positionStrategy = strategy;
     this.overlayRef = overlayRef;

@@ -48,12 +48,21 @@ describe('UiTooltip', () => {
     (fixture.nativeElement as HTMLElement).remove();
   });
 
+  const pointer = (type: string, pointerType = 'mouse') =>
+    Object.assign(new MouseEvent(type), { pointerType });
+
+  it('does not show for a touch, which would leave a sticky bubble', () => {
+    button.dispatchEvent(pointer('pointerenter', 'touch'));
+    vi.advanceTimersByTime(1000);
+    expect(panel()).toBeNull();
+  });
+
   it('describes the host with the message', () => {
     expect(describedText()).toBe('Delete the plan');
   });
 
   it('shows after the delay on hover and hides after the pointer leaves', () => {
-    button.dispatchEvent(new MouseEvent('mouseenter'));
+    button.dispatchEvent(pointer('pointerenter'));
     vi.advanceTimersByTime(150);
     expect(panel()).toBeNull();
     vi.advanceTimersByTime(60);
@@ -61,14 +70,14 @@ describe('UiTooltip', () => {
     expect(panel()?.getAttribute('aria-hidden')).toBe('true');
     expect(panel()?.classList).toContain('ui-tooltip--bottom');
 
-    button.dispatchEvent(new MouseEvent('mouseleave'));
+    button.dispatchEvent(pointer('pointerleave'));
     vi.advanceTimersByTime(60);
     expect(panel()).toBeNull();
   });
 
   it('stays open while the pointer is over the tooltip', () => {
     fixture.componentInstance.tooltip().show();
-    button.dispatchEvent(new MouseEvent('mouseleave'));
+    button.dispatchEvent(pointer('pointerleave'));
     panel()!.dispatchEvent(new MouseEvent('mouseenter'));
     vi.advanceTimersByTime(100);
     expect(panel()).not.toBeNull();
