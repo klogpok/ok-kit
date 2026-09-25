@@ -239,6 +239,10 @@ provideUiLabels(() =>
 );
 ```
 
+Texts with numbers are functions, e.g. `pageLabel: (page) => ...` and
+`pageRange: (start, end, length) => ...` for `ui-pagination`. When the source only gives strings,
+build them in the factory.
+
 Texts that belong to a specific use (a button label, a tooltip, a dialog title) are plain inputs:
 translate them in your templates as usual.
 
@@ -304,6 +308,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                            |
 | `@vplans/ui-kit/accordion`  | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                |
 | `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                          |
+| `@vplans/ui-kit/pagination` | `UiPagination`, `UiPageEvent`, `uiPageItems`                                                                                          |
 | `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
 | `@vplans/ui-kit/menu`       | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                               |
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
@@ -615,6 +620,17 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-menu-item-icon-color`            | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-menu-item-danger-text`           | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
 | `--ui-menu-item-danger-hover-bg`       | component | `var(--ui-color-danger-subtle)`                                              | `var(--ui-color-danger-subtle)`                                        |
+| `--ui-pagination-gap`                  | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-pagination-button-gap`           | component | `var(--ui-space-2xs)`                                                        | `var(--ui-space-2xs)`                                                  |
+| `--ui-pagination-page-size`            | component | `var(--ui-control-height-sm)`                                                | `var(--ui-control-height-sm)`                                          |
+| `--ui-pagination-page-radius`          | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-pagination-page-font-size`       | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-pagination-page-text`            | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-pagination-page-hover-bg`        | component | `var(--ui-color-surface-hover)`                                              | `var(--ui-color-surface-hover)`                                        |
+| `--ui-pagination-page-current-bg`      | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-pagination-page-current-text`    | component | `var(--ui-color-primary-contrast)`                                           | `var(--ui-color-primary-contrast)`                                     |
+| `--ui-pagination-summary-text`         | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-pagination-summary-font-size`    | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
 
 <!-- tokens:end -->
 

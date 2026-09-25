@@ -536,4 +536,15 @@
   --ui-menu-item-icon-color: var(--ui-color-text-muted);
   --ui-menu-item-danger-text: var(--ui-color-danger-text);
   --ui-menu-item-danger-hover-bg: var(--ui-color-danger-subtle);
+  --ui-pagination-gap: var(--ui-space-lg);
+  --ui-pagination-button-gap: var(--ui-space-2xs);
+  --ui-pagination-page-size: var(--ui-control-height-sm);
+  --ui-pagination-page-radius: var(--ui-radius-control);
+  --ui-pagination-page-font-size: var(--ui-font-size-sm);
+  --ui-pagination-page-text: var(--ui-color-text);
+  --ui-pagination-page-hover-bg: var(--ui-color-surface-hover);
+  --ui-pagination-page-current-bg: var(--ui-color-primary);
+  --ui-pagination-page-current-text: var(--ui-color-primary-contrast);
+  --ui-pagination-summary-text: var(--ui-color-text-muted);
+  --ui-pagination-summary-font-size: var(--ui-font-size-sm);
 }

@@ -1,0 +1,95 @@
+@use '../styles/mixins' as ui;
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-pagination-gap);
+  font-family: var(--ui-font-family-sans);
+}
+
+.ui-pagination__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-sm);
+  color: var(--ui-pagination-summary-text);
+  font-size: var(--ui-pagination-summary-font-size);
+}
+
+.ui-pagination__size {
+  inline-size: auto;
+  min-inline-size: 5em;
+}
+
+.ui-pagination__range {
+  margin-inline-start: var(--ui-space-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ui-pagination__pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-pagination-button-gap);
+}
+
+.ui-pagination__page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: var(--ui-pagination-page-size);
+  block-size: var(--ui-pagination-page-size);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--ui-space-xs);
+  border: var(--ui-border-width-default) solid transparent;
+  border-radius: var(--ui-pagination-page-radius);
+  background: none;
+  color: var(--ui-pagination-page-text);
+  font: inherit;
+  font-size: var(--ui-pagination-page-font-size);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  cursor: pointer;
+
+  @include ui.transition(background-color, color);
+  @include ui.focus-visible;
+
+  &:hover:not(:disabled, .ui-pagination__page--current) {
+    background-color: var(--ui-pagination-page-hover-bg);
+  }
+
+  &:disabled {
+    color: var(--ui-color-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+.ui-pagination__page--current {
+  background-color: var(--ui-pagination-page-current-bg);
+  color: var(--ui-pagination-page-current-text);
+  font-weight: var(--ui-font-weight-semibold);
+  cursor: default;
+
+  &:disabled {
+    background-color: var(--ui-color-control-bg-disabled);
+  }
+}
+
+.ui-pagination__gap {
+  display: inline-flex;
+  justify-content: center;
+  min-inline-size: var(--ui-pagination-page-size);
+  color: var(--ui-pagination-summary-text);
+  font-size: var(--ui-pagination-page-font-size);
+}
+
+@media (forced-colors: active) {
+  .ui-pagination__page--current {
+    border-color: Highlight;
+  }
+}

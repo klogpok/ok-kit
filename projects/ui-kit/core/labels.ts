@@ -1,6 +1,9 @@
 import { InjectionToken, Provider, Signal, computed, isSignal, signal } from '@angular/core';
 
-/** Built-in texts of kit components (close buttons, confirm dialogs, empty lists, ...). */
+/**
+ * Built-in texts of kit components (close buttons, confirm dialogs, empty lists, ...).
+ * Texts with numbers are formatter functions.
+ */
 export interface UiLabels {
   /** Close buttons of dialogs and toasts. */
   close: string;
@@ -14,6 +17,18 @@ export interface UiLabels {
   notifications: string;
   /** Accessible name of `ui-spinner` when it has no `label`. */
   loading: string;
+  /** Accessible name of the `ui-pagination` navigation landmark. */
+  pagination: string;
+  firstPage: string;
+  previousPage: string;
+  nextPage: string;
+  lastPage: string;
+  /** Label of the page size select of `ui-pagination`. */
+  itemsPerPage: string;
+  /** Accessible name of a page button, e.g. "Page 3". */
+  pageLabel: (page: number) => string;
+  /** Range summary of `ui-pagination`, e.g. "11–20 of 57". `start` is 1-based; 0 when empty. */
+  pageRange: (start: number, end: number, length: number) => string;
 }
 
 /** Hebrew texts, the default: the VPlans apps are in Hebrew. */
@@ -24,6 +39,15 @@ export const UI_LABELS_HE: UiLabels = {
   noOptions: 'אין תוצאות',
   notifications: 'התראות',
   loading: 'טוען',
+  pagination: 'עימוד',
+  firstPage: 'עמוד ראשון',
+  previousPage: 'עמוד קודם',
+  nextPage: 'עמוד הבא',
+  lastPage: 'עמוד אחרון',
+  itemsPerPage: 'פריטים בעמוד',
+  pageLabel: (page) => `עמוד ${page}`,
+  // The isolate (LRI…PDI) keeps "51–75" from being reordered to "75–51" in RTL text.
+  pageRange: (start, end, length) => `⁦${start}–${end}⁩ מתוך ${length}`,
 };
 
 export const UI_LABELS_EN: UiLabels = {
@@ -33,6 +57,14 @@ export const UI_LABELS_EN: UiLabels = {
   noOptions: 'No options',
   notifications: 'Notifications',
   loading: 'Loading',
+  pagination: 'Pagination',
+  firstPage: 'First page',
+  previousPage: 'Previous page',
+  nextPage: 'Next page',
+  lastPage: 'Last page',
+  itemsPerPage: 'Items per page',
+  pageLabel: (page) => `Page ${page}`,
+  pageRange: (start, end, length) => `${start}–${end} of ${length}`,
 };
 
 /** Current texts. A signal, so components follow a runtime language switch. */

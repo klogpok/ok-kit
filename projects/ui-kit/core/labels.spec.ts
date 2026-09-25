@@ -37,3 +37,10 @@ describe('UI_LABELS', () => {
     expect(TestBed.inject(UI_LABELS)().cancel).toBe('Abbrechen');
   });
 });
+
+describe('UI_LABELS_HE', () => {
+  it('isolates the numeric page range so RTL keeps its order', () => {
+    expect(UI_LABELS_HE.pageRange(51, 75, 480)).toBe('⁦51–75⁩ מתוך 480');
+    expect(UI_LABELS_EN.pageRange(51, 75, 480)).toBe('51–75 of 480');
+  });
+});
