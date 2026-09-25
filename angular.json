@@ -48,7 +48,8 @@
           "options": {
             "lintFilePatterns": [
               "projects/ui-kit/**/*.ts",
-              "projects/ui-kit/**/*.html"
+              "projects/ui-kit/**/*.html",
+              "projects/ui-kit/**/*.mts"
             ]
           }
         },

@@ -30,10 +30,22 @@ export default {
         'unit-disallowed-list': [['px', 'rem', 'pt'], { ignoreProperties: { px: [] } }],
         'declaration-property-value-disallowed-list': {
           '/^(z-index|transition-duration|animation-duration)$/': ['/^[1-9]/'],
+          // Raw durations in shorthands too: use the motion tokens.
+          '/^(transition|animation)$/': ['/(^|\\s)[0-9.]+m?s(\\s|,|$)/'],
           // Logical values (start/end) mirror in RTL; physical ones do not.
           'text-align': ['left', 'right'],
+          '/^(float|clear)$/': ['left', 'right'],
         },
-        'property-disallowed-list': ['margin-left', 'margin-right', 'padding-left', 'padding-right', 'left', 'right', 'border-left', 'border-right'],
+        'property-disallowed-list': [
+          'margin-left',
+          'margin-right',
+          'padding-left',
+          'padding-right',
+          'left',
+          'right',
+          '/^border-(left|right)(-|$)/',
+          '/^border-(top|bottom)-(left|right)-radius$/',
+        ],
       },
     },
   ],

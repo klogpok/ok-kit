@@ -8,7 +8,7 @@ module.exports = tseslint.config(
     ignores: ['dist/**', 'out-tsc/**', '.angular/**', 'storybook-static/**', '**/*.generated.ts'],
   },
   {
-    files: ['**/*.ts'],
+    files: ['**/*.ts', '**/*.mts'],
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.strict,
