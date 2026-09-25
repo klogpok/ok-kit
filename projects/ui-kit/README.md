@@ -214,6 +214,20 @@ theme.toggle();
 `provideUiTheme()` applies the stored mode when the app starts. Without it, the mode is applied only
 once something injects `ThemeService`.
 
+The app boots after the first paint, so a stored `dark` mode would flash light first. Apply it early
+with an inline script in `index.html` (use your `storageKey`):
+
+```html
+<script>
+  try {
+    var mode = localStorage.getItem('ui-theme');
+    if (mode === 'light' || mode === 'dark') {
+      document.documentElement.setAttribute('data-theme', mode);
+    }
+  } catch (e) {}
+</script>
+```
+
 Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
 `:root`, on every `[data-theme]` element and on `.ui-theme-scope`, so they follow the theme of
 the nearest scope:
