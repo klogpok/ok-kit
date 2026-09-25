@@ -53,11 +53,13 @@ const REFERENCE_SUNDAY = new Date(2026, 0, 4);
   selector: 'ui-calendar',
   imports: [UiIcon, UiIconButton],
   template: `
+    <!-- disabledInteractive: a button disabled by its own click keeps focus in the dialog. -->
     <div class="ui-calendar__header">
       <button
         ui-icon-button
         size="sm"
         [label]="labels().previousYear"
+        disabledInteractive
         [disabled]="!canMove(-12)"
         (click)="moveMonths(-12)"
       >
@@ -67,6 +69,7 @@ const REFERENCE_SUNDAY = new Date(2026, 0, 4);
         ui-icon-button
         size="sm"
         [label]="labels().previousMonth"
+        disabledInteractive
         [disabled]="!canMove(-1)"
         (click)="moveMonths(-1)"
       >
@@ -77,6 +80,7 @@ const REFERENCE_SUNDAY = new Date(2026, 0, 4);
         ui-icon-button
         size="sm"
         [label]="labels().nextMonth"
+        disabledInteractive
         [disabled]="!canMove(1)"
         (click)="moveMonths(1)"
       >
@@ -86,6 +90,7 @@ const REFERENCE_SUNDAY = new Date(2026, 0, 4);
         ui-icon-button
         size="sm"
         [label]="labels().nextYear"
+        disabledInteractive
         [disabled]="!canMove(12)"
         (click)="moveMonths(12)"
       >

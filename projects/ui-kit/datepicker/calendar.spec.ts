@@ -129,9 +129,9 @@ describe('UiCalendar', () => {
     }
     await settle();
     expect(host.picked).toHaveLength(0);
-    expect(button('Previous month').disabled).toBe(true);
-    expect(button('Next month').disabled).toBe(true);
-    expect(button('Previous year').disabled).toBe(true);
+    for (const label of ['Previous month', 'Next month', 'Previous year']) {
+      expect(button(label).getAttribute('aria-disabled')).toBe('true');
+    }
   });
 
   it('moves by day and week with the arrows and picks with Enter', async () => {
@@ -199,5 +199,23 @@ describe('UiCalendar', () => {
     button('Previous year').click();
     await settle();
     expect(title()).toBe('October 2025');
+  });
+
+  it('keeps focus on a header button that reaches the min month', async () => {
+    await create();
+    host.min.set(new Date(2026, 7, 10));
+    await settle();
+    const previous = button('Previous month');
+    previous.focus();
+    previous.click();
+    await settle();
+    expect(title()).toBe('August 2026');
+    expect(previous.disabled).toBe(false);
+    expect(previous.getAttribute('aria-disabled')).toBe('true');
+    expect(document.activeElement).toBe(previous);
+
+    previous.click();
+    await settle();
+    expect(title()).toBe('August 2026');
   });
 });
