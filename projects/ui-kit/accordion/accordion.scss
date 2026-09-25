@@ -1,0 +1,7 @@
+:host {
+  display: block;
+  overflow: hidden;
+  border: var(--ui-border-width-default) solid var(--ui-accordion-border);
+  border-radius: var(--ui-accordion-radius);
+  background-color: var(--ui-accordion-bg);
+}

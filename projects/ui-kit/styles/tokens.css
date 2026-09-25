@@ -506,4 +506,17 @@
   --ui-skeleton-radius-text: var(--ui-radius-sm);
   --ui-skeleton-radius-rect: var(--ui-radius-control);
   --ui-skeleton-line-gap: var(--ui-space-xs);
+  --ui-accordion-bg: var(--ui-color-surface);
+  --ui-accordion-border: var(--ui-color-border);
+  --ui-accordion-radius: var(--ui-radius-container);
+  --ui-accordion-header-text: var(--ui-color-text);
+  --ui-accordion-header-hover-bg: var(--ui-color-surface-hover);
+  --ui-accordion-header-padding-block: var(--ui-space-md);
+  --ui-accordion-header-padding-inline: var(--ui-space-lg);
+  --ui-accordion-header-gap: var(--ui-space-sm);
+  --ui-accordion-header-font-size: var(--ui-font-size-md);
+  --ui-accordion-header-font-weight: var(--ui-font-weight-semibold);
+  --ui-accordion-icon-color: var(--ui-color-text-muted);
+  --ui-accordion-panel-padding-block: var(--ui-space-md);
+  --ui-accordion-panel-padding-inline: var(--ui-space-lg);
 }

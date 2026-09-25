@@ -1,0 +1,100 @@
+@use '../styles/mixins' as ui;
+
+:host {
+  display: block;
+  color: var(--ui-color-text);
+  font-family: var(--ui-font-family-sans);
+}
+
+:host + :host {
+  border-block-start: var(--ui-border-width-default) solid var(--ui-accordion-border);
+}
+
+.ui-accordion-item__heading {
+  margin: 0;
+}
+
+.ui-accordion-item__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-accordion-header-gap);
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin: 0;
+  padding-block: var(--ui-accordion-header-padding-block);
+  padding-inline: var(--ui-accordion-header-padding-inline);
+  border: 0;
+  background: none;
+  color: var(--ui-accordion-header-text);
+  font: inherit;
+  font-size: var(--ui-accordion-header-font-size);
+  font-weight: var(--ui-accordion-header-font-weight);
+  line-height: var(--ui-line-height-snug);
+  text-align: start;
+  cursor: pointer;
+
+  @include ui.transition(background-color);
+  @include ui.focus-visible(calc(var(--ui-focus-ring-width) * -1));
+
+  &:hover:not(:disabled) {
+    background-color: var(--ui-accordion-header-hover-bg);
+  }
+
+  &:disabled {
+    color: var(--ui-color-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+.ui-accordion-item__label {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.ui-accordion-item__chevron {
+  flex-shrink: 0;
+  color: var(--ui-accordion-icon-color);
+
+  @include ui.transition(transform);
+
+  :host(.ui-accordion-item--expanded) & {
+    transform: rotate(180deg);
+  }
+
+  .ui-accordion-item__trigger:disabled & {
+    color: inherit;
+  }
+}
+
+// Height animates through grid rows; `visibility` hides the collapsed content from
+// assistive technologies and the tab order once the transition ends.
+.ui-accordion-item__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+
+  @include ui.transition(grid-template-rows, visibility);
+
+  :host(.ui-accordion-item--expanded) & {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+}
+
+.ui-accordion-item__body {
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.ui-accordion-item__content {
+  padding-block: 0 var(--ui-accordion-panel-padding-block);
+  padding-inline: var(--ui-accordion-panel-padding-inline);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-normal);
+}
+
+@media (forced-colors: active) {
+  .ui-accordion-item__trigger:disabled {
+    color: GrayText;
+  }
+}
