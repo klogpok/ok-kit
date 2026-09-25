@@ -40,10 +40,6 @@
   }
 }
 
-:host([hidden]) {
-  display: none;
-}
-
 .ui-option__label {
   flex: 1;
   min-inline-size: 0;
@@ -105,4 +101,9 @@
   .ui-option__checkbox {
     border-color: CanvasText;
   }
+}
+
+// Last, so it wins over the display of groups (same specificity).
+:host([hidden]) {
+  display: none;
 }
