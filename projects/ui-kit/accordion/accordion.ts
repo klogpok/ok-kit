@@ -4,8 +4,9 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
-  InjectionToken,
+  Injectable,
   Injector,
+  Signal,
   TemplateRef,
   contentChild,
   contentChildren,
@@ -31,12 +32,31 @@ export class UiAccordionContent {
   readonly template = inject<TemplateRef<void>>(TemplateRef);
 }
 
-/** Header keyboard navigation provided by `ui-accordion` to its items. */
-interface UiAccordionNavigation {
-  onHeaderKeydown(event: KeyboardEvent, item: FocusableOption): void;
-}
+const HEADER_KEYS = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End']);
 
-const UI_ACCORDION = new InjectionToken<UiAccordionNavigation>('UiAccordion');
+/** Header keyboard navigation that `ui-accordion` provides to its items. Internal. */
+@Injectable()
+class UiAccordionNavigation {
+  private readonly injector = inject(Injector);
+  private keyManager: FocusKeyManager<FocusableOption> | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.keyManager?.destroy());
+  }
+
+  setItems(items: Signal<readonly FocusableOption[]>): void {
+    this.keyManager = new FocusKeyManager<FocusableOption>(items, this.injector)
+      .withVerticalOrientation()
+      .withHomeAndEnd()
+      .withWrap();
+  }
+
+  onHeaderKeydown(event: KeyboardEvent, item: FocusableOption): void {
+    if (!this.keyManager || !HEADER_KEYS.has(event.key)) return;
+    this.keyManager.updateActiveItem(item);
+    this.keyManager.onKeydown(event);
+  }
+}
 
 /**
  * One collapsible section. Use inside `ui-accordion`; alone it works as a disclosure.
@@ -101,7 +121,7 @@ const UI_ACCORDION = new InjectionToken<UiAccordionNavigation>('UiAccordion');
 })
 export class UiAccordionItem implements FocusableOption {
   protected readonly item = inject(CdkAccordionItem);
-  private readonly accordion = inject(UI_ACCORDION, { optional: true });
+  private readonly accordion = inject(UiAccordionNavigation, { optional: true });
   private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
 
   /** Header text. Not called `title`, which would show a native tooltip. */
@@ -152,8 +172,6 @@ export class UiAccordionItem implements FocusableOption {
   }
 }
 
-const HEADER_KEYS = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End']);
-
 /**
  * A set of collapsible sections (WAI-ARIA accordion pattern). One item is open at a time
  * unless `multi` is set.
@@ -176,19 +194,15 @@ const HEADER_KEYS = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End']);
   styleUrl: './accordion.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{ directive: CdkAccordion, inputs: ['multi'] }],
-  providers: [{ provide: UI_ACCORDION, useExisting: UiAccordion }],
+  providers: [UiAccordionNavigation],
   host: { class: 'ui-accordion' },
 })
-export class UiAccordion implements UiAccordionNavigation {
+export class UiAccordion {
   private readonly cdkAccordion = inject(CdkAccordion);
   private readonly items = contentChildren(UiAccordionItem);
-  private readonly keyManager = new FocusKeyManager(this.items, inject(Injector))
-    .withVerticalOrientation()
-    .withHomeAndEnd()
-    .withWrap();
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
+    inject(UiAccordionNavigation).setItems(this.items);
   }
 
   /** Opens every enabled item. Only works with `multi`. */
@@ -199,12 +213,5 @@ export class UiAccordion implements UiAccordionNavigation {
   /** Closes every enabled item. */
   closeAll(): void {
     this.cdkAccordion.closeAll();
-  }
-
-  /** @docs-private */
-  onHeaderKeydown(event: KeyboardEvent, item: FocusableOption): void {
-    if (!HEADER_KEYS.has(event.key)) return;
-    this.keyManager.updateActiveItem(item as UiAccordionItem);
-    this.keyManager.onKeydown(event);
   }
 }
