@@ -188,14 +188,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly isOpen = signal(false);
   protected readonly positions = POSITIONS;
   protected readonly calendarIcon = uiIconCalendar;
-  /** Dropped when the value changes elsewhere (e.g. a reset), so old text does not come back. */
-  private readonly draft = linkedSignal<Date | null, Draft | null>({
-    source: this.value,
-    computation: (value, previous) => {
-      const draft = previous?.value;
-      return draft && (draft.value === value || sameDay(draft.value, value)) ? draft : null;
-    },
-  });
 
   /**
    * Parses typed text into the value. Through `transformedValue` Signal Forms receives the parse
@@ -219,6 +211,19 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
     format: (value: Date | null) => {
       const day = validDay(value);
       return day ? formatDay(day, this.locale()) : '';
+    },
+  });
+
+  /**
+   * Dropped when the value or the parsed text changes elsewhere (e.g. a reset, which sets the
+   * text to the formatted value), so old text does not come back.
+   */
+  private readonly draft = linkedSignal<{ value: Date | null; text: string }, Draft | null>({
+    source: () => ({ value: this.value(), text: this.rawText() }),
+    computation: ({ value, text }, previous) => {
+      const draft = previous?.value;
+      const sameValue = draft && (draft.value === value || sameDay(draft.value, value));
+      return draft && sameValue && draft.text === text ? draft : null;
     },
   });
 

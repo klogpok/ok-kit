@@ -427,6 +427,22 @@ describe('UiDatepicker with Signal Forms', () => {
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
+  it('drops invalid typed text when the form is reset', async () => {
+    input().value = 'abc';
+    input().dispatchEvent(new Event('input'));
+    leave(input());
+    await settle(fixture);
+    expect(input().getAttribute('aria-invalid')).toBe('true');
+
+    fixture.componentInstance.f().reset();
+    await settle(fixture);
+    expect(input().value).toBe('');
+    expect(input().getAttribute('aria-invalid')).toBeNull();
+    expect(fixture.componentInstance.f.date().errors().map((e) => e.kind)).not.toContain(
+      'uiDateParse',
+    );
+  });
+
   it('takes min from minDate() in the schema', async () => {
     input().value = '31.12.2025';
     input().dispatchEvent(new Event('input'));
