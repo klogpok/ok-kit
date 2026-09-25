@@ -1,7 +1,8 @@
 # @vplans/ui-kit
 
 Our in-house Angular design system. Standalone, `OnPush`, zoneless-ready components built on
-`@angular/cdk`, themed with CSS custom properties, RTL-aware and WCAG 2.1 AA compliant.
+`@angular/cdk`, themed with CSS custom properties, RTL-aware and built for WCAG 2.1 AA: every story
+is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 
 - **Storybook:** `pnpm storybook` (http://localhost:6006). It has a theme and direction switcher in the toolbar and an a11y panel.
 - **Playground app:** `pnpm start`
@@ -97,7 +98,15 @@ Common inputs:
 | --------------------- | ----------------------------------------- | ---------------------------------------- |
 | `size`                | `sm \| md \| lg`                          | `md`                                     |
 | `variant`             | `primary \| secondary \| ghost \| danger` | `primary` (`ghost` for `ui-icon-button`) |
+| `type`                | `button \| submit \| reset`               | `button` (ignored on `<a>`)              |
+| `disabled`            | `boolean`                                 | `false`                                  |
 | `disabledInteractive` | `boolean`                                 | `false`                                  |
+| `loading`             | `boolean`                                 | `false`                                  |
+| `fullWidth`           | `boolean` (`ui-button` only)              | `false`                                  |
+| `label`               | `string`, required on `ui-icon-button`    | —                                        |
+
+`loading` shows a spinner, blocks clicks, keeps the button focusable and announces the `loading`
+label. A disabled or loading `a[ui-button]` has no `href`, so it cannot be opened in a new tab.
 
 `disabledInteractive` keeps a `disabled` button focusable and hoverable (`aria-disabled` instead of the
 native `disabled`); clicks stay blocked. Use it when a `uiTooltip` explains why the button is disabled,
@@ -117,6 +126,13 @@ All form controls work with **Signal Forms**, **Reactive Forms** and **template-
 | `ui-checkbox`, `ui-switch` | `FormCheckboxControl` (`checked`) | `ControlValueAccessor` |
 | `ui-radio-group`           | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-select`                | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| `ui-multi-select`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| `ui-datepicker`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+
+Every control supports `disabled`, `readonly` (also from a Signal Forms `readonly()` rule),
+`required` and `aria-describedby`. A readonly control stays focusable and reports
+`aria-readonly`. A `required` checkbox or switch is invalid until checked, also in Reactive and
+template forms.
 
 `ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
 `aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
@@ -246,10 +262,20 @@ the nearest scope:
   --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
 }
 
+// Local re-brand: override the whole primary family, or hover and text colors stay blue.
 .checkout.ui-theme-scope {
-  --ui-color-primary: var(--ui-color-success); // local re-brand
+  --ui-color-primary: var(--ui-ref-color-green-700);
+  --ui-color-primary-hover: var(--ui-ref-color-green-800);
+  --ui-color-primary-active: var(--ui-ref-color-green-900);
+  --ui-color-primary-subtle: var(--ui-ref-color-green-50);
+  --ui-color-primary-subtle-hover: var(--ui-ref-color-green-100);
+  --ui-color-primary-text: var(--ui-ref-color-green-800);
 }
 ```
+
+In the dark theme the primary family uses lighter shades; override it there too
+(`[data-theme='dark'] .checkout.ui-theme-scope { ... }`). Run the new pairs through a contrast
+checker: `pnpm tokens` only checks the built-in tokens.
 
 Use the mixins in application SCSS:
 
@@ -765,14 +791,22 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 
 ### Scripts
 
-| Command          | What it does                                                   |
-| ---------------- | -------------------------------------------------------------- |
-| `pnpm tokens`    | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast |
-| `pnpm test`      | Unit tests (Vitest)                                            |
-| `pnpm lint`      | ESLint (TS + templates + a11y) and Stylelint (token rules)     |
-| `pnpm build`     | Tokens and the library build into `dist/ui-kit`                |
-| `pnpm storybook` | Storybook dev server                                           |
-| `pnpm format`    | Prettier                                                       |
+| Command                 | What it does                                                           |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `pnpm start`            | Playground dev server                                                  |
+| `pnpm tokens`           | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast         |
+| `pnpm test`             | Unit tests (Vitest)                                                    |
+| `pnpm test:watch`       | Unit tests in watch mode                                               |
+| `pnpm test:coverage`    | Unit tests with coverage; fails below the thresholds in `angular.json` |
+| `pnpm test:playground`  | Playground smoke tests                                                 |
+| `pnpm lint`             | ESLint (TS, type-aware bug rules, templates, a11y) and Stylelint       |
+| `pnpm format`           | Prettier (write)                                                       |
+| `pnpm format:check`     | Prettier (check only)                                                  |
+| `pnpm build`            | Tokens and the library build into `dist/ui-kit`                        |
+| `pnpm build:playground` | Playground build (checks the bundle budgets)                           |
+| `pnpm storybook`        | Storybook dev server                                                   |
+| `pnpm build-storybook`  | Static Storybook in `dist/storybook/ui-kit`                            |
+| `pnpm test-storybook`   | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes    |
 
 ### Adding a component
 
@@ -797,7 +831,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
    - keyboard interaction;
    - ARIA attributes;
    - for form controls, Reactive Forms and Signal Forms (value both ways, disabled, touched, error linking).
-8. Required stories: one per variant and state (default, sizes, disabled, invalid, loading, ...). Check the a11y panel in both themes and in RTL.
+8. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL.
 9. Keep commits small, one per component: `feat(<name>): ...`.
 
 Anything not exported from an entry point's `public-api.ts` is internal and may change without notice.
