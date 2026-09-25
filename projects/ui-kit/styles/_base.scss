@@ -1,0 +1,21 @@
+// Opt-in document defaults. Included by ui-kit.scss.
+:root {
+  font-family: var(--ui-font-family-sans);
+  font-size: 100%;
+  line-height: var(--ui-line-height-normal);
+  color: var(--ui-color-text);
+  background-color: var(--ui-color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

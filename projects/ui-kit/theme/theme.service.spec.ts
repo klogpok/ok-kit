@@ -1,0 +1,62 @@
+import { TestBed } from '@angular/core/testing';
+import { DOCUMENT } from '@angular/common';
+import { ThemeService, provideUiTheme } from './theme.service';
+
+describe('ThemeService', () => {
+  let root: HTMLElement;
+
+  function create(options?: Parameters<typeof provideUiTheme>[0]): ThemeService {
+    TestBed.configureTestingModule({ providers: options ? [provideUiTheme(options)] : [] });
+    root = TestBed.inject(DOCUMENT).documentElement;
+    const service = TestBed.inject(ThemeService);
+    TestBed.tick();
+    return service;
+  }
+
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.removeAttribute('data-theme');
+  });
+
+  it('defaults to system mode without a data-theme attribute', () => {
+    const service = create();
+    expect(service.mode()).toBe('system');
+    expect(root.hasAttribute('data-theme')).toBe(false);
+  });
+
+  it('applies and persists an explicit mode', () => {
+    const service = create();
+    service.setMode('dark');
+    TestBed.tick();
+    expect(root.getAttribute('data-theme')).toBe('dark');
+    expect(service.theme()).toBe('dark');
+    expect(localStorage.getItem('ui-theme')).toBe('dark');
+  });
+
+  it('restores the persisted mode', () => {
+    localStorage.setItem('ui-theme', 'dark');
+    const service = create();
+    expect(service.mode()).toBe('dark');
+    expect(root.getAttribute('data-theme')).toBe('dark');
+  });
+
+  it('ignores invalid persisted values', () => {
+    localStorage.setItem('ui-theme', 'purple');
+    expect(create().mode()).toBe('system');
+  });
+
+  it('toggles between light and dark', () => {
+    const service = create({ defaultMode: 'light' });
+    service.toggle();
+    expect(service.mode()).toBe('dark');
+    service.toggle();
+    expect(service.mode()).toBe('light');
+  });
+
+  it('respects a custom storage key and disabled persistence', () => {
+    const service = create({ storageKey: null });
+    service.setMode('light');
+    TestBed.tick();
+    expect(localStorage.length).toBe(0);
+  });
+});

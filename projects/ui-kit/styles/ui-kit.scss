@@ -1,0 +1,5 @@
+// Full ui-kit global stylesheet: tokens + document defaults + typography.
+// Add to angular.json "styles": ["node_modules/@vplans/ui-kit/styles/ui-kit.scss"].
+@use 'tokens';
+@use 'base';
+@use 'typography';

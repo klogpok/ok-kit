@@ -1,0 +1,62 @@
+@use 'mixins';
+
+// Global typography classes. Headings keep semantic HTML: use <h1 class="ui-heading-1">.
+.ui-display {
+  @include mixins.text(4xl, bold, tight);
+  letter-spacing: -0.02em;
+}
+
+.ui-heading-1 {
+  @include mixins.text(3xl, bold, tight);
+  letter-spacing: -0.015em;
+}
+
+.ui-heading-2 {
+  @include mixins.text(2xl, semibold, tight);
+}
+
+.ui-heading-3 {
+  @include mixins.text(xl, semibold, snug);
+}
+
+.ui-heading-4 {
+  @include mixins.text(lg, semibold, snug);
+}
+
+.ui-body-lg {
+  @include mixins.text(lg);
+}
+
+.ui-body {
+  @include mixins.text(md);
+}
+
+.ui-body-sm {
+  @include mixins.text(sm);
+}
+
+.ui-caption {
+  @include mixins.text(xs, regular, snug);
+  color: var(--ui-color-text-muted);
+}
+
+.ui-label {
+  @include mixins.text(sm, medium, snug);
+}
+
+.ui-code {
+  font-family: var(--ui-font-family-mono);
+  font-size: 0.875em;
+}
+
+.ui-text-muted {
+  color: var(--ui-color-text-muted);
+}
+
+.ui-visually-hidden {
+  @include mixins.visually-hidden;
+}
+
+:is(.ui-display, .ui-heading-1, .ui-heading-2, .ui-heading-3, .ui-heading-4) {
+  margin-block: 0;
+}
