@@ -2018,6 +2018,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-size-xs)"
   },
   {
+    "name": "--ui-badge-font-size-md",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
     "name": "--ui-badge-font-weight",
     "layer": "component",
     "light": "var(--ui-font-weight-semibold)",

@@ -27,7 +27,7 @@
 :host(.ui-badge--md) {
   --_pad-block: var(--ui-space-3xs);
   --_pad-inline: var(--ui-space-sm);
-  --_font-size: var(--ui-font-size-sm);
+  --_font-size: var(--ui-badge-font-size-md);
 }
 
 @each $tone in neutral, primary, success, warning, danger {

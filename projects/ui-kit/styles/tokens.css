@@ -457,6 +457,7 @@
   --ui-divider-vertical-min-height: var(--ui-em-1);
   --ui-badge-radius: var(--ui-radius-full);
   --ui-badge-font-size: var(--ui-font-size-xs);
+  --ui-badge-font-size-md: var(--ui-font-size-sm);
   --ui-badge-font-weight: var(--ui-font-weight-semibold);
   --ui-badge-neutral-soft-bg: var(--ui-color-surface-muted);
   --ui-badge-neutral-soft-text: var(--ui-color-text-muted);

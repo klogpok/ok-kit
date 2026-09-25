@@ -591,6 +591,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-divider-vertical-min-height`      | component | `var(--ui-em-1)`                                                             | `var(--ui-em-1)`                                                       |
 | `--ui-badge-radius`                     | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
 | `--ui-badge-font-size`                  | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
+| `--ui-badge-font-size-md`               | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
 | `--ui-badge-font-weight`                | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 | `--ui-badge-neutral-soft-bg`            | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
 | `--ui-badge-neutral-soft-text`          | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
