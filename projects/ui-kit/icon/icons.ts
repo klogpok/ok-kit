@@ -42,6 +42,16 @@ export const uiIconChevronRight: UiIconDefinition = {
   svg: svg('<path d="M9 6l6 6-6 6"/>'),
 };
 
+export const uiIconChevronsLeft: UiIconDefinition = {
+  name: 'chevrons-left',
+  svg: svg('<path d="M18 6l-6 6 6 6M11 6l-6 6 6 6"/>'),
+};
+
+export const uiIconChevronsRight: UiIconDefinition = {
+  name: 'chevrons-right',
+  svg: svg('<path d="M6 6l6 6-6 6M13 6l6 6-6 6"/>'),
+};
+
 export const uiIconArrowLeft: UiIconDefinition = {
   name: 'arrow-left',
   svg: svg('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
@@ -128,6 +138,8 @@ export const UI_ICONS_ALL: readonly UiIconDefinition[] = [
   uiIconChevronUp,
   uiIconChevronLeft,
   uiIconChevronRight,
+  uiIconChevronsLeft,
+  uiIconChevronsRight,
   uiIconArrowLeft,
   uiIconArrowRight,
   uiIconSearch,
