@@ -109,8 +109,13 @@ export class UiTooltip implements UiTooltipHost {
   /** Milliseconds before the tooltip hides after the pointer leaves. */
   readonly hideDelay = input(100, { alias: 'uiTooltipHideDelay', transform: numberAttribute });
 
+  /** The message to show and describe; empty when disabled or blank. */
+  private readonly effectiveMessage = computed(() =>
+    this.disabled() ? '' : this.message().trim(),
+  );
+
   /** Whether the tooltip has a message and is not disabled. */
-  readonly active = computed(() => !this.disabled() && !!this.message().trim());
+  readonly active = computed(() => !!this.effectiveMessage());
 
   private overlayRef: OverlayRef | null = null;
   private positionStrategy: FlexibleConnectedPositionStrategy | null = null;
@@ -126,7 +131,7 @@ export class UiTooltip implements UiTooltipHost {
   constructor() {
     // Keeps aria-describedby and an open tooltip in sync with the message.
     effect(() => {
-      const message = this.disabled() ? '' : this.message().trim();
+      const message = this.effectiveMessage();
       if (message !== this.describedMessage) {
         this.describer.removeDescription(this.host, this.describedMessage);
         if (message) this.describer.describe(this.host, message);
