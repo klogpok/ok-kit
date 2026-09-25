@@ -5,9 +5,7 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
-  Injectable,
   Injector,
-  Signal,
   booleanAttribute,
   computed,
   effect,
@@ -27,7 +25,7 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { UI_TOOLTIP_HOST, UiTooltipHost, resolveDirection } from '@vplans/ui-kit/core';
+import { resolveDirection } from '@vplans/ui-kit/core';
 
 export type UiTooltipPosition = 'top' | 'bottom' | 'start' | 'end';
 
@@ -74,17 +72,6 @@ export class UiTooltipPanel {
   }
 }
 
-/** Tells the host component whether the tooltip is active, kept out of the public `UiTooltip` API. Internal. */
-@Injectable()
-class UiTooltipHostState implements UiTooltipHost {
-  private readonly message = signal<Signal<string>>(signal(''));
-  readonly active = computed(() => !!this.message()());
-
-  connect(message: Signal<string>): void {
-    this.message.set(message);
-  }
-}
-
 /**
  * Short description shown on hover and keyboard focus. The text is also exposed to screen readers
  * through `aria-describedby`. Do not put interactive content or essential information in it.
@@ -101,7 +88,6 @@ class UiTooltipHostState implements UiTooltipHost {
 @Directive({
   selector: '[uiTooltip]',
   exportAs: 'uiTooltip',
-  providers: [UiTooltipHostState, { provide: UI_TOOLTIP_HOST, useExisting: UiTooltipHostState }],
   host: {
     '(mouseenter)': 'onMouseEnter()',
     '(mouseleave)': 'onMouseLeave()',
@@ -146,8 +132,6 @@ export class UiTooltip {
   private titleObserver: MutationObserver | null = null;
 
   constructor() {
-    inject(UiTooltipHostState).connect(this.effectiveMessage);
-
     // Keeps aria-describedby and an open tooltip in sync with the message.
     effect(() => {
       const message = this.effectiveMessage();

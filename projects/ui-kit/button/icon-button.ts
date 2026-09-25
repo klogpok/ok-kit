@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { UI_TOOLTIP_HOST, UiVariant } from '@vplans/ui-kit/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { UiVariant } from '@vplans/ui-kit/core';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import { UiButtonBase } from './button-base';
 
@@ -23,14 +23,11 @@ import { UiButtonBase } from './button-base';
   host: {
     class: 'ui-button ui-button--icon',
     '[attr.aria-label]': 'label()',
-    '[attr.title]': 'nativeTitle()',
+    '[attr.title]': 'label()',
   },
 })
 export class UiIconButton extends UiButtonBase {
   readonly variant = input<UiVariant>('ghost');
-  /** Accessible name, also shown as a native tooltip unless `uiTooltip` is set. */
+  /** Accessible name, also shown as a native tooltip (`uiTooltip` hides it while active). */
   readonly label = input.required<string>();
-
-  private readonly tooltip = inject(UI_TOOLTIP_HOST, { self: true, optional: true });
-  protected readonly nativeTitle = computed(() => (this.tooltip?.active() ? null : this.label()));
 }

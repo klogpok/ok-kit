@@ -156,9 +156,9 @@ class IconHost {
 }
 
 describe('UiTooltip on ui-icon-button', () => {
-  it('removes the native title while the tooltip is active', () => {
+  it('removes the native title while the tooltip is active', async () => {
     const fixture = TestBed.createComponent(IconHost);
-    fixture.detectChanges();
+    await fixture.whenStable();
     const [button, plain] = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
     );
@@ -167,23 +167,23 @@ describe('UiTooltip on ui-icon-button', () => {
     expect(plain.getAttribute('title')).toBe('Close');
 
     fixture.componentInstance.disabled.set(true);
-    fixture.detectChanges();
+    await fixture.whenStable();
     expect(button.getAttribute('title')).toBe('Delete');
 
     fixture.componentInstance.disabled.set(false);
     fixture.componentInstance.message.set('');
-    fixture.detectChanges();
+    await fixture.whenStable();
     expect(button.getAttribute('title')).toBe('Delete');
 
     fixture.componentInstance.message.set('   ');
-    fixture.detectChanges();
+    await fixture.whenStable();
     expect(button.getAttribute('title')).toBe('Delete');
   });
 
-  it('leaves out the native title of a disabled button too', () => {
+  it('leaves out the native title of a disabled button too', async () => {
     const fixture = TestBed.createComponent(IconHost);
     fixture.componentInstance.buttonDisabled.set(true);
-    fixture.detectChanges();
+    await fixture.whenStable();
     const button = (fixture.nativeElement as HTMLElement).querySelector('button')!;
     expect(button.disabled).toBe(true);
     expect(button.hasAttribute('title')).toBe(false);

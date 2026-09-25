@@ -5,4 +5,3 @@ export * from './form-control-base';
 export * from './direction';
 export * from './labels';
 export * from './live-directionality';
-export * from './tooltip-host';
