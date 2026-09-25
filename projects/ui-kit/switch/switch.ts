@@ -43,8 +43,10 @@ import {
           [attr.name]="name() || null"
           [attr.aria-checked]="isChecked()"
           [attr.aria-label]="ariaLabel() || null"
+          [attr.aria-readonly]="readonly() ? 'true' : null"
           [attr.aria-invalid]="showError() ? 'true' : null"
           [attr.aria-describedby]="formField?.describedBy() ?? null"
+          (click)="onInputClick($event)"
           (change)="onInputChange($event)"
           (blur)="onBlur()"
         />
@@ -60,6 +62,7 @@ import {
     '[class]': '"ui-switch--" + size()',
     '[class.ui-switch--checked]': 'isChecked()',
     '[class.ui-switch--disabled]': 'isDisabled()',
+    '[class.ui-switch--readonly]': 'readonly()',
     '[class.ui-switch--invalid]': 'showError()',
     '[class.ui-switch--label-start]': 'labelPosition() === "start"',
     '[class.ui-switch--full-width]': 'fullWidth()',
@@ -91,6 +94,11 @@ export class UiSwitch extends UiFormControlBase<boolean> implements UiFormFieldC
 
   focus(options?: FocusOptions): void {
     this.inputRef().nativeElement.focus(options);
+  }
+
+  /** A readonly checkbox cannot be toggled; a native checkbox ignores the `readonly` attribute. */
+  protected onInputClick(event: MouseEvent): void {
+    if (this.readonly()) event.preventDefault();
   }
 
   protected onInputChange(event: Event): void {

@@ -105,6 +105,10 @@
   outline-offset: var(--ui-border-width-default);
 }
 
+:host(.ui-switch--readonly) .ui-switch__label {
+  cursor: default;
+}
+
 :host(.ui-switch--disabled) {
   color: var(--ui-color-text-disabled);
 

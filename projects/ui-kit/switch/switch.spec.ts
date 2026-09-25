@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { FormField, form } from '@angular/forms/signals';
+import { FormField, form, readonly } from '@angular/forms/signals';
 import { UiSwitch } from './switch';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -94,5 +94,29 @@ describe('UiSwitch static attributes', () => {
     const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
     expect(input.checked).toBe(true);
     expect(input.getAttribute('aria-checked')).toBe('true');
+  });
+});
+
+@Component({
+  imports: [FormField, UiSwitch],
+  template: `<ui-switch [formField]="f.alerts">Alerts</ui-switch>`,
+})
+class ReadonlySwitchHost {
+  readonly model = signal({ alerts: true });
+  readonly f = form(this.model, (p) => {
+    readonly(p.alerts);
+  });
+}
+
+describe('UiSwitch readonly', () => {
+  it('keeps its state on click under a Signal Forms readonly rule', async () => {
+    const fixture = TestBed.createComponent(ReadonlySwitchHost);
+    await settle(fixture);
+    const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
+    input.click();
+    await settle(fixture);
+    expect(fixture.componentInstance.model().alerts).toBe(true);
+    expect(input.checked).toBe(true);
+    expect(input.getAttribute('aria-readonly')).toBe('true');
   });
 });
