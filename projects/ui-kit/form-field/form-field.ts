@@ -1,0 +1,92 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChild,
+  contentChildren,
+  forwardRef,
+  inject,
+  input,
+} from '@angular/core';
+import { _IdGenerator } from '@angular/cdk/a11y';
+import { UI_FORM_FIELD, UI_FORM_FIELD_CONTROL, UiFormFieldContext } from '@vplans/ui-kit/core';
+
+/** Helper text shown below the control while there is no visible error. */
+@Component({
+  selector: 'ui-hint',
+  template: '<ng-content />',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'ui-hint' },
+})
+export class UiHint {}
+
+/** Error message, shown only while the control is in an error state (invalid and touched). */
+@Component({
+  selector: 'ui-error',
+  template: '<ng-content />',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'ui-error' },
+})
+export class UiError {}
+
+/**
+ * Wraps a control with a label, hint and error messages, and links them via
+ * `for` / `aria-labelledby` and `aria-describedby`.
+ *
+ * Errors come from projected `<ui-error>` elements; if none are projected, messages supplied by
+ * the forms layer are shown (Signal Forms `message`, or string-valued Reactive Forms errors).
+ *
+ * @example
+ * <ui-form-field label="Email" hint="We never share it">
+ *   <input ui-input type="email" formControlName="email" />
+ *   @if (email.hasError('required')) { <ui-error>Email is required</ui-error> }
+ * </ui-form-field>
+ */
+@Component({
+  selector: 'ui-form-field',
+  templateUrl: './form-field.html',
+  styleUrl: './form-field.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [{ provide: UI_FORM_FIELD, useExisting: forwardRef(() => UiFormField) }],
+  host: {
+    class: 'ui-form-field',
+    '[class.ui-form-field--disabled]': 'control()?.disabled()',
+    '[class.ui-form-field--invalid]': 'showError()',
+  },
+})
+export class UiFormField implements UiFormFieldContext {
+  private readonly ids = inject(_IdGenerator);
+
+  readonly label = input('');
+  readonly hint = input('');
+  /** Show the required marker. Defaults to the control's required state. */
+  readonly required = input<boolean | undefined>(undefined);
+
+  protected readonly control = contentChild(UI_FORM_FIELD_CONTROL, { descendants: true });
+  private readonly projectedHints = contentChildren(UiHint, { descendants: true });
+  private readonly projectedErrors = contentChildren(UiError, { descendants: true });
+
+  readonly labelId = this.ids.getId('ui-form-field-label-');
+  protected readonly hintId = this.ids.getId('ui-form-field-hint-');
+  protected readonly errorId = this.ids.getId('ui-form-field-error-');
+
+  protected readonly labelFor = computed(() => {
+    const control = this.control();
+    return control?.labelStrategy === 'for' ? control.id() : null;
+  });
+  protected readonly isRequired = computed(() => this.required() ?? this.control()?.required() ?? false);
+  protected readonly showError = computed(() => this.control()?.showError() ?? false);
+  protected readonly hasProjectedErrors = computed(() => this.projectedErrors().length > 0);
+  protected readonly autoErrors = computed(() =>
+    this.hasProjectedErrors() ? [] : (this.control()?.errorMessages() ?? []),
+  );
+  protected readonly hasError = computed(
+    () => this.showError() && (this.hasProjectedErrors() || this.autoErrors().length > 0),
+  );
+  protected readonly hasHint = computed(() => !!this.hint() || this.projectedHints().length > 0);
+
+  readonly describedBy = computed(() => {
+    if (this.hasError()) return this.errorId;
+    return this.hasHint() ? this.hintId : null;
+  });
+}

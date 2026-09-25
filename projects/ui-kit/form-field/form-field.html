@@ -1,0 +1,27 @@
+@if (label()) {
+  <label class="ui-form-field__label" [id]="labelId" [attr.for]="labelFor()">
+    {{ label() }}
+    @if (isRequired()) {
+      <span class="ui-form-field__required" aria-hidden="true">*</span>
+    }
+  </label>
+}
+
+<div class="ui-form-field__control">
+  <ng-content />
+</div>
+
+<!-- Always rendered so that inserted errors are announced by the live region. -->
+<div class="ui-form-field__error" [id]="errorId" aria-live="polite" [hidden]="!hasError()">
+  @if (showError()) {
+    <ng-content select="ui-error" />
+    @for (message of autoErrors(); track message) {
+      <span class="ui-error">{{ message }}</span>
+    }
+  }
+</div>
+
+<div class="ui-form-field__hint" [id]="hintId" [hidden]="!hasHint() || hasError()">
+  <ng-content select="ui-hint" />
+  {{ hint() }}
+</div>
