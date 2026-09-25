@@ -49,7 +49,7 @@ import {
           [attr.aria-label]="ariaLabel() || null"
           [attr.aria-readonly]="readonly() ? 'true' : null"
           [attr.aria-invalid]="showError() ? 'true' : null"
-          [attr.aria-describedby]="formField?.describedBy() ?? null"
+          [attr.aria-describedby]="describedBy()"
           (click)="onInputClick($event)"
           (change)="onInputChange($event)"
           (blur)="onBlur()"
@@ -74,8 +74,9 @@ import {
     '[class.ui-switch--label-start]': 'labelPosition() === "start"',
     '[class.ui-switch--full-width]': 'fullWidth()',
     '[attr.id]': 'id()',
-    // The native control carries the label; a static attribute would also stay on the host.
+    // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
   },
 })
 export class UiSwitch extends UiFormControlBase<boolean> implements UiFormFieldControl {

@@ -293,3 +293,26 @@ describe('UiCheckbox validators set at runtime', () => {
     expect(input.required).toBe(true);
   });
 });
+
+@Component({
+  imports: [UiCheckbox, UiFormField],
+  template: `
+    <p id="terms-note">Read the terms first</p>
+    <ui-form-field hint="Required for new plans">
+      <ui-checkbox aria-describedby="terms-note">Terms</ui-checkbox>
+    </ui-form-field>
+  `,
+})
+class DescribedHost {}
+
+describe('UiCheckbox aria-describedby', () => {
+  it('keeps the app description before the form-field hint on the native input', async () => {
+    const fixture = TestBed.createComponent(DescribedHost);
+    await settle(fixture);
+    const root = fixture.nativeElement as HTMLElement;
+    const ids = root.querySelector('input')!.getAttribute('aria-describedby')!.split(' ');
+    expect(ids[0]).toBe('terms-note');
+    expect(document.getElementById(ids[1])?.textContent).toContain('Required for new plans');
+    expect(root.querySelector('ui-checkbox')!.hasAttribute('aria-describedby')).toBe(false);
+  });
+});

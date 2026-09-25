@@ -93,7 +93,7 @@ interface Draft {
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-required]="isRequired() ? 'true' : null"
         [attr.aria-invalid]="invalidState() ? 'true' : null"
-        [attr.aria-describedby]="formField?.describedBy() ?? null"
+        [attr.aria-describedby]="describedBy()"
         (input)="onInput($event)"
         (keydown)="onInputKeydown($event)"
         (blur)="onBlur()"
@@ -151,8 +151,9 @@ interface Draft {
     '[class.ui-datepicker--readonly]': 'readonly()',
     '[class.ui-datepicker--invalid]': 'invalidState()',
     '[attr.id]': 'id()',
-    // The native control carries the label; a static attribute would also stay on the host.
+    // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
     '(focusout)': 'onFocusOut($event)',
   },
 })

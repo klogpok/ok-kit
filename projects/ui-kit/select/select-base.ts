@@ -51,8 +51,9 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
     '[class.ui-select--readonly]': 'readonly()',
     '[class.ui-select--invalid]': 'showError()',
     '[attr.id]': 'id()',
-    // The native control carries the label; a static attribute would also stay on the host.
+    // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
   },
 })
 export abstract class UiSelectBase<T, V>

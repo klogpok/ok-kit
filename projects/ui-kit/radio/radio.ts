@@ -56,7 +56,7 @@ class UiRadioGroupControl {
     '[attr.id]': 'id()',
     '[attr.aria-label]': 'ariaLabel() || null',
     '[attr.aria-labelledby]': 'ariaLabelledby() || formField?.labelledBy() || null',
-    '[attr.aria-describedby]': 'formField?.describedBy() ?? null',
+    '[attr.aria-describedby]': 'describedBy()',
     '[attr.aria-invalid]': 'showError() ? "true" : null',
     '[attr.aria-required]': 'isRequired() ? "true" : null',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',

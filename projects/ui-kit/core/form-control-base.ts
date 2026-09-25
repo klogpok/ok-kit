@@ -45,6 +45,8 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
    * derived from the control (invalid and touched).
    */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Ids of the app's own descriptions, kept before the hint / error of `ui-form-field`. */
+  readonly ariaDescribedBy = input<string | null>(null, { alias: 'aria-describedby' });
   /** Emits when the user leaves the control. Signal Forms uses it to mark the field touched. */
   readonly touch = output<void>();
 
@@ -62,6 +64,10 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
       (this.controlState.bound
         ? this.controlState.invalid() && this.controlState.touched()
         : this.invalid()),
+  );
+  /** `aria-describedby` of the element that has the control role. */
+  protected readonly describedBy = computed(
+    () => [this.ariaDescribedBy(), this.formField?.describedBy()].filter(Boolean).join(' ') || null,
   );
   readonly errorMessages = computed(() => [
     ...new Set([...this.ownErrors(), ...this.controlState.errorMessages()]),

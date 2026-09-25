@@ -228,7 +228,7 @@ describe('UiRadioGroup with compareWith', () => {
 @Component({
   imports: [FormField, UiRadioGroup, UiRadio],
   template: `
-    <ui-radio-group aria-label="Delivery" [formField]="f.delivery">
+    <ui-radio-group aria-label="Delivery" aria-describedby="delivery-note" [formField]="f.delivery">
       <ui-radio value="pickup">Pickup</ui-radio>
       <ui-radio value="courier" aria-label="Courier delivery">Courier</ui-radio>
     </ui-radio-group>
@@ -253,6 +253,9 @@ describe('UiRadioGroup readonly', () => {
     expect(pickup.checked).toBe(true);
     expect(courier.checked).toBe(false);
     expect(root.querySelector('ui-radio-group')!.getAttribute('aria-readonly')).toBe('true');
+    expect(root.querySelector('ui-radio-group')!.getAttribute('aria-describedby')).toBe(
+      'delivery-note',
+    );
   });
 
   it('moves the aria-label of a radio from its host to the native input', async () => {

@@ -13,7 +13,7 @@
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-readonly]="readonly() ? 'true' : null"
       [attr.aria-invalid]="showError() ? 'true' : null"
-      [attr.aria-describedby]="formField?.describedBy() ?? null"
+      [attr.aria-describedby]="describedBy()"
       (click)="onInputClick($event)"
       (change)="onInputChange($event)"
       (blur)="onBlur()"
