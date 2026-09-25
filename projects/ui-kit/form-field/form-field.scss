@@ -108,6 +108,11 @@
   color: var(--ui-form-field-error-color);
 }
 
+// Out of the flex flow, so the field gap does not grow while there is no error.
+.ui-form-field__error--empty {
+  @include mixins.visually-hidden;
+}
+
 [hidden] {
   display: none;
 }

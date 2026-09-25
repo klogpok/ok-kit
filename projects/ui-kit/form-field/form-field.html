@@ -19,8 +19,16 @@
   }
 </div>
 
-<!-- Always rendered so that inserted errors are announced by the live region. -->
-<div class="ui-form-field__error" [id]="errorId" aria-live="polite" [hidden]="!hasError()">
+<!--
+  Always in the accessibility tree (never display: none), so that inserted errors are announced by
+  the live region. While empty it is visually hidden and takes no space.
+-->
+<div
+  class="ui-form-field__error"
+  [class.ui-form-field__error--empty]="!hasError()"
+  [id]="errorId"
+  aria-live="polite"
+>
   @if (showError()) {
     <ng-content select="ui-error" />
     @for (message of autoErrors(); track message) {

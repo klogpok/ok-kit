@@ -99,7 +99,7 @@ describe('UiFormField + UiInput', () => {
       const error = query(fixture, '.ui-form-field__error');
       expect(inputEl.getAttribute('aria-invalid')).toBe('true');
       expect(inputEl.classList).toContain('ui-input--invalid');
-      expect(error.hidden).toBe(false);
+      expect(error.classList).not.toContain('ui-form-field__error--empty');
       expect(error.textContent).toContain('Email is required');
       expect(error.getAttribute('aria-live')).toBe('polite');
       expect(inputEl.getAttribute('aria-describedby')).toBe(error.id);
@@ -177,7 +177,9 @@ describe('UiFormField + UiInput', () => {
       expect(textarea.getAttribute('aria-describedby')).toBe(
         query(fixture, '.ui-form-field__hint').id,
       );
-      expect(query(fixture, '.ui-form-field__error').hidden).toBe(true);
+      const region = query(fixture, '.ui-form-field__error');
+      expect(region.hidden).toBe(false);
+      expect(region.classList).toContain('ui-form-field__error--empty');
 
       fixture.componentInstance.invalid.set(true);
       await settle(fixture);
