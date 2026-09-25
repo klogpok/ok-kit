@@ -6,6 +6,7 @@ import {
   ElementRef,
   Injector,
   TemplateRef,
+  afterRenderEffect,
   booleanAttribute,
   computed,
   contentChild,
@@ -180,6 +181,23 @@ export class UiTabGroup {
       if (this.activation() === 'automatic') this.select(index);
     });
     inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
+    // An overflowing tab list scrolls the selected tab into view (only sideways, not the page).
+    afterRenderEffect({
+      earlyRead: () => {
+        const button = this.buttons()[this.selected()]?.element;
+        const list = button?.parentElement;
+        if (!button || !list) return null;
+        const tab = button.getBoundingClientRect();
+        const box = list.getBoundingClientRect();
+        const offset =
+          tab.left < box.left ? tab.left - box.left : Math.max(tab.right - box.right, 0);
+        return offset ? { list, offset } : null;
+      },
+      write: (scroll) => {
+        const value = scroll();
+        value?.list.scrollBy?.({ left: value.offset });
+      },
+    });
     // Tell the parent which tab is really shown when its index was disabled or out of range.
     effect(() => {
       const selected = this.selected();

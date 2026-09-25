@@ -60,6 +60,18 @@ describe('UiTabGroup', () => {
 
   afterEach(() => root.remove());
 
+  it('scrolls a selected tab that is out of view into the tab list', async () => {
+    const list = root.querySelector<HTMLElement>('[role="tablist"]')!;
+    const scrollBy = vi.fn();
+    Object.assign(list, { scrollBy });
+    vi.spyOn(list, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 300, 40));
+    vi.spyOn(tabs()[2], 'getBoundingClientRect').mockReturnValue(new DOMRect(320, 0, 100, 40));
+    fixture.componentInstance.index.set(2);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(scrollBy).toHaveBeenCalledWith({ left: 120 });
+  });
+
   it('renders a tablist with linked tabs and panels', () => {
     expect(root.querySelector('[role="tablist"]')!.getAttribute('aria-label')).toBe('Plan');
     expect(root.querySelector('ui-tab-group')!.hasAttribute('aria-label')).toBe(false);
