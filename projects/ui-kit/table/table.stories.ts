@@ -127,6 +127,14 @@ const meta: Meta<TableArgs> = {
     }),
   ],
   argTypes: { rowDensity: { control: 'inline-radio', options: ['default', 'compact'] } },
+};
+
+export default meta;
+type Story = StoryObj<TableArgs>;
+
+/** VPlans plans list: sortable columns, status pills, row actions and pagination. */
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Plans: Story = {
   args: { isLoading: false, rowDensity: 'default' },
   render: (args) => ({
     props: args,
@@ -134,16 +142,10 @@ const meta: Meta<TableArgs> = {
   }),
 };
 
-export default meta;
-type Story = StoryObj<TableArgs>;
-
-/** VPlans plans list: sortable columns, status pills, row actions and pagination. */
-export const Plans: Story = {};
-
-export const Compact: Story = { args: { rowDensity: 'compact' } };
+export const Compact: Story = { ...Plans, args: { ...Plans.args, rowDensity: 'compact' } };
 
 /** Reloading with rows on screen: the table is `aria-busy` and a line pulses under the header. */
-export const Reloading: Story = { args: { isLoading: true } };
+export const Reloading: Story = { ...Plans, args: { ...Plans.args, isLoading: true } };
 
 /** First load: skeleton rows. */
 export const FirstLoad: Story = {
@@ -161,13 +163,12 @@ export const Empty: Story = {
 /** The header stays visible while the container scrolls. */
 export const StickyHeader: Story = {
   render: () => ({
-    props: { rows: Array.from({ length: 30 }, (_, i) => i + 1) },
     template: `
       <div style="max-block-size:16rem;overflow:auto" tabindex="0" role="region" aria-label="Units">
         <table ui-table stickyHeader>
           <thead><tr><th scope="col">Unit</th><th scope="col" class="ui-table-numeric">Area (m²)</th></tr></thead>
           <tbody>
-            @for (row of rows; track row) {
+            @for (row of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; track row) {
               <tr><td>Unit {{ row }}</td><td class="ui-table-numeric">{{ 40 + row * 3 }}</td></tr>
             }
           </tbody>
