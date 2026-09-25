@@ -1956,5 +1956,71 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-danger-contrast)",
     "dark": "var(--ui-color-danger-contrast)"
+  },
+  {
+    "name": "--ui-card-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-card-border",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-card-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-card-shadow",
+    "layer": "component",
+    "light": "var(--ui-shadow-md)",
+    "dark": "var(--ui-shadow-md)"
+  },
+  {
+    "name": "--ui-card-padding-sm",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-card-padding-md",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-card-padding-lg",
+    "layer": "component",
+    "light": "var(--ui-space-xl)",
+    "dark": "var(--ui-space-xl)"
+  },
+  {
+    "name": "--ui-card-gap",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-card-title-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-lg)",
+    "dark": "var(--ui-font-size-lg)"
+  },
+  {
+    "name": "--ui-card-title-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-card-subtitle-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
   }
 ];

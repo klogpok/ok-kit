@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-card-gap);
+  box-sizing: border-box;
+  min-inline-size: 0;
+  padding: var(--_padding);
+  border: var(--ui-border-width-default) solid var(--ui-card-border);
+  border-radius: var(--ui-card-radius);
+  background-color: var(--ui-card-bg);
+  color: var(--ui-color-text);
+  font-family: var(--ui-font-family-sans);
+  overflow: hidden;
+}
+
+:host(.ui-card--elevated) {
+  border-color: transparent;
+  box-shadow: var(--ui-card-shadow);
+}
+
+:host(.ui-card--padding-none) {
+  --_padding: 0;
+}
+
+:host(.ui-card--padding-sm) {
+  --_padding: var(--ui-card-padding-sm);
+}
+
+:host(.ui-card--padding-md) {
+  --_padding: var(--ui-card-padding-md);
+}
+
+:host(.ui-card--padding-lg) {
+  --_padding: var(--ui-card-padding-lg);
+}
+
+@media (forced-colors: active) {
+  :host(.ui-card--elevated) {
+    border-color: CanvasText;
+  }
+}

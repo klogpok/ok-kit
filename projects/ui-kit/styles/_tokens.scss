@@ -439,4 +439,15 @@
   --ui-badge-danger-soft-text: var(--ui-color-danger-text);
   --ui-badge-danger-solid-bg: var(--ui-color-danger);
   --ui-badge-danger-solid-text: var(--ui-color-danger-contrast);
+  --ui-card-bg: var(--ui-color-surface);
+  --ui-card-border: var(--ui-color-border);
+  --ui-card-radius: var(--ui-radius-container);
+  --ui-card-shadow: var(--ui-shadow-md);
+  --ui-card-padding-sm: var(--ui-space-md);
+  --ui-card-padding-md: var(--ui-space-lg);
+  --ui-card-padding-lg: var(--ui-space-xl);
+  --ui-card-gap: var(--ui-space-md);
+  --ui-card-title-font-size: var(--ui-font-size-lg);
+  --ui-card-title-font-weight: var(--ui-font-weight-semibold);
+  --ui-card-subtitle-color: var(--ui-color-text-muted);
 }

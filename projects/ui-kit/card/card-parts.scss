@@ -1,0 +1,48 @@
+// Shared by the card parts; each rule matches only its own host class.
+
+:host(.ui-card-header) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ui-space-md);
+}
+
+.ui-card-header__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ui-space-3xs);
+  min-inline-size: 0;
+}
+
+:host(.ui-card-title) {
+  margin: 0;
+  color: var(--ui-color-text);
+  font-size: var(--ui-card-title-font-size);
+  font-weight: var(--ui-card-title-font-weight);
+  line-height: var(--ui-line-height-tight);
+}
+
+:host(.ui-card-subtitle) {
+  margin: 0;
+  color: var(--ui-card-subtitle-color);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-snug);
+}
+
+:host(.ui-card-content) {
+  display: block;
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-normal);
+}
+
+:host(.ui-card-footer) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ui-space-sm);
+}
+
+:host(.ui-card-footer--start) {
+  justify-content: flex-start;
+}

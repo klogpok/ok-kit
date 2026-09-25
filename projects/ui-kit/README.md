@@ -217,20 +217,21 @@ Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Direction
 
 ## Components
 
-| Entry point                 | Exports                                                |
-| --------------------------- | ------------------------------------------------------ |
-| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                             |
-| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                |
-| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                     |
-| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                           |
-| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                              |
-| `@vplans/ui-kit/switch`     | `UiSwitch`                                             |
-| `@vplans/ui-kit/spinner`    | `UiSpinner`                                            |
-| `@vplans/ui-kit/divider`    | `UiDivider`                                            |
-| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                               |
-| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons            |
-| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                       |
-| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract |
+| Entry point                 | Exports                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                 |
+| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                    |
+| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                                                         |
+| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                               |
+| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                  |
+| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                 |
+| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                |
+| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                |
+| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                   |
+| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter` |
+| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                |
+| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                           |
+| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract                                     |
 
 ## Tokens
 
@@ -437,6 +438,17 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-badge-danger-soft-text`       | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
 | `--ui-badge-danger-solid-bg`        | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
 | `--ui-badge-danger-solid-text`      | component | `var(--ui-color-danger-contrast)`                                            | `var(--ui-color-danger-contrast)`                                      |
+| `--ui-card-bg`                      | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
+| `--ui-card-border`                  | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
+| `--ui-card-radius`                  | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-card-shadow`                  | component | `var(--ui-shadow-md)`                                                        | `var(--ui-shadow-md)`                                                  |
+| `--ui-card-padding-sm`              | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
+| `--ui-card-padding-md`              | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-card-padding-lg`              | component | `var(--ui-space-xl)`                                                         | `var(--ui-space-xl)`                                                   |
+| `--ui-card-gap`                     | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
+| `--ui-card-title-font-size`         | component | `var(--ui-font-size-lg)`                                                     | `var(--ui-font-size-lg)`                                               |
+| `--ui-card-title-font-weight`       | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-card-subtitle-color`          | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 
 <!-- tokens:end -->
 
