@@ -133,6 +133,12 @@ export class UiFormField implements UiFormFieldContext {
     return this.hasHint() ? this.hintId : null;
   });
 
+  /** Like `label[for]`, a click on the label focuses a control that is labelled by id. */
+  protected onLabelClick(): void {
+    const control = this.control();
+    if (control?.labelStrategy === 'labelledby') control.focus();
+  }
+
   /** Clicking decorative affix content focuses the control, like clicking inside a native input. */
   // Returns void on purpose: a `false` result from a template listener calls preventDefault(),
   // which would cancel checkbox/radio toggles inside the field.

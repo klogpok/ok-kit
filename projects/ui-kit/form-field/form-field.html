@@ -1,5 +1,12 @@
 @if (label()) {
-  <label class="ui-form-field__label" [id]="labelId" [attr.for]="labelFor()">
+  <!-- The click only mirrors label[for] for controls labelled by id (radio group). -->
+  <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+  <label
+    class="ui-form-field__label"
+    [id]="labelId"
+    [attr.for]="labelFor()"
+    (click)="onLabelClick()"
+  >
     {{ label() }}
     @if (isRequired()) {
       <span class="ui-form-field__required" aria-hidden="true">*</span>

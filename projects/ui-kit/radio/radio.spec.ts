@@ -85,6 +85,12 @@ describe('UiRadioGroup', () => {
       expect(group.classList).toContain('ui-radio-group--horizontal');
     });
 
+    it('focuses the selected or first radio when the field label is clicked', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      el.querySelector<HTMLElement>('label.ui-form-field__label')!.click();
+      expect(document.activeElement).toBe(el.querySelector('input'));
+    });
+
     it('shares one generated name between native radios', () => {
       const names = new Set(radios.map((r) => r.name));
       expect(names.size).toBe(1);
