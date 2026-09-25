@@ -40,6 +40,8 @@ import {
     '[class.ui-checkbox--readonly]': 'readonly()',
     '[class.ui-checkbox--invalid]': 'showError()',
     '[attr.id]': 'id()',
+    // The native control carries the label; a static attribute would also stay on the host.
+    '[attr.aria-label]': 'null',
   },
 })
 export class UiCheckbox extends UiFormControlBase<boolean> implements UiFormFieldControl {

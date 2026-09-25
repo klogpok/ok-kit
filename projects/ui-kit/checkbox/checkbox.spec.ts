@@ -114,6 +114,7 @@ describe('UiCheckbox', () => {
       expect(document.activeElement).toBe(input);
       const unlabelled = (fixture.nativeElement as HTMLElement).querySelectorAll('input')[1];
       expect(unlabelled.getAttribute('aria-label')).toBe('Select row');
+      expect(unlabelled.closest('ui-checkbox')!.hasAttribute('aria-label')).toBe(false);
     });
   });
 
