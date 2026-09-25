@@ -46,6 +46,13 @@ const meta: Meta<CheckboxArgs> = {
   component: UiCheckbox,
   decorators: [moduleMetadata({ imports: [UiFormField, UiError, SelectAllStory] })],
   argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
+};
+
+export default meta;
+type Story = StoryObj<CheckboxArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: {
     label: 'Send me product updates',
     checked: false,
@@ -60,16 +67,14 @@ const meta: Meta<CheckboxArgs> = {
     template: `<ui-checkbox ${argsToTemplate(args)}>${label}</ui-checkbox>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<CheckboxArgs>;
-
-export const Default: Story = {};
-export const Checked: Story = { args: { checked: true } };
-export const Indeterminate: Story = { args: { indeterminate: true } };
-export const Disabled: Story = { args: { disabled: true } };
-export const DisabledChecked: Story = { args: { disabled: true, checked: true } };
-export const Invalid: Story = { args: { invalid: true } };
+export const Checked: Story = { ...Default, args: { ...Default.args, checked: true } };
+export const Indeterminate: Story = { ...Default, args: { ...Default.args, indeterminate: true } };
+export const Disabled: Story = { ...Default, args: { ...Default.args, disabled: true } };
+export const DisabledChecked: Story = {
+  ...Default,
+  args: { ...Default.args, disabled: true, checked: true },
+};
+export const Invalid: Story = { ...Default, args: { ...Default.args, invalid: true } };
 
 export const Sizes: Story = {
   render: () => ({
