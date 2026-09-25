@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   Injector,
   afterNextRender,
@@ -15,7 +16,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
-import { ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { transformedValue } from '@angular/forms/signals';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { UiIconButton } from '@vplans/ui-kit/button';
@@ -252,6 +253,14 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
     return error ? { [error.kind]: { message: error.message } } : null;
   };
 
+  /** The control that holds `parseValidator`; it must not keep it after this field is gone. */
+  private validatedControl: AbstractControl | null = null;
+
+  constructor() {
+    super();
+    inject(DestroyRef).onDestroy(() => this.releaseParseValidator());
+  }
+
   /** Without a forms directive, the field itself shows the parse error. */
   protected override ownErrors(): readonly string[] {
     return !this.controlState.bound && this.parseError() ? [this.labels().invalidDate] : [];
@@ -266,9 +275,13 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   }
 
   override registerOnChange(fn: (value: Date | null) => void): void {
-    const control = this.ngControl?.control;
-    if (control && !control.hasValidator(this.parseValidator)) {
-      control.addValidators(this.parseValidator);
+    const control = this.ngControl?.control ?? null;
+    if (control !== this.validatedControl) {
+      this.releaseParseValidator();
+      if (control && !control.hasValidator(this.parseValidator)) {
+        control.addValidators(this.parseValidator);
+      }
+      this.validatedControl = control;
     }
     super.registerOnChange(fn);
   }
@@ -359,6 +372,14 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
     const draft = this.draft();
     if (!draft) return;
     this.draft.set(draft.value ? null : { ...draft, committed: true });
+  }
+
+  private releaseParseValidator(): void {
+    const control = this.validatedControl;
+    this.validatedControl = null;
+    if (!control?.hasValidator(this.parseValidator)) return;
+    control.removeValidators(this.parseValidator);
+    control.updateValueAndValidity();
   }
 
   private setValue(value: Date | null): void {

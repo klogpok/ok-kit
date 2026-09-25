@@ -297,6 +297,64 @@ describe('UiDatepicker with Reactive Forms', () => {
 });
 
 @Component({
+  imports: [UiDatepicker, ReactiveFormsModule],
+  template: `
+    @if (shown()) {
+      <ui-datepicker aria-label="Deadline" [formControl]="control()" />
+    }
+  `,
+})
+class ConditionalHost {
+  readonly shown = signal(true);
+  readonly first = new FormControl<Date | null>(null);
+  readonly second = new FormControl<Date | null>(null);
+  readonly control = signal(this.first);
+}
+
+describe('UiDatepicker parse validator', () => {
+  let fixture: ComponentFixture<ConditionalHost>;
+  let root: HTMLElement;
+  const type = async (text: string) => {
+    const input = root.querySelector<HTMLInputElement>('input')!;
+    input.value = text;
+    input.dispatchEvent(new Event('input'));
+    await settle(fixture);
+  };
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ConditionalHost);
+    root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+  });
+
+  afterEach(() => root.remove());
+
+  it('is removed from the control when the datepicker is destroyed', async () => {
+    const { first } = fixture.componentInstance;
+    await type('abc');
+    expect(first.hasError('uiDateParse')).toBe(true);
+
+    fixture.componentInstance.shown.set(false);
+    await settle(fixture);
+    expect(first.valid).toBe(true);
+    expect(first.validator).toBeNull();
+  });
+
+  it('moves to the new control when the bound control changes', async () => {
+    const { first, second } = fixture.componentInstance;
+    await type('abc');
+    fixture.componentInstance.control.set(second);
+    await settle(fixture);
+    expect(first.valid).toBe(true);
+    expect(first.validator).toBeNull();
+
+    await type('xyz');
+    expect(second.hasError('uiDateParse')).toBe(true);
+  });
+});
+
+@Component({
   imports: [UiDatepicker, UiFormField, FormField],
   template: `
     <ui-form-field label="Date">
