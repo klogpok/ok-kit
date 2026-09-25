@@ -458,6 +458,8 @@ describe('UiDatepicker readonly', () => {
     const toggle = root.querySelector<HTMLButtonElement>('.ui-datepicker__toggle')!;
     expect(input.readOnly).toBe(true);
     expect(input.disabled).toBe(false);
+    expect(input.getAttribute('aria-label')).toBe('Date');
+    expect(root.querySelector('ui-datepicker')!.hasAttribute('aria-label')).toBe(false);
     expect(toggle.disabled).toBe(true);
     keydown(input, 'ArrowDown', { altKey: true });
     await settle(fixture);

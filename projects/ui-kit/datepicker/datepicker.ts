@@ -151,6 +151,8 @@ interface Draft {
     '[class.ui-datepicker--readonly]': 'readonly()',
     '[class.ui-datepicker--invalid]': 'invalidState()',
     '[attr.id]': 'id()',
+    // The native control carries the label; a static attribute would also stay on the host.
+    '[attr.aria-label]': 'null',
     '(focusout)': 'onFocusOut($event)',
   },
 })
