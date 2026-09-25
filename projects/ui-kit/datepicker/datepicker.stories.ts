@@ -11,8 +11,8 @@ import { UiDatepicker } from './datepicker';
 interface DatepickerArgs {
   label: string;
   hint: string;
-  isDisabled: boolean;
-  isInvalid: boolean;
+  disabledArg: boolean;
+  invalidArg: boolean;
   controlSize: 'sm' | 'md' | 'lg';
 }
 
@@ -29,8 +29,8 @@ const meta: Meta<DatepickerArgs> = {
   args: {
     label: 'תאריך חתימה',
     hint: 'אפשר להקליד או לבחור מהלוח',
-    isDisabled: false,
-    isInvalid: false,
+    disabledArg: false,
+    invalidArg: false,
     controlSize: 'md',
   },
   render: (args) => ({
@@ -40,8 +40,8 @@ const meta: Meta<DatepickerArgs> = {
         <ui-form-field [label]="label" [hint]="hint">
           <ui-datepicker
             [(value)]="value"
-            [disabled]="isDisabled"
-            [invalid]="isInvalid"
+            [disabled]="disabledArg"
+            [invalid]="invalidArg"
             [size]="controlSize"
           />
         </ui-form-field>
@@ -83,9 +83,9 @@ export const MinMaxAndFilter: Story = {
   }),
 };
 
-export const Disabled: Story = { args: { isDisabled: true } };
+export const Disabled: Story = { args: { disabledArg: true } };
 
-export const Invalid: Story = { args: { isInvalid: true } };
+export const Invalid: Story = { args: { invalidArg: true } };
 
 export const Sizes: Story = {
   render: () => ({
