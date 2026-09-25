@@ -250,7 +250,7 @@ describe('UiSelect', () => {
 
     it('shows an empty message when nothing matches', async () => {
       await type('zzz');
-      expect(listbox()!.textContent).toContain('No options');
+      expect(listbox()!.textContent).toContain('אין תוצאות');
     });
 
     it('keeps Space for typing', async () => {

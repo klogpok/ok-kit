@@ -5,7 +5,7 @@ const meta: Meta<UiSpinner> = {
   title: 'Feedback/Spinner',
   component: UiSpinner,
   argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
-  args: { size: 'md', label: 'Loading', decorative: false },
+  args: { size: 'md', label: '', decorative: false },
   render: (args) => ({ props: args, template: `<ui-spinner ${argsToTemplate(args)} />` }),
 };
 

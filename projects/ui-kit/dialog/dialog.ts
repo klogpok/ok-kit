@@ -71,7 +71,7 @@ export { DialogRef as UiDialogRef, DIALOG_DATA as UI_DIALOG_DATA };
         [attr.cdkFocusInitial]="danger ? '' : null"
         (click)="ref.close(false)"
       >
-        {{ data.cancelLabel || labels.cancel }}
+        {{ data.cancelLabel || labels().cancel }}
       </button>
       <button
         ui-button
@@ -79,7 +79,7 @@ export { DialogRef as UiDialogRef, DIALOG_DATA as UI_DIALOG_DATA };
         [attr.cdkFocusInitial]="danger ? null : ''"
         (click)="ref.close(true)"
       >
-        {{ data.confirmLabel || labels.confirm }}
+        {{ data.confirmLabel || labels().confirm }}
       </button>
     </ui-dialog-actions>
   `,

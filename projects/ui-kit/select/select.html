@@ -81,7 +81,7 @@
   >
     <ng-content />
     @if (noResults()) {
-      <div class="ui-select__empty">{{ labels.noOptions }}</div>
+      <div class="ui-select__empty">{{ labels().noOptions }}</div>
     }
   </div>
 </ng-template>

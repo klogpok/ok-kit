@@ -217,22 +217,30 @@ Components use only logical properties (`margin-inline-start`, `inset-inline-end
 Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Directional icons flip with
 `<ui-icon icon="arrow-right" flipRtl />`.
 
-Built-in texts (close buttons, confirm dialogs, empty lists) default to English. Translate them
-once for the whole app:
+### Built-in texts and i18n
+
+Built-in texts (close buttons, confirm dialogs, empty lists, the spinner name) default to Hebrew
+(`UI_LABELS_HE`). Keys you do not set keep the Hebrew default. `provideUiLabels()` accepts fixed
+values, a signal, or a factory, so it works with any i18n library:
 
 ```ts
-import { provideUiLabels } from '@vplans/ui-kit/core';
+import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 
-providers: [
-  provideUiLabels({
-    close: 'סגירה',
-    confirm: 'אישור',
-    cancel: 'ביטול',
-    noOptions: 'אין תוצאות',
-    notifications: 'התראות',
-  }),
-];
+// English app
+provideUiLabels(UI_LABELS_EN);
+
+// @angular/localize (build-time translation)
+provideUiLabels({ close: $localize`:@@ui.close:Close`, cancel: $localize`:@@ui.cancel:Cancel` });
+
+// Transloco or ngx-translate (runtime switch): the factory runs in an injection context,
+// and the kit follows the signal when the language changes.
+provideUiLabels(() =>
+  toSignal(inject(TranslocoService).selectTranslateObject('uiKit'), { initialValue: {} }),
+);
 ```
+
+Texts that belong to a specific use (a button label, a tooltip, a dialog title) are plain inputs:
+translate them in your templates as usual.
 
 ## Overlays
 

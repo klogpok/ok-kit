@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, input } from '@angular/core';
-import { UiSize } from '@vplans/ui-kit/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, inject, input } from '@angular/core';
+import { UI_LABELS, UiSize } from '@vplans/ui-kit/core';
 
 /**
  * Indeterminate loading indicator. Inherits the current text color.
@@ -20,14 +20,16 @@ import { UiSize } from '@vplans/ui-kit/core';
     class: 'ui-spinner',
     '[class]': '"ui-spinner--" + size()',
     '[attr.role]': 'decorative() ? null : "progressbar"',
-    '[attr.aria-label]': 'decorative() ? null : label()',
+    '[attr.aria-label]': 'decorative() ? null : label() || labels().loading',
     '[attr.aria-hidden]': 'decorative() ? "true" : null',
   },
 })
 export class UiSpinner {
   readonly size = input<UiSize>('md');
-  /** Accessible name announced by screen readers. */
-  readonly label = input('Loading');
+  protected readonly labels = inject(UI_LABELS);
+
+  /** Accessible name announced by screen readers. Defaults to the `loading` label. */
+  readonly label = input('');
   /** Hide from assistive technologies when the surrounding element already conveys busy state. */
   readonly decorative = input(false, { transform: booleanAttribute });
 }

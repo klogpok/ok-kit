@@ -174,7 +174,7 @@ describe('UiDialog', () => {
       expect(el.querySelector('.ui-dialog-header__close')).toBeNull();
 
       const [cancel, confirm] = el.querySelectorAll<HTMLButtonElement>('ui-dialog-actions button');
-      expect(cancel.textContent!.trim()).toBe('Cancel');
+      expect(cancel.textContent!.trim()).toBe('ביטול');
       expect(document.activeElement).toBe(confirm);
       confirm.click();
       await expect(result).resolves.toBe(true);

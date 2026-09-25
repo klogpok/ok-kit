@@ -12,7 +12,7 @@ describe('UiSpinner', () => {
   it('renders as an accessible progressbar with a default label', () => {
     const el = render();
     expect(el.getAttribute('role')).toBe('progressbar');
-    expect(el.getAttribute('aria-label')).toBe('Loading');
+    expect(el.getAttribute('aria-label')).toBe('טוען');
     expect(el.classList).toContain('ui-spinner--md');
   });
 

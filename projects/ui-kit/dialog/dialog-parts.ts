@@ -49,7 +49,7 @@ export class UiDialogTitle {
         variant="ghost"
         size="sm"
         class="ui-dialog-header__close"
-        [label]="closeLabel() || labels.close"
+        [label]="closeLabel() || labels().close"
         (click)="close()"
       >
         <ui-icon [icon]="closeIcon" />

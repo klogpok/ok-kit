@@ -154,7 +154,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
             variant="ghost"
             size="sm"
             class="ui-toast__close"
-            [label]="labels.close"
+            [label]="labels().close"
             (click)="toasts.close(toast.ref)"
           >
             <ui-icon [icon]="closeIcon" />
@@ -169,7 +169,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
     class: 'ui-toast-container',
     role: 'region',
     '[class]': '"ui-toast-container--" + position',
-    '[attr.aria-label]': 'labels.notifications',
+    '[attr.aria-label]': 'labels().notifications',
     '(mouseenter)': 'toasts.pause("pointer")',
     '(mouseleave)': 'toasts.resume("pointer")',
     '(focusin)': 'toasts.pause("focus")',
