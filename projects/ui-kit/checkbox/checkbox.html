@@ -1,0 +1,28 @@
+<label class="ui-checkbox__label">
+  <span class="ui-checkbox__control">
+    <input
+      #input
+      type="checkbox"
+      class="ui-checkbox__input"
+      [id]="controlId()"
+      [checked]="checked()"
+      [indeterminate]="indeterminate()"
+      [disabled]="isDisabled()"
+      [required]="isRequired()"
+      [attr.name]="name() || null"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-invalid]="showError() ? 'true' : null"
+      [attr.aria-describedby]="formField?.describedBy() ?? null"
+      (change)="onInputChange($event)"
+      (blur)="onBlur()"
+    />
+    <svg class="ui-checkbox__mark" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      @if (indeterminate()) {
+        <path d="M4 8h8" />
+      } @else {
+        <path d="M3.5 8.5l3 3 6-7" />
+      }
+    </svg>
+  </span>
+  <span class="ui-checkbox__text"><ng-content /></span>
+</label>
