@@ -67,6 +67,8 @@ import {
     '[class.ui-switch--label-start]': 'labelPosition() === "start"',
     '[class.ui-switch--full-width]': 'fullWidth()',
     '[attr.id]': 'id()',
+    // The native control carries the label; a static attribute would also stay on the host.
+    '[attr.aria-label]': 'null',
   },
 })
 export class UiSwitch extends UiFormControlBase<boolean> implements UiFormFieldControl {

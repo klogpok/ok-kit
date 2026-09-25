@@ -99,7 +99,7 @@ describe('UiSwitch static attributes', () => {
 
 @Component({
   imports: [FormField, UiSwitch],
-  template: `<ui-switch [formField]="f.alerts">Alerts</ui-switch>`,
+  template: `<ui-switch aria-label="Alerts" [formField]="f.alerts" />`,
 })
 class ReadonlySwitchHost {
   readonly model = signal({ alerts: true });
@@ -118,5 +118,13 @@ describe('UiSwitch readonly', () => {
     expect(fixture.componentInstance.model().alerts).toBe(true);
     expect(input.checked).toBe(true);
     expect(input.getAttribute('aria-readonly')).toBe('true');
+  });
+
+  it('moves aria-label from the host to the native input', async () => {
+    const fixture = TestBed.createComponent(ReadonlySwitchHost);
+    await settle(fixture);
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('input')!.getAttribute('aria-label')).toBe('Alerts');
+    expect(root.querySelector('ui-switch')!.hasAttribute('aria-label')).toBe(false);
   });
 });
