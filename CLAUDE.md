@@ -71,6 +71,7 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 - In RTL text a numeric range such as "51–75" is shown as "75–51". Wrap it in LRI/PDI (`⁦…⁩`).
 - In sed and perl replacements `\u` upper-cases the next character. Write `⁦` escapes with Node or the Edit tool.
 - Stylelint allows only logical `text-align` values (`start`, `end`, `center`).
+- The Storybook docs snippet ("Show code") is derived statically and shows an "Incomplete snippet" warning when a story has args that its template does not bind and that are not component inputs, when the template reads `props` that are not args, or when args are not literals (`fn()`, `new Date()`). Put args only on the stories that bind them (others spread `...Default`), keep template state in literal args, and write `parameters.docs.source.code` by hand for dates, functions and service demos.
 - Storybook uses `@storybook/angular-vite`. `@analogjs/vite-plugin-angular` must be >= 2.7.5, older versions fail with the `initializeHash` error.
 - Signal Forms `transformedValue()` reports parse errors to `[formField]` and to Reactive Forms only in its custom-control mode. Our CVA path (`UiFormControlBase` assigns `valueAccessor`) does not get them, so the datepicker also adds a validator to `ngControl.control`.
 - Vitest does not load component styles, so `getComputedStyle` tests of component CSS pass either way. Check CSS fixes in the browser.
