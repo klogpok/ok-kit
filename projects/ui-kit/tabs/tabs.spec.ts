@@ -101,6 +101,14 @@ describe('UiTabGroup', () => {
     fixture.componentInstance.index.set(1);
     fixture.detectChanges();
     expect(tabs()[0].getAttribute('aria-selected')).toBe('true');
+    expect(fixture.componentInstance.index()).toBe(0);
+  });
+
+  it('moves an out of range index to the last tab in the model', () => {
+    fixture.componentInstance.index.set(9);
+    fixture.detectChanges();
+    expect(tabs()[3].getAttribute('aria-selected')).toBe('true');
+    expect(fixture.componentInstance.index()).toBe(3);
   });
 
   it('moves with arrow keys, skips disabled tabs and wraps', async () => {

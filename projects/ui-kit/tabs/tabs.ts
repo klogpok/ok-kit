@@ -10,9 +10,11 @@ import {
   computed,
   contentChild,
   contentChildren,
+  effect,
   inject,
   input,
   model,
+  untracked,
   viewChild,
   viewChildren,
 } from '@angular/core';
@@ -173,6 +175,13 @@ export class UiTabGroup {
       if (this.activation() === 'automatic') this.select(index);
     });
     inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
+    // Tell the parent which tab is really shown when its index was disabled or out of range.
+    effect(() => {
+      const selected = this.selected();
+      if (selected >= 0 && selected !== this.selectedIndex()) {
+        untracked(() => this.selectedIndex.set(selected));
+      }
+    });
   }
 
   protected tabId(index: number): string {
