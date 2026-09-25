@@ -1,7 +1,7 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, required } from '@angular/forms/signals';
+import { FormField, form, readonly, required } from '@angular/forms/signals';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiRadio, UiRadioGroup } from './radio';
 
@@ -202,5 +202,36 @@ describe('UiRadioGroup with compareWith', () => {
     const inputs = (fixture.nativeElement as HTMLElement).querySelectorAll('input');
     expect(inputs[1].checked).toBe(true);
     expect(inputs[0].checked).toBe(false);
+  });
+});
+
+@Component({
+  imports: [FormField, UiRadioGroup, UiRadio],
+  template: `
+    <ui-radio-group aria-label="Delivery" [formField]="f.delivery">
+      <ui-radio value="pickup">Pickup</ui-radio>
+      <ui-radio value="courier">Courier</ui-radio>
+    </ui-radio-group>
+  `,
+})
+class ReadonlyRadioHost {
+  readonly model = signal({ delivery: 'pickup' });
+  readonly f = form(this.model, (p) => {
+    readonly(p.delivery);
+  });
+}
+
+describe('UiRadioGroup readonly', () => {
+  it('keeps the selection under a Signal Forms readonly rule', async () => {
+    const fixture = TestBed.createComponent(ReadonlyRadioHost);
+    await settle(fixture);
+    const root = fixture.nativeElement as HTMLElement;
+    const [pickup, courier] = Array.from(root.querySelectorAll('input'));
+    courier.click();
+    await settle(fixture);
+    expect(fixture.componentInstance.model().delivery).toBe('pickup');
+    expect(pickup.checked).toBe(true);
+    expect(courier.checked).toBe(false);
+    expect(root.querySelector('ui-radio-group')!.getAttribute('aria-readonly')).toBe('true');
   });
 });

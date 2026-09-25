@@ -60,6 +60,7 @@ class UiRadioGroupControl {
     '[attr.aria-invalid]': 'showError() ? "true" : null',
     '[attr.aria-required]': 'isRequired() ? "true" : null',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
+    '[attr.aria-readonly]': 'readonly() ? "true" : null',
   },
 })
 export class UiRadioGroup<T = unknown>
@@ -123,6 +124,7 @@ export class UiRadioGroup<T = unknown>
           [disabled]="isDisabled()"
           [required]="group.isRequired()"
           [attr.aria-label]="ariaLabel() || null"
+          (click)="onClick($event)"
           (change)="control.select(value())"
           (blur)="control.markTouched()"
         />
@@ -137,6 +139,7 @@ export class UiRadioGroup<T = unknown>
     '[class]': '"ui-radio--" + group.size()',
     '[class.ui-radio--checked]': 'isChecked()',
     '[class.ui-radio--disabled]': 'isDisabled()',
+    '[class.ui-radio--readonly]': 'group.readonly()',
     '[class.ui-radio--invalid]': 'group.showError()',
     '[attr.id]': 'id()',
   },
@@ -157,5 +160,10 @@ export class UiRadio<T = unknown> {
 
   focus(options?: FocusOptions): void {
     this.inputRef().nativeElement.focus(options);
+  }
+
+  /** In a readonly group, clicks and arrow keys (which click the next radio) keep the selection. */
+  protected onClick(event: MouseEvent): void {
+    if (this.group.readonly()) event.preventDefault();
   }
 }

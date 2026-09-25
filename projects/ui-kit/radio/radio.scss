@@ -84,6 +84,10 @@
   border-color: var(--ui-radio-invalid-border);
 }
 
+:host(.ui-radio--readonly) .ui-radio__label {
+  cursor: default;
+}
+
 :host(.ui-radio--disabled) {
   color: var(--ui-color-text-disabled);
 
