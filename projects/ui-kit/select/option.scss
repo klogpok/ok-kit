@@ -1,0 +1,79 @@
+// Shared by ui-option and ui-option-group; each rule matches only its own host class.
+
+:host(.ui-option) {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-sm);
+  box-sizing: border-box;
+  min-block-size: var(--ui-select-option-height);
+  padding-block: var(--ui-space-2xs);
+  padding-inline: var(--ui-control-padding-inline-md);
+  color: var(--ui-color-text);
+  font-size: var(--ui-control-font-size-md);
+  line-height: var(--ui-line-height-snug);
+  cursor: pointer;
+  user-select: none;
+}
+
+:host(.ui-option:hover) {
+  background-color: var(--ui-select-option-hover-bg);
+}
+
+// The key manager's active option (aria-activedescendant); focus stays on the trigger.
+:host(.ui-option--active) {
+  background-color: var(--ui-select-option-active-bg);
+  outline: var(--ui-focus-ring-width) solid var(--ui-color-focus-ring);
+  outline-offset: calc(var(--ui-focus-ring-width) * -1);
+}
+
+:host(.ui-option--selected) {
+  color: var(--ui-select-option-selected-text);
+  font-weight: var(--ui-font-weight-medium);
+}
+
+:host(.ui-option--disabled) {
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+.ui-option__label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.ui-option__check {
+  flex-shrink: 0;
+  color: var(--ui-select-option-selected-text);
+}
+
+:host(.ui-option-group) {
+  display: block;
+}
+
+.ui-option-group__label {
+  padding-block: var(--ui-space-xs) var(--ui-space-2xs);
+  padding-inline: var(--ui-control-padding-inline-md);
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: var(--ui-font-weight-semibold);
+  line-height: var(--ui-line-height-tight);
+}
+
+@media (forced-colors: active) {
+  :host(.ui-option--active) {
+    outline-color: Highlight;
+  }
+
+  :host(.ui-option--selected) {
+    color: Highlight;
+  }
+}

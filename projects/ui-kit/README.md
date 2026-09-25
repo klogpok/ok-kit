@@ -250,6 +250,7 @@ providers: [
 | `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |
+| `@vplans/ui-kit/select`     | `UiSelect`, `UiOption`, `UiOptionGroup`                                                                                               |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`                                         |
@@ -512,6 +513,15 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-toast-success-accent`         | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
 | `--ui-toast-warning-accent`         | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
 | `--ui-toast-danger-accent`          | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
+| `--ui-select-panel-bg`              | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
+| `--ui-select-panel-border`          | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
+| `--ui-select-panel-radius`          | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-select-panel-shadow`          | component | `var(--ui-shadow-md)`                                                        | `var(--ui-shadow-md)`                                                  |
+| `--ui-select-panel-max-height`      | component | `18rem`                                                                      | `18rem`                                                                |
+| `--ui-select-option-height`         | component | `var(--ui-control-height-sm)`                                                | `var(--ui-control-height-sm)`                                          |
+| `--ui-select-option-hover-bg`       | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
+| `--ui-select-option-active-bg`      | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
+| `--ui-select-option-selected-text`  | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
 
 <!-- tokens:end -->
 

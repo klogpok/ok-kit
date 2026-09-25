@@ -492,4 +492,13 @@
   --ui-toast-success-accent: var(--ui-color-success);
   --ui-toast-warning-accent: var(--ui-color-warning);
   --ui-toast-danger-accent: var(--ui-color-danger);
+  --ui-select-panel-bg: var(--ui-color-surface-raised);
+  --ui-select-panel-border: var(--ui-color-border);
+  --ui-select-panel-radius: var(--ui-radius-control);
+  --ui-select-panel-shadow: var(--ui-shadow-md);
+  --ui-select-panel-max-height: 18rem;
+  --ui-select-option-height: var(--ui-control-height-sm);
+  --ui-select-option-hover-bg: var(--ui-color-primary-subtle);
+  --ui-select-option-active-bg: var(--ui-color-primary-subtle);
+  --ui-select-option-selected-text: var(--ui-color-primary-text);
 }

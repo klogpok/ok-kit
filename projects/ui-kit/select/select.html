@@ -1,0 +1,87 @@
+<!-- The trigger opens the list on click; keyboard handling lives on the control inside it. -->
+<!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+<div
+  class="ui-select__trigger"
+  cdkOverlayOrigin
+  #origin="cdkOverlayOrigin"
+  (mousedown)="onTriggerMousedown($event)"
+  (click)="toggle()"
+>
+  @if (searchable()) {
+    <input
+      #control
+      type="text"
+      role="combobox"
+      class="ui-select__control ui-select__input"
+      autocomplete="off"
+      aria-autocomplete="list"
+      aria-haspopup="listbox"
+      [id]="controlId()"
+      [value]="isOpen() ? query() : displayLabel()"
+      [placeholder]="displayLabel() || placeholder()"
+      [disabled]="isDisabled()"
+      [attr.name]="name() || null"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-controls]="panelId()"
+      [attr.aria-activedescendant]="isOpen() ? activeId() : null"
+      [attr.aria-required]="isRequired() ? 'true' : null"
+      [attr.aria-invalid]="showError() ? 'true' : null"
+      [attr.aria-describedby]="formField?.describedBy() ?? null"
+      (input)="onSearch($event)"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+    />
+  } @else {
+    <button
+      #control
+      type="button"
+      role="combobox"
+      class="ui-select__control ui-select__button"
+      aria-haspopup="listbox"
+      [id]="controlId()"
+      [disabled]="isDisabled()"
+      [attr.name]="name() || null"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-controls]="panelId()"
+      [attr.aria-activedescendant]="isOpen() ? activeId() : null"
+      [attr.aria-required]="isRequired() ? 'true' : null"
+      [attr.aria-invalid]="showError() ? 'true' : null"
+      [attr.aria-describedby]="formField?.describedBy() ?? null"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+    >
+      <span class="ui-select__value" [class.ui-select__value--placeholder]="!selectedOption()">
+        {{ displayLabel() || placeholder() }}
+      </span>
+    </button>
+  }
+  <ui-icon class="ui-select__chevron" [icon]="chevron" />
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayMinWidth]="panelWidth()"
+  (attach)="onAttach()"
+  (detach)="close()"
+  (overlayOutsideClick)="onOutsideClick($event)"
+>
+  <!-- Options keep focus on the trigger: mousedown must not move it. -->
+  <div
+    role="listbox"
+    class="ui-select__panel"
+    [id]="panelId()"
+    [attr.aria-label]="ariaLabel() || null"
+    [attr.aria-labelledby]="listLabelledBy()"
+    (mousedown)="$event.preventDefault()"
+  >
+    <ng-content />
+    @if (noResults()) {
+      <div class="ui-select__empty">{{ labels.noOptions }}</div>
+    }
+  </div>
+</ng-template>

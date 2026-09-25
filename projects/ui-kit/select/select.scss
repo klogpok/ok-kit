@@ -1,0 +1,162 @@
+@use '../styles/mixins';
+
+// The trigger shares the input tokens, so selects and text inputs look the same in a form.
+
+:host {
+  display: block;
+  inline-size: 100%;
+  font-family: var(--ui-font-family-sans);
+}
+
+:host(.ui-select--sm) {
+  --_height: var(--ui-control-height-sm);
+  --_padding: var(--ui-control-padding-inline-sm);
+  --_font-size: var(--ui-control-font-size-sm);
+}
+
+:host(.ui-select--md) {
+  --_height: var(--ui-control-height-md);
+  --_padding: var(--ui-control-padding-inline-md);
+  --_font-size: var(--ui-control-font-size-md);
+}
+
+:host(.ui-select--lg) {
+  --_height: var(--ui-control-height-lg);
+  --_padding: var(--ui-control-padding-inline-lg);
+  --_font-size: var(--ui-control-font-size-lg);
+}
+
+.ui-select__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-block-size: var(--_height);
+  border: var(--ui-border-width-default) solid var(--ui-input-border);
+  border-radius: var(--ui-input-radius);
+  background-color: var(--ui-input-bg);
+  color: var(--ui-input-text);
+  cursor: pointer;
+  @include mixins.transition(border-color, box-shadow, background-color);
+
+  &:hover {
+    border-color: var(--ui-input-border-hover);
+  }
+
+  &:focus-within {
+    border-color: var(--ui-input-border-focus);
+    outline: var(--ui-focus-ring-width) solid var(--ui-color-focus-ring);
+    outline-offset: calc(var(--ui-border-width-default) * -1);
+  }
+}
+
+.ui-select__control {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  align-self: stretch;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--_padding)
+    calc(var(--_padding) + var(--ui-icon-size-sm) + var(--ui-space-xs));
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--_font-size);
+  line-height: var(--ui-line-height-normal);
+  cursor: inherit;
+  outline: none;
+}
+
+.ui-select__input {
+  cursor: text;
+
+  &::placeholder {
+    color: var(--ui-input-placeholder);
+    opacity: 1;
+  }
+}
+
+// With a value selected, the placeholder shows that value while the user searches.
+:host(.ui-select--open) .ui-select__input::placeholder {
+  color: var(--ui-input-text);
+}
+
+.ui-select__value {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-select__value--placeholder {
+  color: var(--ui-input-placeholder);
+}
+
+.ui-select__chevron {
+  position: absolute;
+  inset-inline-end: var(--_padding);
+  inline-size: var(--ui-icon-size-sm);
+  block-size: var(--ui-icon-size-sm);
+  color: var(--ui-color-text-muted);
+  pointer-events: none;
+  @include mixins.transition(rotate);
+}
+
+:host(.ui-select--open) .ui-select__chevron {
+  rotate: 180deg;
+}
+
+:host(.ui-select--invalid) .ui-select__trigger {
+  border-color: var(--ui-input-border-invalid);
+
+  &:focus-within {
+    outline-color: var(--ui-input-border-invalid);
+  }
+}
+
+:host(.ui-select--disabled) .ui-select__trigger {
+  border-color: var(--ui-color-border);
+  background-color: var(--ui-input-bg-disabled);
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+
+  .ui-select__chevron {
+    color: var(--ui-color-text-disabled);
+  }
+}
+
+.ui-select__panel {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-block-size: var(--ui-select-panel-max-height);
+  margin-block: var(--ui-space-2xs);
+  padding-block: var(--ui-space-2xs);
+  border: var(--ui-border-width-default) solid var(--ui-select-panel-border);
+  border-radius: var(--ui-select-panel-radius);
+  background-color: var(--ui-select-panel-bg);
+  box-shadow: var(--ui-select-panel-shadow);
+  font-family: var(--ui-font-family-sans);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ui-select__empty {
+  padding-block: var(--ui-space-xs);
+  padding-inline: var(--ui-control-padding-inline-md);
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-control-font-size-md);
+}
+
+@media (forced-colors: active) {
+  :host(.ui-select--invalid) .ui-select__trigger {
+    border-style: dashed;
+  }
+
+  .ui-select__panel {
+    border-color: CanvasText;
+  }
+}

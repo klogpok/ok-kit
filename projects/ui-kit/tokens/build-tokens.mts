@@ -158,6 +158,8 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.info-contrast', 'color.info', TEXT],
   ['color.primary-text', 'color.bg', TEXT],
   ['color.primary-text', 'color.primary-subtle', TEXT],
+  ['color.primary-text', 'color.surface-raised', TEXT],
+  ['color.text', 'color.primary-subtle', TEXT],
   ['color.danger-text', 'color.surface', TEXT],
   ['color.danger-text', 'color.danger-subtle', TEXT],
   ['color.success-text', 'color.success-subtle', TEXT],
