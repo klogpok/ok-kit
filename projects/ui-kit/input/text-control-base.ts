@@ -1,0 +1,63 @@
+import {
+  Directive,
+  DoCheck,
+  ElementRef,
+  booleanAttribute,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { _IdGenerator } from '@angular/cdk/a11y';
+import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@vplans/ui-kit/core';
+
+/**
+ * Shared behavior for native text controls (`input[ui-input]`, `textarea[ui-textarea]`).
+ * The value is handled by the forms layer directly on the native element
+ * (DefaultValueAccessor or the Signal Forms native binding); this directive only adds
+ * styling, ids and ARIA wiring.
+ */
+@Directive({
+  host: {
+    '[class]': '"ui-input--" + size()',
+    '[class.ui-input--invalid]': 'showError()',
+    '[id]': 'id()',
+    '[attr.aria-invalid]': 'showError() ? "true" : null',
+    '[attr.aria-describedby]': 'formField?.describedBy() ?? null',
+    '[attr.aria-required]': 'required() ? "true" : null',
+  },
+})
+export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
+  protected readonly element = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef)
+    .nativeElement;
+  protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
+  private readonly state = injectControlState();
+  private readonly nativeDisabled = signal(false);
+  private readonly nativeRequired = signal(false);
+
+  readonly id = input(inject(_IdGenerator).getId('ui-input-'));
+  readonly size = input<UiSize>('md');
+  /**
+   * Shows the error state when no forms directive is bound. With forms bound, the error state
+   * is derived from the control (invalid and touched).
+   */
+  readonly invalid = input(false, { transform: booleanAttribute });
+
+  readonly labelStrategy = 'for' as const;
+  readonly disabled = computed(() => this.state.disabled() || this.nativeDisabled());
+  readonly required = computed(() => this.state.required() || this.nativeRequired());
+  readonly showError = computed(() =>
+    this.state.bound ? this.state.invalid() && this.state.touched() : this.invalid(),
+  );
+  readonly errorMessages = this.state.errorMessages;
+
+  ngDoCheck(): void {
+    this.state.sync();
+    this.nativeDisabled.set(this.element.disabled);
+    this.nativeRequired.set(this.element.required);
+  }
+
+  focus(options?: FocusOptions): void {
+    this.element.focus(options);
+  }
+}

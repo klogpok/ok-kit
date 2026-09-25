@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 
 /** Forms-layer state of a control, independent of Signal Forms vs. Reactive/Template forms. */
 export interface UiControlState {
+  /** Whether a forms directive (`[formField]`, `formControl`, `ngModel`, ...) is bound to the host. */
+  readonly bound: boolean;
   readonly disabled: Signal<boolean>;
   readonly invalid: Signal<boolean>;
   readonly touched: Signal<boolean>;
@@ -69,6 +71,7 @@ export function injectControlState(): UiControlState {
   if (formField) {
     const state = formField.state;
     return {
+      bound: true,
       disabled: computed(() => state().disabled()),
       invalid: computed(() => state().invalid()),
       touched: computed(() => state().touched()),
@@ -98,6 +101,7 @@ export function injectControlState(): UiControlState {
   };
 
   return {
+    bound: ngControl !== null,
     disabled: computed(() => current().disabled),
     invalid: computed(() => current().invalid),
     touched: computed(() => current().touched),
