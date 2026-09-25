@@ -107,6 +107,17 @@ describe('UiDatepicker', () => {
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
+  it('drops invalid text when the value is changed elsewhere', async () => {
+    await type('abc');
+    await blur();
+    host.value.set(new Date(2026, 3, 1));
+    await settle(fixture);
+    host.value.set(null);
+    await settle(fixture);
+    expect(input().value).toBe('');
+    expect(input().getAttribute('aria-invalid')).toBeNull();
+  });
+
   it('rejects typed dates outside min and max', async () => {
     await type('1.1.2027');
     await blur();

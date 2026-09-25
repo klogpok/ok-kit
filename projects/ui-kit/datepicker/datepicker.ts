@@ -8,6 +8,7 @@ import {
   forwardRef,
   inject,
   input,
+  linkedSignal,
   model,
   output,
   signal,
@@ -36,7 +37,7 @@ const POSITIONS: ConnectedPosition[] = [
   { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
 ];
 
-/** Text the user is typing and the value it produced; stale once the value changes elsewhere. */
+/** Text the user is typing and the value it produced. */
 interface Draft {
   text: string;
   value: Date | null;
@@ -173,7 +174,14 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly isOpen = signal(false);
   protected readonly positions = POSITIONS;
   protected readonly calendarIcon = uiIconCalendar;
-  private readonly draft = signal<Draft | null>(null);
+  /** Dropped when the value changes elsewhere (e.g. a reset), so old text does not come back. */
+  private readonly draft = linkedSignal<Date | null, Draft | null>({
+    source: this.value,
+    computation: (value, previous) => {
+      const draft = previous?.value;
+      return draft && (draft.value === value || sameDay(draft.value, value)) ? draft : null;
+    },
+  });
 
   /**
    * Parses typed text into the value. Through `transformedValue` Signal Forms receives the parse
@@ -205,10 +213,8 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
   protected readonly text = computed(() => {
-    const draft = this.draft();
     const value = this.value();
-    if (draft && (draft.value === value || sameDay(draft.value, value))) return draft.text;
-    return value ? formatDay(value, this.locale()) : '';
+    return this.draft()?.text ?? (value ? formatDay(value, this.locale()) : '');
   });
 
   /** Typed text that is not an allowed date. */
