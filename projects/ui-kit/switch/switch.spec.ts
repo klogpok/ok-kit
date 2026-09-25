@@ -39,7 +39,8 @@ describe('UiSwitch', () => {
     const el = input('plain');
     expect(el.type).toBe('checkbox');
     expect(el.getAttribute('role')).toBe('switch');
-    expect(el.getAttribute('aria-checked')).toBe('false');
+    expect((el as HTMLInputElement).checked).toBe(false);
+    expect(el.hasAttribute('aria-checked')).toBe(false);
     expect(el.closest('label')?.textContent).toContain('Wi-Fi');
   });
 
@@ -49,11 +50,11 @@ describe('UiSwitch', () => {
     expect(host.classList).toContain('ui-switch--label-start');
   });
 
-  it('toggles the model and aria-checked', async () => {
+  it('toggles the model and the native checked state', async () => {
     input('plain').click();
     await settle(fixture);
     expect(fixture.componentInstance.checked()).toBe(true);
-    expect(input('plain').getAttribute('aria-checked')).toBe('true');
+    expect((input('plain') as HTMLInputElement).checked).toBe(true);
   });
 
   it('works with Reactive Forms', async () => {
@@ -93,7 +94,6 @@ describe('UiSwitch static attributes', () => {
     await settle(fixture);
     const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
     expect(input.checked).toBe(true);
-    expect(input.getAttribute('aria-checked')).toBe('true');
   });
 });
 

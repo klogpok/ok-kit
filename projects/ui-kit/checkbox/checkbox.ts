@@ -1,24 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   computed,
-  effect,
   forwardRef,
   inject,
   input,
   model,
-  untracked,
-  viewChild,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
-  UiCheckedValidator,
-  UiFormControlBase,
-  UiFormFieldControl,
-  UiSize,
+  UiCheckableBase,
   provideUiCheckedValidator,
 } from '@vplans/ui-kit/core';
 
@@ -52,57 +45,15 @@ import {
     '[attr.aria-describedby]': 'null',
   },
 })
-export class UiCheckbox extends UiFormControlBase<boolean> implements UiFormFieldControl {
-  private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('input');
-
-  readonly checked = model(false);
+export class UiCheckbox extends UiCheckableBase {
   /** Mixed state; cleared when the user toggles the checkbox. */
   readonly indeterminate = model(false);
-  readonly size = input<UiSize>('md');
-  readonly name = input('');
-  /** Host id; the native input gets `${id}-input`. */
   readonly id = input(inject(_IdGenerator).getId('ui-checkbox-'));
-  /** Accessible name when there is no visible label content. */
-  readonly ariaLabel = input('', { alias: 'aria-label' });
 
-  readonly labelStrategy = 'for' as const;
-  readonly controlId = computed(() => `${this.id()}-input`);
-  // model() has no transform, so a static `checked` attribute arrives as '': coerce on read.
-  protected readonly isChecked = computed(() => coerceBooleanProperty(this.checked()));
   protected readonly isIndeterminate = computed(() => coerceBooleanProperty(this.indeterminate()));
 
-  constructor() {
-    super();
-    // Reactive / template forms: a required checkbox must be checked.
-    const validator = inject(UiCheckedValidator);
-    validator.required = this.isRequired;
-    effect(() => {
-      this.isRequired();
-      untracked(() => validator.requiredChanged());
-    });
-  }
-
-  writeValue(value: boolean | null | undefined): void {
-    this.checked.set(!!value);
-  }
-
-  focus(options?: FocusOptions): void {
-    this.inputRef().nativeElement.focus(options);
-  }
-
-  /** A readonly checkbox cannot be toggled; a native checkbox ignores the `readonly` attribute. */
-  protected onInputClick(event: MouseEvent): void {
-    if (this.readonly()) event.preventDefault();
-  }
-
-  protected onInputChange(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
+  protected override onInputChange(event: Event): void {
     this.indeterminate.set(false);
-    this.checked.set(checked);
-    this.notifyChange(checked);
-  }
-
-  protected onBlur(): void {
-    this.notifyTouched();
+    super.onInputChange(event);
   }
 }

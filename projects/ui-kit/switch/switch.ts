@@ -1,25 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   booleanAttribute,
-  computed,
-  effect,
   forwardRef,
   inject,
   input,
-  model,
-  untracked,
-  viewChild,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
-  UiCheckedValidator,
-  UiFormControlBase,
-  UiFormFieldControl,
-  UiSize,
+  UiCheckableBase,
   provideUiCheckedValidator,
 } from '@vplans/ui-kit/core';
 
@@ -45,7 +35,6 @@ import {
           [disabled]="isDisabled()"
           [required]="isRequired()"
           [attr.name]="name() || null"
-          [attr.aria-checked]="isChecked()"
           [attr.aria-label]="ariaLabel() || null"
           [attr.aria-readonly]="readonly() ? 'true' : null"
           [attr.aria-invalid]="showError() ? 'true' : null"
@@ -79,56 +68,10 @@ import {
     '[attr.aria-describedby]': 'null',
   },
 })
-export class UiSwitch extends UiFormControlBase<boolean> implements UiFormFieldControl {
-  private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('input');
-
-  readonly checked = model(false);
-  readonly size = input<UiSize>('md');
-  readonly name = input('');
-  /** Host id; the native input gets `${id}-input`. */
+export class UiSwitch extends UiCheckableBase {
   readonly id = input(inject(_IdGenerator).getId('ui-switch-'));
-  readonly ariaLabel = input('', { alias: 'aria-label' });
   /** Place the label before (`start`) or after (`end`) the switch. */
   readonly labelPosition = input<'start' | 'end'>('end');
   /** Stretch the row and push the switch to the opposite edge (settings lists). */
   readonly fullWidth = input(false, { transform: booleanAttribute });
-
-  readonly labelStrategy = 'for' as const;
-  readonly controlId = computed(() => `${this.id()}-input`);
-  // model() has no transform, so a static `checked` attribute arrives as '': coerce on read.
-  protected readonly isChecked = computed(() => coerceBooleanProperty(this.checked()));
-
-  constructor() {
-    super();
-    // Reactive / template forms: a required switch must be checked.
-    const validator = inject(UiCheckedValidator);
-    validator.required = this.isRequired;
-    effect(() => {
-      this.isRequired();
-      untracked(() => validator.requiredChanged());
-    });
-  }
-
-  writeValue(value: boolean | null | undefined): void {
-    this.checked.set(!!value);
-  }
-
-  focus(options?: FocusOptions): void {
-    this.inputRef().nativeElement.focus(options);
-  }
-
-  /** A readonly checkbox cannot be toggled; a native checkbox ignores the `readonly` attribute. */
-  protected onInputClick(event: MouseEvent): void {
-    if (this.readonly()) event.preventDefault();
-  }
-
-  protected onInputChange(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    this.checked.set(checked);
-    this.notifyChange(checked);
-  }
-
-  protected onBlur(): void {
-    this.notifyTouched();
-  }
 }
