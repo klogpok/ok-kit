@@ -9,7 +9,6 @@ import {
   afterNextRender,
   booleanAttribute,
   computed,
-  forwardRef,
   inject,
   input,
   numberAttribute,
@@ -19,47 +18,6 @@ import { UiSkeleton } from '@vplans/ui-kit/skeleton';
 
 /** Row density of `table[ui-table]`. */
 export type UiTableDensity = 'default' | 'compact';
-
-/**
- * Styles a native `<table>`. Use regular `thead`/`tbody`/`tr`/`th`/`td`, with `scope` on the
- * header cells. Add the class `ui-table-numeric` to cells with numbers to align them to the end.
- *
- * - `loading` sets `aria-busy` and pulses a line under the header. Show `tr[ui-table-skeleton]` rows for the
- *   first load and `tr[ui-table-message]` for empty and error states.
- * - `stickyHeader` keeps the header visible while the page or a scrolling container scrolls.
- * - Sorting: `[uiSort]` on the table and `th[ui-sort-header]`.
- *
- * @example
- * <table ui-table uiSort [(sort)]="sort" [loading]="loading()">
- *   <caption class="ui-visually-hidden">Plans</caption>
- *   <thead><tr><th scope="col" ui-sort-header="name">Name</th></tr></thead>
- *   <tbody>
- *     @for (plan of rows(); track plan.id) { <tr><td>{{ plan.name }}</td></tr> }
- *     @empty { <tr ui-table-message>No plans yet</tr> }
- *   </tbody>
- * </table>
- */
-@Component({
-  selector: 'table[ui-table]',
-  template: '<ng-content />',
-  styleUrl: './table.scss',
-  // Styles must reach the projected rows and cells; selectors are scoped under `.ui-table`.
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [forwardRef(() => UiTableColumns)],
-  host: {
-    class: 'ui-table',
-    '[class]': '"ui-table--" + density()',
-    '[class.ui-table--sticky-header]': 'stickyHeader()',
-    '[class.ui-table--loading]': 'loading()',
-    '[attr.aria-busy]': 'loading() ? "true" : null',
-  },
-})
-export class UiTable {
-  readonly density = input<UiTableDensity>('default');
-  readonly stickyHeader = input(false, { transform: booleanAttribute });
-  readonly loading = input(false, { transform: booleanAttribute });
-}
 
 /** Number of columns of the table that contains `row`, read from its first header row. */
 function countColumns(row: HTMLElement): number {
@@ -101,6 +59,47 @@ class UiTableColumns {
       return countColumns(row);
     });
   }
+}
+
+/**
+ * Styles a native `<table>`. Use regular `thead`/`tbody`/`tr`/`th`/`td`, with `scope` on the
+ * header cells. Add the class `ui-table-numeric` to cells with numbers to align them to the end.
+ *
+ * - `loading` sets `aria-busy` and pulses a line under the header. Show `tr[ui-table-skeleton]` rows for the
+ *   first load and `tr[ui-table-message]` for empty and error states.
+ * - `stickyHeader` keeps the header visible while the page or a scrolling container scrolls.
+ * - Sorting: `[uiSort]` on the table and `th[ui-sort-header]`.
+ *
+ * @example
+ * <table ui-table uiSort [(sort)]="sort" [loading]="loading()">
+ *   <caption class="ui-visually-hidden">Plans</caption>
+ *   <thead><tr><th scope="col" ui-sort-header="name">Name</th></tr></thead>
+ *   <tbody>
+ *     @for (plan of rows(); track plan.id) { <tr><td>{{ plan.name }}</td></tr> }
+ *     @empty { <tr ui-table-message>No plans yet</tr> }
+ *   </tbody>
+ * </table>
+ */
+@Component({
+  selector: 'table[ui-table]',
+  template: '<ng-content />',
+  styleUrl: './table.scss',
+  // Styles must reach the projected rows and cells; selectors are scoped under `.ui-table`.
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [UiTableColumns],
+  host: {
+    class: 'ui-table',
+    '[class]': '"ui-table--" + density()',
+    '[class.ui-table--sticky-header]': 'stickyHeader()',
+    '[class.ui-table--loading]': 'loading()',
+    '[attr.aria-busy]': 'loading() ? "true" : null',
+  },
+})
+export class UiTable {
+  readonly density = input<UiTableDensity>('default');
+  readonly stickyHeader = input(false, { transform: booleanAttribute });
+  readonly loading = input(false, { transform: booleanAttribute });
 }
 
 /**
