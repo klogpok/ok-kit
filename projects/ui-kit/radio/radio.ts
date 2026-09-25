@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  Injectable,
   booleanAttribute,
   computed,
   contentChildren,
@@ -18,6 +19,13 @@ import {
   UiFormFieldControl,
   UiSize,
 } from '@vplans/ui-kit/core';
+
+/** What a radio may do with its group, kept out of the public `UiRadioGroup` API. Internal. */
+@Injectable()
+class UiRadioGroupControl {
+  select: (value: unknown) => void = () => undefined;
+  markTouched: () => void = () => undefined;
+}
 
 /**
  * Group of mutually exclusive options. Uses native radios sharing a `name`, so arrow-key
@@ -37,7 +45,10 @@ import {
   template: '<ng-content />',
   styleUrl: './radio-group.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRadioGroup) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRadioGroup) },
+    UiRadioGroupControl,
+  ],
   host: {
     class: 'ui-radio-group',
     role: 'radiogroup',
@@ -69,9 +80,21 @@ export class UiRadioGroup<T = unknown>
   readonly size = input<UiSize>('md');
   readonly ariaLabel = input('', { alias: 'aria-label' });
   readonly ariaLabelledby = input('', { alias: 'aria-labelledby' });
+  /** Compares option values with the selected value, e.g. by id for objects. */
+  readonly compareWith = input<(a: T | null, b: T) => boolean>(Object.is);
 
   readonly labelStrategy = 'labelledby' as const;
   readonly controlId = computed(() => this.id());
+
+  constructor() {
+    super();
+    const control = inject(UiRadioGroupControl);
+    control.select = (value) => {
+      this.value.set(value as T);
+      this.notifyChange(value as T);
+    };
+    control.markTouched = () => this.notifyTouched();
+  }
 
   writeValue(value: T | null | undefined): void {
     this.value.set(value ?? null);
@@ -81,17 +104,6 @@ export class UiRadioGroup<T = unknown>
   focus(options?: FocusOptions): void {
     const radios = this.radios().filter((radio) => !radio.isDisabled());
     (radios.find((radio) => radio.isChecked()) ?? radios[0])?.focus(options);
-  }
-
-  /** @internal */
-  select(value: T): void {
-    this.value.set(value);
-    this.notifyChange(value);
-  }
-
-  /** @internal */
-  markTouched(): void {
-    this.notifyTouched();
   }
 }
 
@@ -111,8 +123,8 @@ export class UiRadioGroup<T = unknown>
           [disabled]="isDisabled()"
           [required]="group.isRequired()"
           [attr.aria-label]="ariaLabel() || null"
-          (change)="group.select(value())"
-          (blur)="group.markTouched()"
+          (change)="control.select(value())"
+          (blur)="control.markTouched()"
         />
       </span>
       <span class="ui-radio__text"><ng-content /></span>
@@ -131,6 +143,7 @@ export class UiRadioGroup<T = unknown>
 })
 export class UiRadio<T = unknown> {
   protected readonly group = inject<UiRadioGroup<T>>(UiRadioGroup);
+  protected readonly control = inject(UiRadioGroupControl);
   private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('input');
 
   readonly value = input.required<T>();
@@ -139,7 +152,7 @@ export class UiRadio<T = unknown> {
   readonly ariaLabel = input('', { alias: 'aria-label' });
 
   protected readonly inputId = computed(() => `${this.id()}-input`);
-  readonly isChecked = computed(() => this.group.value() === this.value());
+  readonly isChecked = computed(() => this.group.compareWith()(this.group.value(), this.value()));
   readonly isDisabled = computed(() => this.disabled() || this.group.isDisabled());
 
   focus(options?: FocusOptions): void {

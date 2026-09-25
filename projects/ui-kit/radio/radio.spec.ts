@@ -169,3 +169,38 @@ describe('UiRadioGroup', () => {
     });
   });
 });
+
+interface City {
+  id: number;
+  name: string;
+}
+
+@Component({
+  imports: [UiRadioGroup, UiRadio, ReactiveFormsModule],
+  template: `
+    <ui-radio-group [formControl]="control" [compareWith]="byId" aria-label="City">
+      @for (city of cities; track city.id) {
+        <ui-radio [value]="city">{{ city.name }}</ui-radio>
+      }
+    </ui-radio-group>
+  `,
+})
+class CompareHost {
+  readonly cities: City[] = [
+    { id: 1, name: 'Haifa' },
+    { id: 2, name: 'Eilat' },
+  ];
+  // A copy from the server, not one of the option objects.
+  readonly control = new FormControl<City | null>({ id: 2, name: 'Eilat' });
+  readonly byId = (a: City | null, b: City) => a?.id === b.id;
+}
+
+describe('UiRadioGroup with compareWith', () => {
+  it('checks the option equal to an object value', async () => {
+    const fixture = TestBed.createComponent(CompareHost);
+    await settle(fixture);
+    const inputs = (fixture.nativeElement as HTMLElement).querySelectorAll('input');
+    expect(inputs[1].checked).toBe(true);
+    expect(inputs[0].checked).toBe(false);
+  });
+});
