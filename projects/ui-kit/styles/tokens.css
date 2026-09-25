@@ -462,4 +462,10 @@
   --ui-tabs-font-size: var(--ui-font-size-md);
   --ui-tabs-font-weight: var(--ui-font-weight-medium);
   --ui-tabs-panel-padding: var(--ui-space-lg);
+  --ui-tooltip-bg: var(--ui-color-text);
+  --ui-tooltip-text: var(--ui-color-text-inverse);
+  --ui-tooltip-radius: var(--ui-radius-sm);
+  --ui-tooltip-font-size: var(--ui-font-size-xs);
+  --ui-tooltip-max-width: 20em;
+  --ui-tooltip-offset: var(--ui-space-xs);
 }

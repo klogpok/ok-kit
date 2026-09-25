@@ -230,6 +230,7 @@ Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Direction
 | `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                   |
 | `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter` |
 | `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                        |
+| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                           |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                           |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract                                     |
@@ -462,6 +463,12 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-tabs-font-size`               | component | `var(--ui-font-size-md)`                                                     | `var(--ui-font-size-md)`                                               |
 | `--ui-tabs-font-weight`             | component | `var(--ui-font-weight-medium)`                                               | `var(--ui-font-weight-medium)`                                         |
 | `--ui-tabs-panel-padding`           | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-tooltip-bg`                   | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-tooltip-text`                 | component | `var(--ui-color-text-inverse)`                                               | `var(--ui-color-text-inverse)`                                         |
+| `--ui-tooltip-radius`               | component | `var(--ui-radius-sm)`                                                        | `var(--ui-radius-sm)`                                                  |
+| `--ui-tooltip-font-size`            | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
+| `--ui-tooltip-max-width`            | component | `20em`                                                                       | `20em`                                                                 |
+| `--ui-tooltip-offset`               | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
 
 <!-- tokens:end -->
 

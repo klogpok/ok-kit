@@ -2094,5 +2094,41 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-space-lg)",
     "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-tooltip-bg",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-tooltip-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-inverse)",
+    "dark": "var(--ui-color-text-inverse)"
+  },
+  {
+    "name": "--ui-tooltip-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-sm)",
+    "dark": "var(--ui-radius-sm)"
+  },
+  {
+    "name": "--ui-tooltip-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
+    "name": "--ui-tooltip-max-width",
+    "layer": "component",
+    "light": "20em",
+    "dark": "20em"
+  },
+  {
+    "name": "--ui-tooltip-offset",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
   }
 ];

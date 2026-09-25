@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  max-inline-size: var(--ui-tooltip-max-width);
+  padding-block: var(--ui-space-2xs);
+  padding-inline: var(--ui-space-sm);
+  border-radius: var(--ui-tooltip-radius);
+  background-color: var(--ui-tooltip-bg);
+  color: var(--ui-tooltip-text);
+  box-shadow: var(--ui-shadow-sm);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-tooltip-font-size);
+  line-height: var(--ui-line-height-snug);
+  overflow-wrap: anywhere;
+  animation: ui-tooltip-enter var(--ui-motion-duration-fast) var(--ui-motion-easing-enter);
+}
+
+// The gap to the host element. Margins are part of the pane, so positioning accounts for them.
+:host(.ui-tooltip--top) {
+  margin-block-end: var(--ui-tooltip-offset);
+}
+
+:host(.ui-tooltip--bottom) {
+  margin-block-start: var(--ui-tooltip-offset);
+}
+
+:host(.ui-tooltip--start) {
+  margin-inline-end: var(--ui-tooltip-offset);
+}
+
+:host(.ui-tooltip--end) {
+  margin-inline-start: var(--ui-tooltip-offset);
+}
+
+@keyframes ui-tooltip-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :host {
+    border: var(--ui-border-width-default) solid CanvasText;
+  }
+}
