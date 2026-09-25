@@ -62,6 +62,16 @@ export const uiIconArrowRight: UiIconDefinition = {
   svg: svg('<path d="M5 12h14M13 6l6 6-6 6"/>'),
 };
 
+export const uiIconArrowUp: UiIconDefinition = {
+  name: 'arrow-up',
+  svg: svg('<path d="M12 19V5M6 11l6-6 6 6"/>'),
+};
+
+export const uiIconArrowDown: UiIconDefinition = {
+  name: 'arrow-down',
+  svg: svg('<path d="M12 5v14M18 13l-6 6-6-6"/>'),
+};
+
 export const uiIconSearch: UiIconDefinition = {
   name: 'search',
   svg: svg('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'),
@@ -142,6 +152,8 @@ export const UI_ICONS_ALL: readonly UiIconDefinition[] = [
   uiIconChevronsRight,
   uiIconArrowLeft,
   uiIconArrowRight,
+  uiIconArrowUp,
+  uiIconArrowDown,
   uiIconSearch,
   uiIconInfo,
   uiIconAlertCircle,
