@@ -186,7 +186,8 @@ describe('UiCheckbox', () => {
 @Component({
   imports: [UiCheckbox],
   // Simulates a bare attribute in non-strict templates (strictTemplates rejects it at compile time).
-  template: `<ui-checkbox [checked]="$any('')">A</ui-checkbox><ui-checkbox [indeterminate]="$any('')">B</ui-checkbox>`,
+  template: `<ui-checkbox [checked]="$any('')">A</ui-checkbox
+    ><ui-checkbox [indeterminate]="$any('')">B</ui-checkbox>`,
 })
 class StaticAttributeHost {}
 

@@ -92,6 +92,8 @@
               }
             ],
             "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
+              "projects/ui-kit/styles/ui-kit.scss",
               "projects/playground/src/styles.scss"
             ]
           },

@@ -14,7 +14,10 @@ const withThemeAndDirection: Decorator = (story, context) => {
 };
 
 const preview: Preview = {
-  decorators: [applicationConfig({ providers: [provideUiIcons(UI_ICONS_ALL)] }), withThemeAndDirection],
+  decorators: [
+    applicationConfig({ providers: [provideUiIcons(UI_ICONS_ALL)] }),
+    withThemeAndDirection,
+  ],
   globalTypes: {
     theme: {
       description: 'Color theme',

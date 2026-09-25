@@ -13,7 +13,9 @@ import { UiCheckbox } from './checkbox';
       </ui-checkbox>
       <div style="display:grid;gap:8px;padding-inline-start:28px">
         @for (item of items(); track item.name; let i = $index) {
-          <ui-checkbox [checked]="item.done" (checkedChange)="toggle(i, $event)">{{ item.name }}</ui-checkbox>
+          <ui-checkbox [checked]="item.done" (checkedChange)="toggle(i, $event)">{{
+            item.name
+          }}</ui-checkbox>
         }
       </div>
     </div>

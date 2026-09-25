@@ -12,7 +12,18 @@ import { UiError, UiFormField, UiHint } from './form-field';
 
 @Component({
   selector: 'ui-story-signal-form',
-  imports: [JsonPipe, FormField, UiFormField, UiInput, UiTextarea, UiCheckbox, UiRadioGroup, UiRadio, UiSwitch, UiButton],
+  imports: [
+    JsonPipe,
+    FormField,
+    UiFormField,
+    UiInput,
+    UiTextarea,
+    UiCheckbox,
+    UiRadioGroup,
+    UiRadio,
+    UiSwitch,
+    UiButton,
+  ],
   template: `
     <form style="display:grid;gap:16px;max-inline-size:400px" (submit)="submit($event)" novalidate>
       <ui-form-field label="Full name">
@@ -41,7 +52,14 @@ import { UiError, UiFormField, UiHint } from './form-field';
   `,
 })
 class SignalFormStory {
-  readonly model = signal({ name: '', email: '', plan: '', notes: '', newsletter: true, terms: false });
+  readonly model = signal({
+    name: '',
+    email: '',
+    plan: '',
+    notes: '',
+    newsletter: true,
+    terms: false,
+  });
   readonly f = form(this.model, (p) => {
     required(p.name, { message: 'Enter your name' });
     minLength(p.name, 2, { message: 'At least 2 characters' });
@@ -62,7 +80,11 @@ class SignalFormStory {
   selector: 'ui-story-reactive-form',
   imports: [ReactiveFormsModule, UiFormField, UiInput, UiError, UiHint, UiCheckbox, UiButton],
   template: `
-    <form [formGroup]="group" style="display:grid;gap:16px;max-inline-size:400px" (ngSubmit)="group.markAllAsTouched()">
+    <form
+      [formGroup]="group"
+      style="display:grid;gap:16px;max-inline-size:400px"
+      (ngSubmit)="group.markAllAsTouched()"
+    >
       <ui-form-field label="Username">
         <input ui-input formControlName="username" />
         <ui-hint>Letters and digits only</ui-hint>
@@ -78,7 +100,9 @@ class SignalFormStory {
       </ui-form-field>
       <div style="display:flex;gap:8px">
         <button ui-button type="submit">Sign in</button>
-        <button ui-button variant="secondary" (click)="toggle()">{{ group.disabled ? 'Enable' : 'Disable' }}</button>
+        <button ui-button variant="secondary" (click)="toggle()">
+          {{ group.disabled ? 'Enable' : 'Disable' }}
+        </button>
       </div>
     </form>
   `,

@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/angular-vite';
 import { UI_TOKENS } from './tokens.generated';
 
-const semanticColors = UI_TOKENS.filter((t) => t.layer === 'semantic' && t.name.startsWith('--ui-color-'));
+const semanticColors = UI_TOKENS.filter(
+  (t) => t.layer === 'semantic' && t.name.startsWith('--ui-color-'),
+);
 const component = UI_TOKENS.filter((t) => t.layer === 'component');
 const scale = UI_TOKENS.filter(
-  (t) => t.layer === 'semantic' && /^--ui-(space|radius|font-size|control-height|shadow)-/.test(t.name),
+  (t) =>
+    t.layer === 'semantic' && /^--ui-(space|radius|font-size|control-height|shadow)-/.test(t.name),
 );
 
 const meta: Meta = {

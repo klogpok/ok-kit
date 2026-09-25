@@ -12,7 +12,13 @@ const meta: Meta<InputArgs> = {
   argTypes: {
     size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
   },
-  args: { size: 'md', invalid: false, placeholder: 'you@company.com', disabled: false, readonly: false },
+  args: {
+    size: 'md',
+    invalid: false,
+    placeholder: 'you@company.com',
+    disabled: false,
+    readonly: false,
+  },
   render: ({ placeholder, disabled, readonly, ...args }) => ({
     props: { ...args, placeholder, disabled, readonly },
     template: `
