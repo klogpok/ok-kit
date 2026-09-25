@@ -33,12 +33,12 @@ import {
     </ui-dialog-header>
     <ui-dialog-content>
       <ui-form-field label="Plan name" hint="Shown to the owner and the coordinator">
-        <input ui-input [value]="data.name" #name />
+        <input ui-input [value]="name()" (input)="onInput($event)" />
       </ui-form-field>
     </ui-dialog-content>
     <ui-dialog-actions>
       <button ui-button variant="secondary" uiDialogClose>Cancel</button>
-      <button ui-button (click)="ref.close(name.value)">Save</button>
+      <button ui-button (click)="ref.close(name())">Save</button>
     </ui-dialog-actions>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +46,11 @@ import {
 class RenameDialog {
   protected readonly data = inject<{ name: string }>(UI_DIALOG_DATA);
   protected readonly ref = inject<UiDialogRef<string>>(UiDialogRef);
+  protected readonly name = signal(this.data.name);
+
+  protected onInput(event: Event): void {
+    this.name.set((event.target as HTMLInputElement).value);
+  }
 }
 
 @Component({
