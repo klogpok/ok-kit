@@ -13,6 +13,7 @@ Our in-house Angular design system. Standalone, `OnPush`, zoneless-ready compone
 - [Forms](#forms)
 - [Theming](#theming)
 - [RTL](#rtl)
+- [Overlays](#overlays)
 - [Components](#components)
 - [Tokens](#tokens)
 - [Contributing](#contributing)
@@ -95,6 +96,7 @@ All form controls work with **Signal Forms**, **Reactive Forms** and **template-
 | `textarea[ui-textarea]`    | native binding                    | `DefaultValueAccessor` |
 | `ui-checkbox`, `ui-switch` | `FormCheckboxControl` (`checked`) | `ControlValueAccessor` |
 | `ui-radio-group`           | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| `ui-select`                | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 
 `ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
 `aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
@@ -231,6 +233,51 @@ providers: [
   }),
 ];
 ```
+
+## Overlays
+
+Select panels, tooltips, dialogs and toasts render in CDK overlays, which use the browser top layer
+(Popover API). They read the text direction when they open, so switching `dir` on `<html>` at
+runtime is enough.
+
+```ts
+// Dialog: focus trap, Escape/backdrop close and focus restore come from CDK Dialog.
+const ref = this.dialog.open<string>(RenamePlanDialog, { data: plan, size: 'sm' });
+ref.closed.subscribe((name) => ...);
+
+if (await this.dialog.confirm({ title: 'Delete the plan?', tone: 'danger', confirmLabel: 'Delete' })) {
+  ...
+}
+
+// Toast: announced to screen readers; pauses while hovered or focused.
+this.toast.success('The plan was sent to the owner');
+this.toast.show({ message: 'Plan deleted', action: 'Undo' }).onAction.subscribe(() => restore());
+```
+
+```html
+<!-- Dialog content -->
+<ui-dialog-header><h2 ui-dialog-title>Rename plan</h2></ui-dialog-header>
+<ui-dialog-content>...</ui-dialog-content>
+<ui-dialog-actions>
+  <button ui-button variant="secondary" uiDialogClose>Cancel</button>
+  <button ui-button [uiDialogClose]="name()">Save</button>
+</ui-dialog-actions>
+
+<!-- Tooltip: a description, never the only label of an icon button -->
+<button ui-icon-button label="Delete" uiTooltip="Delete the plan"><ui-icon icon="trash" /></button>
+
+<!-- Select -->
+<ui-form-field label="Coordinator">
+  <ui-select [formField]="form.coordinator" placeholder="Choose" searchable>
+    @for (c of coordinators; track c.id) {
+    <ui-option [value]="c.id">{{ c.name }}</ui-option>
+    }
+  </ui-select>
+</ui-form-field>
+```
+
+Change the toast position, duration or stack size with
+`provideUiToast({ position: 'top-center', duration: 4000, max: 3 })`.
 
 ## Components
 

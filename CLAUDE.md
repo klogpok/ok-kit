@@ -24,7 +24,8 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 ## Status
 
 - **Phase 1 is done.** Delivered: tokens, typography, icon, spinner, button, icon-button, input, textarea, form-field with `uiPrefix`/`uiSuffix`, checkbox, radio group, switch, ThemeService, Storybook, playground.
-- **Next:** Phase 2 (select/combobox, tooltip, dialog, toast, tabs, badge, card, divider), then Phase 3.
+- **Phase 2 is built and awaits approval** (2026-09-25). Delivered: divider, badge, card, tabs, tooltip, dialog (+ `confirm()`), toast, select (+ `searchable`), `provideUiLabels()`, `resolveDirection()`.
+- **Next:** Phase 3 (table, pagination, date picker, menu/dropdown, accordion, skeleton), after approval.
 
 ## Workflow per phase
 
@@ -41,4 +42,8 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 - Signal Forms' `[formField]` sets the inputs `disabled`, `invalid`, `required`, `touched` and `name` on **every** directive of the host.
 - If a component provides `NG_VALUE_ACCESSOR`, `[formField]` falls back to CVA interop. This is why `UiFormControlBase` assigns `ngControl.valueAccessor` manually.
 - pnpm 12: dependencies that need build scripts must be listed under `allowBuilds` in `pnpm-workspace.yaml`. Do not use `pnpm dlx` for such CLIs.
+- The CDK `Directionality` reads `dir` once at startup. Every overlay must resolve the direction when it opens (`resolveDirection()` + `overlayRef.setDirection()`, or `direction` for CDK Dialog), otherwise it renders LTR after a runtime switch to RTL.
+- CDK overlays use the Popover API (top layer) by default, so `z-index` does not order them. Opening order does.
+- In Vitest (jsdom): the CDK key managers read `keyCode`, so pass it in `KeyboardEvent`. `InteractivityChecker` sees every element as hidden (no layout), so dialog focus tests need a fake checker (see `dialog.spec.ts`).
+- Storybook writes args onto the `component` instance when an arg name matches a field. For directives this replaced signal inputs. Use arg names that differ from the class fields (see `tooltip.stories.ts`).
 - Storybook uses `@storybook/angular-vite`. `@analogjs/vite-plugin-angular` must be >= 2.7.5, older versions fail with the `initializeHash` error.
