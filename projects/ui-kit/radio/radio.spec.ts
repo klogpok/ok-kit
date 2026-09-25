@@ -192,7 +192,11 @@ class CompareHost {
   ];
   // A copy from the server, not one of the option objects.
   readonly control = new FormControl<City | null>({ id: 2, name: 'Eilat' });
-  readonly byId = (a: City | null, b: City) => a?.id === b.id;
+  readonly calls: [City, City][] = [];
+  readonly byId = (option: City, selected: City) => {
+    this.calls.push([option, selected]);
+    return option.id === selected.id;
+  };
 }
 
 describe('UiRadioGroup with compareWith', () => {
@@ -202,6 +206,22 @@ describe('UiRadioGroup with compareWith', () => {
     const inputs = (fixture.nativeElement as HTMLElement).querySelectorAll('input');
     expect(inputs[1].checked).toBe(true);
     expect(inputs[0].checked).toBe(false);
+  });
+
+  it('calls compareWith(option, selected) and never with null', async () => {
+    const fixture = TestBed.createComponent(CompareHost);
+    await settle(fixture);
+    const host = fixture.componentInstance;
+    const [option, selected] = host.calls[0];
+    expect(host.cities).toContain(option);
+    expect(selected).toBe(host.control.value);
+
+    host.calls.length = 0;
+    host.control.setValue(null);
+    await settle(fixture);
+    expect(host.calls).toEqual([]);
+    const inputs = (fixture.nativeElement as HTMLElement).querySelectorAll('input');
+    expect([...inputs].some((input) => input.checked)).toBe(false);
   });
 });
 

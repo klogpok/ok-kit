@@ -81,8 +81,11 @@ export class UiRadioGroup<T = unknown>
   readonly size = input<UiSize>('md');
   readonly ariaLabel = input('', { alias: 'aria-label' });
   readonly ariaLabelledby = input('', { alias: 'aria-labelledby' });
-  /** Compares option values with the selected value, e.g. by id for objects. */
-  readonly compareWith = input<(a: T | null, b: T) => boolean>(Object.is);
+  /**
+   * Compares an option value with the selected value, e.g. by id for objects. Called as
+   * `compareWith(option, selected)` and never with `null`: a `null` value matches only `null`.
+   */
+  readonly compareWith = input<(option: T, selected: T) => boolean>(Object.is);
 
   readonly labelStrategy = 'labelledby' as const;
   readonly controlId = computed(() => this.id());
@@ -157,7 +160,13 @@ export class UiRadio<T = unknown> {
   readonly ariaLabel = input('', { alias: 'aria-label' });
 
   protected readonly inputId = computed(() => `${this.id()}-input`);
-  readonly isChecked = computed(() => this.group.compareWith()(this.group.value(), this.value()));
+  readonly isChecked = computed(() => {
+    const option = this.value();
+    const selected = this.group.value();
+    return option == null || selected == null
+      ? option === selected
+      : this.group.compareWith()(option, selected);
+  });
   readonly isDisabled = computed(() => this.disabled() || this.group.isDisabled());
 
   focus(options?: FocusOptions): void {

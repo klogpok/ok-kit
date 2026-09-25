@@ -145,8 +145,9 @@ once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `
 
 Without a forms directive, use the `invalid` input to show the error state manually.
 
-`ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values (e.g. by
-id). `ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with
+`ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values, e.g.
+`(option: City, selected: City) => option.id === selected.id`. It is called as
+`compareWith(option, selected)` and never with `null`; a `null` value matches only `null`. `ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with
 the `invalidDate` label as its message; the value is `null` meanwhile.
 
 ### Prefix and suffix
