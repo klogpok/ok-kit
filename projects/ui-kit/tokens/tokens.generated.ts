@@ -266,6 +266,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#4a5466"
   },
   {
+    "name": "--ui-ref-color-gray-750",
+    "layer": "primitive",
+    "light": "#3a4457",
+    "dark": "#3a4457"
+  },
+  {
     "name": "--ui-ref-color-gray-800",
     "layer": "primitive",
     "light": "#2b3549",
@@ -1355,7 +1361,7 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-color-surface-hover",
     "layer": "semantic",
     "light": "#f1f3f6",
-    "dark": "#2b3549"
+    "dark": "#3a4457"
   },
   {
     "name": "--ui-color-surface-active",

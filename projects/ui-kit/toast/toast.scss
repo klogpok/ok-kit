@@ -15,9 +15,6 @@
 }
 
 .ui-toast {
-  // In dark mode the default ghost hover equals the toast background.
-  --ui-button-ghost-bg-hover: var(--ui-color-surface-active);
-
   display: flex;
   align-items: flex-start;
   gap: var(--ui-space-sm);

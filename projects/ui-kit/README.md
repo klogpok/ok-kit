@@ -466,7 +466,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-surface-subtle`             | semantic  | `#f8f9fb`                                                                    | `#1d2535`                                                              |
 | `--ui-color-surface-muted`              | semantic  | `#f1f3f6`                                                                    | `#2b3549`                                                              |
 | `--ui-color-surface-raised`             | semantic  | `#ffffff`                                                                    | `#2b3549`                                                              |
-| `--ui-color-surface-hover`              | semantic  | `#f1f3f6`                                                                    | `#2b3549`                                                              |
+| `--ui-color-surface-hover`              | semantic  | `#f1f3f6`                                                                    | `#3a4457`                                                              |
 | `--ui-color-surface-active`             | semantic  | `#e4e7ed`                                                                    | `#4a5466`                                                              |
 | `--ui-color-text`                       | semantic  | `#1d2535`                                                                    | `#f8f9fb`                                                              |
 | `--ui-color-text-muted`                 | semantic  | `#636d7e`                                                                    | `#a7acaf`                                                              |
