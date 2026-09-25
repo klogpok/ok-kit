@@ -5,6 +5,8 @@
   box-sizing: border-box;
   min-inline-size: var(--ui-menu-min-width);
   max-inline-size: var(--ui-menu-max-width);
+  // CDK Menu overlays have fixed dimensions, so a long menu scrolls instead of leaving the screen.
+  max-block-size: var(--ui-menu-max-height);
   padding-block: var(--ui-menu-padding-block);
   overflow: auto;
   border: var(--ui-border-width-default) solid var(--ui-menu-border);

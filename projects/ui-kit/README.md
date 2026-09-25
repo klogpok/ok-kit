@@ -703,6 +703,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-menu-padding-block`               | component | `var(--ui-space-2xs)`                                                        | `var(--ui-space-2xs)`                                                  |
 | `--ui-menu-min-width`                   | component | `var(--ui-container-width-xs)`                                               | `var(--ui-container-width-xs)`                                         |
 | `--ui-menu-max-width`                   | component | `var(--ui-container-width-md)`                                               | `var(--ui-container-width-md)`                                         |
+| `--ui-menu-max-height`                  | component | `var(--ui-panel-max-height)`                                                 | `var(--ui-panel-max-height)`                                           |
 | `--ui-menu-item-height`                 | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
 | `--ui-menu-item-padding-inline`         | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-menu-item-gap`                    | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |

@@ -2690,6 +2690,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-container-width-md)"
   },
   {
+    "name": "--ui-menu-max-height",
+    "layer": "component",
+    "light": "var(--ui-panel-max-height)",
+    "dark": "var(--ui-panel-max-height)"
+  },
+  {
     "name": "--ui-menu-item-height",
     "layer": "component",
     "light": "var(--ui-control-height-md)",
