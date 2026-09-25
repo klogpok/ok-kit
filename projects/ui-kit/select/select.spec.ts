@@ -1,7 +1,7 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, required } from '@angular/forms/signals';
+import { FormField, form, readonly, required } from '@angular/forms/signals';
 import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiOption, UiOptionGroup } from './option';
 import { UiSelect } from './select';
@@ -458,5 +458,64 @@ describe('UiSelect with Signal Forms', () => {
     expect(fixture.componentInstance.f.role().touched()).toBe(true);
     expect(control().getAttribute('aria-invalid')).toBe('true');
     expect(root.textContent).toContain('Choose a role');
+  });
+});
+
+@Component({
+  imports: [FormField, UiSelect, UiOption],
+  template: `
+    <ui-select aria-label="Coordinator" [formField]="f.coordinator" [searchable]="searchable()">
+      <ui-option value="dana">Dana</ui-option>
+      <ui-option value="yael">Yael</ui-option>
+    </ui-select>
+  `,
+})
+class ReadonlySelectHost {
+  readonly searchable = signal(false);
+  readonly locked = signal(true);
+  readonly model = signal({ coordinator: 'dana' });
+  readonly f = form(this.model, (p) => {
+    readonly(p.coordinator, () => this.locked());
+  });
+}
+
+describe('UiSelect readonly', () => {
+  let fixture: ComponentFixture<ReadonlySelectHost>;
+  const control = () =>
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('[role="combobox"]')!;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReadonlySelectHost);
+    document.body.appendChild(fixture.nativeElement);
+    await settle(fixture);
+  });
+
+  afterEach(() => (fixture.nativeElement as HTMLElement).remove());
+
+  it('does not open under a Signal Forms readonly rule and stays focusable', async () => {
+    expect(control().getAttribute('aria-readonly')).toBe('true');
+    expect((control() as HTMLButtonElement).disabled).toBe(false);
+    control().click();
+    keydown(control(), 'ArrowDown');
+    await settle(fixture);
+    expect(listbox()).toBeNull();
+    expect(fixture.componentInstance.model().coordinator).toBe('dana');
+  });
+
+  it('makes the search field readonly', async () => {
+    fixture.componentInstance.searchable.set(true);
+    await settle(fixture);
+    expect((control() as HTMLInputElement).readOnly).toBe(true);
+  });
+
+  it('closes an open list when it becomes readonly', async () => {
+    fixture.componentInstance.locked.set(false);
+    await settle(fixture);
+    control().click();
+    await settle(fixture);
+    expect(listbox()).not.toBeNull();
+    fixture.componentInstance.locked.set(true);
+    await settle(fixture);
+    expect(listbox()).toBeNull();
   });
 });

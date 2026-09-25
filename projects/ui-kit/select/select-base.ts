@@ -47,6 +47,7 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
     '[class]': '"ui-select--" + size()',
     '[class.ui-select--open]': 'isOpen()',
     '[class.ui-select--disabled]': 'isDisabled()',
+    '[class.ui-select--readonly]': 'readonly()',
     '[class.ui-select--invalid]': 'showError()',
     '[attr.id]': 'id()',
   },
@@ -124,11 +125,15 @@ export abstract class UiSelectBase<T, V>
       multiple: () => this.multiple,
       isSelected: (value) => this.isSelected(value),
       isFilteredOut: (label) => this.isFilteredOut(label),
-      selectOption: (value) => this.selectOption(value),
+      selectOption: (value) => this.pick(value),
     });
     this.keyManager.change.subscribe(() =>
       this.activeId.set(this.keyManager.activeItem?.id ?? null),
     );
+    // A list opened before the control became readonly must not stay open.
+    effect(() => {
+      if (this.readonly()) untracked(() => this.close());
+    });
     // The key manager keeps an active option that was removed (e.g. new server-side results).
     effect(() => {
       const options = this.options();
@@ -160,7 +165,7 @@ export abstract class UiSelectBase<T, V>
   }
 
   open(): void {
-    if (this.isOpen() || this.isDisabled()) return;
+    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
     this.panelWidth.set(this.host.getBoundingClientRect().width);
     this.isOpen.set(true);
     this.opened.emit();
@@ -242,7 +247,7 @@ export abstract class UiSelectBase<T, V>
         return;
       }
       const active = this.keyManager.activeItem;
-      if (active && !active.disabled) this.selectOption(active.value());
+      if (active && !active.disabled) this.pick(active.value());
     } else if (key === 'ArrowUp' && event.altKey) {
       event.preventDefault();
       this.close();
@@ -251,6 +256,11 @@ export abstract class UiSelectBase<T, V>
     } else if (!searchable || NAVIGATION_KEYS.has(key)) {
       this.keyManager.onKeydown(event);
     }
+  }
+
+  /** Selects an option the user chose, unless the value cannot change. */
+  private pick(value: unknown): void {
+    if (!this.readonly()) this.selectOption(value);
   }
 
   private activateSelected(): void {
