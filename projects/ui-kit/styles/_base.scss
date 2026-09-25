@@ -10,6 +10,13 @@
   text-size-adjust: 100%;
 }
 
+// `color` is inherited as a value, so a nested theme sets the text color and background again.
+// :where() keeps the specificity at zero, so app styles on the element win.
+:where([data-theme]) {
+  color: var(--ui-color-text);
+  background-color: var(--ui-color-bg);
+}
+
 body {
   margin: 0;
 }
