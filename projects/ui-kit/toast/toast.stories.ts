@@ -61,6 +61,35 @@ class ToastDemo {
 const meta: Meta<ToastDemo> = {
   title: 'Feedback/Toast',
   component: ToastDemo,
+  // The derived snippet would show the story-only demo component; show how an app calls the service.
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import { UiButton } from '@vplans/ui-kit/button';
+import { UiToast } from '@vplans/ui-kit/toast';
+
+@Component({
+  selector: 'app-demo',
+  imports: [UiButton],
+  template: \`<button ui-button (click)="send()">Send</button>\`,
+})
+export class DemoComponent {
+  private readonly toast = inject(UiToast);
+
+  send(): void {
+    this.toast.success('The plan was sent to the owner');
+    this.toast.error('Check the connection and try again.', { title: 'Upload failed', duration: 0 });
+    this.toast
+      .show({ message: 'Plan deleted', action: 'Undo', duration: 8000 })
+      .onAction.subscribe(() => this.restore());
+  }
+
+  private restore(): void {}
+}`,
+      },
+    },
+  },
 };
 
 export default meta;
