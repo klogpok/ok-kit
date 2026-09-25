@@ -5,7 +5,9 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
+  Injectable,
   Injector,
+  Signal,
   booleanAttribute,
   computed,
   effect,
@@ -73,6 +75,15 @@ export class UiTooltipPanel {
 }
 
 /**
+ * Tells the host component whether the tooltip is active, kept out of the public `UiTooltip`
+ * API. `UiTooltip` sets `active` in its constructor, before any host binding reads it. Internal.
+ */
+@Injectable()
+class UiTooltipHostState implements UiTooltipHost {
+  active: Signal<boolean> = signal(false);
+}
+
+/**
  * Short description shown on hover and keyboard focus. The text is also exposed to screen readers
  * through `aria-describedby`. Do not put interactive content or essential information in it.
  *
@@ -88,14 +99,14 @@ export class UiTooltipPanel {
 @Directive({
   selector: '[uiTooltip]',
   exportAs: 'uiTooltip',
-  providers: [{ provide: UI_TOOLTIP_HOST, useExisting: UiTooltip }],
+  providers: [UiTooltipHostState, { provide: UI_TOOLTIP_HOST, useExisting: UiTooltipHostState }],
   host: {
     '(mouseenter)': 'onMouseEnter()',
     '(mouseleave)': 'onMouseLeave()',
     '(keydown.escape)': 'onEscape($event)',
   },
 })
-export class UiTooltip implements UiTooltipHost {
+export class UiTooltip {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
   private readonly describer = inject(AriaDescriber);
@@ -114,9 +125,6 @@ export class UiTooltip implements UiTooltipHost {
     this.disabled() ? '' : this.message().trim(),
   );
 
-  /** Whether the tooltip has a message and is not disabled. */
-  readonly active = computed(() => !!this.effectiveMessage());
-
   private overlayRef: OverlayRef | null = null;
   private positionStrategy: FlexibleConnectedPositionStrategy | null = null;
   private panel: ComponentRef<UiTooltipPanel> | null = null;
@@ -129,6 +137,8 @@ export class UiTooltip implements UiTooltipHost {
   private describedMessage = '';
 
   constructor() {
+    inject(UiTooltipHostState).active = computed(() => !!this.effectiveMessage());
+
     // Keeps aria-describedby and an open tooltip in sync with the message.
     effect(() => {
       const message = this.effectiveMessage();
