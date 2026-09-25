@@ -40,6 +40,11 @@ describe('UiToast', () => {
     expect(items()[0].textContent).toContain('Plan sent');
   });
 
+  it('loads the visually hidden styles the announcer element needs', () => {
+    const css = [...document.querySelectorAll('style')].map((style) => style.textContent).join('');
+    expect(css).toContain('.cdk-visually-hidden');
+  });
+
   it('announces politely, and assertively for errors', () => {
     toast.info('Saved', { title: 'Plan' });
     expect(announce).toHaveBeenLastCalledWith('Plan. Saved', 'polite');

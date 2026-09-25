@@ -13,6 +13,7 @@ import {
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { OverlayRef, createGlobalPositionStrategy, createOverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
+import { _CdkPrivateStyleLoader, _VisuallyHiddenLoader } from '@angular/cdk/private';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UI_LABELS, resolveDirection } from '@vplans/ui-kit/core';
 import {
@@ -210,6 +211,11 @@ export class UiToast {
   private readonly pausedBy = new Set<'pointer' | 'focus'>();
   private overlayRef: OverlayRef | null = null;
   private nextId = 0;
+
+  constructor() {
+    // The announcer element relies on `.cdk-visually-hidden`, which CDK only loads with FocusTrap.
+    inject(_CdkPrivateStyleLoader).load(_VisuallyHiddenLoader);
+  }
 
   /** Toasts currently shown, oldest first. */
   readonly active = this.items.asReadonly();
