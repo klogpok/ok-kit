@@ -142,6 +142,8 @@ export class UiRadioGroup<T = unknown>
     '[class.ui-radio--readonly]': 'group.readonly()',
     '[class.ui-radio--invalid]': 'group.showError()',
     '[attr.id]': 'id()',
+    // The native control carries the label; a static attribute would also stay on the host.
+    '[attr.aria-label]': 'null',
   },
 })
 export class UiRadio<T = unknown> {

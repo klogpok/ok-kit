@@ -210,7 +210,7 @@ describe('UiRadioGroup with compareWith', () => {
   template: `
     <ui-radio-group aria-label="Delivery" [formField]="f.delivery">
       <ui-radio value="pickup">Pickup</ui-radio>
-      <ui-radio value="courier">Courier</ui-radio>
+      <ui-radio value="courier" aria-label="Courier delivery">Courier</ui-radio>
     </ui-radio-group>
   `,
 })
@@ -233,5 +233,13 @@ describe('UiRadioGroup readonly', () => {
     expect(pickup.checked).toBe(true);
     expect(courier.checked).toBe(false);
     expect(root.querySelector('ui-radio-group')!.getAttribute('aria-readonly')).toBe('true');
+  });
+
+  it('moves the aria-label of a radio from its host to the native input', async () => {
+    const fixture = TestBed.createComponent(ReadonlyRadioHost);
+    await settle(fixture);
+    const courier = (fixture.nativeElement as HTMLElement).querySelectorAll('ui-radio')[1];
+    expect(courier.querySelector('input')!.getAttribute('aria-label')).toBe('Courier delivery');
+    expect(courier.hasAttribute('aria-label')).toBe(false);
   });
 });
