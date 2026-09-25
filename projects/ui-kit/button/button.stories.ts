@@ -1,10 +1,9 @@
 import { argsToTemplate, moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
-import { fn } from 'storybook/test';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiButton } from './button';
 import { UiIconButton } from './icon-button';
 
-type ButtonArgs = UiButton & { label: string; click: () => void };
+type ButtonArgs = UiButton & { label: string };
 
 const meta: Meta<ButtonArgs> = {
   title: 'Actions/Button',
@@ -16,6 +15,13 @@ const meta: Meta<ButtonArgs> = {
     type: { control: 'inline-radio', options: ['button', 'submit', 'reset'] },
     label: { control: 'text' },
   },
+};
+
+export default meta;
+type Story = StoryObj<ButtonArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Primary: Story = {
   args: {
     label: 'Save changes',
     variant: 'primary',
@@ -24,26 +30,26 @@ const meta: Meta<ButtonArgs> = {
     disabledInteractive: false,
     loading: false,
     fullWidth: false,
-    click: fn(),
   },
-  render: ({ label, click, ...args }) => ({
-    props: { ...args, click },
-    template: `<button ui-button ${argsToTemplate(args)} (click)="click()">${label}</button>`,
+  render: ({ label, ...args }) => ({
+    props: args,
+    template: `<button ui-button ${argsToTemplate(args)}>${label}</button>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<ButtonArgs>;
-
-export const Primary: Story = {};
-export const Secondary: Story = { args: { variant: 'secondary' } };
-export const Ghost: Story = { args: { variant: 'ghost' } };
-export const Danger: Story = { args: { variant: 'danger', label: 'Delete' } };
-export const Disabled: Story = { args: { disabled: true } };
+export const Secondary: Story = { ...Primary, args: { ...Primary.args, variant: 'secondary' } };
+export const Ghost: Story = { ...Primary, args: { ...Primary.args, variant: 'ghost' } };
+export const Danger: Story = {
+  ...Primary,
+  args: { ...Primary.args, variant: 'danger', label: 'Delete' },
+};
+export const Disabled: Story = { ...Primary, args: { ...Primary.args, disabled: true } };
 /** Looks disabled and blocks clicks, but stays focusable and hoverable. */
-export const DisabledInteractive: Story = { args: { disabled: true, disabledInteractive: true } };
-export const Loading: Story = { args: { loading: true } };
-export const FullWidth: Story = { args: { fullWidth: true } };
+export const DisabledInteractive: Story = {
+  ...Primary,
+  args: { ...Primary.args, disabled: true, disabledInteractive: true },
+};
+export const Loading: Story = { ...Primary, args: { ...Primary.args, loading: true } };
+export const FullWidth: Story = { ...Primary, args: { ...Primary.args, fullWidth: true } };
 
 export const Sizes: Story = {
   render: () => ({
