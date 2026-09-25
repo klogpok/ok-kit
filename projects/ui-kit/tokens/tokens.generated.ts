@@ -1229,7 +1229,7 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-color-border",
     "layer": "semantic",
     "light": "#e4e7ed",
-    "dark": "#2b3549"
+    "dark": "#4a5466"
   },
   {
     "name": "--ui-color-border-control",
