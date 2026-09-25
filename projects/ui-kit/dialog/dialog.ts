@@ -2,13 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  EventEmitter,
   Injectable,
   Injector,
   TemplateRef,
   ViewContainerRef,
   inject,
+  signal,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
+import { Direction, Directionality } from '@angular/cdk/bidi';
 import { ComponentType } from '@angular/cdk/portal';
 import { AutoFocusTarget, DIALOG_DATA, Dialog, DialogRef } from '@angular/cdk/dialog';
 import { UiButton } from '@vplans/ui-kit/button';
@@ -41,6 +44,12 @@ export interface UiDialogOptions<D = unknown> {
   direction?: 'ltr' | 'rtl';
   injector?: Injector;
   viewContainerRef?: ViewContainerRef;
+}
+
+/** A fixed `Directionality`, the same shape CDK Dialog provides for `config.direction`. */
+function fixedDirectionality(value: Direction): Partial<Directionality> {
+  const change = new EventEmitter<Direction>();
+  return { value, valueSignal: signal(value), change, ngOnDestroy: () => change.complete() };
 }
 
 /** Options of `UiDialog.confirm()`. */
@@ -128,6 +137,10 @@ export class UiDialog {
   ): DialogRef<R, C> {
     const autoFocus = options.autoFocus ?? 'first-field';
     const restoreToOpener = (options.restoreFocus ?? true) === true;
+    // Resolved per dialog: the CDK Directionality misses runtime changes of `dir` on <html>.
+    const direction =
+      options.direction ??
+      resolveDirection(this.document.activeElement ?? this.document.documentElement);
     const config: UiDialogConfig<D, DialogRef<R, C>> = {
       ...options,
       // With 'dialog' the CDK only focuses the container when the kit found nothing to focus.
@@ -137,10 +150,10 @@ export class UiDialog {
       restoreFocus: restoreToOpener ? false : options.restoreFocus,
       restoreToOpener,
       size: options.size ?? 'md',
-      // Resolved per dialog: the CDK Directionality misses runtime changes of `dir` on <html>.
-      direction:
-        options.direction ??
-        resolveDirection(this.document.activeElement ?? this.document.documentElement),
+      direction,
+      // CDK provides `direction` to the content only when `injector` / `viewContainerRef` has
+      // no Directionality, and the root one always exists.
+      providers: [{ provide: Directionality, useValue: fixedDirectionality(direction) }],
       container: UiDialogContainer,
       ariaModal: true,
       panelClass: 'ui-dialog-pane',

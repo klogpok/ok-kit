@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, Injector, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { InteractivityChecker } from '@angular/cdk/a11y';
 import { Directionality } from '@angular/cdk/bidi';
@@ -30,6 +30,7 @@ import {
 class RenameDialog {
   readonly data = inject<{ name: string }>(DIALOG_DATA);
   readonly ref = inject(DialogRef);
+  readonly dir = inject(Directionality);
 }
 
 @Component({
@@ -117,6 +118,21 @@ describe('UiDialog', () => {
       dialog.open(RenameDialog, { data: { name: 'A' } });
       await settle();
       expect(container()!.closest('[dir]')!.getAttribute('dir')).toBe('rtl');
+    } finally {
+      document.documentElement.removeAttribute('dir');
+    }
+  });
+
+  it('gives the content the dialog direction also with a custom injector', async () => {
+    expect(TestBed.inject(Directionality).value).toBe('ltr');
+    document.documentElement.dir = 'rtl';
+    try {
+      const ref = dialog.open<unknown, unknown, RenameDialog>(RenameDialog, {
+        data: { name: 'A' },
+        injector: TestBed.inject(Injector),
+      });
+      await settle();
+      expect(ref.componentInstance!.dir.value).toBe('rtl');
     } finally {
       document.documentElement.removeAttribute('dir');
     }
