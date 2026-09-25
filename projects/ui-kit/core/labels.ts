@@ -15,6 +15,11 @@ export interface UiLabels {
   noOptions: string;
   /** Accessible name of the toast region. */
   notifications: string;
+  /**
+   * Read after the label of a `ui-form-field` marked `required` whose control is not required
+   * itself (e.g. a group where one choice is needed).
+   */
+  required: string;
   /** Accessible name of `ui-spinner` when it has no `label`. */
   loading: string;
   /** Accessible name of the `ui-pagination` navigation landmark. */
@@ -48,6 +53,7 @@ export const UI_LABELS_HE: UiLabels = {
   cancel: 'ביטול',
   noOptions: 'אין תוצאות',
   notifications: 'התראות',
+  required: 'חובה',
   loading: 'טוען',
   pagination: 'עימוד',
   firstPage: 'עמוד ראשון',
@@ -73,6 +79,7 @@ export const UI_LABELS_EN: UiLabels = {
   cancel: 'Cancel',
   noOptions: 'No options',
   notifications: 'Notifications',
+  required: 'required',
   loading: 'Loading',
   pagination: 'Pagination',
   firstPage: 'First page',

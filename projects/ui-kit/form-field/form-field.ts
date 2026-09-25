@@ -11,7 +11,12 @@ import {
   input,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
-import { UI_FORM_FIELD, UI_FORM_FIELD_CONTROL, UiFormFieldContext } from '@vplans/ui-kit/core';
+import {
+  UI_FORM_FIELD,
+  UI_FORM_FIELD_CONTROL,
+  UI_LABELS,
+  UiFormFieldContext,
+} from '@vplans/ui-kit/core';
 
 /** Helper text shown below the control while there is no visible error. */
 @Component({
@@ -78,6 +83,7 @@ export class UiSuffix {}
 })
 export class UiFormField implements UiFormFieldContext {
   private readonly ids = inject(_IdGenerator);
+  protected readonly labels = inject(UI_LABELS);
 
   readonly label = input('');
   readonly hint = input('');
@@ -107,6 +113,10 @@ export class UiFormField implements UiFormFieldContext {
   });
   protected readonly isRequired = computed(
     () => this.required() ?? this.control()?.isRequired() ?? false,
+  );
+  /** Marked required here only: the control has no `aria-required`, so say it in the label. */
+  protected readonly requiredOnlyHere = computed(
+    () => this.required() === true && !this.control()?.isRequired(),
   );
   protected readonly showError = computed(() => this.control()?.showError() ?? false);
   protected readonly hasProjectedErrors = computed(() => this.projectedErrors().length > 0);

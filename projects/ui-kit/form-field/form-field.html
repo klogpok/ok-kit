@@ -4,6 +4,9 @@
     @if (isRequired()) {
       <span class="ui-form-field__required" aria-hidden="true">*</span>
     }
+    @if (requiredOnlyHere()) {
+      <span class="ui-form-field__required-text">{{ labels().required }}</span>
+    }
   </label>
 }
 

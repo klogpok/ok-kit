@@ -83,6 +83,7 @@ describe('UiFormField + UiInput', () => {
     it('shows the required marker from Validators.required', () => {
       expect(inputEl.getAttribute('aria-required')).toBe('true');
       expect(query(fixture, '.ui-form-field__required')).not.toBeNull();
+      expect(query(fixture, '.ui-form-field__required-text')).toBeNull();
     });
 
     it('describes the input with the hint while valid or untouched', () => {
@@ -265,5 +266,13 @@ describe('UiFormField with a bare required attribute', () => {
     const fixture = TestBed.createComponent(BareRequiredHost);
     await settle(fixture);
     expect(query(fixture, '.ui-form-field__required')).not.toBeNull();
+  });
+
+  it('tells assistive technology that a field the control does not mark is required', async () => {
+    const fixture = TestBed.createComponent(BareRequiredHost);
+    await settle(fixture);
+    const label = query(fixture, 'label')!;
+    expect(label.querySelector('.ui-form-field__required-text')!.textContent).toBe('חובה');
+    expect(query(fixture, 'input')!.hasAttribute('aria-required')).toBe(false);
   });
 });
