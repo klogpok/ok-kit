@@ -41,6 +41,30 @@
               "projects/ui-kit/**/*.html"
             ]
           }
+        },
+        "storybook": {
+          "builder": "@storybook/angular-vite:start-storybook",
+          "options": {
+            "configDir": "projects/ui-kit/.storybook",
+            "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
+            "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
+              "projects/ui-kit/styles/ui-kit.scss"
+            ],
+            "port": 6006
+          }
+        },
+        "build-storybook": {
+          "builder": "@storybook/angular-vite:build-storybook",
+          "options": {
+            "configDir": "projects/ui-kit/.storybook",
+            "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
+            "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
+              "projects/ui-kit/styles/ui-kit.scss"
+            ],
+            "outputDir": "dist/storybook/ui-kit"
+          }
         }
       }
     },

@@ -11,7 +11,9 @@
     "test:watch": "ng test ui-kit",
     "lint": "ng lint && stylelint \"projects/**/*.scss\"",
     "format": "prettier --write \"projects/**/*.{ts,html,scss,json}\"",
-    "format:check": "prettier --check \"projects/**/*.{ts,html,scss,json}\""
+    "format:check": "prettier --check \"projects/**/*.{ts,html,scss,json}\"",
+    "storybook": "ng run ui-kit:storybook",
+    "build-storybook": "ng run ui-kit:build-storybook"
   },
   "private": true,
   "packageManager": "pnpm@12.3.4",
@@ -27,20 +29,28 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.7.5",
     "@angular-eslint/builder": "22.5.0",
     "@angular/build": "^22.2.0",
     "@angular/cli": "^22.2.0",
     "@angular/compiler-cli": "^22.2.0",
     "@eslint/js": "^10.0.1",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/addon-docs": "10.6.0",
+    "@storybook/angular-vite": "10.6.0",
+    "@types/node": "^26.6.2",
     "angular-eslint": "22.5.0",
     "eslint": "^10.9.1",
     "jsdom": "^30.0.0",
     "ng-packagr": "^22.2.0",
     "prettier": "^3.8.1",
+    "storybook": "10.6.0",
     "stylelint": "^17.15.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "8.69.0",
+    "vite": "^8.3.0",
     "vitest": "^5.0.0"
   }
 }
