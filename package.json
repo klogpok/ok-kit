@@ -44,6 +44,7 @@
     "eslint": "^10.9.1",
     "jsdom": "^30.0.0",
     "ng-packagr": "^22.2.0",
+    "playwright-core": "^1.63.0",
     "prettier": "^3.8.1",
     "storybook": "10.6.0",
     "stylelint": "^17.15.0",
