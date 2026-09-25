@@ -480,7 +480,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-surface-subtle`             | semantic  | `#f8f9fb`                                                                    | `#1d2535`                                                              |
 | `--ui-color-surface-muted`              | semantic  | `#f1f3f6`                                                                    | `#2b3549`                                                              |
 | `--ui-color-surface-raised`             | semantic  | `#ffffff`                                                                    | `#2b3549`                                                              |
-| `--ui-color-surface-hover`              | semantic  | `#f1f3f6`                                                                    | `#3a4457`                                                              |
+| `--ui-color-surface-hover`              | semantic  | `#f1f3f6`                                                                    | `#364054`                                                              |
 | `--ui-color-surface-active`             | semantic  | `#e4e7ed`                                                                    | `#4a5466`                                                              |
 | `--ui-color-text`                       | semantic  | `#1d2535`                                                                    | `#f8f9fb`                                                              |
 | `--ui-color-text-muted`                 | semantic  | `#636d7e`                                                                    | `#a7acaf`                                                              |
@@ -504,7 +504,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-danger-active`              | semantic  | `#991b1b`                                                                    | `#fecaca`                                                              |
 | `--ui-color-danger-contrast`            | semantic  | `#ffffff`                                                                    | `#111723`                                                              |
 | `--ui-color-danger-subtle`              | semantic  | `#fef2f2`                                                                    | `#450a0a`                                                              |
-| `--ui-color-danger-text`                | semantic  | `#b91c1c`                                                                    | `#fca5a5`                                                              |
+| `--ui-color-danger-text`                | semantic  | `#b91c1c`                                                                    | `#fecaca`                                                              |
 | `--ui-color-success`                    | semantic  | `#008752`                                                                    | `#3fae7c`                                                              |
 | `--ui-color-success-contrast`           | semantic  | `#ffffff`                                                                    | `#111723`                                                              |
 | `--ui-color-success-subtle`             | semantic  | `#e8f6ef`                                                                    | `#032819`                                                              |

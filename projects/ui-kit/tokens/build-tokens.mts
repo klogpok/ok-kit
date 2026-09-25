@@ -151,6 +151,11 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.text-muted', 'color.bg', TEXT],
   ['color.text-muted', 'color.surface', TEXT],
   ['color.text-muted', 'color.surface-muted', TEXT],
+  ['color.text-muted', 'color.surface-raised', TEXT],
+  ['color.text-muted', 'color.surface-hover', TEXT],
+  // Muted icons (menu items, toast close) on pressed/hovered menu items.
+  ['color.text-muted', 'color.surface-active', UI],
+  ['color.text', 'color.surface-hover', TEXT],
   ['color.text-inverse', 'color.text-muted', TEXT],
   ['color.text-inverse', 'color.text', TEXT],
   ['color.text-subtle', 'color.surface', TEXT],
@@ -167,6 +172,9 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.primary-text', 'color.surface-raised', TEXT],
   ['color.text', 'color.primary-subtle', TEXT],
   ['color.danger-text', 'color.surface', TEXT],
+  ['color.danger-text', 'color.surface-raised', TEXT],
+  // Danger menu items on hover.
+  ['color.danger-text', 'color.surface-active', TEXT],
   ['color.danger-text', 'color.danger-subtle', TEXT],
   ['color.success-text', 'color.success-subtle', TEXT],
   ['color.warning-text', 'color.warning-subtle', TEXT],
