@@ -83,6 +83,30 @@ describe('UiButton', () => {
     expect(host.clicks).toBe(0);
   });
 
+  it('removes the href of a disabled anchor and blocks middle clicks', () => {
+    const { get, update } = setup();
+    update((h) => h.disabled.set(true));
+    const link = get('link');
+    expect(link.hasAttribute('href')).toBe(false);
+    const middle = new MouseEvent('auxclick', { button: 1, bubbles: true, cancelable: true });
+    link.dispatchEvent(middle);
+    expect(middle.defaultPrevented).toBe(true);
+
+    update((h) => h.disabled.set(false));
+    expect(link.getAttribute('href')).toBe('/orders');
+  });
+
+  it('keeps a disabledInteractive anchor focusable without its href', () => {
+    const { get, update } = setup();
+    update((h) => {
+      h.disabled.set(true);
+      h.interactive.set(true);
+    });
+    const link = get('link');
+    expect(link.hasAttribute('href')).toBe(false);
+    expect(link.getAttribute('tabindex')).toBe('0');
+  });
+
   it('disables anchors with aria-disabled, removes them from tab order and blocks clicks', () => {
     const { get, update, host } = setup();
     update((h) => h.disabled.set(true));
@@ -112,7 +136,7 @@ describe('UiButton', () => {
 
     const link = get('link');
     expect(link.getAttribute('aria-disabled')).toBe('true');
-    expect(link.hasAttribute('tabindex')).toBe(false);
+    expect(link.getAttribute('tabindex')).toBe('0');
     link.click();
     expect(host.clicks).toBe(0);
 

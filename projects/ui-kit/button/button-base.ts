@@ -2,6 +2,7 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
+  afterEveryRender,
   booleanAttribute,
   computed,
   inject,
@@ -17,7 +18,7 @@ import { UiSize, UiVariant } from '@vplans/ui-kit/core';
     '[attr.disabled]': '!isAnchor && disabled() && !disabledInteractive() ? "" : null',
     '[attr.aria-disabled]':
       'isInert() && (isAnchor || loading() || disabledInteractive()) ? "true" : null',
-    '[attr.tabindex]': 'isAnchor && disabled() && !disabledInteractive() ? -1 : null',
+    '[attr.tabindex]': 'anchorTabIndex()',
     '[attr.aria-busy]': 'loading() ? "true" : null',
   },
 })
@@ -44,6 +45,12 @@ export abstract class UiButtonBase {
   /** Disabled or loading: activation is blocked. */
   protected readonly isInert = computed(() => this.disabled() || this.loading());
 
+  /** An inert anchor has no href, so it needs a tabindex to stay focusable (or to leave the order). */
+  protected readonly anchorTabIndex = computed(() => {
+    if (!this.isAnchor || !this.isInert()) return null;
+    return this.disabled() && !this.disabledInteractive() ? -1 : 0;
+  });
+
   protected readonly modifierClasses = computed(() =>
     [
       `ui-button--${this.variant()}`,
@@ -61,9 +68,32 @@ export abstract class UiButtonBase {
         event.stopImmediatePropagation();
       }
     };
-    this.host.addEventListener('click', blockWhileInert, { capture: true });
-    inject(DestroyRef).onDestroy(() =>
-      this.host.removeEventListener('click', blockWhileInert, { capture: true }),
-    );
+    // `auxclick`: a middle click opens a link in a new tab without a `click` event.
+    const types = this.isAnchor ? ['click', 'auxclick'] : ['click'];
+    for (const type of types) this.host.addEventListener(type, blockWhileInert, { capture: true });
+    inject(DestroyRef).onDestroy(() => {
+      for (const type of types) {
+        this.host.removeEventListener(type, blockWhileInert, { capture: true });
+      }
+    });
+
+    // An inert link has no href, so Ctrl+click and "Open in new tab" do not navigate either.
+    // RouterLink may write the href again after navigations, so check after every render.
+    if (this.isAnchor) {
+      let removedHref: string | null = null;
+      afterEveryRender({
+        write: () => {
+          if (this.isInert()) {
+            const href = this.host.getAttribute('href');
+            if (href === null) return;
+            removedHref = href;
+            this.host.removeAttribute('href');
+          } else if (removedHref !== null) {
+            this.host.setAttribute('href', removedHref);
+            removedHref = null;
+          }
+        },
+      });
+    }
   }
 }
