@@ -10,6 +10,13 @@ const meta: Meta<SwitchArgs> = {
     size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
     labelPosition: { control: 'inline-radio', options: ['start', 'end'] },
   },
+};
+
+export default meta;
+type Story = StoryObj<SwitchArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: {
     label: 'Email notifications',
     checked: false,
@@ -24,15 +31,13 @@ const meta: Meta<SwitchArgs> = {
     template: `<ui-switch ${argsToTemplate(args)}>${label}</ui-switch>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<SwitchArgs>;
-
-export const Default: Story = {};
-export const Checked: Story = { args: { checked: true } };
-export const Disabled: Story = { args: { disabled: true } };
-export const DisabledChecked: Story = { args: { disabled: true, checked: true } };
-export const LabelStart: Story = { args: { labelPosition: 'start' } };
+export const Checked: Story = { ...Default, args: { ...Default.args, checked: true } };
+export const Disabled: Story = { ...Default, args: { ...Default.args, disabled: true } };
+export const DisabledChecked: Story = {
+  ...Default,
+  args: { ...Default.args, disabled: true, checked: true },
+};
+export const LabelStart: Story = { ...Default, args: { ...Default.args, labelPosition: 'start' } };
 
 export const Sizes: Story = {
   render: () => ({
