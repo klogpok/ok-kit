@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  ElementRef,
   EnvironmentProviders,
   Injectable,
   InjectionToken,
@@ -135,7 +136,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
   selector: 'ui-toast-container',
   imports: [UiIcon, UiButton, UiIconButton],
   template: `
-    @for (toast of toasts.active(); track toast.ref.id) {
+    @for (toast of toasts.active(); track toast.ref.id; let index = $index) {
       <div class="ui-toast" [class]="'ui-toast--' + toast.tone">
         <ui-icon class="ui-toast__icon" size="md" [icon]="icons[toast.tone]" />
         <div class="ui-toast__body">
@@ -145,7 +146,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
           <div class="ui-toast__message">{{ toast.message }}</div>
         </div>
         @if (toast.action) {
-          <button ui-button variant="ghost" size="sm" (click)="toast.ref._triggerAction()">
+          <button ui-button variant="ghost" size="sm" (click)="dismiss(toast, index, 'action')">
             {{ toast.action }}
           </button>
         }
@@ -156,7 +157,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
             size="sm"
             class="ui-toast__close"
             [label]="labels().close"
-            (click)="toasts.close(toast.ref)"
+            (click)="dismiss(toast, index, 'close')"
           >
             <ui-icon [icon]="closeIcon" />
           </button>
@@ -173,7 +174,7 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
     '[attr.aria-label]': 'labels().notifications',
     '(mouseenter)': 'toasts.pause("pointer")',
     '(mouseleave)': 'toasts.resume("pointer")',
-    '(focusin)': 'toasts.pause("focus")',
+    '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'onFocusOut($event)',
   },
 })
@@ -183,6 +184,34 @@ export class UiToastContainer {
   protected readonly position = inject(UI_TOAST_CONFIG).position;
   protected readonly icons = ICONS;
   protected readonly closeIcon = uiIconX;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly document = inject(DOCUMENT);
+  /** Where focus came from when it entered the stack. */
+  private returnTo: HTMLElement | null = null;
+
+  protected onFocusIn(event: FocusEvent): void {
+    const from = event.relatedTarget;
+    if (from instanceof HTMLElement && !this.host.contains(from)) this.returnTo = from;
+    this.toasts.pause('focus');
+  }
+
+  /**
+   * Keeps keyboard focus when the focused toast goes away: it moves to the neighbouring toast,
+   * or back to where it came from when this was the last one.
+   */
+  protected dismiss(toast: UiToastItem, index: number, reason: 'action' | 'close'): void {
+    if (this.host.contains(this.document.activeElement)) {
+      const items = this.host.querySelectorAll<HTMLElement>('.ui-toast');
+      const neighbour = items[index + 1] ?? items[index - 1];
+      const target =
+        neighbour?.querySelector<HTMLElement>('.ui-toast__close') ??
+        neighbour?.querySelector<HTMLElement>('button') ??
+        (this.returnTo?.isConnected ? this.returnTo : null);
+      target?.focus();
+    }
+    if (reason === 'action') toast.ref._triggerAction();
+    else this.toasts.close(toast.ref);
+  }
 
   protected onFocusOut(event: FocusEvent): void {
     const next = event.relatedTarget as Node | null;

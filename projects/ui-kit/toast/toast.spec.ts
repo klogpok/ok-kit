@@ -112,6 +112,33 @@ describe('UiToast', () => {
     expect(reasons).toEqual(['close']);
   });
 
+  it('moves focus to the next toast when the focused one is closed', () => {
+    toast.show('First');
+    toast.show('Second');
+    render();
+    const [first, second] = items().map((item) =>
+      item.querySelector<HTMLElement>('.ui-toast__close')!,
+    );
+    first.focus();
+    first.click();
+    render();
+    expect(document.activeElement).toBe(second);
+  });
+
+  it('returns focus to where it came from when the last toast is closed', () => {
+    const outside = document.createElement('button');
+    document.body.appendChild(outside);
+    toast.show('Only');
+    render();
+    outside.focus();
+    const close = items()[0].querySelector<HTMLElement>('.ui-toast__close')!;
+    close.focus();
+    close.click();
+    render();
+    expect(document.activeElement).toBe(outside);
+    outside.remove();
+  });
+
   it('runs the action and then dismisses', () => {
     const onAction = vi.fn();
     const reasons: UiToastDismissReason[] = [];
