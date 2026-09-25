@@ -97,7 +97,8 @@ ${declarations(light, 'semantic')}
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  /* :where() keeps the specificity of :root, so app overrides on :root also win in dark mode. */
+  :root:where(:not([data-theme='light'])) {
 ${declarations(dark, 'semantic', '    ')}
   }
 }
