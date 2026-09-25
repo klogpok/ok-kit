@@ -1,5 +1,10 @@
 // Calendar dates as local `Date` objects at midnight. Internal to the datepicker entry point.
 
+/** The value as a usable date: anything but a valid `Date` (a string, an Invalid Date) is `null`. */
+export function validDay(value: unknown): Date | null {
+  return value instanceof Date && !Number.isNaN(value.getTime()) ? value : null;
+}
+
 export function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }

@@ -29,7 +29,15 @@ import {
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
-import { UiDateFilter, formatDay, formatHint, isDayEnabled, parseDay, sameDay } from './date-utils';
+import {
+  UiDateFilter,
+  formatDay,
+  formatHint,
+  isDayEnabled,
+  parseDay,
+  sameDay,
+  validDay,
+} from './date-utils';
 
 const POSITIONS: ConnectedPosition[] = [
   { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
@@ -121,7 +129,7 @@ interface Draft {
         [attr.aria-label]="labels().chooseDate"
       >
         <ui-calendar
-          [selected]="value()"
+          [selected]="day()"
           [min]="min()"
           [max]="max()"
           [dateFilter]="dateFilter()"
@@ -203,7 +211,10 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
             : undefined,
       };
     },
-    format: (value: Date | null) => (value ? formatDay(value, this.locale()) : ''),
+    format: (value: Date | null) => {
+      const day = validDay(value);
+      return day ? formatDay(day, this.locale()) : '';
+    },
   });
 
   readonly labelStrategy = 'for' as const;
@@ -212,10 +223,13 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   private readonly locale = computed(() => this.labels().locale);
   protected readonly hint = computed(() => formatHint(this.locale()));
 
+  /** The value when it is a valid `Date`; a string from an API or an Invalid Date is shown empty. */
+  protected readonly day = computed(() => validDay(this.value()));
+
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
   protected readonly text = computed(() => {
-    const value = this.value();
-    return this.draft()?.text ?? (value ? formatDay(value, this.locale()) : '');
+    const day = this.day();
+    return this.draft()?.text ?? (day ? formatDay(day, this.locale()) : '');
   });
 
   /** Typed text that is not an allowed date. */
@@ -244,10 +258,11 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   }
 
   writeValue(value: Date | null | undefined): void {
+    const day = validDay(value);
     this.draft.set(null);
-    this.value.set(value ?? null);
+    this.value.set(day);
     // A new date clears the parse errors by itself; `null` over `null` (reset) does not.
-    if (value == null) this.rawText.set('');
+    if (day === null) this.rawText.set('');
   }
 
   override registerOnChange(fn: (value: Date | null) => void): void {

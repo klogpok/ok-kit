@@ -113,6 +113,18 @@ describe('UiDatepicker', () => {
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
+  it('shows an Invalid Date or a string value as empty instead of failing', async () => {
+    host.value.set(new Date(Number.NaN));
+    await settle(fixture);
+    expect(input().value).toBe('');
+    host.value.set('2026-04-01' as unknown as Date);
+    await settle(fixture);
+    expect(input().value).toBe('');
+    toggle().click();
+    await settle(fixture);
+    expect(dialog()).not.toBeNull();
+  });
+
   it('drops invalid text when the value is changed elsewhere', async () => {
     await type('abc');
     await blur();
