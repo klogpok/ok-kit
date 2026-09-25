@@ -1,0 +1,89 @@
+import {
+  Directive,
+  booleanAttribute,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { FORM_FIELD } from '@angular/forms/signals';
+import { injectControlState } from './control-state';
+import { UI_FORM_FIELD } from './form-field-control';
+
+/**
+ * Base class for custom (non-native) form controls such as checkbox, switch and radio group.
+ *
+ * - **Signal Forms**: subclasses expose a `value` or `checked` model, so `[formField]` binds them
+ *   natively as `FormValueControl` / `FormCheckboxControl` (inputs `disabled`, `required`,
+ *   `invalid` are set by the directive; `touch` marks the field touched).
+ * - **Reactive / template forms**: registers itself as the `ControlValueAccessor` of the host's
+ *   `NgControl` (instead of `NG_VALUE_ACCESSOR`, which would force `[formField]` into CVA interop).
+ *
+ * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`.
+ */
+@Directive()
+export abstract class UiFormControlBase<T> implements ControlValueAccessor {
+  protected readonly controlState = injectControlState();
+  protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
+
+  readonly disabled = input(false, { transform: booleanAttribute });
+  readonly required = input(false, { transform: booleanAttribute });
+  /**
+   * Shows the error state when no forms directive is bound. With forms bound, the error state is
+   * derived from the control (invalid and touched).
+   */
+  readonly invalid = input(false, { transform: booleanAttribute });
+  /** Emits when the user leaves the control. Signal Forms uses it to mark the field touched. */
+  readonly touch = output<void>();
+
+  private readonly cvaDisabled = signal(false);
+  private onChange: (value: T) => void = () => undefined;
+  private onTouched: () => void = () => undefined;
+
+  readonly isDisabled = computed(
+    () => this.disabled() || this.cvaDisabled() || this.controlState.disabled(),
+  );
+  readonly isRequired = computed(() => this.required() || this.controlState.required());
+  readonly showError = computed(() =>
+    this.controlState.bound
+      ? this.controlState.invalid() && this.controlState.touched()
+      : this.invalid(),
+  );
+  readonly errorMessages = this.controlState.errorMessages;
+
+  constructor() {
+    if (!inject(FORM_FIELD, { self: true, optional: true })) {
+      const ngControl = inject(NgControl, { self: true, optional: true });
+      if (ngControl) ngControl.valueAccessor = this;
+    }
+  }
+
+  abstract writeValue(value: T | null | undefined): void;
+
+  registerOnChange(fn: (value: T) => void): void {
+    this.onChange = fn;
+    this.controlState.sync();
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+    this.controlState.sync();
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
+  }
+
+  /** Call when the user changes the value. */
+  protected notifyChange(value: T): void {
+    this.onChange(value);
+  }
+
+  /** Call when focus leaves the control. */
+  protected notifyTouched(): void {
+    this.onTouched();
+    this.touch.emit();
+  }
+}

@@ -50,7 +50,7 @@ export class UiError {}
   providers: [{ provide: UI_FORM_FIELD, useExisting: forwardRef(() => UiFormField) }],
   host: {
     class: 'ui-form-field',
-    '[class.ui-form-field--disabled]': 'control()?.disabled()',
+    '[class.ui-form-field--disabled]': 'control()?.isDisabled()',
     '[class.ui-form-field--invalid]': 'showError()',
   },
 })
@@ -72,9 +72,9 @@ export class UiFormField implements UiFormFieldContext {
 
   protected readonly labelFor = computed(() => {
     const control = this.control();
-    return control?.labelStrategy === 'for' ? control.id() : null;
+    return control?.labelStrategy === 'for' ? control.controlId() : null;
   });
-  protected readonly isRequired = computed(() => this.required() ?? this.control()?.required() ?? false);
+  protected readonly isRequired = computed(() => this.required() ?? this.control()?.isRequired() ?? false);
   protected readonly showError = computed(() => this.control()?.showError() ?? false);
   protected readonly hasProjectedErrors = computed(() => this.projectedErrors().length > 0);
   protected readonly autoErrors = computed(() =>

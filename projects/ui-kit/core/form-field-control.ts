@@ -6,14 +6,14 @@ import { InjectionToken, Signal } from '@angular/core';
  */
 export interface UiFormFieldControl {
   /** Id of the focusable element (target of `<label for>`). */
-  readonly id: Signal<string>;
+  readonly controlId: Signal<string>;
   /**
    * `for`: the form field renders `<label for="id">` (native inputs, checkbox, switch).
    * `labelledby`: the control references the label via `aria-labelledby` (groups).
    */
   readonly labelStrategy: 'for' | 'labelledby';
-  readonly disabled: Signal<boolean>;
-  readonly required: Signal<boolean>;
+  readonly isDisabled: Signal<boolean>;
+  readonly isRequired: Signal<boolean>;
   /** Whether the control is in an error state that should be shown to the user. */
   readonly showError: Signal<boolean>;
   /** Error messages supplied by the forms layer (Signal Forms `message`, or string-valued errors). */

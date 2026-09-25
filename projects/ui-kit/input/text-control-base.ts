@@ -24,7 +24,7 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
     '[id]': 'id()',
     '[attr.aria-invalid]': 'showError() ? "true" : null',
     '[attr.aria-describedby]': 'formField?.describedBy() ?? null',
-    '[attr.aria-required]': 'required() ? "true" : null',
+    '[attr.aria-required]': 'isRequired() ? "true" : null',
   },
 })
 export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
@@ -44,8 +44,9 @@ export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
   readonly invalid = input(false, { transform: booleanAttribute });
 
   readonly labelStrategy = 'for' as const;
-  readonly disabled = computed(() => this.state.disabled() || this.nativeDisabled());
-  readonly required = computed(() => this.state.required() || this.nativeRequired());
+  readonly controlId = computed(() => this.id());
+  readonly isDisabled = computed(() => this.state.disabled() || this.nativeDisabled());
+  readonly isRequired = computed(() => this.state.required() || this.nativeRequired());
   readonly showError = computed(() =>
     this.state.bound ? this.state.invalid() && this.state.touched() : this.invalid(),
   );
