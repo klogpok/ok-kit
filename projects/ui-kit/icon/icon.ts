@@ -11,6 +11,7 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UiSize } from '@vplans/ui-kit/core';
 import { UiIconDefinition, UiIconRegistry } from './icon-registry';
+import { UiIconName } from './icons';
 
 /**
  * Renders an SVG icon that inherits the current text color.
@@ -40,8 +41,11 @@ export class UiIcon {
   private readonly registry = inject(UiIconRegistry);
   private readonly sanitizer = inject(DomSanitizer);
 
-  /** Registered icon name or an icon definition. */
-  readonly icon = input.required<string | UiIconDefinition>();
+  /**
+   * Registered icon name or an icon definition. Built-in names autocomplete; names of the app's
+   * own registered icons work too.
+   */
+  readonly icon = input.required<UiIconName | (string & Record<never, never>) | UiIconDefinition>();
   /** `inherit` scales with the surrounding font size (1em). */
   readonly size = input<UiSize | 'inherit'>('inherit');
   /** Accessible name. When empty the icon is decorative. */
