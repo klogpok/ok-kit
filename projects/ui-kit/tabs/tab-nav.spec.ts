@@ -15,13 +15,14 @@ class Page {}
       <a ui-tab-link routerLink="/billing" routerLinkActive [disabled]="billingDisabled()">
         Billing
       </a>
-      <a ui-tab-link href="#help" [active]="helpActive()">Help</a>
+      <a ui-tab-link href="#help" [active]="helpActive()" [disabled]="helpDisabled()">Help</a>
     </nav>
   `,
 })
 class Host {
   readonly helpActive = signal(false);
   readonly billingDisabled = signal(true);
+  readonly helpDisabled = signal(false);
 }
 
 describe('UiTabNav', () => {
@@ -84,6 +85,24 @@ describe('UiTabNav', () => {
     fixture.componentInstance.billingDisabled.set(false);
     await settle();
     expect(billing.getAttribute('href')).toBe('/billing');
+  });
+
+  it('keeps the href of a disabled link removed after a navigation', async () => {
+    await router.navigateByUrl('/history');
+    await settle();
+    expect(links()[2].hasAttribute('href')).toBe(false);
+    fixture.componentInstance.billingDisabled.set(false);
+    await settle();
+    expect(links()[2].getAttribute('href')).toBe('/billing');
+  });
+
+  it('removes a plain href while disabled', async () => {
+    fixture.componentInstance.helpDisabled.set(true);
+    await settle();
+    expect(links()[3].hasAttribute('href')).toBe(false);
+    fixture.componentInstance.helpDisabled.set(false);
+    await settle();
+    expect(links()[3].getAttribute('href')).toBe('#help');
   });
 
   it('accepts an explicit active state', () => {

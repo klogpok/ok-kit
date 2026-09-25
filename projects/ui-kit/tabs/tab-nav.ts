@@ -3,13 +3,12 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  afterEveryRender,
   booleanAttribute,
   computed,
-  effect,
   inject,
   input,
   signal,
-  untracked,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -56,8 +55,6 @@ export class UiTabLink {
   private readonly routerLinkActive = inject(RouterLinkActive, { self: true, optional: true });
   private readonly routerActive = signal(false);
   private readonly routerLink = inject(RouterLink, { self: true, optional: true });
-  /** The router href while the link is disabled. */
-  private hiddenHref: string | null | undefined;
 
   /** Marks the link as the current page. Overrides `RouterLinkActive` when set. */
   readonly active = input<boolean | undefined>(undefined);
@@ -89,20 +86,21 @@ export class UiTabLink {
       }
     });
 
-    // A disabled link has no href, so "Open in new tab" is not offered either.
-    effect(() => {
-      const disabled = this.disabled();
-      const routerLink = this.routerLink;
-      if (!routerLink) return;
-      untracked(() => {
-        if (disabled && this.hiddenHref === undefined) {
-          this.hiddenHref = routerLink.href;
-          routerLink.href = null;
-        } else if (!disabled && this.hiddenHref !== undefined) {
-          routerLink.href = this.hiddenHref;
-          this.hiddenHref = undefined;
+    // A disabled link has no href, so "Open in new tab" is not offered either. RouterLink writes
+    // the href again after navigations, so remove it after every render while disabled.
+    let removedHref: string | null = null;
+    afterEveryRender({
+      write: () => {
+        if (this.disabled()) {
+          const href = host.getAttribute('href');
+          if (href === null) return;
+          removedHref = href;
+          host.removeAttribute('href');
+        } else if (removedHref !== null) {
+          host.setAttribute('href', this.routerLink?.href ?? removedHref);
+          removedHref = null;
         }
-      });
+      },
     });
   }
 }
