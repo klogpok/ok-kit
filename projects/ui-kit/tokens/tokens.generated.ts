@@ -1788,5 +1788,35 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-border-width-strong)",
     "dark": "var(--ui-border-width-strong)"
+  },
+  {
+    "name": "--ui-divider-color",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-divider-thickness",
+    "layer": "component",
+    "light": "var(--ui-border-width-default)",
+    "dark": "var(--ui-border-width-default)"
+  },
+  {
+    "name": "--ui-divider-label-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-divider-label-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
+    "name": "--ui-divider-label-gap",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
   }
 ];

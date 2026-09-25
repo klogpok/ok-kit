@@ -1,0 +1,38 @@
+:host {
+  --_line: var(--ui-divider-thickness) solid var(--ui-divider-color);
+  display: block;
+  flex-shrink: 0;
+  border-block-start: var(--_line);
+}
+
+:host(.ui-divider--vertical) {
+  display: inline-block;
+  align-self: stretch;
+  min-block-size: 1em;
+  border-block-start: 0;
+  border-inline-start: var(--_line);
+}
+
+:host(.ui-divider--labelled) {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-divider-label-gap);
+  border-block-start: 0;
+  color: var(--ui-divider-label-color);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-divider-label-font-size);
+  line-height: var(--ui-line-height-tight);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-block-start: var(--_line);
+  }
+}
+
+@media (forced-colors: active) {
+  :host {
+    --_line: var(--ui-divider-thickness) solid CanvasText;
+  }
+}

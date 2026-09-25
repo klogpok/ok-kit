@@ -411,4 +411,9 @@
   --ui-switch-invalid-outline: var(--ui-color-danger);
   --ui-spinner-track-color: var(--ui-color-border);
   --ui-spinner-stroke-width: var(--ui-border-width-strong);
+  --ui-divider-color: var(--ui-color-border);
+  --ui-divider-thickness: var(--ui-border-width-default);
+  --ui-divider-label-color: var(--ui-color-text-muted);
+  --ui-divider-label-font-size: var(--ui-font-size-xs);
+  --ui-divider-label-gap: var(--ui-space-md);
 }

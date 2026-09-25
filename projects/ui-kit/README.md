@@ -226,6 +226,7 @@ Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Direction
 | `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                              |
 | `@vplans/ui-kit/switch`     | `UiSwitch`                                             |
 | `@vplans/ui-kit/spinner`    | `UiSpinner`                                            |
+| `@vplans/ui-kit/divider`    | `UiDivider`                                            |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons            |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                       |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract |
@@ -407,6 +408,11 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-switch-invalid-outline`       | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
 | `--ui-spinner-track-color`          | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-spinner-stroke-width`         | component | `var(--ui-border-width-strong)`                                              | `var(--ui-border-width-strong)`                                        |
+| `--ui-divider-color`                | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
+| `--ui-divider-thickness`            | component | `var(--ui-border-width-default)`                                             | `var(--ui-border-width-default)`                                       |
+| `--ui-divider-label-color`          | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-divider-label-font-size`      | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
+| `--ui-divider-label-gap`            | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 
 <!-- tokens:end -->
 
