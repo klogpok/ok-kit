@@ -79,7 +79,9 @@ describe('UiRadioGroup', () => {
       expect(group.getAttribute('role')).toBe('radiogroup');
       expect(group.getAttribute('aria-labelledby')).toBe(label.id);
       expect(label.hasAttribute('for')).toBe(false);
-      expect(group.getAttribute('aria-describedby')).toBe(el.querySelector('.ui-form-field__hint')!.id);
+      expect(group.getAttribute('aria-describedby')).toBe(
+        el.querySelector('.ui-form-field__hint')!.id,
+      );
       expect(group.classList).toContain('ui-radio-group--horizontal');
     });
 

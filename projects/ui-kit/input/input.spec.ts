@@ -75,5 +75,4 @@ describe('UiInput / UiTextarea', () => {
     await update((h) => h.autosize.set(true));
     expect(textarea.classList).toContain('ui-textarea--autosize');
   });
-
 });

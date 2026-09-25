@@ -28,8 +28,8 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
   },
 })
 export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
-  protected readonly element = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef)
-    .nativeElement;
+  protected readonly element =
+    inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef).nativeElement;
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
   private readonly state = injectControlState();
   private readonly nativeDisabled = signal(false);

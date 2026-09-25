@@ -28,7 +28,13 @@ interface Snapshot {
   errors: ValidationErrors | null;
 }
 
-const EMPTY: Snapshot = { disabled: false, invalid: false, touched: false, required: false, errors: null };
+const EMPTY: Snapshot = {
+  disabled: false,
+  invalid: false,
+  touched: false,
+  required: false,
+  errors: null,
+};
 
 const sameSnapshot = (a: Snapshot, b: Snapshot): boolean =>
   a.disabled === b.disabled &&

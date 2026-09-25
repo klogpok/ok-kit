@@ -46,7 +46,9 @@ export class ThemeService {
     this.options.storageKey === undefined ? 'ui-theme' : this.options.storageKey;
   private readonly media = this.document.defaultView?.matchMedia?.('(prefers-color-scheme: dark)');
   private readonly systemDark = signal(this.media?.matches ?? false);
-  private readonly modeState = signal<UiThemeMode>(this.readStored() ?? this.options.defaultMode ?? 'system');
+  private readonly modeState = signal<UiThemeMode>(
+    this.readStored() ?? this.options.defaultMode ?? 'system',
+  );
 
   /** Selected mode, including `system`. */
   readonly mode = this.modeState.asReadonly();

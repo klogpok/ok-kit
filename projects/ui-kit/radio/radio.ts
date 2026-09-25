@@ -55,7 +55,10 @@ export class UiRadioGroup<T = unknown>
   extends UiFormControlBase<T | null>
   implements UiFormFieldControl
 {
-  private readonly radios = contentChildren(forwardRef(() => UiRadio), { descendants: true });
+  private readonly radios = contentChildren(
+    forwardRef(() => UiRadio),
+    { descendants: true },
+  );
   private readonly ids = inject(_IdGenerator);
 
   readonly value = model<T | null>(null);

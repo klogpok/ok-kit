@@ -75,7 +75,9 @@ export class UiFormField implements UiFormFieldContext {
     const control = this.control();
     return control?.labelStrategy === 'for' ? control.controlId() : null;
   });
-  protected readonly isRequired = computed(() => this.required() ?? this.control()?.isRequired() ?? false);
+  protected readonly isRequired = computed(
+    () => this.required() ?? this.control()?.isRequired() ?? false,
+  );
   protected readonly showError = computed(() => this.control()?.showError() ?? false);
   protected readonly hasProjectedErrors = computed(() => this.projectedErrors().length > 0);
   protected readonly autoErrors = computed(() =>

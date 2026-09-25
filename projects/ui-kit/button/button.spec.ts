@@ -18,7 +18,9 @@ import { UiIconButton } from './icon-button';
       Save
     </button>
     <button ui-button id="submit" type="submit">Submit</button>
-    <a ui-button id="link" href="/orders" [disabled]="disabled()" (click)="clicks = clicks + 1">Orders</a>
+    <a ui-button id="link" href="/orders" [disabled]="disabled()" (click)="clicks = clicks + 1"
+      >Orders</a
+    >
     <button ui-icon-button id="icon" label="Close" size="sm">x</button>
   `,
 })

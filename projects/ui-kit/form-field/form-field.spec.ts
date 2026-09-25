@@ -5,7 +5,10 @@ import { FormField, form, required } from '@angular/forms/signals';
 import { UiInput, UiTextarea } from '@vplans/ui-kit/input';
 import { UiError, UiFormField, UiHint } from './form-field';
 
-function query<T extends Element = HTMLElement>(fixture: ComponentFixture<unknown>, selector: string): T {
+function query<T extends Element = HTMLElement>(
+  fixture: ComponentFixture<unknown>,
+  selector: string,
+): T {
   return (fixture.nativeElement as HTMLElement).querySelector<T>(selector)!;
 }
 
@@ -171,7 +174,9 @@ describe('UiFormField + UiInput', () => {
 
     it('uses projected hint and toggles the error via the invalid input', async () => {
       const textarea = query<HTMLTextAreaElement>(fixture, 'textarea');
-      expect(textarea.getAttribute('aria-describedby')).toBe(query(fixture, '.ui-form-field__hint').id);
+      expect(textarea.getAttribute('aria-describedby')).toBe(
+        query(fixture, '.ui-form-field__hint').id,
+      );
       expect(query(fixture, '.ui-form-field__error').hidden).toBe(true);
 
       fixture.componentInstance.invalid.set(true);
