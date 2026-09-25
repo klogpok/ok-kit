@@ -183,12 +183,16 @@ if (failures.length) {
 
 // ---- Docs data -------------------------------------------------------------
 
+/** Docs show semantic tokens with their resolved primitive values, e.g. `#4f46e5`. */
+const resolvePrimitives = (value: string): string =>
+  value.replace(REF, (_, path: string) => primitiveMap.get(path) ?? path);
+
 const themeValue = (theme: FlatToken[], path: string): string =>
-  toCss((theme.find((t) => t.path === path) ?? base.find((t) => t.path === path))?.value ?? '', 'semantic');
+  resolvePrimitives(theme.find((t) => t.path === path)?.value ?? '');
 
 const docs: TokenDoc[] = [
   ...primitives.map((t) => ({ name: cssName('ref-', t.path), layer: 'primitive' as const, light: t.value, dark: t.value })),
-  ...base.map((t) => ({ name: cssName('', t.path), layer: 'semantic' as const, light: toCss(t.value, 'semantic'), dark: toCss(t.value, 'semantic') })),
+  ...base.map((t) => ({ name: cssName('', t.path), layer: 'semantic' as const, light: resolvePrimitives(t.value), dark: resolvePrimitives(t.value) })),
   ...light
     .filter((t) => !THEME_PROPERTIES.has(t.path))
     .map((t) => ({ name: cssName('', t.path), layer: 'semantic' as const, light: themeValue(light, t.path), dark: themeValue(dark, t.path) })),
@@ -221,7 +225,11 @@ if (readme.includes(start) && readme.includes(end)) {
     .map((d) => `| \`${d.name}\` | ${d.layer} | \`${d.light}\` | \`${d.dark}\` |`)
     .join('\n');
   const table = `${start}\n| Token | Layer | Light | Dark |\n| --- | --- | --- | --- |\n${rows}\n${end}`;
-  writeFileSync(readmePath, readme.replace(new RegExp(`${start}[\\s\\S]*${end}`), table));
+  const updated = readme.replace(new RegExp(`${start}[\\s\\S]*${end}`), table);
+  // Keep the README stable under `pnpm format`.
+  const prettier = await import('prettier');
+  const options = (await prettier.resolveConfig(readmePath)) ?? {};
+  writeFileSync(readmePath, await prettier.format(updated, { ...options, filepath: readmePath }));
 }
 
 console.log(`Tokens: ${primitives.length} primitive, ${base.length + light.length} semantic, ${component.length} component. Contrast OK.`);

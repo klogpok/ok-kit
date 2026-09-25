@@ -844,638 +844,638 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-font-family-sans",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-family-sans)",
-    "dark": "var(--ui-ref-font-family-sans)"
+    "light": "'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif",
+    "dark": "'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif"
   },
   {
     "name": "--ui-font-family-mono",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-family-mono)",
-    "dark": "var(--ui-ref-font-family-mono)"
+    "light": "ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, monospace",
+    "dark": "ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, monospace"
   },
   {
     "name": "--ui-font-size-xs",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-xs)",
-    "dark": "var(--ui-ref-font-size-xs)"
+    "light": "0.75rem",
+    "dark": "0.75rem"
   },
   {
     "name": "--ui-font-size-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-sm)",
-    "dark": "var(--ui-ref-font-size-sm)"
+    "light": "0.875rem",
+    "dark": "0.875rem"
   },
   {
     "name": "--ui-font-size-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-md)",
-    "dark": "var(--ui-ref-font-size-md)"
+    "light": "1rem",
+    "dark": "1rem"
   },
   {
     "name": "--ui-font-size-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-lg)",
-    "dark": "var(--ui-ref-font-size-lg)"
+    "light": "1.125rem",
+    "dark": "1.125rem"
   },
   {
     "name": "--ui-font-size-xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-xl)",
-    "dark": "var(--ui-ref-font-size-xl)"
+    "light": "1.25rem",
+    "dark": "1.25rem"
   },
   {
     "name": "--ui-font-size-2xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-2xl)",
-    "dark": "var(--ui-ref-font-size-2xl)"
+    "light": "1.5rem",
+    "dark": "1.5rem"
   },
   {
     "name": "--ui-font-size-3xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-3xl)",
-    "dark": "var(--ui-ref-font-size-3xl)"
+    "light": "1.875rem",
+    "dark": "1.875rem"
   },
   {
     "name": "--ui-font-size-4xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-4xl)",
-    "dark": "var(--ui-ref-font-size-4xl)"
+    "light": "2.25rem",
+    "dark": "2.25rem"
   },
   {
     "name": "--ui-font-weight-regular",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-weight-regular)",
-    "dark": "var(--ui-ref-font-weight-regular)"
+    "light": "400",
+    "dark": "400"
   },
   {
     "name": "--ui-font-weight-medium",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-weight-medium)",
-    "dark": "var(--ui-ref-font-weight-medium)"
+    "light": "500",
+    "dark": "500"
   },
   {
     "name": "--ui-font-weight-semibold",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-weight-semibold)",
-    "dark": "var(--ui-ref-font-weight-semibold)"
+    "light": "600",
+    "dark": "600"
   },
   {
     "name": "--ui-font-weight-bold",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-weight-bold)",
-    "dark": "var(--ui-ref-font-weight-bold)"
+    "light": "700",
+    "dark": "700"
   },
   {
     "name": "--ui-line-height-tight",
     "layer": "semantic",
-    "light": "var(--ui-ref-line-height-tight)",
-    "dark": "var(--ui-ref-line-height-tight)"
+    "light": "1.25",
+    "dark": "1.25"
   },
   {
     "name": "--ui-line-height-snug",
     "layer": "semantic",
-    "light": "var(--ui-ref-line-height-snug)",
-    "dark": "var(--ui-ref-line-height-snug)"
+    "light": "1.375",
+    "dark": "1.375"
   },
   {
     "name": "--ui-line-height-normal",
     "layer": "semantic",
-    "light": "var(--ui-ref-line-height-normal)",
-    "dark": "var(--ui-ref-line-height-normal)"
+    "light": "1.5",
+    "dark": "1.5"
   },
   {
     "name": "--ui-space-3xs",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-0-5)",
-    "dark": "var(--ui-ref-space-0-5)"
+    "light": "0.125rem",
+    "dark": "0.125rem"
   },
   {
     "name": "--ui-space-2xs",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-1)",
-    "dark": "var(--ui-ref-space-1)"
+    "light": "0.25rem",
+    "dark": "0.25rem"
   },
   {
     "name": "--ui-space-xs",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-1-5)",
-    "dark": "var(--ui-ref-space-1-5)"
+    "light": "0.375rem",
+    "dark": "0.375rem"
   },
   {
     "name": "--ui-space-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-2)",
-    "dark": "var(--ui-ref-space-2)"
+    "light": "0.5rem",
+    "dark": "0.5rem"
   },
   {
     "name": "--ui-space-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-3)",
-    "dark": "var(--ui-ref-space-3)"
+    "light": "0.75rem",
+    "dark": "0.75rem"
   },
   {
     "name": "--ui-space-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-4)",
-    "dark": "var(--ui-ref-space-4)"
+    "light": "1rem",
+    "dark": "1rem"
   },
   {
     "name": "--ui-space-xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-6)",
-    "dark": "var(--ui-ref-space-6)"
+    "light": "1.5rem",
+    "dark": "1.5rem"
   },
   {
     "name": "--ui-space-2xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-8)",
-    "dark": "var(--ui-ref-space-8)"
+    "light": "2rem",
+    "dark": "2rem"
   },
   {
     "name": "--ui-space-3xl",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-12)",
-    "dark": "var(--ui-ref-space-12)"
+    "light": "3rem",
+    "dark": "3rem"
   },
   {
     "name": "--ui-radius-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-radius-sm)",
-    "dark": "var(--ui-ref-radius-sm)"
+    "light": "0.25rem",
+    "dark": "0.25rem"
   },
   {
     "name": "--ui-radius-control",
     "layer": "semantic",
-    "light": "var(--ui-ref-radius-md)",
-    "dark": "var(--ui-ref-radius-md)"
+    "light": "0.375rem",
+    "dark": "0.375rem"
   },
   {
     "name": "--ui-radius-container",
     "layer": "semantic",
-    "light": "var(--ui-ref-radius-lg)",
-    "dark": "var(--ui-ref-radius-lg)"
+    "light": "0.5rem",
+    "dark": "0.5rem"
   },
   {
     "name": "--ui-radius-full",
     "layer": "semantic",
-    "light": "var(--ui-ref-radius-full)",
-    "dark": "var(--ui-ref-radius-full)"
+    "light": "9999px",
+    "dark": "9999px"
   },
   {
     "name": "--ui-border-width-default",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-px)",
-    "dark": "var(--ui-ref-size-px)"
+    "light": "1px",
+    "dark": "1px"
   },
   {
     "name": "--ui-border-width-strong",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-2px)",
-    "dark": "var(--ui-ref-size-2px)"
+    "light": "2px",
+    "dark": "2px"
   },
   {
     "name": "--ui-focus-ring-width",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-2px)",
-    "dark": "var(--ui-ref-size-2px)"
+    "light": "2px",
+    "dark": "2px"
   },
   {
     "name": "--ui-focus-ring-offset",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-2px)",
-    "dark": "var(--ui-ref-size-2px)"
+    "light": "2px",
+    "dark": "2px"
   },
   {
     "name": "--ui-control-height-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-8)",
-    "dark": "var(--ui-ref-size-8)"
+    "light": "2rem",
+    "dark": "2rem"
   },
   {
     "name": "--ui-control-height-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-10)",
-    "dark": "var(--ui-ref-size-10)"
+    "light": "2.5rem",
+    "dark": "2.5rem"
   },
   {
     "name": "--ui-control-height-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-11)",
-    "dark": "var(--ui-ref-size-11)"
+    "light": "2.75rem",
+    "dark": "2.75rem"
   },
   {
     "name": "--ui-control-padding-inline-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-2-5)",
-    "dark": "var(--ui-ref-space-2-5)"
+    "light": "0.625rem",
+    "dark": "0.625rem"
   },
   {
     "name": "--ui-control-padding-inline-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-3)",
-    "dark": "var(--ui-ref-space-3)"
+    "light": "0.75rem",
+    "dark": "0.75rem"
   },
   {
     "name": "--ui-control-padding-inline-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-4)",
-    "dark": "var(--ui-ref-space-4)"
+    "light": "1rem",
+    "dark": "1rem"
   },
   {
     "name": "--ui-control-font-size-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-sm)",
-    "dark": "var(--ui-ref-font-size-sm)"
+    "light": "0.875rem",
+    "dark": "0.875rem"
   },
   {
     "name": "--ui-control-font-size-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-sm)",
-    "dark": "var(--ui-ref-font-size-sm)"
+    "light": "0.875rem",
+    "dark": "0.875rem"
   },
   {
     "name": "--ui-control-font-size-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-font-size-md)",
-    "dark": "var(--ui-ref-font-size-md)"
+    "light": "1rem",
+    "dark": "1rem"
   },
   {
     "name": "--ui-control-gap-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-1-5)",
-    "dark": "var(--ui-ref-space-1-5)"
+    "light": "0.375rem",
+    "dark": "0.375rem"
   },
   {
     "name": "--ui-control-gap-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-2)",
-    "dark": "var(--ui-ref-space-2)"
+    "light": "0.5rem",
+    "dark": "0.5rem"
   },
   {
     "name": "--ui-control-gap-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-space-2-5)",
-    "dark": "var(--ui-ref-space-2-5)"
+    "light": "0.625rem",
+    "dark": "0.625rem"
   },
   {
     "name": "--ui-icon-size-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-4)",
-    "dark": "var(--ui-ref-size-4)"
+    "light": "1rem",
+    "dark": "1rem"
   },
   {
     "name": "--ui-icon-size-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-5)",
-    "dark": "var(--ui-ref-size-5)"
+    "light": "1.25rem",
+    "dark": "1.25rem"
   },
   {
     "name": "--ui-icon-size-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-size-6)",
-    "dark": "var(--ui-ref-size-6)"
+    "light": "1.5rem",
+    "dark": "1.5rem"
   },
   {
     "name": "--ui-z-raised",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-raised)",
-    "dark": "var(--ui-ref-z-raised)"
+    "light": "10",
+    "dark": "10"
   },
   {
     "name": "--ui-z-dropdown",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-dropdown)",
-    "dark": "var(--ui-ref-z-dropdown)"
+    "light": "1000",
+    "dark": "1000"
   },
   {
     "name": "--ui-z-sticky",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-sticky)",
-    "dark": "var(--ui-ref-z-sticky)"
+    "light": "1100",
+    "dark": "1100"
   },
   {
     "name": "--ui-z-overlay",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-overlay)",
-    "dark": "var(--ui-ref-z-overlay)"
+    "light": "1200",
+    "dark": "1200"
   },
   {
     "name": "--ui-z-modal",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-modal)",
-    "dark": "var(--ui-ref-z-modal)"
+    "light": "1300",
+    "dark": "1300"
   },
   {
     "name": "--ui-z-toast",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-toast)",
-    "dark": "var(--ui-ref-z-toast)"
+    "light": "1400",
+    "dark": "1400"
   },
   {
     "name": "--ui-z-tooltip",
     "layer": "semantic",
-    "light": "var(--ui-ref-z-tooltip)",
-    "dark": "var(--ui-ref-z-tooltip)"
+    "light": "1500",
+    "dark": "1500"
   },
   {
     "name": "--ui-motion-duration-instant",
     "layer": "semantic",
-    "light": "var(--ui-ref-duration-instant)",
-    "dark": "var(--ui-ref-duration-instant)"
+    "light": "50ms",
+    "dark": "50ms"
   },
   {
     "name": "--ui-motion-duration-fast",
     "layer": "semantic",
-    "light": "var(--ui-ref-duration-fast)",
-    "dark": "var(--ui-ref-duration-fast)"
+    "light": "120ms",
+    "dark": "120ms"
   },
   {
     "name": "--ui-motion-duration-normal",
     "layer": "semantic",
-    "light": "var(--ui-ref-duration-normal)",
-    "dark": "var(--ui-ref-duration-normal)"
+    "light": "200ms",
+    "dark": "200ms"
   },
   {
     "name": "--ui-motion-duration-slow",
     "layer": "semantic",
-    "light": "var(--ui-ref-duration-slow)",
-    "dark": "var(--ui-ref-duration-slow)"
+    "light": "320ms",
+    "dark": "320ms"
   },
   {
     "name": "--ui-motion-easing-standard",
     "layer": "semantic",
-    "light": "var(--ui-ref-easing-standard)",
-    "dark": "var(--ui-ref-easing-standard)"
+    "light": "cubic-bezier(0.2, 0, 0, 1)",
+    "dark": "cubic-bezier(0.2, 0, 0, 1)"
   },
   {
     "name": "--ui-motion-easing-enter",
     "layer": "semantic",
-    "light": "var(--ui-ref-easing-enter)",
-    "dark": "var(--ui-ref-easing-enter)"
+    "light": "cubic-bezier(0, 0, 0.2, 1)",
+    "dark": "cubic-bezier(0, 0, 0.2, 1)"
   },
   {
     "name": "--ui-motion-easing-exit",
     "layer": "semantic",
-    "light": "var(--ui-ref-easing-exit)",
-    "dark": "var(--ui-ref-easing-exit)"
+    "light": "cubic-bezier(0.4, 0, 1, 1)",
+    "dark": "cubic-bezier(0.4, 0, 1, 1)"
   },
   {
     "name": "--ui-color-bg",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-950)"
+    "light": "#ffffff",
+    "dark": "#020617"
   },
   {
     "name": "--ui-color-surface",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-900)"
+    "light": "#ffffff",
+    "dark": "#0f172a"
   },
   {
     "name": "--ui-color-surface-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-50)",
-    "dark": "var(--ui-ref-color-slate-900)"
+    "light": "#f8fafc",
+    "dark": "#0f172a"
   },
   {
     "name": "--ui-color-surface-muted",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-100)",
-    "dark": "var(--ui-ref-color-slate-800)"
+    "light": "#f1f5f9",
+    "dark": "#1e293b"
   },
   {
     "name": "--ui-color-surface-raised",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-800)"
+    "light": "#ffffff",
+    "dark": "#1e293b"
   },
   {
     "name": "--ui-color-surface-hover",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-100)",
-    "dark": "var(--ui-ref-color-slate-800)"
+    "light": "#f1f5f9",
+    "dark": "#1e293b"
   },
   {
     "name": "--ui-color-surface-active",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-200)",
-    "dark": "var(--ui-ref-color-slate-700)"
+    "light": "#e2e8f0",
+    "dark": "#334155"
   },
   {
     "name": "--ui-color-text",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-900)",
-    "dark": "var(--ui-ref-color-slate-50)"
+    "light": "#0f172a",
+    "dark": "#f8fafc"
   },
   {
     "name": "--ui-color-text-muted",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-600)",
-    "dark": "var(--ui-ref-color-slate-400)"
+    "light": "#475569",
+    "dark": "#94a3b8"
   },
   {
     "name": "--ui-color-text-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-500)",
-    "dark": "var(--ui-ref-color-slate-400)"
+    "light": "#64748b",
+    "dark": "#94a3b8"
   },
   {
     "name": "--ui-color-text-disabled",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-400)",
-    "dark": "var(--ui-ref-color-slate-600)"
+    "light": "#94a3b8",
+    "dark": "#475569"
   },
   {
     "name": "--ui-color-text-inverse",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-900)"
+    "light": "#ffffff",
+    "dark": "#0f172a"
   },
   {
     "name": "--ui-color-border",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-200)",
-    "dark": "var(--ui-ref-color-slate-800)"
+    "light": "#e2e8f0",
+    "dark": "#1e293b"
   },
   {
     "name": "--ui-color-border-control",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-500)",
-    "dark": "var(--ui-ref-color-slate-500)"
+    "light": "#64748b",
+    "dark": "#64748b"
   },
   {
     "name": "--ui-color-border-control-hover",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-700)",
-    "dark": "var(--ui-ref-color-slate-300)"
+    "light": "#334155",
+    "dark": "#cbd5e1"
   },
   {
     "name": "--ui-color-control-bg",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-900)"
+    "light": "#ffffff",
+    "dark": "#0f172a"
   },
   {
     "name": "--ui-color-control-bg-disabled",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-100)",
-    "dark": "var(--ui-ref-color-slate-800)"
+    "light": "#f1f5f9",
+    "dark": "#1e293b"
   },
   {
     "name": "--ui-color-primary",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-600)",
-    "dark": "var(--ui-ref-color-indigo-400)"
+    "light": "#4f46e5",
+    "dark": "#818cf8"
   },
   {
     "name": "--ui-color-primary-hover",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-700)",
-    "dark": "var(--ui-ref-color-indigo-300)"
+    "light": "#4338ca",
+    "dark": "#a5b4fc"
   },
   {
     "name": "--ui-color-primary-active",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-800)",
-    "dark": "var(--ui-ref-color-indigo-200)"
+    "light": "#3730a3",
+    "dark": "#c7d2fe"
   },
   {
     "name": "--ui-color-primary-contrast",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-950)"
+    "light": "#ffffff",
+    "dark": "#020617"
   },
   {
     "name": "--ui-color-primary-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-50)",
-    "dark": "var(--ui-ref-color-indigo-950)"
+    "light": "#eef2ff",
+    "dark": "#1e1b4b"
   },
   {
     "name": "--ui-color-primary-subtle-hover",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-100)",
-    "dark": "var(--ui-ref-color-indigo-900)"
+    "light": "#e0e7ff",
+    "dark": "#312e81"
   },
   {
     "name": "--ui-color-primary-text",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-700)",
-    "dark": "var(--ui-ref-color-indigo-300)"
+    "light": "#4338ca",
+    "dark": "#a5b4fc"
   },
   {
     "name": "--ui-color-danger",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-red-600)",
-    "dark": "var(--ui-ref-color-red-400)"
+    "light": "#dc2626",
+    "dark": "#f87171"
   },
   {
     "name": "--ui-color-danger-hover",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-red-700)",
-    "dark": "var(--ui-ref-color-red-300)"
+    "light": "#b91c1c",
+    "dark": "#fca5a5"
   },
   {
     "name": "--ui-color-danger-active",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-red-800)",
-    "dark": "var(--ui-ref-color-red-200)"
+    "light": "#991b1b",
+    "dark": "#fecaca"
   },
   {
     "name": "--ui-color-danger-contrast",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-950)"
+    "light": "#ffffff",
+    "dark": "#020617"
   },
   {
     "name": "--ui-color-danger-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-red-50)",
-    "dark": "var(--ui-ref-color-red-950)"
+    "light": "#fef2f2",
+    "dark": "#450a0a"
   },
   {
     "name": "--ui-color-danger-text",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-red-700)",
-    "dark": "var(--ui-ref-color-red-300)"
+    "light": "#b91c1c",
+    "dark": "#fca5a5"
   },
   {
     "name": "--ui-color-success",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-green-700)",
-    "dark": "var(--ui-ref-color-green-400)"
+    "light": "#15803d",
+    "dark": "#4ade80"
   },
   {
     "name": "--ui-color-success-contrast",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-950)"
+    "light": "#ffffff",
+    "dark": "#020617"
   },
   {
     "name": "--ui-color-success-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-green-50)",
-    "dark": "var(--ui-ref-color-green-950)"
+    "light": "#f0fdf4",
+    "dark": "#052e16"
   },
   {
     "name": "--ui-color-success-text",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-green-700)",
-    "dark": "var(--ui-ref-color-green-300)"
+    "light": "#15803d",
+    "dark": "#86efac"
   },
   {
     "name": "--ui-color-warning",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-amber-500)",
-    "dark": "var(--ui-ref-color-amber-400)"
+    "light": "#f59e0b",
+    "dark": "#fbbf24"
   },
   {
     "name": "--ui-color-warning-contrast",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-slate-950)",
-    "dark": "var(--ui-ref-color-slate-950)"
+    "light": "#020617",
+    "dark": "#020617"
   },
   {
     "name": "--ui-color-warning-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-amber-50)",
-    "dark": "var(--ui-ref-color-amber-950)"
+    "light": "#fffbeb",
+    "dark": "#451a03"
   },
   {
     "name": "--ui-color-warning-text",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-amber-800)",
-    "dark": "var(--ui-ref-color-amber-300)"
+    "light": "#92400e",
+    "dark": "#fcd34d"
   },
   {
     "name": "--ui-color-info",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-sky-700)",
-    "dark": "var(--ui-ref-color-sky-400)"
+    "light": "#0369a1",
+    "dark": "#38bdf8"
   },
   {
     "name": "--ui-color-info-contrast",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-white)",
-    "dark": "var(--ui-ref-color-slate-950)"
+    "light": "#ffffff",
+    "dark": "#020617"
   },
   {
     "name": "--ui-color-info-subtle",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-sky-50)",
-    "dark": "var(--ui-ref-color-sky-950)"
+    "light": "#f0f9ff",
+    "dark": "#082f49"
   },
   {
     "name": "--ui-color-info-text",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-sky-800)",
-    "dark": "var(--ui-ref-color-sky-300)"
+    "light": "#075985",
+    "dark": "#7dd3fc"
   },
   {
     "name": "--ui-color-focus-ring",
     "layer": "semantic",
-    "light": "var(--ui-ref-color-indigo-600)",
-    "dark": "var(--ui-ref-color-indigo-400)"
+    "light": "#4f46e5",
+    "dark": "#818cf8"
   },
   {
     "name": "--ui-color-backdrop",
@@ -1486,20 +1486,20 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-shadow-sm",
     "layer": "semantic",
-    "light": "var(--ui-ref-shadow-sm)",
-    "dark": "var(--ui-ref-shadow-dark-sm)"
+    "light": "0 1px 2px 0 rgb(15 23 42 / 0.06)",
+    "dark": "0 1px 2px 0 rgb(0 0 0 / 0.4)"
   },
   {
     "name": "--ui-shadow-md",
     "layer": "semantic",
-    "light": "var(--ui-ref-shadow-md)",
-    "dark": "var(--ui-ref-shadow-dark-md)"
+    "light": "0 4px 8px -2px rgb(15 23 42 / 0.10), 0 2px 4px -2px rgb(15 23 42 / 0.06)",
+    "dark": "0 4px 8px -2px rgb(0 0 0 / 0.5)"
   },
   {
     "name": "--ui-shadow-lg",
     "layer": "semantic",
-    "light": "var(--ui-ref-shadow-lg)",
-    "dark": "var(--ui-ref-shadow-dark-lg)"
+    "light": "0 12px 24px -6px rgb(15 23 42 / 0.16), 0 4px 8px -4px rgb(15 23 42 / 0.08)",
+    "dark": "0 12px 24px -6px rgb(0 0 0 / 0.6)"
   },
   {
     "name": "--ui-button-radius",

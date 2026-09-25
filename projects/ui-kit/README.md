@@ -1,1 +1,406 @@
 # @vplans/ui-kit
+
+Our in-house Angular design system. Standalone, `OnPush`, zoneless-ready components built on
+`@angular/cdk`, themed with CSS custom properties, RTL-aware and WCAG 2.1 AA compliant.
+
+- **Storybook:** `pnpm storybook` (http://localhost:6006). It has a theme and direction switcher in the toolbar and an a11y panel.
+- **Playground app:** `pnpm start`
+
+## Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Forms](#forms)
+- [Theming](#theming)
+- [RTL](#rtl)
+- [Components](#components)
+- [Tokens](#tokens)
+- [Contributing](#contributing)
+
+## Installation
+
+```bash
+pnpm add @vplans/ui-kit @angular/cdk
+```
+
+Add the global stylesheet (tokens, document defaults, typography) and a font to `angular.json`:
+
+```jsonc
+"styles": [
+  "node_modules/@fontsource-variable/inter/index.css",
+  "node_modules/@vplans/ui-kit/styles/ui-kit.scss",
+  "src/styles.scss"
+]
+```
+
+If you only need the CSS variables and not the document defaults, use `styles/tokens.css`.
+
+Register the icons you use and (optionally) configure the theme:
+
+```ts
+import { provideUiIcons, uiIconCheck, uiIconX, uiIconSearch } from '@vplans/ui-kit/icon';
+import { provideUiTheme } from '@vplans/ui-kit/theme';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideUiIcons([uiIconCheck, uiIconX, uiIconSearch]),
+    provideUiTheme({ defaultMode: 'system', storageKey: 'app-theme' }),
+  ],
+};
+```
+
+## Usage
+
+Every component has its own secondary entry point for tree-shaking. Import from it, not from the root:
+
+```ts
+import { UiButton } from '@vplans/ui-kit/button';
+import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiInput } from '@vplans/ui-kit/input';
+```
+
+```html
+<button ui-button variant="secondary" size="sm" (click)="cancel()">Cancel</button>
+<button ui-button [loading]="saving()">Save</button>
+<a ui-button routerLink="/orders">Orders</a>
+<button ui-icon-button label="Close" (click)="close()"><ui-icon icon="x" /></button>
+```
+
+Common inputs:
+
+| Input     | Values                                    | Default                                  |
+| --------- | ----------------------------------------- | ---------------------------------------- |
+| `size`    | `sm \| md \| lg`                          | `md`                                     |
+| `variant` | `primary \| secondary \| ghost \| danger` | `primary` (`ghost` for `ui-icon-button`) |
+
+With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
+A bare `checked` attribute is a compile error.
+
+## Forms
+
+All form controls work with **Signal Forms**, **Reactive Forms** and **template-driven forms**:
+
+| Control                    | Signal Forms contract             | Other forms            |
+| -------------------------- | --------------------------------- | ---------------------- |
+| `input[ui-input]`          | native binding                    | `DefaultValueAccessor` |
+| `textarea[ui-textarea]`    | native binding                    | `DefaultValueAccessor` |
+| `ui-checkbox`, `ui-switch` | `FormCheckboxControl` (`checked`) | `ControlValueAccessor` |
+| `ui-radio-group`           | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+
+`ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
+`aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
+once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `submit()`).
+
+```html
+<!-- Signal Forms: messages from validators are shown automatically -->
+<ui-form-field label="Email" hint="We never share it">
+  <input ui-input type="email" [formField]="form.email" />
+</ui-form-field>
+
+<!-- Reactive Forms: project <ui-error>, or use string-valued errors / { message } -->
+<ui-form-field label="Username">
+  <input ui-input formControlName="username" />
+  @if (username.hasError('required')) {
+  <ui-error>Username is required</ui-error>
+  }
+</ui-form-field>
+
+<ui-form-field label="Delivery">
+  <ui-radio-group [formField]="form.delivery">
+    <ui-radio value="pickup">Pickup</ui-radio>
+    <ui-radio value="courier">Courier</ui-radio>
+  </ui-radio-group>
+</ui-form-field>
+```
+
+Without a forms directive, use the `invalid` input to show the error state manually.
+
+## Theming
+
+Tokens come in three layers. All of them are CSS custom properties generated from
+[`tokens/tokens.json`](tokens/tokens.json):
+
+1. **Primitive** (`--ui-ref-*`): the raw palette and scales. Never use these in components or apps.
+2. **Semantic** (`--ui-color-primary`, `--ui-space-md`, `--ui-radius-control`, ...): the public API. They differ per theme.
+3. **Component** (`--ui-button-primary-bg`, `--ui-input-radius`, ...): per-component overrides. They default to semantic tokens.
+
+Light and dark themes:
+
+- `<html data-theme="dark">` or `data-theme="light"` forces a theme.
+- With no attribute, the theme follows `prefers-color-scheme`.
+- A `data-theme` attribute on any element themes that subtree.
+
+```ts
+const theme = inject(ThemeService);
+theme.mode(); // 'light' | 'dark' | 'system'
+theme.theme(); // resolved: 'light' | 'dark'
+theme.setMode('dark'); // persisted in localStorage
+theme.toggle();
+```
+
+Override tokens in your global styles:
+
+```scss
+:root {
+  --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
+}
+
+.checkout {
+  --ui-color-primary: var(--ui-color-success); // local re-brand
+}
+```
+
+Use the mixins in application SCSS:
+
+```scss
+@use '@vplans/ui-kit/styles' as ui;
+
+.card-link {
+  @include ui.focus-visible;
+  @include ui.transition(background-color);
+}
+```
+
+Typography classes: `ui-display`, `ui-heading-1..4`, `ui-body-lg`, `ui-body`, `ui-body-sm`,
+`ui-label`, `ui-caption`, `ui-code`, `ui-text-muted`, `ui-visually-hidden`.
+
+## RTL
+
+Components use only logical properties (`margin-inline-start`, `inset-inline-end`, ...).
+Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Directional icons flip with
+`<ui-icon icon="arrow-right" flipRtl />`.
+
+## Components
+
+| Entry point                 | Exports                                                |
+| --------------------------- | ------------------------------------------------------ |
+| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                             |
+| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                |
+| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                     |
+| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                           |
+| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                              |
+| `@vplans/ui-kit/switch`     | `UiSwitch`                                             |
+| `@vplans/ui-kit/spinner`    | `UiSpinner`                                            |
+| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons            |
+| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                       |
+| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract |
+
+## Tokens
+
+Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
+
+<!-- tokens:start -->
+
+| Token                               | Layer     | Light                                                                                                            | Dark                                                                                                             |
+| ----------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `--ui-font-family-sans`             | semantic  | `'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif` | `'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif` |
+| `--ui-font-family-mono`             | semantic  | `ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, monospace`                                           | `ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, monospace`                                           |
+| `--ui-font-size-xs`                 | semantic  | `0.75rem`                                                                                                        | `0.75rem`                                                                                                        |
+| `--ui-font-size-sm`                 | semantic  | `0.875rem`                                                                                                       | `0.875rem`                                                                                                       |
+| `--ui-font-size-md`                 | semantic  | `1rem`                                                                                                           | `1rem`                                                                                                           |
+| `--ui-font-size-lg`                 | semantic  | `1.125rem`                                                                                                       | `1.125rem`                                                                                                       |
+| `--ui-font-size-xl`                 | semantic  | `1.25rem`                                                                                                        | `1.25rem`                                                                                                        |
+| `--ui-font-size-2xl`                | semantic  | `1.5rem`                                                                                                         | `1.5rem`                                                                                                         |
+| `--ui-font-size-3xl`                | semantic  | `1.875rem`                                                                                                       | `1.875rem`                                                                                                       |
+| `--ui-font-size-4xl`                | semantic  | `2.25rem`                                                                                                        | `2.25rem`                                                                                                        |
+| `--ui-font-weight-regular`          | semantic  | `400`                                                                                                            | `400`                                                                                                            |
+| `--ui-font-weight-medium`           | semantic  | `500`                                                                                                            | `500`                                                                                                            |
+| `--ui-font-weight-semibold`         | semantic  | `600`                                                                                                            | `600`                                                                                                            |
+| `--ui-font-weight-bold`             | semantic  | `700`                                                                                                            | `700`                                                                                                            |
+| `--ui-line-height-tight`            | semantic  | `1.25`                                                                                                           | `1.25`                                                                                                           |
+| `--ui-line-height-snug`             | semantic  | `1.375`                                                                                                          | `1.375`                                                                                                          |
+| `--ui-line-height-normal`           | semantic  | `1.5`                                                                                                            | `1.5`                                                                                                            |
+| `--ui-space-3xs`                    | semantic  | `0.125rem`                                                                                                       | `0.125rem`                                                                                                       |
+| `--ui-space-2xs`                    | semantic  | `0.25rem`                                                                                                        | `0.25rem`                                                                                                        |
+| `--ui-space-xs`                     | semantic  | `0.375rem`                                                                                                       | `0.375rem`                                                                                                       |
+| `--ui-space-sm`                     | semantic  | `0.5rem`                                                                                                         | `0.5rem`                                                                                                         |
+| `--ui-space-md`                     | semantic  | `0.75rem`                                                                                                        | `0.75rem`                                                                                                        |
+| `--ui-space-lg`                     | semantic  | `1rem`                                                                                                           | `1rem`                                                                                                           |
+| `--ui-space-xl`                     | semantic  | `1.5rem`                                                                                                         | `1.5rem`                                                                                                         |
+| `--ui-space-2xl`                    | semantic  | `2rem`                                                                                                           | `2rem`                                                                                                           |
+| `--ui-space-3xl`                    | semantic  | `3rem`                                                                                                           | `3rem`                                                                                                           |
+| `--ui-radius-sm`                    | semantic  | `0.25rem`                                                                                                        | `0.25rem`                                                                                                        |
+| `--ui-radius-control`               | semantic  | `0.375rem`                                                                                                       | `0.375rem`                                                                                                       |
+| `--ui-radius-container`             | semantic  | `0.5rem`                                                                                                         | `0.5rem`                                                                                                         |
+| `--ui-radius-full`                  | semantic  | `9999px`                                                                                                         | `9999px`                                                                                                         |
+| `--ui-border-width-default`         | semantic  | `1px`                                                                                                            | `1px`                                                                                                            |
+| `--ui-border-width-strong`          | semantic  | `2px`                                                                                                            | `2px`                                                                                                            |
+| `--ui-focus-ring-width`             | semantic  | `2px`                                                                                                            | `2px`                                                                                                            |
+| `--ui-focus-ring-offset`            | semantic  | `2px`                                                                                                            | `2px`                                                                                                            |
+| `--ui-control-height-sm`            | semantic  | `2rem`                                                                                                           | `2rem`                                                                                                           |
+| `--ui-control-height-md`            | semantic  | `2.5rem`                                                                                                         | `2.5rem`                                                                                                         |
+| `--ui-control-height-lg`            | semantic  | `2.75rem`                                                                                                        | `2.75rem`                                                                                                        |
+| `--ui-control-padding-inline-sm`    | semantic  | `0.625rem`                                                                                                       | `0.625rem`                                                                                                       |
+| `--ui-control-padding-inline-md`    | semantic  | `0.75rem`                                                                                                        | `0.75rem`                                                                                                        |
+| `--ui-control-padding-inline-lg`    | semantic  | `1rem`                                                                                                           | `1rem`                                                                                                           |
+| `--ui-control-font-size-sm`         | semantic  | `0.875rem`                                                                                                       | `0.875rem`                                                                                                       |
+| `--ui-control-font-size-md`         | semantic  | `0.875rem`                                                                                                       | `0.875rem`                                                                                                       |
+| `--ui-control-font-size-lg`         | semantic  | `1rem`                                                                                                           | `1rem`                                                                                                           |
+| `--ui-control-gap-sm`               | semantic  | `0.375rem`                                                                                                       | `0.375rem`                                                                                                       |
+| `--ui-control-gap-md`               | semantic  | `0.5rem`                                                                                                         | `0.5rem`                                                                                                         |
+| `--ui-control-gap-lg`               | semantic  | `0.625rem`                                                                                                       | `0.625rem`                                                                                                       |
+| `--ui-icon-size-sm`                 | semantic  | `1rem`                                                                                                           | `1rem`                                                                                                           |
+| `--ui-icon-size-md`                 | semantic  | `1.25rem`                                                                                                        | `1.25rem`                                                                                                        |
+| `--ui-icon-size-lg`                 | semantic  | `1.5rem`                                                                                                         | `1.5rem`                                                                                                         |
+| `--ui-z-raised`                     | semantic  | `10`                                                                                                             | `10`                                                                                                             |
+| `--ui-z-dropdown`                   | semantic  | `1000`                                                                                                           | `1000`                                                                                                           |
+| `--ui-z-sticky`                     | semantic  | `1100`                                                                                                           | `1100`                                                                                                           |
+| `--ui-z-overlay`                    | semantic  | `1200`                                                                                                           | `1200`                                                                                                           |
+| `--ui-z-modal`                      | semantic  | `1300`                                                                                                           | `1300`                                                                                                           |
+| `--ui-z-toast`                      | semantic  | `1400`                                                                                                           | `1400`                                                                                                           |
+| `--ui-z-tooltip`                    | semantic  | `1500`                                                                                                           | `1500`                                                                                                           |
+| `--ui-motion-duration-instant`      | semantic  | `50ms`                                                                                                           | `50ms`                                                                                                           |
+| `--ui-motion-duration-fast`         | semantic  | `120ms`                                                                                                          | `120ms`                                                                                                          |
+| `--ui-motion-duration-normal`       | semantic  | `200ms`                                                                                                          | `200ms`                                                                                                          |
+| `--ui-motion-duration-slow`         | semantic  | `320ms`                                                                                                          | `320ms`                                                                                                          |
+| `--ui-motion-easing-standard`       | semantic  | `cubic-bezier(0.2, 0, 0, 1)`                                                                                     | `cubic-bezier(0.2, 0, 0, 1)`                                                                                     |
+| `--ui-motion-easing-enter`          | semantic  | `cubic-bezier(0, 0, 0.2, 1)`                                                                                     | `cubic-bezier(0, 0, 0.2, 1)`                                                                                     |
+| `--ui-motion-easing-exit`           | semantic  | `cubic-bezier(0.4, 0, 1, 1)`                                                                                     | `cubic-bezier(0.4, 0, 1, 1)`                                                                                     |
+| `--ui-color-bg`                     | semantic  | `#ffffff`                                                                                                        | `#020617`                                                                                                        |
+| `--ui-color-surface`                | semantic  | `#ffffff`                                                                                                        | `#0f172a`                                                                                                        |
+| `--ui-color-surface-subtle`         | semantic  | `#f8fafc`                                                                                                        | `#0f172a`                                                                                                        |
+| `--ui-color-surface-muted`          | semantic  | `#f1f5f9`                                                                                                        | `#1e293b`                                                                                                        |
+| `--ui-color-surface-raised`         | semantic  | `#ffffff`                                                                                                        | `#1e293b`                                                                                                        |
+| `--ui-color-surface-hover`          | semantic  | `#f1f5f9`                                                                                                        | `#1e293b`                                                                                                        |
+| `--ui-color-surface-active`         | semantic  | `#e2e8f0`                                                                                                        | `#334155`                                                                                                        |
+| `--ui-color-text`                   | semantic  | `#0f172a`                                                                                                        | `#f8fafc`                                                                                                        |
+| `--ui-color-text-muted`             | semantic  | `#475569`                                                                                                        | `#94a3b8`                                                                                                        |
+| `--ui-color-text-subtle`            | semantic  | `#64748b`                                                                                                        | `#94a3b8`                                                                                                        |
+| `--ui-color-text-disabled`          | semantic  | `#94a3b8`                                                                                                        | `#475569`                                                                                                        |
+| `--ui-color-text-inverse`           | semantic  | `#ffffff`                                                                                                        | `#0f172a`                                                                                                        |
+| `--ui-color-border`                 | semantic  | `#e2e8f0`                                                                                                        | `#1e293b`                                                                                                        |
+| `--ui-color-border-control`         | semantic  | `#64748b`                                                                                                        | `#64748b`                                                                                                        |
+| `--ui-color-border-control-hover`   | semantic  | `#334155`                                                                                                        | `#cbd5e1`                                                                                                        |
+| `--ui-color-control-bg`             | semantic  | `#ffffff`                                                                                                        | `#0f172a`                                                                                                        |
+| `--ui-color-control-bg-disabled`    | semantic  | `#f1f5f9`                                                                                                        | `#1e293b`                                                                                                        |
+| `--ui-color-primary`                | semantic  | `#4f46e5`                                                                                                        | `#818cf8`                                                                                                        |
+| `--ui-color-primary-hover`          | semantic  | `#4338ca`                                                                                                        | `#a5b4fc`                                                                                                        |
+| `--ui-color-primary-active`         | semantic  | `#3730a3`                                                                                                        | `#c7d2fe`                                                                                                        |
+| `--ui-color-primary-contrast`       | semantic  | `#ffffff`                                                                                                        | `#020617`                                                                                                        |
+| `--ui-color-primary-subtle`         | semantic  | `#eef2ff`                                                                                                        | `#1e1b4b`                                                                                                        |
+| `--ui-color-primary-subtle-hover`   | semantic  | `#e0e7ff`                                                                                                        | `#312e81`                                                                                                        |
+| `--ui-color-primary-text`           | semantic  | `#4338ca`                                                                                                        | `#a5b4fc`                                                                                                        |
+| `--ui-color-danger`                 | semantic  | `#dc2626`                                                                                                        | `#f87171`                                                                                                        |
+| `--ui-color-danger-hover`           | semantic  | `#b91c1c`                                                                                                        | `#fca5a5`                                                                                                        |
+| `--ui-color-danger-active`          | semantic  | `#991b1b`                                                                                                        | `#fecaca`                                                                                                        |
+| `--ui-color-danger-contrast`        | semantic  | `#ffffff`                                                                                                        | `#020617`                                                                                                        |
+| `--ui-color-danger-subtle`          | semantic  | `#fef2f2`                                                                                                        | `#450a0a`                                                                                                        |
+| `--ui-color-danger-text`            | semantic  | `#b91c1c`                                                                                                        | `#fca5a5`                                                                                                        |
+| `--ui-color-success`                | semantic  | `#15803d`                                                                                                        | `#4ade80`                                                                                                        |
+| `--ui-color-success-contrast`       | semantic  | `#ffffff`                                                                                                        | `#020617`                                                                                                        |
+| `--ui-color-success-subtle`         | semantic  | `#f0fdf4`                                                                                                        | `#052e16`                                                                                                        |
+| `--ui-color-success-text`           | semantic  | `#15803d`                                                                                                        | `#86efac`                                                                                                        |
+| `--ui-color-warning`                | semantic  | `#f59e0b`                                                                                                        | `#fbbf24`                                                                                                        |
+| `--ui-color-warning-contrast`       | semantic  | `#020617`                                                                                                        | `#020617`                                                                                                        |
+| `--ui-color-warning-subtle`         | semantic  | `#fffbeb`                                                                                                        | `#451a03`                                                                                                        |
+| `--ui-color-warning-text`           | semantic  | `#92400e`                                                                                                        | `#fcd34d`                                                                                                        |
+| `--ui-color-info`                   | semantic  | `#0369a1`                                                                                                        | `#38bdf8`                                                                                                        |
+| `--ui-color-info-contrast`          | semantic  | `#ffffff`                                                                                                        | `#020617`                                                                                                        |
+| `--ui-color-info-subtle`            | semantic  | `#f0f9ff`                                                                                                        | `#082f49`                                                                                                        |
+| `--ui-color-info-text`              | semantic  | `#075985`                                                                                                        | `#7dd3fc`                                                                                                        |
+| `--ui-color-focus-ring`             | semantic  | `#4f46e5`                                                                                                        | `#818cf8`                                                                                                        |
+| `--ui-color-backdrop`               | semantic  | `rgb(15 23 42 / 0.5)`                                                                                            | `rgb(0 0 0 / 0.6)`                                                                                               |
+| `--ui-shadow-sm`                    | semantic  | `0 1px 2px 0 rgb(15 23 42 / 0.06)`                                                                               | `0 1px 2px 0 rgb(0 0 0 / 0.4)`                                                                                   |
+| `--ui-shadow-md`                    | semantic  | `0 4px 8px -2px rgb(15 23 42 / 0.10), 0 2px 4px -2px rgb(15 23 42 / 0.06)`                                       | `0 4px 8px -2px rgb(0 0 0 / 0.5)`                                                                                |
+| `--ui-shadow-lg`                    | semantic  | `0 12px 24px -6px rgb(15 23 42 / 0.16), 0 4px 8px -4px rgb(15 23 42 / 0.08)`                                     | `0 12px 24px -6px rgb(0 0 0 / 0.6)`                                                                              |
+| `--ui-button-radius`                | component | `var(--ui-radius-control)`                                                                                       | `var(--ui-radius-control)`                                                                                       |
+| `--ui-button-font-weight`           | component | `var(--ui-font-weight-medium)`                                                                                   | `var(--ui-font-weight-medium)`                                                                                   |
+| `--ui-button-primary-bg`            | component | `var(--ui-color-primary)`                                                                                        | `var(--ui-color-primary)`                                                                                        |
+| `--ui-button-primary-bg-hover`      | component | `var(--ui-color-primary-hover)`                                                                                  | `var(--ui-color-primary-hover)`                                                                                  |
+| `--ui-button-primary-bg-active`     | component | `var(--ui-color-primary-active)`                                                                                 | `var(--ui-color-primary-active)`                                                                                 |
+| `--ui-button-primary-text`          | component | `var(--ui-color-primary-contrast)`                                                                               | `var(--ui-color-primary-contrast)`                                                                               |
+| `--ui-button-primary-border`        | component | `transparent`                                                                                                    | `transparent`                                                                                                    |
+| `--ui-button-secondary-bg`          | component | `var(--ui-color-surface)`                                                                                        | `var(--ui-color-surface)`                                                                                        |
+| `--ui-button-secondary-bg-hover`    | component | `var(--ui-color-surface-hover)`                                                                                  | `var(--ui-color-surface-hover)`                                                                                  |
+| `--ui-button-secondary-bg-active`   | component | `var(--ui-color-surface-active)`                                                                                 | `var(--ui-color-surface-active)`                                                                                 |
+| `--ui-button-secondary-text`        | component | `var(--ui-color-text)`                                                                                           | `var(--ui-color-text)`                                                                                           |
+| `--ui-button-secondary-border`      | component | `var(--ui-color-border-control)`                                                                                 | `var(--ui-color-border-control)`                                                                                 |
+| `--ui-button-ghost-bg`              | component | `transparent`                                                                                                    | `transparent`                                                                                                    |
+| `--ui-button-ghost-bg-hover`        | component | `var(--ui-color-surface-hover)`                                                                                  | `var(--ui-color-surface-hover)`                                                                                  |
+| `--ui-button-ghost-bg-active`       | component | `var(--ui-color-surface-active)`                                                                                 | `var(--ui-color-surface-active)`                                                                                 |
+| `--ui-button-ghost-text`            | component | `var(--ui-color-text)`                                                                                           | `var(--ui-color-text)`                                                                                           |
+| `--ui-button-ghost-border`          | component | `transparent`                                                                                                    | `transparent`                                                                                                    |
+| `--ui-button-danger-bg`             | component | `var(--ui-color-danger)`                                                                                         | `var(--ui-color-danger)`                                                                                         |
+| `--ui-button-danger-bg-hover`       | component | `var(--ui-color-danger-hover)`                                                                                   | `var(--ui-color-danger-hover)`                                                                                   |
+| `--ui-button-danger-bg-active`      | component | `var(--ui-color-danger-active)`                                                                                  | `var(--ui-color-danger-active)`                                                                                  |
+| `--ui-button-danger-text`           | component | `var(--ui-color-danger-contrast)`                                                                                | `var(--ui-color-danger-contrast)`                                                                                |
+| `--ui-button-danger-border`         | component | `transparent`                                                                                                    | `transparent`                                                                                                    |
+| `--ui-input-bg`                     | component | `var(--ui-color-control-bg)`                                                                                     | `var(--ui-color-control-bg)`                                                                                     |
+| `--ui-input-bg-disabled`            | component | `var(--ui-color-control-bg-disabled)`                                                                            | `var(--ui-color-control-bg-disabled)`                                                                            |
+| `--ui-input-text`                   | component | `var(--ui-color-text)`                                                                                           | `var(--ui-color-text)`                                                                                           |
+| `--ui-input-placeholder`            | component | `var(--ui-color-text-subtle)`                                                                                    | `var(--ui-color-text-subtle)`                                                                                    |
+| `--ui-input-border`                 | component | `var(--ui-color-border-control)`                                                                                 | `var(--ui-color-border-control)`                                                                                 |
+| `--ui-input-border-hover`           | component | `var(--ui-color-border-control-hover)`                                                                           | `var(--ui-color-border-control-hover)`                                                                           |
+| `--ui-input-border-focus`           | component | `var(--ui-color-primary)`                                                                                        | `var(--ui-color-primary)`                                                                                        |
+| `--ui-input-border-invalid`         | component | `var(--ui-color-danger)`                                                                                         | `var(--ui-color-danger)`                                                                                         |
+| `--ui-input-radius`                 | component | `var(--ui-radius-control)`                                                                                       | `var(--ui-radius-control)`                                                                                       |
+| `--ui-form-field-gap`               | component | `var(--ui-space-2xs)`                                                                                            | `var(--ui-space-2xs)`                                                                                            |
+| `--ui-form-field-label-color`       | component | `var(--ui-color-text)`                                                                                           | `var(--ui-color-text)`                                                                                           |
+| `--ui-form-field-label-font-size`   | component | `var(--ui-font-size-sm)`                                                                                         | `var(--ui-font-size-sm)`                                                                                         |
+| `--ui-form-field-label-font-weight` | component | `var(--ui-font-weight-medium)`                                                                                   | `var(--ui-font-weight-medium)`                                                                                   |
+| `--ui-form-field-hint-color`        | component | `var(--ui-color-text-muted)`                                                                                     | `var(--ui-color-text-muted)`                                                                                     |
+| `--ui-form-field-error-color`       | component | `var(--ui-color-danger-text)`                                                                                    | `var(--ui-color-danger-text)`                                                                                    |
+| `--ui-form-field-message-font-size` | component | `var(--ui-font-size-xs)`                                                                                         | `var(--ui-font-size-xs)`                                                                                         |
+| `--ui-checkbox-size`                | component | `var(--ui-icon-size-sm)`                                                                                         | `var(--ui-icon-size-sm)`                                                                                         |
+| `--ui-checkbox-radius`              | component | `var(--ui-radius-sm)`                                                                                            | `var(--ui-radius-sm)`                                                                                            |
+| `--ui-checkbox-bg`                  | component | `var(--ui-color-control-bg)`                                                                                     | `var(--ui-color-control-bg)`                                                                                     |
+| `--ui-checkbox-border`              | component | `var(--ui-color-border-control)`                                                                                 | `var(--ui-color-border-control)`                                                                                 |
+| `--ui-checkbox-checked-bg`          | component | `var(--ui-color-primary)`                                                                                        | `var(--ui-color-primary)`                                                                                        |
+| `--ui-checkbox-checked-color`       | component | `var(--ui-color-primary-contrast)`                                                                               | `var(--ui-color-primary-contrast)`                                                                               |
+| `--ui-checkbox-invalid-border`      | component | `var(--ui-color-danger)`                                                                                         | `var(--ui-color-danger)`                                                                                         |
+| `--ui-radio-size`                   | component | `var(--ui-icon-size-sm)`                                                                                         | `var(--ui-icon-size-sm)`                                                                                         |
+| `--ui-radio-bg`                     | component | `var(--ui-color-control-bg)`                                                                                     | `var(--ui-color-control-bg)`                                                                                     |
+| `--ui-radio-border`                 | component | `var(--ui-color-border-control)`                                                                                 | `var(--ui-color-border-control)`                                                                                 |
+| `--ui-radio-checked-color`          | component | `var(--ui-color-primary)`                                                                                        | `var(--ui-color-primary)`                                                                                        |
+| `--ui-radio-invalid-border`         | component | `var(--ui-color-danger)`                                                                                         | `var(--ui-color-danger)`                                                                                         |
+| `--ui-switch-track-width`           | component | `var(--ui-control-height-md)`                                                                                    | `var(--ui-control-height-md)`                                                                                    |
+| `--ui-switch-track-height`          | component | `var(--ui-icon-size-md)`                                                                                         | `var(--ui-icon-size-md)`                                                                                         |
+| `--ui-switch-track-bg`              | component | `var(--ui-color-border-control)`                                                                                 | `var(--ui-color-border-control)`                                                                                 |
+| `--ui-switch-track-checked-bg`      | component | `var(--ui-color-primary)`                                                                                        | `var(--ui-color-primary)`                                                                                        |
+| `--ui-switch-thumb-bg`              | component | `var(--ui-color-control-bg)`                                                                                     | `var(--ui-color-control-bg)`                                                                                     |
+| `--ui-switch-invalid-outline`       | component | `var(--ui-color-danger)`                                                                                         | `var(--ui-color-danger)`                                                                                         |
+| `--ui-spinner-track-color`          | component | `var(--ui-color-border)`                                                                                         | `var(--ui-color-border)`                                                                                         |
+| `--ui-spinner-stroke-width`         | component | `var(--ui-border-width-strong)`                                                                                  | `var(--ui-border-width-strong)`                                                                                  |
+
+<!-- tokens:end -->
+
+## Contributing
+
+### Scripts
+
+| Command          | What it does                                                   |
+| ---------------- | -------------------------------------------------------------- |
+| `pnpm tokens`    | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast |
+| `pnpm test`      | Unit tests (Vitest)                                            |
+| `pnpm lint`      | ESLint (TS + templates + a11y) and Stylelint (token rules)     |
+| `pnpm build`     | Tokens and the library build into `dist/ui-kit`                |
+| `pnpm storybook` | Storybook dev server                                           |
+| `pnpm format`    | Prettier                                                       |
+
+### Adding a component
+
+1. Create a folder `projects/ui-kit/<name>/` containing `ng-package.json` (`{ "lib": { "entryFile": "public-api.ts" } }`) and `public-api.ts`.
+2. Name files `<name>.ts`, `<name>.scss` and `<name>.spec.ts`, plus `<name>.stories.ts` for Storybook.
+3. Name classes `Ui<Name>`. Use the selector `ui-<name>` for elements; use `button[ui-<name>]` when you extend a native element.
+4. Follow the component rules:
+   - Standalone, `ChangeDetectionStrategy.OnPush`.
+   - Only `input()`, `model()`, `output()`, `computed()`, `viewChild()`/`contentChild()`.
+   - `host: {}` metadata. No `@HostBinding`/`@HostListener`, no NgModules.
+   - Prefer native elements and CDK primitives (`FocusTrap`, `LiveAnnouncer`, `ActiveDescendantKeyManager`, overlay, listbox) over custom focus or keyboard code.
+5. Styles use **only semantic or component tokens**, applied with logical properties:
+   - No hex or `rgb()`, and no `px`/`rem`. Use `em` only when relative to text.
+   - No `!important`, no `::ng-deep`.
+   - Private per-component variables use the `--_name` form.
+   - Stylelint enforces these rules.
+   - New component tokens go into `tokens.json` → `component.<name>`, and reference semantic tokens.
+6. For a form control, extend `UiFormControlBase` (from `@vplans/ui-kit/core`) and provide `UI_FORM_FIELD_CONTROL`. For a native element, use `injectControlState()`.
+7. Required tests:
+   - rendering and inputs;
+   - outputs and model updates;
+   - keyboard interaction;
+   - ARIA attributes;
+   - for form controls, Reactive Forms and Signal Forms (value both ways, disabled, touched, error linking).
+8. Required stories: one per variant and state (default, sizes, disabled, invalid, loading, ...). Check the a11y panel in both themes and in RTL.
+9. Keep commits small, one per component: `feat(<name>): ...`.
+
+Anything not exported from an entry point's `public-api.ts` is internal and may change without notice.
