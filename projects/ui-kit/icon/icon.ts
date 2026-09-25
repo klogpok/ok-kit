@@ -58,7 +58,8 @@ export class UiIcon {
     const markup = typeof icon === 'string' ? this.registry.get(icon) : icon.svg;
     if (markup === undefined) {
       if (isDevMode()) {
-        console.warn(`[ui-icon] Icon "${String(icon)}" is not registered. Use provideUiIcons().`);
+        const name = typeof icon === 'string' ? icon : icon.name;
+        console.warn(`[ui-icon] Icon "${name}" is not registered. Use provideUiIcons().`);
       }
       return null;
     }

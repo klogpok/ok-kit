@@ -5,11 +5,8 @@ import { FormField, form, required } from '@angular/forms/signals';
 import { UiInput, UiTextarea } from '@vplans/ui-kit/input';
 import { UiError, UiFormField, UiHint, UiPrefix, UiSuffix } from './form-field';
 
-function query<T extends Element = HTMLElement>(
-  fixture: ComponentFixture<unknown>,
-  selector: string,
-): T {
-  return (fixture.nativeElement as HTMLElement).querySelector<T>(selector)!;
+function query(fixture: ComponentFixture<unknown>, selector: string): HTMLElement {
+  return (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(selector)!;
 }
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -70,11 +67,11 @@ describe('UiFormField + UiInput', () => {
     beforeEach(async () => {
       fixture = TestBed.createComponent(ReactiveHost);
       await settle(fixture);
-      inputEl = query<HTMLInputElement>(fixture, 'input');
+      inputEl = query(fixture, 'input') as HTMLInputElement;
     });
 
     it('links label to the input via for/id', () => {
-      const label = query<HTMLLabelElement>(fixture, 'label');
+      const label = query(fixture, 'label') as HTMLLabelElement;
       expect(inputEl.id).toMatch(/^ui-input-/);
       expect(label.htmlFor).toBe(inputEl.id);
       expect(label.textContent).toContain('Email');
@@ -133,7 +130,7 @@ describe('UiFormField + UiInput', () => {
     beforeEach(async () => {
       fixture = TestBed.createComponent(SignalHost);
       await settle(fixture);
-      inputEl = query<HTMLInputElement>(fixture, 'input');
+      inputEl = query(fixture, 'input') as HTMLInputElement;
     });
 
     it('binds the value both ways', async () => {
@@ -170,11 +167,11 @@ describe('UiFormField + UiInput', () => {
     });
 
     it('respects a user-provided id', () => {
-      expect(query<HTMLLabelElement>(fixture, 'label').htmlFor).toBe('notes');
+      expect((query(fixture, 'label') as HTMLLabelElement).htmlFor).toBe('notes');
     });
 
     it('uses projected hint and toggles the error via the invalid input', async () => {
-      const textarea = query<HTMLTextAreaElement>(fixture, 'textarea');
+      const textarea = query(fixture, 'textarea') as HTMLTextAreaElement;
       expect(textarea.getAttribute('aria-describedby')).toBe(
         query(fixture, '.ui-form-field__hint').id,
       );
@@ -240,12 +237,12 @@ describe('UiFormField affixes', () => {
   });
 
   it('lets interactive suffix content handle its own clicks', async () => {
-    const toggle = query<HTMLButtonElement>(fixture, '#toggle');
+    const toggle = query(fixture, '#toggle') as HTMLButtonElement;
     toggle.focus();
     toggle.click();
     await settle(fixture);
     expect(document.activeElement).toBe(toggle);
-    expect(query<HTMLInputElement>(fixture, 'input').type).toBe('text');
+    expect((query(fixture, 'input') as HTMLInputElement).type).toBe('text');
   });
 
   it('reflects the invalid state on the field box', async () => {
@@ -271,8 +268,8 @@ describe('UiFormField with a bare required attribute', () => {
   it('tells assistive technology that a field the control does not mark is required', async () => {
     const fixture = TestBed.createComponent(BareRequiredHost);
     await settle(fixture);
-    const label = query(fixture, 'label')!;
+    const label = query(fixture, 'label');
     expect(label.querySelector('.ui-form-field__required-text')!.textContent).toBe('חובה');
-    expect(query(fixture, 'input')!.hasAttribute('aria-required')).toBe(false);
+    expect(query(fixture, 'input').hasAttribute('aria-required')).toBe(false);
   });
 });

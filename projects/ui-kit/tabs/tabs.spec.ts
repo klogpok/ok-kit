@@ -75,7 +75,7 @@ describe('UiTabGroup', () => {
   it('renders a tablist with linked tabs and panels', () => {
     expect(root.querySelector('[role="tablist"]')!.getAttribute('aria-label')).toBe('Plan');
     expect(root.querySelector('ui-tab-group')!.hasAttribute('aria-label')).toBe(false);
-    expect(tabs().map((t) => t.textContent!.trim())).toEqual([
+    expect(tabs().map((t) => t.textContent.trim())).toEqual([
       'Details',
       'Disabled',
       'Docs 3',
@@ -101,7 +101,7 @@ describe('UiTabGroup', () => {
     expect(panels()[3].textContent).not.toContain('History panel');
   });
 
-  it('selects on click and updates the model', async () => {
+  it('selects on click and updates the model', () => {
     tabs()[3].click();
     fixture.detectChanges();
     expect(fixture.componentInstance.index()).toBe(3);
@@ -160,7 +160,7 @@ describe('UiTabGroup', () => {
     expect(fixture.componentInstance.index()).toBe(0);
   });
 
-  it('creates lazy content only when its tab is selected', async () => {
+  it('creates lazy content only when its tab is selected', () => {
     expect(lazyCreated).toBe(0);
     tabs()[2].click();
     fixture.detectChanges();

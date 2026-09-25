@@ -182,8 +182,8 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   readonly id = input(inject(_IdGenerator).getId('ui-datepicker-'));
   readonly ariaLabel = input('', { alias: 'aria-label' });
 
-  readonly opened = output<void>();
-  readonly closed = output<void>();
+  readonly opened = output();
+  readonly closed = output();
 
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
   private readonly toggleButton = viewChild.required<string, ElementRef<HTMLButtonElement>>(
@@ -271,7 +271,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
   private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
-    const [error] = this.rawText.parseErrors();
+    const error = this.rawText.parseErrors().at(0);
     return error ? { [error.kind]: { message: error.message } } : null;
   };
 
@@ -339,7 +339,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected onAttach(): void {
     // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef?.setDirection(resolveDirection(this.host));
+    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
     afterNextRender(
       { write: () => this.calendar()?.focusActiveCell() },
       { injector: this.injector },

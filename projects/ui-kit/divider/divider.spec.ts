@@ -37,8 +37,8 @@ describe('UiDivider', () => {
     expect(el('vertical').classList).toContain('ui-divider--vertical');
   });
 
-  it('renders the label as readable text without a separator role', async () => {
-    expect(el('labelled').textContent?.trim()).toBe('או');
+  it('renders the label as readable text without a separator role', () => {
+    expect(el('labelled').textContent.trim()).toBe('או');
     expect(el('labelled').hasAttribute('role')).toBe(false);
     expect(el('labelled').classList).toContain('ui-divider--labelled');
 

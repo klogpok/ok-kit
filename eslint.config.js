@@ -11,11 +11,23 @@ module.exports = tseslint.config(
     files: ['**/*.ts', '**/*.mts'],
     extends: [
       eslint.configs.recommended,
-      ...tseslint.configs.strict,
-      ...tseslint.configs.stylistic,
+      ...tseslint.configs.strictTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
       ...angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
+    languageOptions: {
+      parserOptions: {
+        project: [
+          './projects/ui-kit/tsconfig.lib.json',
+          './projects/ui-kit/tsconfig.spec.json',
+          './projects/ui-kit/.storybook/tsconfig.json',
+          './projects/playground/tsconfig.app.json',
+          './projects/playground/tsconfig.spec.json',
+        ],
+        tsconfigRootDir: __dirname,
+      },
+    },
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'off',
@@ -29,6 +41,13 @@ module.exports = tseslint.config(
       '@angular-eslint/no-input-rename': 'off',
       '@angular-eslint/prefer-standalone': 'error',
       '@angular-eslint/use-lifecycle-interface': 'error',
+      'no-console': ['error', { allow: ['warn', 'error'] }],
+      // `() => this.value.set(x)` is the usual Angular callback shape.
+      '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
+      // Numbers read fine in template strings (ids, labels such as "Page 3").
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+      // Static helpers such as Validators.required are passed by reference on purpose.
+      '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
       'no-restricted-imports': [
         'error',
         {
@@ -57,32 +76,10 @@ module.exports = tseslint.config(
     },
   },
   {
-    // Type-aware rules that catch bugs (not the whole strictTypeChecked set).
-    files: ['projects/**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: [
-          './projects/ui-kit/tsconfig.lib.json',
-          './projects/ui-kit/tsconfig.spec.json',
-          './projects/ui-kit/.storybook/tsconfig.json',
-          './projects/playground/tsconfig.app.json',
-          './projects/playground/tsconfig.spec.json',
-        ],
-        tsconfigRootDir: __dirname,
-      },
-    },
-    rules: {
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
-      '@typescript-eslint/await-thenable': 'error',
-      '@typescript-eslint/no-unsafe-argument': 'error',
-      '@typescript-eslint/no-unsafe-assignment': 'error',
-      '@typescript-eslint/no-unsafe-call': 'error',
-      '@typescript-eslint/no-unsafe-member-access': 'error',
-      '@typescript-eslint/no-unsafe-return': 'error',
-      '@typescript-eslint/no-deprecated': 'error',
-      'no-console': ['error', { allow: ['warn', 'error'] }],
-    },
+    // The token script runs in Node outside the Angular tsconfigs.
+    files: ['**/*.mts'],
+    extends: [tseslint.configs.disableTypeChecked],
+    rules: { 'no-console': 'off' },
   },
   {
     files: ['projects/ui-kit/**/*.ts'],

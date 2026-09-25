@@ -100,8 +100,10 @@ describe('ThemeService', () => {
       addEventListener: vi.fn((_: string, fn: typeof listener) => (listener = fn)),
       removeEventListener: vi.fn(),
     };
-    const original = window.matchMedia;
-    window.matchMedia = () => media as unknown as MediaQueryList;
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: () => media as unknown as MediaQueryList,
+    });
     try {
       const service = create();
       expect(service.theme()).toBe('light');
@@ -110,7 +112,7 @@ describe('ThemeService', () => {
       TestBed.resetTestingModule();
       expect(media.removeEventListener).toHaveBeenCalledWith('change', listener);
     } finally {
-      window.matchMedia = original;
+      delete (window as Partial<Window>).matchMedia;
     }
   });
 });

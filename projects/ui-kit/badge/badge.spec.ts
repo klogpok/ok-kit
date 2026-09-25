@@ -30,7 +30,7 @@ describe('UiBadge', () => {
     );
   });
 
-  it('applies tone, appearance and size', async () => {
+  it('applies tone, appearance and size', () => {
     expect([...el('custom').classList]).toEqual(
       expect.arrayContaining(['ui-badge--warning', 'ui-badge--soft', 'ui-badge--sm']),
     );

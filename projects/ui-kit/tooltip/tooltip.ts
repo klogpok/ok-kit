@@ -64,7 +64,7 @@ export class UiTooltipPanel {
   readonly message = signal('');
   readonly position = signal<UiTooltipPosition>('top');
   readonly hovered = signal(false);
-  readonly pointerLeft = output<void>();
+  readonly pointerLeft = output();
 
   protected onMouseLeave(): void {
     this.hovered.set(false);

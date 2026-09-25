@@ -138,7 +138,7 @@ describe('UiSelect with server-side search', () => {
     await settle(fixture);
 
     const active = document.getElementById(control.getAttribute('aria-activedescendant')!);
-    expect(active!.textContent!.trim()).toBe('Dana');
+    expect(active!.textContent.trim()).toBe('Dana');
     keydown(control, 'Enter');
     await settle(fixture);
     expect(fixture.componentInstance.value()).toBe('Dana');
@@ -202,7 +202,7 @@ describe('UiSelect', () => {
     expect(root.querySelector('label')!.getAttribute('for')).toBe(button.id);
     const hint = document.getElementById(button.getAttribute('aria-describedby')!);
     expect(hint!.textContent).toContain('Approves the plan');
-    expect(button.textContent!.trim()).toBe('Choose');
+    expect(button.textContent.trim()).toBe('Choose');
   });
 
   it('opens a labelled listbox with options and groups', async () => {
@@ -226,7 +226,7 @@ describe('UiSelect', () => {
     await settle(fixture);
     expect(fixture.componentInstance.value()).toBe('yael');
     expect(listbox()).toBeNull();
-    expect(control().textContent!.trim()).toBe('Yael');
+    expect(control().textContent.trim()).toBe('Yael');
     expect(document.activeElement).toBe(control());
   });
 
@@ -323,7 +323,7 @@ describe('UiSelect', () => {
     expect(listbox()).toBeNull();
   });
 
-  it('jumps to a matching option when typing', async () => {
+  it('jumps to a matching option when typing', () => {
     vi.useFakeTimers();
     try {
       control().focus();
@@ -439,7 +439,7 @@ describe('UiSelect with Reactive Forms', () => {
   afterEach(() => root.remove());
 
   it('shows the initial value using compareWith', () => {
-    expect(control().textContent!.trim()).toBe('Tel Aviv');
+    expect(control().textContent.trim()).toBe('Tel Aviv');
   });
 
   it('writes the selected object to the control', async () => {
@@ -511,7 +511,7 @@ describe('UiSelect with Signal Forms', () => {
 
     fixture.componentInstance.model.set({ role: 'owner' });
     await settle(fixture);
-    expect(control().textContent!.trim()).toBe('Owner');
+    expect(control().textContent.trim()).toBe('Owner');
   });
 
   it('shows the required state and the error message once touched', async () => {

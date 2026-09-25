@@ -132,12 +132,13 @@ export class UiOption<T = unknown> implements Highlightable {
   }
 
   private readText(): string {
-    return (this.element.textContent ?? '').trim();
+    return this.element.textContent.trim();
   }
 
   setActiveStyles(): void {
     this.active.set(true);
-    this.element.scrollIntoView?.({ block: 'nearest' });
+    // jsdom has no scrollIntoView.
+    if ('scrollIntoView' in this.element) this.element.scrollIntoView({ block: 'nearest' });
   }
 
   setInactiveStyles(): void {

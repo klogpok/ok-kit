@@ -73,7 +73,7 @@ describe('UiMultiSelect', () => {
   afterEach(() => root.remove());
 
   it('shows the placeholder and a multiselectable listbox with checkboxes', async () => {
-    expect(control().textContent!.trim()).toBe('Choose');
+    expect(control().textContent.trim()).toBe('Choose');
     expect(root.querySelector('ui-multi-select')!.classList).toContain('ui-select');
     await open();
     expect(listbox()!.getAttribute('aria-multiselectable')).toBe('true');
@@ -91,7 +91,7 @@ describe('UiMultiSelect', () => {
     expect(fixture.componentInstance.value()).toEqual(['yael', 'dana']);
     expect(options()[0].getAttribute('aria-selected')).toBe('true');
     // The trigger lists the labels in option order.
-    expect(control().textContent!.trim()).toBe('Dana, Yael');
+    expect(control().textContent.trim()).toBe('Dana, Yael');
 
     options()[2].click();
     await settle(fixture);
@@ -148,7 +148,7 @@ describe('UiMultiSelect', () => {
     input.dispatchEvent(new Event('input'));
     await settle(fixture);
     const visible = options().filter((o) => !o.hidden);
-    expect(visible.map((o) => o.textContent!.trim())).toEqual(['Yossi']);
+    expect(visible.map((o) => o.textContent.trim())).toEqual(['Yossi']);
 
     keydown(input, 'Enter');
     await settle(fixture);
@@ -191,7 +191,7 @@ describe('UiMultiSelect with Reactive Forms', () => {
   afterEach(() => root.remove());
 
   it('shows the initial value using compareWith and writes a new array', async () => {
-    expect(control().textContent!.trim()).toBe('Tel Aviv');
+    expect(control().textContent.trim()).toBe('Tel Aviv');
     const before = fixture.componentInstance.control.value;
     control().click();
     await settle(fixture);
@@ -217,7 +217,7 @@ describe('UiMultiSelect with Reactive Forms', () => {
   it('treats a null value as empty', async () => {
     fixture.componentInstance.control.setValue(null);
     await settle(fixture);
-    expect(control().textContent!.trim()).toBe('');
+    expect(control().textContent.trim()).toBe('');
   });
 });
 
@@ -265,7 +265,7 @@ describe('UiMultiSelect with Signal Forms', () => {
 
     fixture.componentInstance.model.set({ roles: ['owner'] });
     await settle(fixture);
-    expect(control().textContent!.trim()).toBe('Owner');
+    expect(control().textContent.trim()).toBe('Owner');
   });
 
   it('shows the required state and the error once touched', async () => {

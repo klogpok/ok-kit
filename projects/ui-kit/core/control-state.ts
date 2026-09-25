@@ -60,7 +60,7 @@ function messagesFromErrors(errors: ValidationErrors | null): string[] {
   return Object.values(errors).flatMap((value: unknown) => {
     if (typeof value === 'string') return [value];
     if (typeof value === 'object' && value !== null && 'message' in value) {
-      const message = (value as { message: unknown }).message;
+      const message = value.message;
       return typeof message === 'string' ? [message] : [];
     }
     return [];

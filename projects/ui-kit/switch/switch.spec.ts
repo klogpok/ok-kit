@@ -39,7 +39,7 @@ describe('UiSwitch', () => {
     const el = input('plain');
     expect(el.type).toBe('checkbox');
     expect(el.getAttribute('role')).toBe('switch');
-    expect((el as HTMLInputElement).checked).toBe(false);
+    expect(el.checked).toBe(false);
     expect(el.hasAttribute('aria-checked')).toBe(false);
     expect(el.closest('label')?.textContent).toContain('Wi-Fi');
   });
@@ -54,7 +54,7 @@ describe('UiSwitch', () => {
     input('plain').click();
     await settle(fixture);
     expect(fixture.componentInstance.checked()).toBe(true);
-    expect((input('plain') as HTMLInputElement).checked).toBe(true);
+    expect(input('plain').checked).toBe(true);
   });
 
   it('works with Reactive Forms', async () => {

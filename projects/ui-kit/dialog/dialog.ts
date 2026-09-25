@@ -40,7 +40,7 @@ export interface UiDialogOptions<D = unknown> {
    * What gets focus on open. `first-field` (default): `[cdkFocusInitial]`, else the first form
    * field, else the first tabbable element. Other values are passed to CDK Dialog.
    */
-  autoFocus?: 'first-field' | AutoFocusTarget | string | boolean;
+  autoFocus?: 'first-field' | AutoFocusTarget | (string & Record<never, never>) | boolean;
   /** Element to focus on close. Defaults to the element focused before the dialog opened. */
   restoreFocus?: boolean | string | HTMLElement;
   /** Text direction of the dialog. Defaults to the direction around the focused element. */

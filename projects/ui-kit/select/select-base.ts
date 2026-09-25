@@ -91,8 +91,8 @@ export abstract class UiSelectBase<T, V>
    */
   readonly displayWith = input<((value: T) => string) | null>(null);
 
-  readonly opened = output<void>();
-  readonly closed = output<void>();
+  readonly opened = output();
+  readonly closed = output();
   /**
    * Emits the search text as the user types (`searchable` only), and `''` when the list closes
    * with a search, so server-side results can be reset.
@@ -248,7 +248,7 @@ export abstract class UiSelectBase<T, V>
 
   protected onAttach(): void {
     // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef?.setDirection(resolveDirection(this.host));
+    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
   }
 
   /** Keeps focus on the control when the chevron or padding of the trigger is pressed. */

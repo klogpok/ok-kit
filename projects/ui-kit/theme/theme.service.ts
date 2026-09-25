@@ -52,7 +52,8 @@ export class ThemeService {
   private readonly options = inject(UI_THEME_OPTIONS);
   private readonly storageKey =
     this.options.storageKey === undefined ? 'ui-theme' : this.options.storageKey;
-  private readonly media = this.document.defaultView?.matchMedia?.('(prefers-color-scheme: dark)');
+  // No window on the server; jsdom has no matchMedia.
+  private readonly media = this.mediaQuery('(prefers-color-scheme: dark)');
   private readonly systemDark = signal(this.media?.matches ?? false);
   private readonly modeState = signal<UiThemeMode>(
     this.readStored() ?? this.options.defaultMode ?? 'system',
@@ -104,6 +105,11 @@ export class ThemeService {
   /** Toggles between light and dark, leaving `system` mode. */
   toggle(): void {
     this.setMode(this.theme() === 'dark' ? 'light' : 'dark');
+  }
+
+  private mediaQuery(query: string): MediaQueryList | undefined {
+    const view = this.document.defaultView;
+    return typeof view?.matchMedia === 'function' ? view.matchMedia(query) : undefined;
   }
 
   private readStored(): UiThemeMode | null {

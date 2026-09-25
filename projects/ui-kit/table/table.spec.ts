@@ -113,7 +113,7 @@ describe('UiTable', () => {
   const table = () => (fixture.nativeElement as HTMLElement).querySelector('table')!;
   const header = (i: number) => table().tHead!.rows[0].cells[i];
   const sortButton = (i: number) => header(i).querySelector('button')!;
-  const firstColumn = () => [...table().tBodies[0].rows].map((r) => r.cells[0].textContent!.trim());
+  const firstColumn = () => [...table().tBodies[0].rows].map((r) => r.cells[0].textContent.trim());
   const settle = async () => {
     fixture.detectChanges();
     await fixture.whenStable();
@@ -186,7 +186,7 @@ describe('UiTable', () => {
     host.data.set([]);
     await settle();
     const cell = table().querySelector('tr.ui-table-message > td')!;
-    expect(cell.textContent!.trim()).toBe('No plans yet');
+    expect(cell.textContent.trim()).toBe('No plans yet');
     expect(cell.getAttribute('colspan')).toBe('3');
   });
 

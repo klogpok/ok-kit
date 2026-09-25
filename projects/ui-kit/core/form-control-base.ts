@@ -50,7 +50,7 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   /** Ids of the app's own descriptions, kept before the hint / error of `ui-form-field`. */
   readonly ariaDescribedBy = input<string | null>(null, { alias: 'aria-describedby' });
   /** Emits when the user leaves the control. Signal Forms uses it to mark the field touched. */
-  readonly touch = output<void>();
+  readonly touch = output();
 
   private readonly cvaDisabled = signal(false);
   private onChange: (value: T) => void = () => undefined;

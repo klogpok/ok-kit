@@ -114,7 +114,7 @@ export class UiRadioGroup<T = unknown>
   /** Focuses the selected radio, or the first enabled one. */
   focus(options?: FocusOptions): void {
     const radios = this.radios().filter((radio) => !radio.isDisabled());
-    (radios.find((radio) => radio.isChecked()) ?? radios[0])?.focus(options);
+    (radios.find((radio) => radio.isChecked()) ?? radios.at(0))?.focus(options);
   }
 }
 

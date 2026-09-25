@@ -31,7 +31,7 @@ describe('UiCalendar', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
   const root = () => fixture.nativeElement as HTMLElement;
-  const title = () => root().querySelector('.ui-calendar__title')!.textContent!.trim();
+  const title = () => root().querySelector('.ui-calendar__title')!.textContent.trim();
   const cell = (key: string) => root().querySelector<HTMLElement>(`td[data-date="${key}"]`)!;
   const focused = () => (document.activeElement as HTMLElement | null)?.dataset['date'];
   const button = (label: string) =>
@@ -69,15 +69,7 @@ describe('UiCalendar', () => {
     );
     const headers = [...grid.querySelectorAll('th')];
     expect(headers.map((th) => th.getAttribute('abbr'))[0]).toBe('Sunday');
-    expect(headers.map((th) => th.textContent!.trim())).toEqual([
-      'S',
-      'M',
-      'T',
-      'W',
-      'T',
-      'F',
-      'S',
-    ]);
+    expect(headers.map((th) => th.textContent.trim())).toEqual(['S', 'M', 'T', 'W', 'T', 'F', 'S']);
     // September 1, 2026 is a Tuesday: two blank cells first.
     expect(grid.querySelectorAll('tbody tr:first-child .ui-calendar__blank')).toHaveLength(2);
   });

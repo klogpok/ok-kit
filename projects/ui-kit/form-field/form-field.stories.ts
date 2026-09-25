@@ -72,7 +72,7 @@ class SignalFormStory {
   submit(event: Event): void {
     event.preventDefault();
     // Marks every field touched, then runs the action only when the form is valid.
-    void submit(this.f, async () => undefined);
+    void submit(this.f, () => Promise.resolve(undefined));
   }
 }
 

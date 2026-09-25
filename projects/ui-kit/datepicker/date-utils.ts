@@ -110,7 +110,9 @@ export function datePattern(locale: string): { order: DatePart[]; separator: str
   const order = parts
     .map((part) => part.type)
     .filter((type): type is DatePart => type === 'day' || type === 'month' || type === 'year');
-  const separator = parts.find((part) => part.type === 'literal')?.value.trim() || '/';
+  // An empty literal (no separator) also falls back to "/".
+  const literal = parts.find((part) => part.type === 'literal')?.value.trim();
+  const separator = literal?.length ? literal : '/';
   return { order, separator };
 }
 
@@ -128,7 +130,7 @@ export function formatDay(date: Date, locale: string): string {
 export function parseDay(text: string, locale: string): Date | null {
   const numbers = text.match(/\d+/g);
   const { order } = datePattern(locale);
-  if (!numbers || numbers.length !== 3 || order.length !== 3) return null;
+  if (numbers?.length !== 3 || order.length !== 3) return null;
 
   const value = (part: DatePart) => Number(numbers[order.indexOf(part)]);
   const day = value('day');

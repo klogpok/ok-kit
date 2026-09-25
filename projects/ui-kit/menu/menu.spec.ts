@@ -56,7 +56,7 @@ describe('UiMenu', () => {
   ];
   const item = (label: string) =>
     [...document.querySelectorAll<HTMLButtonElement>('[ui-menu-item]')].find(
-      (el) => el.textContent?.trim() === label,
+      (el) => el.textContent.trim() === label,
     )!;
   const settle = async () => {
     fixture.detectChanges();

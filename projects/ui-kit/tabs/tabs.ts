@@ -184,7 +184,9 @@ export class UiTabGroup {
     // An overflowing tab list scrolls the selected tab into view (only sideways, not the page).
     afterRenderEffect({
       earlyRead: () => {
-        const button = this.buttons()[this.selected()]?.element;
+        // -1 when every tab is disabled; at(-1) would pick the last tab.
+        const index = this.selected();
+        const button = index < 0 ? undefined : this.buttons().at(index)?.element;
         const list = button?.parentElement;
         if (!button || !list) return null;
         const tab = button.getBoundingClientRect();
@@ -195,7 +197,8 @@ export class UiTabGroup {
       },
       write: (scroll) => {
         const value = scroll();
-        value?.list.scrollBy?.({ left: value.offset });
+        // jsdom has no scrollBy.
+        if (value && 'scrollBy' in value.list) value.list.scrollBy({ left: value.offset });
       },
     });
     // Tell the parent which tab is really shown when its index was disabled or out of range.

@@ -8,7 +8,7 @@ describe('App', () => {
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('h1')?.textContent).toContain('ui-kit playground');
-    const sections = [...el.querySelectorAll('section h2')].map((h) => h.textContent?.trim());
+    const sections = [...el.querySelectorAll('section h2')].map((h) => h.textContent.trim());
     expect(sections).toEqual(
       expect.arrayContaining(['Profile (Signal Forms)', 'Plans', 'Actions']),
     );
@@ -21,7 +21,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const toggle = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
-      (b) => b.textContent?.trim() === 'LTR',
+      (b) => b.textContent.trim() === 'LTR',
     )!;
     toggle.click();
     await fixture.whenStable();

@@ -225,7 +225,7 @@ describe('UiToast', () => {
     ref.afterDismissed.subscribe((r) => reasons.push(r));
     render();
     const action = [...items()[0].querySelectorAll('button')].find(
-      (b) => b.textContent!.trim() === 'Undo',
+      (b) => b.textContent.trim() === 'Undo',
     )!;
     action.click();
     expect(onAction).toHaveBeenCalledTimes(1);
