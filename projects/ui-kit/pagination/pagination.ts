@@ -6,11 +6,13 @@ import {
   afterNextRender,
   booleanAttribute,
   computed,
+  effect,
   inject,
   input,
   model,
   numberAttribute,
   output,
+  untracked,
 } from '@angular/core';
 import { UiIconButton } from '@vplans/ui-kit/button';
 import { UI_LABELS } from '@vplans/ui-kit/core';
@@ -206,6 +208,20 @@ export class UiPagination {
     const end = Math.min(length, (this.current() + 1) * this.pageSize());
     return this.labels().pageRange(start, end, length);
   });
+
+  constructor() {
+    // When the list shrinks (e.g. a filter), move the parent to the last existing page. Not while
+    // `length` is 0: that is usually "not loaded yet", and a restored page index must survive it.
+    effect(() => {
+      const index = this.pageIndex();
+      const current = this.current();
+      if (this.length() === 0 || index === current) return;
+      untracked(() => {
+        this.pageIndex.set(current);
+        this.emit(index);
+      });
+    });
+  }
 
   /**
    * Goes to a page (clamped to the existing ones). With `keepFocus`, focus moves to the current

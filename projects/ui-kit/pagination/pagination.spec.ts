@@ -131,10 +131,25 @@ describe('UiPagination', () => {
     expect(document.activeElement).toBe(current());
   });
 
-  it('clamps an out of range page index', async () => {
+  it('moves an out of range page index to the last page and reports it', async () => {
     host.pageIndex.set(40);
     await settle();
     expect(current()?.textContent?.trim()).toBe('10');
+    expect(host.pageIndex()).toBe(9);
+    expect(host.events.at(-1)).toMatchObject({ pageIndex: 9, previousPageIndex: 40 });
+  });
+
+  it('follows a shrinking list but keeps the page index while the length is 0', async () => {
+    host.pageIndex.set(5);
+    await settle();
+    host.length.set(0);
+    await settle();
+    expect(host.pageIndex()).toBe(5);
+
+    host.length.set(12);
+    await settle();
+    expect(host.pageIndex()).toBe(1);
+    expect(current()?.textContent?.trim()).toBe('2');
   });
 
   it('changes the page size and keeps the first item visible', async () => {
