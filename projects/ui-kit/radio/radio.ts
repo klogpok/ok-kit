@@ -24,7 +24,6 @@ import {
 @Injectable()
 class UiRadioGroupControl {
   select: (value: unknown) => void = () => undefined;
-  markTouched: () => void = () => undefined;
 }
 
 /**
@@ -55,12 +54,14 @@ class UiRadioGroupControl {
     '[class]': '"ui-radio-group--" + orientation()',
     '[attr.id]': 'id()',
     '[attr.aria-label]': 'ariaLabel() || null',
-    '[attr.aria-labelledby]': 'ariaLabelledby() || formField?.labelledBy() || null',
+    '[attr.aria-labelledby]':
+      'ariaLabelledby() || (ariaLabel() ? null : formField?.labelledBy()) || null',
     '[attr.aria-describedby]': 'describedBy()',
     '[attr.aria-invalid]': 'showError() ? "true" : null',
     '[attr.aria-required]': 'isRequired() ? "true" : null',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
     '[attr.aria-readonly]': 'readonly() ? "true" : null',
+    '(focusout)': 'onFocusOut($event)',
   },
 })
 export class UiRadioGroup<T = unknown>
@@ -97,11 +98,16 @@ export class UiRadioGroup<T = unknown>
       this.value.set(value as T);
       this.notifyChange(value as T);
     };
-    control.markTouched = () => this.notifyTouched();
   }
 
   writeValue(value: T | null | undefined): void {
     this.value.set(value ?? null);
+  }
+
+  /** Touched once focus leaves the group; arrow keys move focus between its radios. */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (!next || !(event.currentTarget as HTMLElement).contains(next)) this.notifyTouched();
   }
 
   /** Focuses the selected radio, or the first enabled one. */
@@ -129,7 +135,6 @@ export class UiRadioGroup<T = unknown>
           [attr.aria-label]="ariaLabel() || null"
           (click)="onClick($event)"
           (change)="control.select(value())"
-          (blur)="control.markTouched()"
         />
       </span>
       <span class="ui-radio__text"><ng-content /></span>

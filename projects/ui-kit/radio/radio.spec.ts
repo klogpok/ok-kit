@@ -146,7 +146,12 @@ describe('UiRadioGroup', () => {
       radios[0].click();
       expect(control.value).toBe(1);
 
-      radios[0].dispatchEvent(new Event('blur'));
+      // Moving between radios keeps focus in the group.
+      radios[0].dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, relatedTarget: radios[1] }),
+      );
+      expect(control.touched).toBe(false);
+      radios[1].dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
       expect(control.touched).toBe(true);
 
       control.disable();
@@ -163,7 +168,7 @@ describe('UiRadioGroup', () => {
       const radios = el.querySelectorAll<HTMLInputElement>('input');
       const group = el.querySelector('ui-radio-group')!;
 
-      radios[0].dispatchEvent(new Event('blur'));
+      radios[0].dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
       await settle(fixture);
       expect(group.getAttribute('aria-invalid')).toBe('true');
       expect(el.textContent).toContain('Pick a plan');
@@ -262,6 +267,25 @@ describe('UiRadioGroup readonly', () => {
     expect(root.querySelector('ui-radio-group')!.getAttribute('aria-describedby')).toBe(
       'delivery-note',
     );
+  });
+
+  it('prefers its own aria-label over the form-field label', async () => {
+    TestBed.overrideTemplate(
+      ReadonlyRadioHost,
+      `<ui-form-field label="Delivery method">
+        <ui-radio-group aria-label="Delivery" [formField]="f.delivery">
+          <ui-radio value="pickup">Pickup</ui-radio>
+        </ui-radio-group>
+      </ui-form-field>`,
+    );
+    TestBed.overrideComponent(ReadonlyRadioHost, {
+      add: { imports: [UiFormField] },
+    });
+    const fixture = TestBed.createComponent(ReadonlyRadioHost);
+    await settle(fixture);
+    const group = (fixture.nativeElement as HTMLElement).querySelector('ui-radio-group')!;
+    expect(group.getAttribute('aria-label')).toBe('Delivery');
+    expect(group.hasAttribute('aria-labelledby')).toBe(false);
   });
 
   it('moves the aria-label of a radio from its host to the native input', async () => {
