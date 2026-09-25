@@ -32,13 +32,10 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 
 - **Phase 1 is done.** Delivered: tokens, typography, icon, spinner, button, icon-button, input, textarea, form-field with `uiPrefix`/`uiSuffix`, checkbox, radio group, switch, ThemeService, Storybook, playground.
 - **Phase 2 is done and approved** (2026-09-25). Delivered: divider, badge, card, tabs + `ui-tab-nav` (router links), tooltip, dialog (+ `confirm()`), toast, select (+ `searchable`), `provideUiLabels()`, `resolveDirection()`.
-- **Next: Phase 3. The user approved it; start it in a new session.** Scope:
-  - skeleton, accordion, menu/dropdown, pagination, table (sorting, empty and loading states), multi-select, date picker;
-  - a new "Phase 3" section in the playground.
+- **Phase 3 is done and waits for the user's review** (2026-09-25). Delivered: skeleton, accordion, menu (+ submenus), pagination, table (`table[ui-table]`, `[uiSort]`, `th[ui-sort-header]`, message/skeleton rows, `uiSortData()`), multi-select (shared `UiSelectBase`), calendar + date picker, `UiLiveDirectionality`, new labels (pagination, dates, `locale`), icons `chevrons-*` and `arrow-up`/`arrow-down`, and the "Phase 3" playground section.
+- Open questions for the review: the table loading indicator (a pulsing line under the header instead of dimmed rows, which failed contrast); lazy accordion content is kept after closing; the date placeholder is `DD.MM.YYYY`; invalid or out-of-range typed dates set the value to `null`.
 
-## Phase 3 plan
-
-Build in this order: skeleton → accordion → menu → pagination → table → multi-select → date picker → playground. Planned approach:
+## Phase 3 design (as built)
 
 - **Skeleton.** `ui-skeleton` with `shape` text/rect/circle, `width`/`height`, `lines`. It is always `aria-hidden`; the loading container sets `aria-busy`. No shimmer under reduced motion.
 - **Accordion.** `ui-accordion` / `ui-accordion-item` with `@angular/cdk/accordion` as host directives. Follow the APG pattern: heading (`headingLevel`), button with `aria-expanded`/`aria-controls`, region panel. Name the item input `label`, not `title` (that shows a native tooltip). Offer lazy content via `ng-template uiAccordionContent`.
@@ -67,4 +64,10 @@ Build in this order: skeleton → accordion → menu → pagination → table �
 - CDK overlays use the Popover API (top layer) by default, so `z-index` does not order them. Opening order does.
 - In Vitest (jsdom): the CDK key managers read `keyCode`, so pass it in `KeyboardEvent`. `InteractivityChecker` sees every element as hidden (no layout), so dialog focus tests need a fake checker (see `dialog.spec.ts`).
 - Storybook writes args onto the `component` instance when an arg name matches a field. For directives this replaced signal inputs. Use arg names that differ from the class fields (see `tooltip.stories.ts`).
+- Angular 22 components are OnPush by default, including test hosts. Use signals for host state in specs.
+- A static attribute that an input consumes (`<button ui-menu-item disabled>`) still stays on the native element. Bind `'[attr.disabled]': 'null'` when the native state is wrong (menu items must stay focusable).
+- Signal Forms `required()` treats only `null`, `''` and `false` as empty. An empty array needs `minLength(path, 1)`. `[formField]` also binds `min`/`max` (a `Date` for `minDate()`/`maxDate()`), so date inputs must accept `Date | null | undefined`.
+- In RTL text a numeric range such as "51–75" is shown as "75–51". Wrap it in LRI/PDI (`⁦…⁩`).
+- In sed and perl replacements `\u` upper-cases the next character. Write `⁦` escapes with Node or the Edit tool.
+- Stylelint allows only logical `text-align` values (`start`, `end`, `center`).
 - Storybook uses `@storybook/angular-vite`. `@analogjs/vite-plugin-angular` must be >= 2.7.5, older versions fail with the `initializeHash` error.
