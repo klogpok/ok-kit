@@ -92,10 +92,15 @@ import { UiInput } from '@vplans/ui-kit/input';
 
 Common inputs:
 
-| Input     | Values                                    | Default                                  |
-| --------- | ----------------------------------------- | ---------------------------------------- |
-| `size`    | `sm \| md \| lg`                          | `md`                                     |
-| `variant` | `primary \| secondary \| ghost \| danger` | `primary` (`ghost` for `ui-icon-button`) |
+| Input                 | Values                                    | Default                                  |
+| --------------------- | ----------------------------------------- | ---------------------------------------- |
+| `size`                | `sm \| md \| lg`                          | `md`                                     |
+| `variant`             | `primary \| secondary \| ghost \| danger` | `primary` (`ghost` for `ui-icon-button`) |
+| `disabledInteractive` | `boolean`                                 | `false`                                  |
+
+`disabledInteractive` keeps a `disabled` button focusable and hoverable (`aria-disabled` instead of the
+native `disabled`); clicks stay blocked. Use it when a `uiTooltip` explains why the button is disabled,
+instead of wrapping the button in an element with `uiTooltip`.
 
 With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
 A bare `checked` attribute is a compile error.
@@ -303,8 +308,9 @@ this.toast.show({ message: 'Plan deleted', action: 'Undo' }).onAction.subscribe(
   <button ui-button [uiDialogClose]="name()">Save</button>
 </ui-dialog-actions>
 
-<!-- Tooltip: a description, never the only label of an icon button -->
+<!-- Tooltip: a description, never the only label of an icon button. Hides the native title while active -->
 <button ui-icon-button label="Delete" uiTooltip="Delete the plan"><ui-icon icon="trash" /></button>
+<button ui-button disabled disabledInteractive uiTooltip="Fill in all required fields">Send</button>
 
 <!-- Select -->
 <ui-form-field label="Coordinator">

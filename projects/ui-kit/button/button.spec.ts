@@ -12,13 +12,20 @@ import { UiIconButton } from './icon-button';
       id="btn"
       [variant]="variant()"
       [disabled]="disabled()"
+      [disabledInteractive]="interactive()"
       [loading]="loading()"
       (click)="clicks = clicks + 1"
     >
       Save
     </button>
     <button ui-button id="submit" type="submit">Submit</button>
-    <a ui-button id="link" href="/orders" [disabled]="disabled()" (click)="clicks = clicks + 1"
+    <a
+      ui-button
+      id="link"
+      href="/orders"
+      [disabled]="disabled()"
+      [disabledInteractive]="interactive()"
+      (click)="clicks = clicks + 1"
       >Orders</a
     >
     <button ui-icon-button id="icon" label="Close" size="sm">x</button>
@@ -28,6 +35,7 @@ class Host {
   readonly variant = signal<UiVariant>('primary');
   readonly disabled = signal(false);
   readonly loading = signal(false);
+  readonly interactive = signal(false);
   clicks = 0;
 }
 
@@ -88,6 +96,29 @@ describe('UiButton', () => {
     link.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(true);
     expect(host.clicks).toBe(0);
+  });
+
+  it('keeps a disabledInteractive button and link focusable but blocks clicks', () => {
+    const { get, update, host } = setup();
+    update((h) => {
+      h.disabled.set(true);
+      h.interactive.set(true);
+    });
+    const btn = get('btn') as HTMLButtonElement;
+    expect(btn.disabled).toBe(false);
+    expect(btn.getAttribute('aria-disabled')).toBe('true');
+    expect(btn.classList).toContain('ui-button--disabled');
+    btn.click();
+
+    const link = get('link');
+    expect(link.getAttribute('aria-disabled')).toBe('true');
+    expect(link.hasAttribute('tabindex')).toBe(false);
+    link.click();
+    expect(host.clicks).toBe(0);
+
+    update((h) => h.disabled.set(false));
+    expect(btn.hasAttribute('aria-disabled')).toBe(false);
+    expect(link.hasAttribute('aria-disabled')).toBe(false);
   });
 
   it('shows a spinner while loading, stays focusable and blocks clicks', () => {

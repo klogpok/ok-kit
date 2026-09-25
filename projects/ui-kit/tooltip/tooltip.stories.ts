@@ -73,6 +73,19 @@ export const Toolbar: Story = {
   }),
 };
 
+/** `disabledInteractive` keeps a disabled button focusable and hoverable, so the tooltip can explain why. */
+export const DisabledButton: Story = {
+  render: () => ({
+    template: `
+      <div style="padding:48px;display:flex;gap:16px;justify-content:center">
+        <button ui-icon-button label="Delete" disabled disabledInteractive uiTooltip="Only the owner can delete the plan">
+          <ui-icon icon="trash" />
+        </button>
+        <button ui-button disabled disabledInteractive uiTooltip="Fill in all required fields first">Send</button>
+      </div>`,
+  }),
+};
+
 export const Hebrew: Story = {
   render: () => ({
     template: `

@@ -21,6 +21,7 @@ const meta: Meta<ButtonArgs> = {
     variant: 'primary',
     size: 'md',
     disabled: false,
+    disabledInteractive: false,
     loading: false,
     fullWidth: false,
     click: fn(),
@@ -39,6 +40,8 @@ export const Secondary: Story = { args: { variant: 'secondary' } };
 export const Ghost: Story = { args: { variant: 'ghost' } };
 export const Danger: Story = { args: { variant: 'danger', label: 'Delete' } };
 export const Disabled: Story = { args: { disabled: true } };
+/** Looks disabled and blocks clicks, but stays focusable and hoverable. */
+export const DisabledInteractive: Story = { args: { disabled: true, disabledInteractive: true } };
 export const Loading: Story = { args: { loading: true } };
 export const FullWidth: Story = { args: { fullWidth: true } };
 

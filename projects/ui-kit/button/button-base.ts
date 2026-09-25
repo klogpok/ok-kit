@@ -14,9 +14,10 @@ import { UiSize, UiVariant } from '@vplans/ui-kit/core';
   host: {
     '[class]': 'modifierClasses()',
     '[attr.type]': 'isAnchor ? null : type()',
-    '[attr.disabled]': '!isAnchor && disabled() ? "" : null',
-    '[attr.aria-disabled]': 'isInert() && (isAnchor || loading()) ? "true" : null',
-    '[attr.tabindex]': 'isAnchor && disabled() ? -1 : null',
+    '[attr.disabled]': '!isAnchor && disabled() && !disabledInteractive() ? "" : null',
+    '[attr.aria-disabled]':
+      'isInert() && (isAnchor || loading() || disabledInteractive()) ? "true" : null',
+    '[attr.tabindex]': 'isAnchor && disabled() && !disabledInteractive() ? -1 : null',
     '[attr.aria-busy]': 'loading() ? "true" : null',
   },
 })
@@ -29,6 +30,11 @@ export abstract class UiButtonBase {
   /** Ignored for `<a>` hosts. Defaults to `button` so buttons never submit forms by accident. */
   readonly type = input<'button' | 'submit' | 'reset'>('button');
   readonly disabled = input(false, { transform: booleanAttribute });
+  /**
+   * Keeps a disabled button focusable and hoverable (`aria-disabled` instead of `disabled`), so a
+   * `uiTooltip` can explain why it is disabled. Activation stays blocked.
+   */
+  readonly disabledInteractive = input(false, { transform: booleanAttribute });
   /**
    * Shows a spinner and blocks activation while keeping the button focusable
    * (`aria-disabled` + `aria-busy`) so screen reader users keep their place.
