@@ -11,6 +11,13 @@ const meta: Meta<AccordionArgs> = {
   component: UiAccordion,
   decorators: [moduleMetadata({ imports: [UiAccordionItem, UiAccordionContent, UiButton] })],
   argTypes: { allowMultiple: { control: 'boolean' } },
+};
+
+export default meta;
+type Story = StoryObj<AccordionArgs>;
+
+// Only the arg-driven stories get args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: { allowMultiple: false },
   render: (args) => ({
     props: args,
@@ -28,11 +35,6 @@ const meta: Meta<AccordionArgs> = {
       </ui-accordion>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<AccordionArgs>;
-
-export const Default: Story = {};
 
 export const Multiple: Story = {
   args: { allowMultiple: true },
