@@ -1,0 +1,141 @@
+@use '../styles/mixins';
+
+:host {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  block-size: var(--_height);
+  min-inline-size: var(--_height);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--_padding);
+  border: var(--ui-border-width-default) solid var(--_border);
+  border-radius: var(--ui-button-radius);
+  background-color: var(--_bg);
+  color: var(--_text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--_font-size);
+  font-weight: var(--ui-button-font-weight);
+  line-height: var(--ui-line-height-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  @include mixins.transition(background-color, border-color, color, box-shadow);
+  @include mixins.focus-visible;
+}
+
+.ui-button__content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_gap);
+}
+
+.ui-button__spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+// Sizes
+:host(.ui-button--sm) {
+  --_height: var(--ui-control-height-sm);
+  --_padding: var(--ui-control-padding-inline-sm);
+  --_font-size: var(--ui-control-font-size-sm);
+  --_gap: var(--ui-control-gap-sm);
+}
+
+:host(.ui-button--md) {
+  --_height: var(--ui-control-height-md);
+  --_padding: var(--ui-control-padding-inline-md);
+  --_font-size: var(--ui-control-font-size-md);
+  --_gap: var(--ui-control-gap-md);
+}
+
+:host(.ui-button--lg) {
+  --_height: var(--ui-control-height-lg);
+  --_padding: var(--ui-control-padding-inline-lg);
+  --_font-size: var(--ui-control-font-size-lg);
+  --_gap: var(--ui-control-gap-lg);
+}
+
+// Variants
+@each $variant in primary, secondary, ghost, danger {
+  :host(.ui-button--#{$variant}) {
+    --_bg: var(--ui-button-#{$variant}-bg);
+    --_bg-hover: var(--ui-button-#{$variant}-bg-hover);
+    --_bg-active: var(--ui-button-#{$variant}-bg-active);
+    --_text: var(--ui-button-#{$variant}-text);
+    --_border: var(--ui-button-#{$variant}-border);
+  }
+}
+
+// States
+:host(:hover:not(.ui-button--disabled, .ui-button--loading)) {
+  background-color: var(--_bg-hover);
+}
+
+:host(:active:not(.ui-button--disabled, .ui-button--loading)) {
+  background-color: var(--_bg-active);
+}
+
+:host(.ui-button--disabled) {
+  --_bg: var(--ui-color-control-bg-disabled);
+  --_text: var(--ui-color-text-disabled);
+  --_border: transparent;
+  cursor: not-allowed;
+}
+
+:host(.ui-button--ghost.ui-button--disabled) {
+  --_bg: transparent;
+}
+
+:host(.ui-button--loading) {
+  cursor: progress;
+
+  .ui-button__content {
+    // Opacity (not visibility) keeps the label in the accessibility tree.
+    opacity: 0;
+  }
+}
+
+:host(.ui-button--full-width) {
+  display: flex;
+  inline-size: 100%;
+}
+
+// Icon-only
+:host(.ui-button--icon) {
+  inline-size: var(--_height);
+  padding-inline: 0;
+
+  .ui-button__content {
+    font-size: var(--_icon-size);
+  }
+}
+
+:host(.ui-button--icon.ui-button--sm) {
+  --_icon-size: var(--ui-icon-size-sm);
+}
+
+:host(.ui-button--icon.ui-button--md) {
+  --_icon-size: var(--ui-icon-size-md);
+}
+
+:host(.ui-button--icon.ui-button--lg) {
+  --_icon-size: var(--ui-icon-size-lg);
+}
+
+@media (forced-colors: active) {
+  :host {
+    border-color: ButtonText;
+  }
+
+  :host(.ui-button--disabled) {
+    border-color: GrayText;
+    color: GrayText;
+  }
+}
