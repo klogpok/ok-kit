@@ -13,8 +13,16 @@ const meta: Meta<UiMenu> = {
     }),
   ],
   parameters: { layout: 'padded' },
-  render: () => ({
-    props: { last: '' },
+};
+
+export default meta;
+type Story = StoryObj<UiMenu>;
+
+// The arg keeps the last action in the docs snippet; props outside args make it incomplete.
+export const Default: StoryObj<{ last: string }> = {
+  args: { last: '' },
+  render: (args) => ({
+    props: args,
     template: `
       <div style="min-block-size:18rem">
         <button ui-button variant="secondary" [uiMenuTriggerFor]="menu">
@@ -33,11 +41,6 @@ const meta: Meta<UiMenu> = {
       </div>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<UiMenu>;
-
-export const Default: Story = {};
 
 export const Submenu: Story = {
   render: () => ({
