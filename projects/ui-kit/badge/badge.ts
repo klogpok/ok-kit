@@ -11,7 +11,7 @@ export type UiBadgeTone = 'neutral' | 'primary' | 'success' | 'warning' | 'dange
  * text (e.g. "Overdue" instead of a red dot).
  *
  * @example <ui-badge tone="primary">ממתין לאישור מתאם</ui-badge>
- * @example <ui-badge tone="success" appearance="solid"><ui-icon icon="check" /> Approved</ui-badge>
+ * @example <ui-badge tone="success" appearance="soft"><ui-icon icon="check" /> Approved</ui-badge>
  */
 @Component({
   selector: 'ui-badge',
@@ -25,6 +25,6 @@ export type UiBadgeTone = 'neutral' | 'primary' | 'success' | 'warning' | 'dange
 })
 export class UiBadge {
   readonly tone = input<UiBadgeTone>('neutral');
-  readonly appearance = input<'soft' | 'solid'>('soft');
+  readonly appearance = input<'soft' | 'solid'>('solid');
   readonly size = input<'sm' | 'md'>('md');
 }

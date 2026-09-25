@@ -16,7 +16,7 @@ const meta: Meta<BadgeArgs> = {
     appearance: { control: 'inline-radio', options: ['soft', 'solid'] },
     size: { control: 'inline-radio', options: ['sm', 'md'] },
   },
-  args: { text: 'Pending approval', tone: 'primary', appearance: 'soft', size: 'md' },
+  args: { text: 'Pending approval', tone: 'primary', appearance: 'solid', size: 'md' },
   render: ({ text, ...args }) => ({
     props: args,
     template: `<ui-badge [tone]="tone" [appearance]="appearance" [size]="size">${text}</ui-badge>`,
@@ -70,7 +70,7 @@ export const WithIcon: Story = {
     template: `
       <div style="display:flex;gap:8px">
         <ui-badge tone="success"><ui-icon icon="check" /> Approved</ui-badge>
-        <ui-badge tone="danger" appearance="solid"><ui-icon icon="alert-circle" /> Rejected</ui-badge>
+        <ui-badge tone="danger" appearance="soft"><ui-icon icon="alert-circle" /> Rejected</ui-badge>
       </div>`,
   }),
 };
