@@ -143,7 +143,12 @@ export class UiTabButton implements FocusableOption {
   `,
   styleUrl: './tabs.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ui-tab-group' },
+  host: {
+    class: 'ui-tab-group',
+    // The tablist carries the label; a static attribute would also stay on the host.
+    '[attr.aria-label]': 'null',
+    '[attr.aria-labelledby]': 'null',
+  },
 })
 export class UiTabGroup {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
