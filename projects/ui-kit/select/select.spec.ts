@@ -67,6 +67,50 @@ class Host {
   readonly select = viewChild.required(UiSelect);
 }
 
+@Component({
+  imports: [UiSelect, UiOption],
+  template: `
+    <ui-select
+      aria-label="Owner"
+      searchable
+      [filterOptions]="false"
+      [(value)]="value"
+      (searchChange)="search($event)"
+    >
+      @for (name of results(); track name) {
+        <ui-option [value]="name">{{ name }}</ui-option>
+      }
+    </ui-select>
+  `,
+})
+class ServerSearchHost {
+  readonly value = signal<string | null>(null);
+  readonly results = signal(['Avi', 'Batya']);
+  search(text: string): void {
+    this.results.set(text ? ['Dana', 'Dvora'] : ['Avi', 'Batya']);
+  }
+}
+
+describe('UiSelect with server-side search', () => {
+  it('activates the first new result instead of a removed option', async () => {
+    const fixture = TestBed.createComponent(ServerSearchHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    const control = root.querySelector<HTMLInputElement>('.ui-select__control')!;
+    control.value = 'd';
+    control.dispatchEvent(new Event('input'));
+    await settle(fixture);
+
+    const active = document.getElementById(control.getAttribute('aria-activedescendant')!);
+    expect(active!.textContent!.trim()).toBe('Dana');
+    keydown(control, 'Enter');
+    await settle(fixture);
+    expect(fixture.componentInstance.value()).toBe('Dana');
+    root.remove();
+  });
+});
+
 describe('UiSelect', () => {
   let fixture: ComponentFixture<Host>;
   let root: HTMLElement;

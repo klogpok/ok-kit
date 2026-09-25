@@ -8,10 +8,12 @@ import {
   booleanAttribute,
   computed,
   contentChildren,
+  effect,
   inject,
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { ActiveDescendantKeyManager, _IdGenerator } from '@angular/cdk/a11y';
@@ -121,6 +123,17 @@ export abstract class UiSelectBase<T, V>
     this.keyManager.change.subscribe(() =>
       this.activeId.set(this.keyManager.activeItem?.id ?? null),
     );
+    // The key manager keeps an active option that was removed (e.g. new server-side results).
+    effect(() => {
+      const options = this.options();
+      untracked(() => {
+        const active = this.keyManager.activeItem;
+        if (!active || options.includes(active)) return;
+        this.keyManager.setActiveItem(-1);
+        this.activeId.set(null);
+        if (this.isOpen()) this.keyManager.setFirstItemActive();
+      });
+    });
   }
 
   // --- UiOptionParent -------------------------------------------------------------------
