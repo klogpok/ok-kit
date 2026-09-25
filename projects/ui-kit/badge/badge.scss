@@ -1,0 +1,49 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2xs);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  padding-block: var(--_pad-block);
+  padding-inline: var(--_pad-inline);
+  border: var(--ui-border-width-default) solid transparent;
+  border-radius: var(--ui-badge-radius);
+  background-color: var(--_bg);
+  color: var(--_text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--_font-size);
+  font-weight: var(--ui-badge-font-weight);
+  line-height: var(--ui-line-height-tight);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+:host(.ui-badge--sm) {
+  --_pad-block: 0;
+  --_pad-inline: var(--ui-space-xs);
+  --_font-size: var(--ui-badge-font-size);
+}
+
+:host(.ui-badge--md) {
+  --_pad-block: var(--ui-space-3xs);
+  --_pad-inline: var(--ui-space-sm);
+  --_font-size: var(--ui-font-size-sm);
+}
+
+@each $tone in neutral, primary, success, warning, danger {
+  :host(.ui-badge--#{$tone}.ui-badge--soft) {
+    --_bg: var(--ui-badge-#{$tone}-soft-bg);
+    --_text: var(--ui-badge-#{$tone}-soft-text);
+  }
+
+  :host(.ui-badge--#{$tone}.ui-badge--solid) {
+    --_bg: var(--ui-badge-#{$tone}-solid-bg);
+    --_text: var(--ui-badge-#{$tone}-solid-text);
+  }
+}
+
+@media (forced-colors: active) {
+  :host {
+    border-color: CanvasText;
+  }
+}

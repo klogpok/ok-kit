@@ -416,4 +416,27 @@
   --ui-divider-label-color: var(--ui-color-text-muted);
   --ui-divider-label-font-size: var(--ui-font-size-xs);
   --ui-divider-label-gap: var(--ui-space-md);
+  --ui-badge-radius: var(--ui-radius-full);
+  --ui-badge-font-size: var(--ui-font-size-xs);
+  --ui-badge-font-weight: var(--ui-font-weight-semibold);
+  --ui-badge-neutral-soft-bg: var(--ui-color-surface-muted);
+  --ui-badge-neutral-soft-text: var(--ui-color-text-muted);
+  --ui-badge-neutral-solid-bg: var(--ui-color-text-muted);
+  --ui-badge-neutral-solid-text: var(--ui-color-text-inverse);
+  --ui-badge-primary-soft-bg: var(--ui-color-primary-subtle);
+  --ui-badge-primary-soft-text: var(--ui-color-primary-text);
+  --ui-badge-primary-solid-bg: var(--ui-color-primary);
+  --ui-badge-primary-solid-text: var(--ui-color-primary-contrast);
+  --ui-badge-success-soft-bg: var(--ui-color-success-subtle);
+  --ui-badge-success-soft-text: var(--ui-color-success-text);
+  --ui-badge-success-solid-bg: var(--ui-color-success);
+  --ui-badge-success-solid-text: var(--ui-color-success-contrast);
+  --ui-badge-warning-soft-bg: var(--ui-color-warning-subtle);
+  --ui-badge-warning-soft-text: var(--ui-color-warning-text);
+  --ui-badge-warning-solid-bg: var(--ui-color-warning);
+  --ui-badge-warning-solid-text: var(--ui-color-warning-contrast);
+  --ui-badge-danger-soft-bg: var(--ui-color-danger-subtle);
+  --ui-badge-danger-soft-text: var(--ui-color-danger-text);
+  --ui-badge-danger-solid-bg: var(--ui-color-danger);
+  --ui-badge-danger-solid-text: var(--ui-color-danger-contrast);
 }

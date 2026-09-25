@@ -1818,5 +1818,143 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-space-md)",
     "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-badge-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-full)",
+    "dark": "var(--ui-radius-full)"
+  },
+  {
+    "name": "--ui-badge-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
+    "name": "--ui-badge-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-badge-neutral-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-badge-neutral-soft-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-badge-neutral-solid-bg",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-badge-neutral-solid-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-inverse)",
+    "dark": "var(--ui-color-text-inverse)"
+  },
+  {
+    "name": "--ui-badge-primary-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
+    "name": "--ui-badge-primary-soft-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-text)",
+    "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-badge-primary-solid-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-badge-primary-solid-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-contrast)",
+    "dark": "var(--ui-color-primary-contrast)"
+  },
+  {
+    "name": "--ui-badge-success-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-success-subtle)",
+    "dark": "var(--ui-color-success-subtle)"
+  },
+  {
+    "name": "--ui-badge-success-soft-text",
+    "layer": "component",
+    "light": "var(--ui-color-success-text)",
+    "dark": "var(--ui-color-success-text)"
+  },
+  {
+    "name": "--ui-badge-success-solid-bg",
+    "layer": "component",
+    "light": "var(--ui-color-success)",
+    "dark": "var(--ui-color-success)"
+  },
+  {
+    "name": "--ui-badge-success-solid-text",
+    "layer": "component",
+    "light": "var(--ui-color-success-contrast)",
+    "dark": "var(--ui-color-success-contrast)"
+  },
+  {
+    "name": "--ui-badge-warning-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-warning-subtle)",
+    "dark": "var(--ui-color-warning-subtle)"
+  },
+  {
+    "name": "--ui-badge-warning-soft-text",
+    "layer": "component",
+    "light": "var(--ui-color-warning-text)",
+    "dark": "var(--ui-color-warning-text)"
+  },
+  {
+    "name": "--ui-badge-warning-solid-bg",
+    "layer": "component",
+    "light": "var(--ui-color-warning)",
+    "dark": "var(--ui-color-warning)"
+  },
+  {
+    "name": "--ui-badge-warning-solid-text",
+    "layer": "component",
+    "light": "var(--ui-color-warning-contrast)",
+    "dark": "var(--ui-color-warning-contrast)"
+  },
+  {
+    "name": "--ui-badge-danger-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-danger-subtle)",
+    "dark": "var(--ui-color-danger-subtle)"
+  },
+  {
+    "name": "--ui-badge-danger-soft-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-text)",
+    "dark": "var(--ui-color-danger-text)"
+  },
+  {
+    "name": "--ui-badge-danger-solid-bg",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
+  },
+  {
+    "name": "--ui-badge-danger-solid-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-contrast)",
+    "dark": "var(--ui-color-danger-contrast)"
   }
 ];

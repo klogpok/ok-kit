@@ -144,6 +144,8 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.text', 'color.surface-active', TEXT],
   ['color.text-muted', 'color.bg', TEXT],
   ['color.text-muted', 'color.surface', TEXT],
+  ['color.text-muted', 'color.surface-muted', TEXT],
+  ['color.text-inverse', 'color.text-muted', TEXT],
   ['color.text-subtle', 'color.surface', TEXT],
   ['color.primary-contrast', 'color.primary', TEXT],
   ['color.primary-contrast', 'color.primary-hover', TEXT],

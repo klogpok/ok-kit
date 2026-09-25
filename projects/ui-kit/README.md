@@ -227,6 +227,7 @@ Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Direction
 | `@vplans/ui-kit/switch`     | `UiSwitch`                                             |
 | `@vplans/ui-kit/spinner`    | `UiSpinner`                                            |
 | `@vplans/ui-kit/divider`    | `UiDivider`                                            |
+| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                               |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons            |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                       |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract |
@@ -413,6 +414,29 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-divider-label-color`          | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-divider-label-font-size`      | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
 | `--ui-divider-label-gap`            | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
+| `--ui-badge-radius`                 | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
+| `--ui-badge-font-size`              | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
+| `--ui-badge-font-weight`            | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-badge-neutral-soft-bg`        | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
+| `--ui-badge-neutral-soft-text`      | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-badge-neutral-solid-bg`       | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-badge-neutral-solid-text`     | component | `var(--ui-color-text-inverse)`                                               | `var(--ui-color-text-inverse)`                                         |
+| `--ui-badge-primary-soft-bg`        | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
+| `--ui-badge-primary-soft-text`      | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-badge-primary-solid-bg`       | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-badge-primary-solid-text`     | component | `var(--ui-color-primary-contrast)`                                           | `var(--ui-color-primary-contrast)`                                     |
+| `--ui-badge-success-soft-bg`        | component | `var(--ui-color-success-subtle)`                                             | `var(--ui-color-success-subtle)`                                       |
+| `--ui-badge-success-soft-text`      | component | `var(--ui-color-success-text)`                                               | `var(--ui-color-success-text)`                                         |
+| `--ui-badge-success-solid-bg`       | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
+| `--ui-badge-success-solid-text`     | component | `var(--ui-color-success-contrast)`                                           | `var(--ui-color-success-contrast)`                                     |
+| `--ui-badge-warning-soft-bg`        | component | `var(--ui-color-warning-subtle)`                                             | `var(--ui-color-warning-subtle)`                                       |
+| `--ui-badge-warning-soft-text`      | component | `var(--ui-color-warning-text)`                                               | `var(--ui-color-warning-text)`                                         |
+| `--ui-badge-warning-solid-bg`       | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
+| `--ui-badge-warning-solid-text`     | component | `var(--ui-color-warning-contrast)`                                           | `var(--ui-color-warning-contrast)`                                     |
+| `--ui-badge-danger-soft-bg`         | component | `var(--ui-color-danger-subtle)`                                              | `var(--ui-color-danger-subtle)`                                        |
+| `--ui-badge-danger-soft-text`       | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
+| `--ui-badge-danger-solid-bg`        | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
+| `--ui-badge-danger-solid-text`      | component | `var(--ui-color-danger-contrast)`                                            | `var(--ui-color-danger-contrast)`                                      |
 
 <!-- tokens:end -->
 
