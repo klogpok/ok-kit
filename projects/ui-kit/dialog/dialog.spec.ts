@@ -231,6 +231,8 @@ describe('UiDialog', () => {
       expect(el.classList).toContain('ui-dialog-container--sm');
       expect(el.textContent).toContain('The owner gets an email.');
       expect(el.querySelector('.ui-dialog-header__close')).toBeNull();
+      const description = document.getElementById(el.getAttribute('aria-describedby')!);
+      expect(description!.textContent!.trim()).toBe('The owner gets an email.');
 
       const [cancel, confirm] = el.querySelectorAll<HTMLButtonElement>('ui-dialog-actions button');
       expect(cancel.textContent!.trim()).toBe('ביטול');
@@ -242,6 +244,7 @@ describe('UiDialog', () => {
     it('focuses Cancel first for a destructive action and resolves false', async () => {
       const result = dialog.confirm({ title: 'Delete?', tone: 'danger', confirmLabel: 'Delete' });
       await settle();
+      expect(container()!.hasAttribute('aria-describedby')).toBe(false);
       const [cancel, confirm] = container()!.querySelectorAll<HTMLButtonElement>(
         'ui-dialog-actions button',
       );

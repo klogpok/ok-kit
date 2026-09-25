@@ -8,6 +8,7 @@ import {
   ViewContainerRef,
   inject,
 } from '@angular/core';
+import { _IdGenerator } from '@angular/cdk/a11y';
 import { ComponentType } from '@angular/cdk/portal';
 import { AutoFocusTarget, DIALOG_DATA, Dialog, DialogRef } from '@angular/cdk/dialog';
 import { UiButton } from '@vplans/ui-kit/button';
@@ -54,6 +55,11 @@ export interface UiConfirmOptions {
   tone?: 'primary' | 'danger';
 }
 
+interface UiConfirmData extends UiConfirmOptions {
+  /** Id of the message, which describes the alert dialog. */
+  messageId: string;
+}
+
 /** The ref returned by `UiDialog.open()` (the CDK `DialogRef`). */
 export { DialogRef as UiDialogRef, DIALOG_DATA as UI_DIALOG_DATA };
 
@@ -65,7 +71,7 @@ export { DialogRef as UiDialogRef, DIALOG_DATA as UI_DIALOG_DATA };
       <h2 ui-dialog-title>{{ data.title }}</h2>
     </ui-dialog-header>
     @if (data.message) {
-      <ui-dialog-content>{{ data.message }}</ui-dialog-content>
+      <ui-dialog-content [attr.id]="data.messageId">{{ data.message }}</ui-dialog-content>
     }
     <ui-dialog-actions>
       <button
@@ -89,7 +95,7 @@ export { DialogRef as UiDialogRef, DIALOG_DATA as UI_DIALOG_DATA };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class UiConfirmDialog {
-  protected readonly data = inject<UiConfirmOptions>(DIALOG_DATA);
+  protected readonly data = inject<UiConfirmData>(DIALOG_DATA);
   protected readonly ref = inject<DialogRef<boolean>>(DialogRef);
   protected readonly labels = inject(UI_LABELS);
   protected readonly danger = this.data.tone === 'danger';
@@ -114,6 +120,7 @@ class UiConfirmDialog {
 export class UiDialog {
   private readonly dialog = inject(Dialog);
   private readonly document = inject(DOCUMENT);
+  private readonly ids = inject(_IdGenerator);
 
   open<R = unknown, D = unknown, C = unknown>(
     content: ComponentType<C> | TemplateRef<C>,
@@ -144,10 +151,13 @@ export class UiDialog {
 
   /** Asks a yes/no question. Resolves `true` when confirmed, `false` when cancelled or dismissed. */
   async confirm(options: UiConfirmOptions): Promise<boolean> {
-    const ref = this.open<boolean, UiConfirmOptions>(UiConfirmDialog, {
-      data: options,
+    const messageId = this.ids.getId('ui-confirm-message-');
+    const ref = this.open<boolean, UiConfirmData>(UiConfirmDialog, {
+      data: { ...options, messageId },
       size: 'sm',
       role: 'alertdialog',
+      // An alert dialog is described by its message (APG).
+      ariaDescribedBy: options.message ? messageId : undefined,
     });
     return (await firstValueFrom(ref.closed)) === true;
   }
