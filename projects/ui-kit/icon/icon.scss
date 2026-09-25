@@ -1,0 +1,33 @@
+.ui-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_ui-icon-size, 1em);
+  block-size: var(--_ui-icon-size, 1em);
+  color: inherit;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.ui-icon--sm {
+  --_ui-icon-size: var(--ui-icon-size-sm);
+}
+
+.ui-icon--md {
+  --_ui-icon-size: var(--ui-icon-size-md);
+}
+
+.ui-icon--lg {
+  --_ui-icon-size: var(--ui-icon-size-lg);
+}
+
+.ui-icon > svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.ui-icon--flip-rtl:dir(rtl) {
+  transform: scaleX(-1);
+}
