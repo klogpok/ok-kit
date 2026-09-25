@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   Injectable,
   Injector,
   TemplateRef,
@@ -10,7 +11,7 @@ import {
 import { ComponentType } from '@angular/cdk/portal';
 import { AutoFocusTarget, DIALOG_DATA, Dialog, DialogRef } from '@angular/cdk/dialog';
 import { UiButton } from '@vplans/ui-kit/button';
-import { UI_LABELS } from '@vplans/ui-kit/core';
+import { UI_LABELS, resolveDirection } from '@vplans/ui-kit/core';
 import { firstValueFrom } from 'rxjs';
 import { UiDialogConfig, UiDialogContainer, UiDialogSize } from './dialog-container';
 import { UiDialogActions, UiDialogContent, UiDialogHeader, UiDialogTitle } from './dialog-parts';
@@ -32,6 +33,8 @@ export interface UiDialogOptions<D = unknown> {
   autoFocus?: AutoFocusTarget | string | boolean;
   /** Element to focus on close. Defaults to the element focused before the dialog opened. */
   restoreFocus?: boolean | string | HTMLElement;
+  /** Text direction of the dialog. Defaults to the direction around the focused element. */
+  direction?: 'ltr' | 'rtl';
   injector?: Injector;
   viewContainerRef?: ViewContainerRef;
 }
@@ -107,6 +110,7 @@ class UiConfirmDialog {
 @Injectable({ providedIn: 'root' })
 export class UiDialog {
   private readonly dialog = inject(Dialog);
+  private readonly document = inject(DOCUMENT);
 
   open<R = unknown, D = unknown, C = unknown>(
     content: ComponentType<C> | TemplateRef<C>,
@@ -115,6 +119,10 @@ export class UiDialog {
     const config: UiDialogConfig<D, DialogRef<R, C>> = {
       ...options,
       size: options.size ?? 'md',
+      // Resolved per dialog: the CDK Directionality misses runtime changes of `dir` on <html>.
+      direction:
+        options.direction ??
+        resolveDirection(this.document.activeElement ?? this.document.documentElement),
       container: UiDialogContainer,
       ariaModal: true,
       panelClass: 'ui-dialog-pane',

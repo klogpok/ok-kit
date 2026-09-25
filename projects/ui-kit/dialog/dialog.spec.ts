@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { InteractivityChecker } from '@angular/cdk/a11y';
+import { Directionality } from '@angular/cdk/bidi';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { provideUiLabels } from '@vplans/ui-kit/core';
 import { UiDialog } from './dialog';
@@ -80,6 +81,19 @@ describe('UiDialog', () => {
     expect(title.textContent).toBe('Rename Plan A');
     expect(el.getAttribute('aria-labelledby')).toBe(title.id);
     expect(document.querySelector('.ui-dialog-backdrop')).not.toBeNull();
+  });
+
+  it('follows a dir attribute changed at runtime', async () => {
+    // The app reads the direction at startup, before the user switches it.
+    expect(TestBed.inject(Directionality).value).toBe('ltr');
+    document.documentElement.dir = 'rtl';
+    try {
+      dialog.open(RenameDialog, { data: { name: 'A' } });
+      await settle();
+      expect(container()!.closest('[dir]')!.getAttribute('dir')).toBe('rtl');
+    } finally {
+      document.documentElement.removeAttribute('dir');
+    }
   });
 
   it('applies the size and moves focus into the dialog', async () => {
