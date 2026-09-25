@@ -7,9 +7,9 @@
   box-sizing: border-box;
   min-block-size: var(--ui-select-option-height);
   padding-block: var(--ui-space-2xs);
-  padding-inline: var(--ui-control-padding-inline-md);
+  padding-inline: var(--_option-padding, var(--ui-control-padding-inline-md));
   color: var(--ui-color-text);
-  font-size: var(--ui-control-font-size-md);
+  font-size: var(--_option-font-size, var(--ui-control-font-size-md));
   line-height: var(--ui-line-height-snug);
   cursor: pointer;
   user-select: none;
@@ -82,7 +82,7 @@
 
 .ui-option-group__label {
   padding-block: var(--ui-space-xs) var(--ui-space-2xs);
-  padding-inline: var(--ui-control-padding-inline-md);
+  padding-inline: var(--_option-padding, var(--ui-control-padding-inline-md));
   color: var(--ui-color-text-muted);
   font-size: var(--ui-font-size-xs);
   font-weight: var(--ui-font-weight-semibold);

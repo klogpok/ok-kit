@@ -76,6 +76,7 @@
   <div
     role="listbox"
     class="ui-select__panel"
+    [class]="'ui-select__panel--' + size()"
     [id]="panelId()"
     [attr.aria-label]="ariaLabel() || null"
     [attr.aria-labelledby]="listLabelledBy()"
