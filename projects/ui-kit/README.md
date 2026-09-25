@@ -124,6 +124,42 @@ once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `
 
 Without a forms directive, use the `invalid` input to show the error state manually.
 
+### Prefix and suffix
+
+Mark content with `uiPrefix` / `uiSuffix` to place it inside the border of a text control:
+icons, currency signs, units, or an icon button. The field then draws the border and the
+focus, invalid and disabled states. Clicking decorative affix content focuses the input.
+Affixes are mirrored in RTL.
+
+```html
+<ui-form-field label="Search">
+  <ui-icon uiPrefix icon="search" />
+  <input ui-input type="search" />
+</ui-form-field>
+
+<ui-form-field label="Price">
+  <span uiPrefix>₪</span>
+  <input ui-input inputmode="decimal" formControlName="price" />
+  <span uiSuffix>per month</span>
+</ui-form-field>
+
+<ui-form-field label="Password">
+  <input ui-input [type]="visible() ? 'text' : 'password'" formControlName="password" />
+  <button
+    uiSuffix
+    ui-icon-button
+    size="sm"
+    type="button"
+    label="Show password"
+    (click)="visible.set(!visible())"
+  >
+    <ui-icon [icon]="visible() ? 'eye-off' : 'eye'" />
+  </button>
+</ui-form-field>
+```
+
+Affixes are meant for `input[ui-input]` and `textarea[ui-textarea]`.
+
 ## Theming
 
 Tokens come in three layers. All of them are CSS custom properties generated from
@@ -350,6 +386,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-form-field-hint-color`        | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-form-field-error-color`       | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
 | `--ui-form-field-message-font-size` | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
+| `--ui-form-field-affix-color`       | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-checkbox-size`                | component | `var(--ui-icon-size-sm)`                                                     | `var(--ui-icon-size-sm)`                                               |
 | `--ui-checkbox-radius`              | component | `var(--ui-radius-sm)`                                                        | `var(--ui-radius-sm)`                                                  |
 | `--ui-checkbox-bg`                  | component | `var(--ui-color-control-bg)`                                                 | `var(--ui-color-control-bg)`                                           |

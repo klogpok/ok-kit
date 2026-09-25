@@ -87,3 +87,20 @@
     border-style: dashed;
   }
 }
+
+// Inside a ui-form-field with uiPrefix/uiSuffix the field box draws the border and focus ring.
+:host(.ui-input--affixed) {
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: calc(var(--_height) - var(--ui-border-width-default) * 2);
+  border-width: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+:host(.ui-input--affixed:focus),
+:host(.ui-input--affixed:disabled),
+:host(.ui-input--affixed.ui-input--invalid) {
+  outline: none;
+  background-color: transparent;
+}

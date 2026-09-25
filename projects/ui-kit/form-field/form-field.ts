@@ -4,6 +4,7 @@ import {
   computed,
   contentChild,
   contentChildren,
+  Directive,
   forwardRef,
   inject,
   input,
@@ -30,6 +31,25 @@ export class UiHint {}
 export class UiError {}
 
 /**
+ * Content shown before a text control inside the field border: an icon, a currency sign, a unit.
+ *
+ * @example <ui-icon uiPrefix icon="search" />
+ */
+@Directive({ selector: '[uiPrefix]' })
+export class UiPrefix {}
+
+/**
+ * Content shown after a text control inside the field border: a unit or an icon button.
+ *
+ * @example
+ * <button uiSuffix ui-icon-button label="Show password" (click)="show.set(!show())">
+ *   <ui-icon icon="eye" />
+ * </button>
+ */
+@Directive({ selector: '[uiSuffix]' })
+export class UiSuffix {}
+
+/**
  * Wraps a control with a label, hint and error messages, and links them via
  * `for` / `aria-labelledby` and `aria-describedby`.
  *
@@ -52,6 +72,7 @@ export class UiError {}
     class: 'ui-form-field',
     '[class.ui-form-field--disabled]': 'control()?.isDisabled()',
     '[class.ui-form-field--invalid]': 'showError()',
+    '[class.ui-form-field--affixed]': 'hasAffixes()',
   },
 })
 export class UiFormField implements UiFormFieldContext {
@@ -65,6 +86,12 @@ export class UiFormField implements UiFormFieldContext {
   protected readonly control = contentChild(UI_FORM_FIELD_CONTROL, { descendants: true });
   private readonly projectedHints = contentChildren(UiHint, { descendants: true });
   private readonly projectedErrors = contentChildren(UiError, { descendants: true });
+  private readonly prefixes = contentChildren(UiPrefix);
+  private readonly suffixes = contentChildren(UiSuffix);
+
+  protected readonly hasPrefix = computed(() => this.prefixes().length > 0);
+  protected readonly hasSuffix = computed(() => this.suffixes().length > 0);
+  readonly hasAffixes = computed(() => this.hasPrefix() || this.hasSuffix());
 
   protected readonly labelId = this.ids.getId('ui-form-field-label-');
   readonly labelledBy = computed(() => (this.label() ? this.labelId : null));
@@ -92,4 +119,14 @@ export class UiFormField implements UiFormFieldContext {
     if (this.hasError()) return this.errorId;
     return this.hasHint() ? this.hintId : null;
   });
+
+  /** Clicking decorative affix content focuses the control, like clicking inside a native input. */
+  // Returns void on purpose: a `false` result from a template listener calls preventDefault(),
+  // which would cancel checkbox/radio toggles inside the field.
+  protected onBoxClick(event: MouseEvent): void {
+    if (!this.hasAffixes()) return;
+    const target = event.target as Element;
+    if (target.closest('button, a, input, textarea, select, [tabindex]')) return;
+    this.control()?.focus();
+  }
 }

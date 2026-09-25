@@ -7,8 +7,16 @@
   </label>
 }
 
-<div class="ui-form-field__control">
+<!-- The box draws the control border when affixes are present (see form-field.scss). -->
+<!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+<div class="ui-form-field__control" (click)="onBoxClick($event)">
+  @if (hasPrefix()) {
+    <span class="ui-form-field__prefix"><ng-content select="[uiPrefix]" /></span>
+  }
   <ng-content />
+  @if (hasSuffix()) {
+    <span class="ui-form-field__suffix"><ng-content select="[uiSuffix]" /></span>
+  }
 </div>
 
 <!-- Always rendered so that inserted errors are announced by the live region. -->

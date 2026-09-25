@@ -1664,6 +1664,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-size-xs)"
   },
   {
+    "name": "--ui-form-field-affix-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
     "name": "--ui-checkbox-size",
     "layer": "component",
     "light": "var(--ui-icon-size-sm)",

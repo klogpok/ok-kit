@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormField, form, required } from '@angular/forms/signals';
 import { UiInput, UiTextarea } from '@vplans/ui-kit/input';
-import { UiError, UiFormField, UiHint } from './form-field';
+import { UiError, UiFormField, UiHint, UiPrefix, UiSuffix } from './form-field';
 
 function query<T extends Element = HTMLElement>(
   fixture: ComponentFixture<unknown>,
@@ -188,5 +188,66 @@ describe('UiFormField + UiInput', () => {
     it('detects the native disabled attribute', () => {
       expect(query(fixture, 'ui-form-field').classList).toContain('ui-form-field--disabled');
     });
+  });
+});
+
+@Component({
+  imports: [UiFormField, UiInput, UiPrefix, UiSuffix],
+  template: `
+    <ui-form-field label="Password">
+      <span uiPrefix id="prefix">#</span>
+      <input ui-input [type]="visible() ? 'text' : 'password'" [invalid]="invalid()" />
+      <button uiSuffix id="toggle" type="button" (click)="visible.set(!visible())">Show</button>
+    </ui-form-field>
+    <ui-form-field label="Plain" id="plain"><input ui-input /></ui-form-field>
+  `,
+})
+class AffixHost {
+  readonly visible = signal(false);
+  readonly invalid = signal(false);
+}
+
+describe('UiFormField affixes', () => {
+  let fixture: ComponentFixture<AffixHost>;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(AffixHost);
+    await settle(fixture);
+  });
+
+  it('renders prefix and suffix inside the control box and switches to affixed mode', () => {
+    const field = query(fixture, 'ui-form-field');
+    const box = query(fixture, '.ui-form-field__control');
+    expect(field.classList).toContain('ui-form-field--affixed');
+    expect(box.querySelector('.ui-form-field__prefix #prefix')).not.toBeNull();
+    expect(box.querySelector('.ui-form-field__suffix #toggle')).not.toBeNull();
+    expect(query(fixture, 'input').classList).toContain('ui-input--affixed');
+  });
+
+  it('keeps plain fields unaffixed', () => {
+    const plain = query(fixture, '#plain');
+    expect(plain.classList).not.toContain('ui-form-field--affixed');
+    expect(plain.querySelector('input')!.classList).not.toContain('ui-input--affixed');
+    expect(plain.querySelector('.ui-form-field__prefix')).toBeNull();
+  });
+
+  it('focuses the input when decorative affix content is clicked', () => {
+    query(fixture, '#prefix').click();
+    expect(document.activeElement).toBe(query(fixture, 'input'));
+  });
+
+  it('lets interactive suffix content handle its own clicks', async () => {
+    const toggle = query<HTMLButtonElement>(fixture, '#toggle');
+    toggle.focus();
+    toggle.click();
+    await settle(fixture);
+    expect(document.activeElement).toBe(toggle);
+    expect(query<HTMLInputElement>(fixture, 'input').type).toBe('text');
+  });
+
+  it('reflects the invalid state on the field box', async () => {
+    fixture.componentInstance.invalid.set(true);
+    await settle(fixture);
+    expect(query(fixture, 'ui-form-field').classList).toContain('ui-form-field--invalid');
   });
 });

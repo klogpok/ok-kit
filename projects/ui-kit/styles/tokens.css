@@ -390,6 +390,7 @@
   --ui-form-field-hint-color: var(--ui-color-text-muted);
   --ui-form-field-error-color: var(--ui-color-danger-text);
   --ui-form-field-message-font-size: var(--ui-font-size-xs);
+  --ui-form-field-affix-color: var(--ui-color-text-muted);
   --ui-checkbox-size: var(--ui-icon-size-sm);
   --ui-checkbox-radius: var(--ui-radius-sm);
   --ui-checkbox-bg: var(--ui-color-control-bg);

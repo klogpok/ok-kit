@@ -29,6 +29,11 @@ export interface UiFormFieldContext {
   readonly labelledBy: Signal<string | null>;
   /** Space-separated ids of the hint and visible error messages, or `null`. */
   readonly describedBy: Signal<string | null>;
+  /**
+   * Whether the field has `uiPrefix` / `uiSuffix` content. The field then draws the control
+   * border around the whole group and text controls render borderless inside it.
+   */
+  readonly hasAffixes: Signal<boolean>;
 }
 
 export const UI_FORM_FIELD = new InjectionToken<UiFormFieldContext>('UiFormField');

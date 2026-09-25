@@ -21,6 +21,7 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
   host: {
     '[class]': '"ui-input--" + size()',
     '[class.ui-input--invalid]': 'showError()',
+    '[class.ui-input--affixed]': 'formField?.hasAffixes() ?? false',
     '[id]': 'id()',
     '[attr.aria-invalid]': 'showError() ? "true" : null',
     '[attr.aria-describedby]': 'formField?.describedBy() ?? null',

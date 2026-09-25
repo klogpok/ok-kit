@@ -1,5 +1,7 @@
 import { argsToTemplate, moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
-import { UiFormField, UiHint, UiError } from '@vplans/ui-kit/form-field';
+import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
+import { UiError, UiFormField, UiHint, UiPrefix, UiSuffix } from '@vplans/ui-kit/form-field';
+import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiInput } from './input';
 import { UiTextarea } from './textarea';
 
@@ -8,7 +10,21 @@ type InputArgs = UiInput & { placeholder: string; disabled: boolean; readonly: b
 const meta: Meta<InputArgs> = {
   title: 'Forms/Input',
   component: UiInput,
-  decorators: [moduleMetadata({ imports: [UiFormField, UiHint, UiError, UiTextarea] })],
+  decorators: [
+    moduleMetadata({
+      imports: [
+        UiFormField,
+        UiHint,
+        UiError,
+        UiTextarea,
+        UiPrefix,
+        UiSuffix,
+        UiIcon,
+        UiIconButton,
+        UiButton,
+      ],
+    }),
+  ],
   argTypes: {
     size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
   },
@@ -73,4 +89,42 @@ export const Hebrew: Story = {
         </ui-form-field>
       </div>`,
   }),
+};
+
+const affixesTemplate = `
+  <div style="display:grid;gap:16px;max-inline-size:360px">
+    <ui-form-field label="Search">
+      <ui-icon uiPrefix icon="search" />
+      <input ui-input type="search" placeholder="Project, customer, address" />
+    </ui-form-field>
+    <ui-form-field label="Password" hint="At least 8 characters">
+      <input ui-input [type]="visible ? 'text' : 'password'" value="secret-pass" />
+      <button uiSuffix ui-icon-button size="sm" type="button"
+        [label]="visible ? 'Hide password' : 'Show password'" (click)="visible = !visible">
+        <ui-icon [icon]="visible ? 'eye-off' : 'eye'" />
+      </button>
+    </ui-form-field>
+    <ui-form-field label="Price">
+      <span uiPrefix>₪</span>
+      <input ui-input inputmode="decimal" value="1,250" />
+      <span uiSuffix>per month</span>
+    </ui-form-field>
+    <ui-form-field label="Area">
+      <input ui-input inputmode="decimal" value="120" invalid />
+      <span uiSuffix>m²</span>
+      <ui-error>Area exceeds the plot size</ui-error>
+    </ui-form-field>
+    <ui-form-field label="Disabled">
+      <ui-icon uiPrefix icon="calendar" />
+      <input ui-input value="12/07/2026" disabled />
+    </ui-form-field>
+  </div>`;
+
+export const PrefixAndSuffix: Story = {
+  render: () => ({ props: { visible: false }, template: affixesTemplate }),
+};
+
+export const PrefixAndSuffixRtl: Story = {
+  globals: { dir: 'rtl' },
+  render: () => ({ props: { visible: false }, template: affixesTemplate }),
 };
