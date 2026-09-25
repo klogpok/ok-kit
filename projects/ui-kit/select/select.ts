@@ -44,7 +44,7 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
   protected readonly displayLabel = computed(() => this.selectedOptions()[0]?.getLabel() ?? '');
 
   protected isSelected(value: unknown): boolean {
-    return this.compareWith()(value, this.value());
+    return this.matches(value, this.value());
   }
 
   protected selectOption(value: unknown): void {

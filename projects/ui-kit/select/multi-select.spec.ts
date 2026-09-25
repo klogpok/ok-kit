@@ -173,7 +173,7 @@ class ReactiveHost {
     { id: 2, name: 'Tel Aviv' },
   ];
   readonly control = new FormControl<{ id: number; name: string }[]>([{ id: 2, name: 'Tel Aviv' }]);
-  readonly byId = (a: unknown, b: unknown) => (a as { id: number }).id === (b as { id: number }).id;
+  readonly byId = (option: { id: number }, selected: { id: number }) => option.id === selected.id;
 }
 
 describe('UiMultiSelect with Reactive Forms', () => {

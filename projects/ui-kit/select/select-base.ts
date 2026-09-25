@@ -75,8 +75,11 @@ export abstract class UiSelectBase<T, V>
   readonly searchable = input(false, { transform: booleanAttribute });
   /** Hide options whose label does not contain the search text. Turn off for server-side search. */
   readonly filterOptions = input(true, { transform: booleanAttribute });
-  /** Compares option values with the selected value, e.g. by id for objects. */
-  readonly compareWith = input<(a: unknown, b: unknown) => boolean>(Object.is);
+  /**
+   * Compares an option value with a selected value, e.g. by id for objects. Called as
+   * `compareWith(option, selected)` and never with `null`: a `null` value matches only `null`.
+   */
+  readonly compareWith = input<(option: T, selected: T) => boolean>(Object.is);
 
   readonly opened = output<void>();
   readonly closed = output<void>();
@@ -153,6 +156,13 @@ export abstract class UiSelectBase<T, V>
 
   protected abstract isSelected(value: unknown): boolean;
   protected abstract selectOption(value: unknown): void;
+
+  /** Whether an option value equals a selected value, through `compareWith`. */
+  protected matches(option: unknown, selected: unknown): boolean {
+    return option == null || selected == null
+      ? option === selected
+      : this.compareWith()(option as T, selected as T);
+  }
 
   protected isFilteredOut(label: string): boolean {
     const query = this.query().trim().toLocaleLowerCase();

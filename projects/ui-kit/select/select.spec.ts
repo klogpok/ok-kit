@@ -357,8 +357,7 @@ class ReactiveHost {
     { id: 2, name: 'Tel Aviv' },
     Validators.required,
   );
-  readonly byId = (a: unknown, b: unknown) =>
-    (a as { id: number } | null)?.id === (b as { id: number } | null)?.id;
+  readonly byId = (option: { id: number }, selected: { id: number }) => option.id === selected.id;
 }
 
 describe('UiSelect with Reactive Forms', () => {

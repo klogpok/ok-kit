@@ -46,16 +46,14 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   );
 
   protected isSelected(value: unknown): boolean {
-    const compare = this.compareWith();
-    return this.value().some((selected) => compare(value, selected));
+    return this.value().some((selected) => this.matches(value, selected));
   }
 
   /** Adds the value, or removes it when it is already selected. */
   protected selectOption(value: unknown): void {
-    const compare = this.compareWith();
     const current = this.value();
     const next = this.isSelected(value)
-      ? current.filter((selected) => !compare(value, selected))
+      ? current.filter((selected) => !this.matches(value, selected))
       : [...current, value as T];
     this.value.set(next);
     this.notifyChange(next);
