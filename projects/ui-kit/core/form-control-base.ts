@@ -16,8 +16,8 @@ import { UI_FORM_FIELD } from './form-field-control';
  * Base class for custom (non-native) form controls such as checkbox, switch and radio group.
  *
  * - **Signal Forms**: subclasses expose a `value` or `checked` model, so `[formField]` binds them
- *   natively as `FormValueControl` / `FormCheckboxControl` (inputs `disabled`, `required`,
- *   `invalid` are set by the directive; `touch` marks the field touched).
+ *   natively as `FormValueControl` / `FormCheckboxControl` (inputs `disabled`, `readonly`,
+ *   `required`, `invalid` are set by the directive; `touch` marks the field touched).
  * - **Reactive / template forms**: registers itself as the `ControlValueAccessor` of the host's
  *   `NgControl` (instead of `NG_VALUE_ACCESSOR`, which would force `[formField]` into CVA interop).
  *
@@ -34,6 +34,11 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor {
 
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly required = input(false, { transform: booleanAttribute });
+  /**
+   * The value is shown and focusable but the user cannot change it. Signal Forms binds it from a
+   * `readonly()` rule.
+   */
+  readonly readonly = input(false, { transform: booleanAttribute });
   /**
    * Shows the error state when no forms directive is bound. With forms bound, the error state is
    * derived from the control (invalid and touched).

@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, required } from '@angular/forms/signals';
+import { FormField, form, readonly, required } from '@angular/forms/signals';
 import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiCheckbox } from './checkbox';
 
@@ -198,5 +198,40 @@ describe('UiCheckbox static attributes', () => {
     const [a, b] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input'));
     expect(a.checked).toBe(true);
     expect(b.indeterminate).toBe(true);
+  });
+});
+
+@Component({
+  imports: [FormField, UiCheckbox],
+  template: `
+    <ui-checkbox [formField]="f.agree">Agree</ui-checkbox>
+    <ui-checkbox [readonly]="true" [(checked)]="plain">Plain</ui-checkbox>
+  `,
+})
+class ReadonlyHost {
+  readonly model = signal({ agree: true });
+  readonly f = form(this.model, (p) => {
+    readonly(p.agree);
+  });
+  readonly plain = signal(false);
+}
+
+describe('UiCheckbox readonly', () => {
+  it('keeps its state on click and reports aria-readonly, also from a Signal Forms rule', async () => {
+    const fixture = TestBed.createComponent(ReadonlyHost);
+    await settle(fixture);
+    const [bound, plain] = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('input'),
+    );
+    bound.click();
+    plain.click();
+    await settle(fixture);
+    expect(fixture.componentInstance.model().agree).toBe(true);
+    expect(bound.checked).toBe(true);
+    expect(fixture.componentInstance.plain()).toBe(false);
+    expect(plain.checked).toBe(false);
+    expect(bound.getAttribute('aria-readonly')).toBe('true');
+    expect(plain.getAttribute('aria-readonly')).toBe('true');
+    expect(bound.disabled).toBe(false);
   });
 });

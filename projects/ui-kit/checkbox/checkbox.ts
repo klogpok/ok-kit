@@ -37,6 +37,7 @@ import {
     '[class.ui-checkbox--checked]': 'isChecked()',
     '[class.ui-checkbox--indeterminate]': 'isIndeterminate()',
     '[class.ui-checkbox--disabled]': 'isDisabled()',
+    '[class.ui-checkbox--readonly]': 'readonly()',
     '[class.ui-checkbox--invalid]': 'showError()',
     '[attr.id]': 'id()',
   },
@@ -66,6 +67,11 @@ export class UiCheckbox extends UiFormControlBase<boolean> implements UiFormFiel
 
   focus(options?: FocusOptions): void {
     this.inputRef().nativeElement.focus(options);
+  }
+
+  /** A readonly checkbox cannot be toggled; a native checkbox ignores the `readonly` attribute. */
+  protected onInputClick(event: MouseEvent): void {
+    if (this.readonly()) event.preventDefault();
   }
 
   protected onInputChange(event: Event): void {

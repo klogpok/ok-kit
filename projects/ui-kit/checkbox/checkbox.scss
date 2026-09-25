@@ -87,6 +87,10 @@
   border-color: var(--ui-checkbox-invalid-border);
 }
 
+:host(.ui-checkbox--readonly) .ui-checkbox__label {
+  cursor: default;
+}
+
 :host(.ui-checkbox--disabled) {
   color: var(--ui-color-text-disabled);
 

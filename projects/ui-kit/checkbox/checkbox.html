@@ -11,8 +11,10 @@
       [required]="isRequired()"
       [attr.name]="name() || null"
       [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-readonly]="readonly() ? 'true' : null"
       [attr.aria-invalid]="showError() ? 'true' : null"
       [attr.aria-describedby]="formField?.describedBy() ?? null"
+      (click)="onInputClick($event)"
       (change)="onInputChange($event)"
       (blur)="onBlur()"
     />
