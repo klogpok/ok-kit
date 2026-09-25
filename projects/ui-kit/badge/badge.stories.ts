@@ -16,17 +16,19 @@ const meta: Meta<BadgeArgs> = {
     appearance: { control: 'inline-radio', options: ['soft', 'solid'] },
     size: { control: 'inline-radio', options: ['sm', 'md'] },
   },
+};
+
+export default meta;
+type Story = StoryObj<BadgeArgs>;
+
+// Only the arg-driven story gets args: the docs snippet warns about args a static template does not use.
+export const Default: Story = {
   args: { text: 'Pending approval', tone: 'primary', appearance: 'solid', size: 'md' },
   render: ({ text, ...args }) => ({
     props: args,
     template: `<ui-badge [tone]="tone" [appearance]="appearance" [size]="size">${text}</ui-badge>`,
   }),
 };
-
-export default meta;
-type Story = StoryObj<BadgeArgs>;
-
-export const Default: Story = {};
 
 /** The three statuses from the VPlans list screen. */
 export const VPlansStatuses: Story = {
