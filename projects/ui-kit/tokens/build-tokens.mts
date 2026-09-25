@@ -106,9 +106,14 @@ ${declarations(dark, 'semantic', '    ')}
 ${declarations(dark, 'semantic')}
 }
 
-/* Component tokens are re-declared on every themed scope so they follow nested themes. */
+/*
+ * Component tokens are re-declared on every themed scope so they follow nested themes, and on
+ * .ui-theme-scope so they follow semantic tokens overridden on that element. Override component
+ * tokens on the same selectors (ui.$theme-scopes) or nested scopes reset them.
+ */
 :root,
-[data-theme] {
+[data-theme],
+.ui-theme-scope {
 ${declarations(component, 'component')}
 }
 `;

@@ -349,9 +349,14 @@
   --ui-shadow-lg: var(--ui-ref-shadow-dark-lg);
 }
 
-/* Component tokens are re-declared on every themed scope so they follow nested themes. */
+/*
+ * Component tokens are re-declared on every themed scope so they follow nested themes, and on
+ * .ui-theme-scope so they follow semantic tokens overridden on that element. Override component
+ * tokens on the same selectors (ui.$theme-scopes) or nested scopes reset them.
+ */
 :root,
-[data-theme] {
+[data-theme],
+.ui-theme-scope {
   --ui-button-radius: var(--ui-radius-control);
   --ui-button-font-weight: var(--ui-font-weight-medium);
   --ui-button-primary-bg: var(--ui-color-primary);

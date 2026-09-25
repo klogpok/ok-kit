@@ -1,2 +1,6 @@
 // Import mixins in application SCSS: @use '@vplans/ui-kit/styles' as ui;
 @forward 'mixins';
+
+/// Elements that re-declare the component tokens. Override component tokens on all of them, or
+/// a nested [data-theme] / .ui-theme-scope resets them: `#{ui.$theme-scopes} { ... }`.
+$theme-scopes: ':root, [data-theme], .ui-theme-scope';

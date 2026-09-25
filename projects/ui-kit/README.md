@@ -185,14 +185,24 @@ theme.setMode('dark'); // persisted in localStorage
 theme.toggle();
 ```
 
-Override tokens in your global styles:
+Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
+`:root`, on every `[data-theme]` element and on `.ui-theme-scope`, so they follow the theme of
+the nearest scope:
+
+- **Component tokens**: override them on all of these selectors (`ui.$theme-scopes`). An
+  override on `:root` alone is reset inside a nested `[data-theme]`.
+- **Semantic tokens**: an override on `:root` or `[data-theme]` applies everywhere. For a local
+  re-brand, override them on an element with the `ui-theme-scope` class, so the component tokens
+  are recomputed there.
 
 ```scss
-:root {
+@use '@vplans/ui-kit/styles' as ui;
+
+#{ui.$theme-scopes} {
   --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
 }
 
-.checkout {
+.checkout.ui-theme-scope {
   --ui-color-primary: var(--ui-color-success); // local re-brand
 }
 ```
