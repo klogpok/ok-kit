@@ -31,6 +31,15 @@ class RenameDialog {
   readonly ref = inject(DialogRef);
 }
 
+@Component({
+  imports: [UiDialogHeader, UiDialogTitle, UiDialogContent],
+  template: `
+    <ui-dialog-header><h2 ui-dialog-title>Saved</h2></ui-dialog-header>
+    <ui-dialog-content>The plan was saved.</ui-dialog-content>
+  `,
+})
+class NoticeDialog {}
+
 // jsdom has no layout, so the real checker treats every element as hidden.
 const FOCUSABLE = 'button, input, select, textarea, a[href], [tabindex]';
 const focusable = (el: HTMLElement) => el.matches(FOCUSABLE) && !el.hasAttribute('disabled');
@@ -96,12 +105,23 @@ describe('UiDialog', () => {
     }
   });
 
-  it('applies the size and moves focus into the dialog', async () => {
+  it('applies the size and focuses the first form field', async () => {
     dialog.open(RenameDialog, { data: { name: 'A' }, size: 'lg' });
     await settle();
     expect(container()!.classList).toContain('ui-dialog-container--lg');
-    // The close button is the first tabbable element.
+    expect(document.activeElement).toBe(container()!.querySelector('input'));
+  });
+
+  it('focuses the first tabbable element when there are no fields', async () => {
+    dialog.open(NoticeDialog);
+    await settle();
     expect(document.activeElement).toBe(container()!.querySelector('.ui-dialog-header__close'));
+  });
+
+  it('passes other autoFocus values to the CDK', async () => {
+    dialog.open(RenameDialog, { data: { name: 'A' }, autoFocus: 'first-heading' });
+    await settle();
+    expect(document.activeElement).toBe(container()!.querySelector('h2'));
   });
 
   it('closes with the uiDialogClose result and restores focus', async () => {

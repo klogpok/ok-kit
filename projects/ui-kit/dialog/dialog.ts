@@ -29,8 +29,11 @@ export interface UiDialogOptions<D = unknown> {
   /** Accessible name when the dialog has no `ui-dialog-title`. */
   ariaLabel?: string;
   ariaDescribedBy?: string;
-  /** What gets focus on open. Defaults to the first tabbable element (or `[cdkFocusInitial]`). */
-  autoFocus?: AutoFocusTarget | string | boolean;
+  /**
+   * What gets focus on open. `first-field` (default): `[cdkFocusInitial]`, else the first form
+   * field, else the first tabbable element. Other values are passed to CDK Dialog.
+   */
+  autoFocus?: 'first-field' | AutoFocusTarget | string | boolean;
   /** Element to focus on close. Defaults to the element focused before the dialog opened. */
   restoreFocus?: boolean | string | HTMLElement;
   /** Text direction of the dialog. Defaults to the direction around the focused element. */
@@ -116,8 +119,12 @@ export class UiDialog {
     content: ComponentType<C> | TemplateRef<C>,
     options: UiDialogOptions<D> = {},
   ): DialogRef<R, C> {
+    const autoFocus = options.autoFocus ?? 'first-field';
     const config: UiDialogConfig<D, DialogRef<R, C>> = {
       ...options,
+      // With 'dialog' the CDK only focuses the container when the kit found nothing to focus.
+      autoFocus: autoFocus === 'first-field' ? 'dialog' : autoFocus,
+      focusFirstField: autoFocus === 'first-field',
       size: options.size ?? 'md',
       // Resolved per dialog: the CDK Directionality misses runtime changes of `dir` on <html>.
       direction:
