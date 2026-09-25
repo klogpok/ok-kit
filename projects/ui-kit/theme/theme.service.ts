@@ -74,6 +74,19 @@ export class ThemeService {
       inject(DestroyRef).onDestroy(() => this.media?.removeEventListener('change', listener));
     }
 
+    // Another tab of the app changed the mode.
+    const view = this.document.defaultView;
+    if (view && this.storageKey) {
+      const onStorage = (event: StorageEvent): void => {
+        if (event.key !== this.storageKey) return;
+        this.modeState.set(
+          isMode(event.newValue) ? event.newValue : (this.options.defaultMode ?? 'system'),
+        );
+      };
+      view.addEventListener('storage', onStorage);
+      inject(DestroyRef).onDestroy(() => view.removeEventListener('storage', onStorage));
+    }
+
     effect(() => {
       const mode = this.modeState();
       const root = this.document.documentElement;

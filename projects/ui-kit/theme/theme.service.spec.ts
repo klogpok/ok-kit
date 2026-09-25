@@ -67,10 +67,50 @@ describe('ThemeService', () => {
     expect(service.mode()).toBe('light');
   });
 
-  it('respects a custom storage key and disabled persistence', () => {
+  it('does not persist when storageKey is null', () => {
     const service = create({ storageKey: null });
     service.setMode('light');
     TestBed.tick();
     expect(localStorage.length).toBe(0);
+  });
+
+  it('reads and writes a custom storage key', () => {
+    localStorage.setItem('app-theme', 'dark');
+    const service = create({ storageKey: 'app-theme' });
+    expect(service.mode()).toBe('dark');
+    service.setMode('light');
+    expect(localStorage.getItem('app-theme')).toBe('light');
+    expect(localStorage.getItem('ui-theme')).toBeNull();
+  });
+
+  it('follows a mode changed in another tab', () => {
+    const service = create();
+    window.dispatchEvent(new StorageEvent('storage', { key: 'ui-theme', newValue: 'dark' }));
+    TestBed.tick();
+    expect(service.mode()).toBe('dark');
+    expect(root.getAttribute('data-theme')).toBe('dark');
+    window.dispatchEvent(new StorageEvent('storage', { key: 'ui-theme', newValue: null }));
+    expect(service.mode()).toBe('system');
+  });
+
+  it('follows prefers-color-scheme in system mode and stops listening on destroy', () => {
+    let listener: ((event: MediaQueryListEvent) => void) | undefined;
+    const media = {
+      matches: false,
+      addEventListener: vi.fn((_: string, fn: typeof listener) => (listener = fn)),
+      removeEventListener: vi.fn(),
+    };
+    const original = window.matchMedia;
+    window.matchMedia = () => media as unknown as MediaQueryList;
+    try {
+      const service = create();
+      expect(service.theme()).toBe('light');
+      listener!({ matches: true } as MediaQueryListEvent);
+      expect(service.theme()).toBe('dark');
+      TestBed.resetTestingModule();
+      expect(media.removeEventListener).toHaveBeenCalledWith('change', listener);
+    } finally {
+      window.matchMedia = original;
+    }
   });
 });
