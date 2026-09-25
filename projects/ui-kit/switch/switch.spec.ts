@@ -79,3 +79,20 @@ describe('UiSwitch', () => {
     expect(input('signal').checked).toBe(false);
   });
 });
+
+@Component({
+  imports: [UiSwitch],
+  // Simulates a bare attribute in non-strict templates (strictTemplates rejects it at compile time).
+  template: `<ui-switch [checked]="$any('')">A</ui-switch>`,
+})
+class StaticAttributeHost {}
+
+describe('UiSwitch static attributes', () => {
+  it('treats a bare checked attribute as true', async () => {
+    const fixture = TestBed.createComponent(StaticAttributeHost);
+    await settle(fixture);
+    const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
+    expect(input.checked).toBe(true);
+    expect(input.getAttribute('aria-checked')).toBe('true');
+  });
+});

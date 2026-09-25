@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
   UiFormControlBase,
@@ -36,11 +37,11 @@ import {
           role="switch"
           class="ui-switch__input"
           [id]="controlId()"
-          [checked]="checked()"
+          [checked]="isChecked()"
           [disabled]="isDisabled()"
           [required]="isRequired()"
           [attr.name]="name() || null"
-          [attr.aria-checked]="checked()"
+          [attr.aria-checked]="isChecked()"
           [attr.aria-label]="ariaLabel() || null"
           [attr.aria-invalid]="showError() ? 'true' : null"
           [attr.aria-describedby]="formField?.describedBy() ?? null"
@@ -57,7 +58,7 @@ import {
   host: {
     class: 'ui-switch',
     '[class]': '"ui-switch--" + size()',
-    '[class.ui-switch--checked]': 'checked()',
+    '[class.ui-switch--checked]': 'isChecked()',
     '[class.ui-switch--disabled]': 'isDisabled()',
     '[class.ui-switch--invalid]': 'showError()',
     '[class.ui-switch--label-start]': 'labelPosition() === "start"',
@@ -81,6 +82,8 @@ export class UiSwitch extends UiFormControlBase<boolean> implements UiFormFieldC
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
+  // model() has no transform, so a static `checked` attribute arrives as '': coerce on read.
+  protected readonly isChecked = computed(() => coerceBooleanProperty(this.checked()));
 
   writeValue(value: boolean | null | undefined): void {
     this.checked.set(!!value);

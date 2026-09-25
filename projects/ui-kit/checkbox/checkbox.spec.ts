@@ -182,3 +182,20 @@ describe('UiCheckbox', () => {
     });
   });
 });
+
+@Component({
+  imports: [UiCheckbox],
+  // Simulates a bare attribute in non-strict templates (strictTemplates rejects it at compile time).
+  template: `<ui-checkbox [checked]="$any('')">A</ui-checkbox><ui-checkbox [indeterminate]="$any('')">B</ui-checkbox>`,
+})
+class StaticAttributeHost {}
+
+describe('UiCheckbox static attributes', () => {
+  it('treats bare checked/indeterminate attributes as true', async () => {
+    const fixture = TestBed.createComponent(StaticAttributeHost);
+    await settle(fixture);
+    const [a, b] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input'));
+    expect(a.checked).toBe(true);
+    expect(b.indeterminate).toBe(true);
+  });
+});

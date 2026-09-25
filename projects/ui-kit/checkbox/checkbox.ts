@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
   UiFormControlBase,
@@ -33,8 +34,8 @@ import {
   host: {
     class: 'ui-checkbox',
     '[class]': '"ui-checkbox--" + size()',
-    '[class.ui-checkbox--checked]': 'checked()',
-    '[class.ui-checkbox--indeterminate]': 'indeterminate()',
+    '[class.ui-checkbox--checked]': 'isChecked()',
+    '[class.ui-checkbox--indeterminate]': 'isIndeterminate()',
     '[class.ui-checkbox--disabled]': 'isDisabled()',
     '[class.ui-checkbox--invalid]': 'showError()',
     '[attr.id]': 'id()',
@@ -55,6 +56,9 @@ export class UiCheckbox extends UiFormControlBase<boolean> implements UiFormFiel
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
+  // model() has no transform, so a static `checked` attribute arrives as '': coerce on read.
+  protected readonly isChecked = computed(() => coerceBooleanProperty(this.checked()));
+  protected readonly isIndeterminate = computed(() => coerceBooleanProperty(this.indeterminate()));
 
   writeValue(value: boolean | null | undefined): void {
     this.checked.set(!!value);
