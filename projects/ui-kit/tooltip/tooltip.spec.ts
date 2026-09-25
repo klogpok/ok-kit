@@ -137,7 +137,13 @@ describe('UiTooltip', () => {
 @Component({
   imports: [UiIconButton, UiTooltip],
   template: `
-    <button ui-icon-button label="Delete" [uiTooltip]="message()" [uiTooltipDisabled]="disabled()">
+    <button
+      ui-icon-button
+      label="Delete"
+      [disabled]="buttonDisabled()"
+      [uiTooltip]="message()"
+      [uiTooltipDisabled]="disabled()"
+    >
       x
     </button>
     <button ui-icon-button label="Close" id="plain">x</button>
@@ -146,6 +152,7 @@ describe('UiTooltip', () => {
 class IconHost {
   readonly message = signal('Delete the plan');
   readonly disabled = signal(false);
+  readonly buttonDisabled = signal(false);
 }
 
 describe('UiTooltip on ui-icon-button', () => {
@@ -167,5 +174,18 @@ describe('UiTooltip on ui-icon-button', () => {
     fixture.componentInstance.message.set('');
     fixture.detectChanges();
     expect(button.getAttribute('title')).toBe('Delete');
+
+    fixture.componentInstance.message.set('   ');
+    fixture.detectChanges();
+    expect(button.getAttribute('title')).toBe('Delete');
+  });
+
+  it('leaves out the native title of a disabled button too', () => {
+    const fixture = TestBed.createComponent(IconHost);
+    fixture.componentInstance.buttonDisabled.set(true);
+    fixture.detectChanges();
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button')!;
+    expect(button.disabled).toBe(true);
+    expect(button.hasAttribute('title')).toBe(false);
   });
 });

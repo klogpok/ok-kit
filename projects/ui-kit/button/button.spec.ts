@@ -117,11 +117,12 @@ describe('UiButton', () => {
 });
 
 describe('UiIconButton', () => {
-  it('uses label as accessible name and defaults to ghost', () => {
+  it('uses label as accessible name and native title, and defaults to ghost', () => {
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
     const btn = (fixture.nativeElement as HTMLElement).querySelector('#icon')!;
     expect(btn.getAttribute('aria-label')).toBe('Close');
+    expect(btn.getAttribute('title')).toBe('Close');
     expect(btn.classList).toContain('ui-button--icon');
     expect(btn.classList).toContain('ui-button--ghost');
     expect(btn.classList).toContain('ui-button--sm');
