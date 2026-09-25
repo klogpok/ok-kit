@@ -20,6 +20,13 @@
       <ui-form-field label="Email" hint="Used for notifications only">
         <input ui-input type="email" autocomplete="email" [formField]="profile.email" />
       </ui-form-field>
+      <ui-form-field label="Team" hint="Type to search">
+        <ui-select searchable placeholder="Choose a team" [formField]="profile.team">
+          @for (team of teams; track team) {
+            <ui-option [value]="team">{{ team }}</ui-option>
+          }
+        </ui-select>
+      </ui-form-field>
       <ui-form-field label="Role">
         <ui-radio-group orientation="horizontal" [formField]="profile.role">
           <ui-radio value="developer">Developer</ui-radio>
@@ -42,9 +49,52 @@
       </ui-form-field>
       <div class="row">
         <button ui-button type="submit" [loading]="saving()">Save profile</button>
-        <button ui-button variant="ghost" (click)="profile().reset()">Reset</button>
+        <button ui-button variant="ghost" (click)="reset()">Reset</button>
       </div>
     </form>
+  </section>
+
+  <section aria-labelledby="plans-title">
+    <h2 id="plans-title" class="ui-heading-4">Plans</h2>
+    <ui-tab-group aria-labelledby="plans-title">
+      @for (group of planGroups; track group.label) {
+        <ui-tab>
+          <ng-template uiTabLabel>
+            {{ group.label }} <ui-badge size="sm">{{ group.plans.length }}</ui-badge>
+          </ng-template>
+          <div class="stack">
+            @for (plan of group.plans; track plan.name) {
+              <ui-card>
+                <ui-card-header>
+                  <h3 ui-card-title>{{ plan.name }}</h3>
+                  <p ui-card-subtitle>{{ plan.updated }}</p>
+                  <ui-badge uiCardHeaderAside [tone]="plan.tone">{{ plan.status }}</ui-badge>
+                </ui-card-header>
+                <ui-divider />
+                <ui-card-footer>
+                  <button
+                    ui-icon-button
+                    label="Send reminder"
+                    uiTooltip="Send a reminder to the owner"
+                    (click)="remind(plan.name)"
+                  >
+                    <ui-icon icon="info" />
+                  </button>
+                  <button
+                    ui-icon-button
+                    label="Delete"
+                    uiTooltip="Delete the plan"
+                    (click)="remove(plan.name)"
+                  >
+                    <ui-icon icon="trash" />
+                  </button>
+                </ui-card-footer>
+              </ui-card>
+            }
+          </div>
+        </ui-tab>
+      }
+    </ui-tab-group>
   </section>
 
   <section aria-labelledby="actions-title">
