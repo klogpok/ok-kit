@@ -35,7 +35,8 @@ module.exports = tseslint.config(
           patterns: [
             {
               group: ['primeng', 'primeng/*', '@angular/material', '@angular/material/*'],
-              message: 'The project uses @vplans/ui-kit instead of third-party component libraries.',
+              message:
+                'The project uses @vplans/ui-kit instead of third-party component libraries.',
             },
           ],
         },
@@ -43,14 +44,44 @@ module.exports = tseslint.config(
       'no-restricted-syntax': [
         'error',
         {
-          selector: 'Decorator[expression.callee.name=/^(HostBinding|HostListener|Input|Output|ViewChild|ViewChildren|ContentChild|ContentChildren)$/]',
-          message: 'Use host metadata and signal APIs (input, output, model, viewChild, contentChild).',
+          selector:
+            'Decorator[expression.callee.name=/^(HostBinding|HostListener|Input|Output|ViewChild|ViewChildren|ContentChild|ContentChildren)$/]',
+          message:
+            'Use host metadata and signal APIs (input, output, model, viewChild, contentChild).',
         },
         {
           selector: 'Decorator[expression.callee.name="NgModule"]',
           message: 'Standalone components only.',
         },
       ],
+    },
+  },
+  {
+    // Type-aware rules that catch bugs (not the whole strictTypeChecked set).
+    files: ['projects/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: [
+          './projects/ui-kit/tsconfig.lib.json',
+          './projects/ui-kit/tsconfig.spec.json',
+          './projects/ui-kit/.storybook/tsconfig.json',
+          './projects/playground/tsconfig.app.json',
+          './projects/playground/tsconfig.spec.json',
+        ],
+        tsconfigRootDir: __dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/no-deprecated': 'error',
+      'no-console': ['error', { allow: ['warn', 'error'] }],
     },
   },
   {
@@ -79,6 +110,8 @@ module.exports = tseslint.config(
     files: ['**/*.spec.ts', '**/*.stories.ts'],
     rules: {
       '@angular-eslint/prefer-on-push-component-change-detection': 'off',
+      // The CDK key managers read the legacy keyCode, so test events must set it.
+      '@typescript-eslint/no-deprecated': 'off',
     },
   },
   {
