@@ -189,3 +189,57 @@ describe('UiTooltip on ui-icon-button', () => {
     expect(button.hasAttribute('title')).toBe(false);
   });
 });
+
+@Component({
+  imports: [UiTooltip],
+  template: `
+    <a href="/plans" title="Open" [uiTooltip]="message()" [uiTooltipDisabled]="disabled()">Plans</a>
+    <span [attr.title]="title()" [uiTooltip]="message()">Status</span>
+  `,
+})
+class TitleHost {
+  readonly message = signal('Open the plan list');
+  readonly disabled = signal(false);
+  readonly title = signal<string | null>('Draft');
+}
+
+describe('UiTooltip native title', () => {
+  let fixture: ComponentFixture<TitleHost>;
+  let link: HTMLElement;
+  let span: HTMLElement;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(TitleHost);
+    await fixture.whenStable();
+    link = (fixture.nativeElement as HTMLElement).querySelector('a')!;
+    span = (fixture.nativeElement as HTMLElement).querySelector('span')!;
+  });
+
+  it('takes off a static title while active and puts it back after', async () => {
+    expect(link.hasAttribute('title')).toBe(false);
+
+    fixture.componentInstance.disabled.set(true);
+    await fixture.whenStable();
+    expect(link.getAttribute('title')).toBe('Open');
+
+    fixture.componentInstance.disabled.set(false);
+    await fixture.whenStable();
+    expect(link.hasAttribute('title')).toBe(false);
+
+    fixture.componentInstance.message.set('');
+    await fixture.whenStable();
+    expect(link.getAttribute('title')).toBe('Open');
+  });
+
+  it('keeps a bound title off and puts back its latest value', async () => {
+    expect(span.hasAttribute('title')).toBe(false);
+
+    fixture.componentInstance.title.set('Signed');
+    await fixture.whenStable();
+    expect(span.hasAttribute('title')).toBe(false);
+
+    fixture.componentInstance.message.set('');
+    await fixture.whenStable();
+    expect(span.getAttribute('title')).toBe('Signed');
+  });
+});

@@ -137,6 +137,13 @@ export class UiTooltip {
   private showTimer: ReturnType<typeof setTimeout> | undefined;
   private hideTimer: ReturnType<typeof setTimeout> | undefined;
   private describedMessage = '';
+  /**
+   * The host's native `title`, taken off while the tooltip is active and put back after.
+   * A binding that removes the title meanwhile is not seen (removing an absent attribute
+   * is not a mutation), so the last value comes back.
+   */
+  private hiddenTitle: string | null = null;
+  private titleObserver: MutationObserver | null = null;
 
   constructor() {
     inject(UiTooltipHostState).connect(this.effectiveMessage);
@@ -153,6 +160,12 @@ export class UiTooltip {
       else this.hide();
     });
 
+    // The browser would show a native title next to the tooltip.
+    effect(() => {
+      if (this.effectiveMessage()) this.hideNativeTitle();
+      else this.restoreNativeTitle();
+    });
+
     this.focusMonitor.monitor(this.host).subscribe((origin) => {
       this.keyboardFocused = origin === 'keyboard';
       if (this.keyboardFocused) this.show();
@@ -163,8 +176,35 @@ export class UiTooltip {
       this.clearTimers();
       this.focusMonitor.stopMonitoring(this.host);
       this.describer.removeDescription(this.host, this.describedMessage);
+      this.titleObserver?.disconnect();
       this.overlayRef?.dispose();
     });
+  }
+
+  private hideNativeTitle(): void {
+    if (this.titleObserver || typeof MutationObserver === 'undefined') return;
+    this.takeNativeTitle();
+    // Keeps the title off when a binding sets it again, and remembers the latest value.
+    this.titleObserver = new MutationObserver(() => {
+      this.takeNativeTitle();
+      this.titleObserver?.takeRecords(); // drops the record of our own removal
+    });
+    this.titleObserver.observe(this.host, { attributeFilter: ['title'] });
+  }
+
+  private takeNativeTitle(): void {
+    this.hiddenTitle = this.host.getAttribute('title');
+    this.host.removeAttribute('title');
+  }
+
+  private restoreNativeTitle(): void {
+    if (!this.titleObserver) return;
+    // A binding changed the title after the last callback: the attribute holds the latest value.
+    if (this.titleObserver.takeRecords().length) this.takeNativeTitle();
+    this.titleObserver.disconnect();
+    this.titleObserver = null;
+    if (this.hiddenTitle !== null) this.host.setAttribute('title', this.hiddenTitle);
+    this.hiddenTitle = null;
   }
 
   /** Whether the tooltip is currently shown. */
