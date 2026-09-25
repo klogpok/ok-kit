@@ -170,6 +170,11 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.focus-ring', 'color.surface', UI],
   ['color.primary', 'color.surface', UI],
   ['color.danger', 'color.surface', UI],
+  ['color.text', 'color.surface-raised', TEXT],
+  ['color.info', 'color.surface-raised', UI],
+  ['color.success', 'color.surface-raised', UI],
+  ['color.warning', 'color.surface-raised', UI],
+  ['color.danger', 'color.surface-raised', UI],
 ];
 
 const failures: string[] = [];

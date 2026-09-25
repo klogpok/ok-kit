@@ -479,4 +479,17 @@
   --ui-dialog-width-lg: 50rem;
   --ui-dialog-title-font-size: var(--ui-font-size-xl);
   --ui-dialog-title-font-weight: var(--ui-font-weight-semibold);
+  --ui-toast-bg: var(--ui-color-surface-raised);
+  --ui-toast-text: var(--ui-color-text);
+  --ui-toast-border: var(--ui-color-border);
+  --ui-toast-radius: var(--ui-radius-container);
+  --ui-toast-shadow: var(--ui-shadow-lg);
+  --ui-toast-width: 24rem;
+  --ui-toast-gap: var(--ui-space-sm);
+  --ui-toast-offset: var(--ui-space-lg);
+  --ui-toast-accent-width: var(--ui-border-width-strong);
+  --ui-toast-info-accent: var(--ui-color-info);
+  --ui-toast-success-accent: var(--ui-color-success);
+  --ui-toast-warning-accent: var(--ui-color-warning);
+  --ui-toast-danger-accent: var(--ui-color-danger);
 }

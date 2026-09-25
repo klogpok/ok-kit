@@ -2196,5 +2196,83 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-font-weight-semibold)",
     "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-toast-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-raised)",
+    "dark": "var(--ui-color-surface-raised)"
+  },
+  {
+    "name": "--ui-toast-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-toast-border",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-toast-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-toast-shadow",
+    "layer": "component",
+    "light": "var(--ui-shadow-lg)",
+    "dark": "var(--ui-shadow-lg)"
+  },
+  {
+    "name": "--ui-toast-width",
+    "layer": "component",
+    "light": "24rem",
+    "dark": "24rem"
+  },
+  {
+    "name": "--ui-toast-gap",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-toast-offset",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-toast-accent-width",
+    "layer": "component",
+    "light": "var(--ui-border-width-strong)",
+    "dark": "var(--ui-border-width-strong)"
+  },
+  {
+    "name": "--ui-toast-info-accent",
+    "layer": "component",
+    "light": "var(--ui-color-info)",
+    "dark": "var(--ui-color-info)"
+  },
+  {
+    "name": "--ui-toast-success-accent",
+    "layer": "component",
+    "light": "var(--ui-color-success)",
+    "dark": "var(--ui-color-success)"
+  },
+  {
+    "name": "--ui-toast-warning-accent",
+    "layer": "component",
+    "light": "var(--ui-color-warning)",
+    "dark": "var(--ui-color-warning)"
+  },
+  {
+    "name": "--ui-toast-danger-accent",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
   }
 ];

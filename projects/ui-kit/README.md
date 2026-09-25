@@ -222,7 +222,13 @@ once for the whole app:
 import { provideUiLabels } from '@vplans/ui-kit/core';
 
 providers: [
-  provideUiLabels({ close: 'סגירה', confirm: 'אישור', cancel: 'ביטול', noOptions: 'אין תוצאות' }),
+  provideUiLabels({
+    close: 'סגירה',
+    confirm: 'אישור',
+    cancel: 'ביטול',
+    noOptions: 'אין תוצאות',
+    notifications: 'התראות',
+  }),
 ];
 ```
 
@@ -243,6 +249,7 @@ providers: [
 | `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                                                                   |
 | `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
+| `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`                                         |
@@ -492,6 +499,19 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-dialog-width-lg`              | component | `50rem`                                                                      | `50rem`                                                                |
 | `--ui-dialog-title-font-size`       | component | `var(--ui-font-size-xl)`                                                     | `var(--ui-font-size-xl)`                                               |
 | `--ui-dialog-title-font-weight`     | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-toast-bg`                     | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
+| `--ui-toast-text`                   | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-toast-border`                 | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
+| `--ui-toast-radius`                 | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-toast-shadow`                 | component | `var(--ui-shadow-lg)`                                                        | `var(--ui-shadow-lg)`                                                  |
+| `--ui-toast-width`                  | component | `24rem`                                                                      | `24rem`                                                                |
+| `--ui-toast-gap`                    | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
+| `--ui-toast-offset`                 | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-toast-accent-width`           | component | `var(--ui-border-width-strong)`                                              | `var(--ui-border-width-strong)`                                        |
+| `--ui-toast-info-accent`            | component | `var(--ui-color-info)`                                                       | `var(--ui-color-info)`                                                 |
+| `--ui-toast-success-accent`         | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
+| `--ui-toast-warning-accent`         | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
+| `--ui-toast-danger-accent`          | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
 
 <!-- tokens:end -->
 

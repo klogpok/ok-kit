@@ -10,6 +10,8 @@ export interface UiLabels {
   cancel: string;
   /** Shown by `ui-select` when no option matches the search. */
   noOptions: string;
+  /** Accessible name of the toast region. */
+  notifications: string;
 }
 
 export const UI_DEFAULT_LABELS: UiLabels = {
@@ -17,6 +19,7 @@ export const UI_DEFAULT_LABELS: UiLabels = {
   confirm: 'Confirm',
   cancel: 'Cancel',
   noOptions: 'No options',
+  notifications: 'Notifications',
 };
 
 export const UI_LABELS = new InjectionToken<UiLabels>('UiLabels', {
@@ -27,7 +30,7 @@ export const UI_LABELS = new InjectionToken<UiLabels>('UiLabels', {
 /**
  * Overrides the built-in texts, e.g. for a Hebrew app. Unset keys keep their English defaults.
  *
- * @example provideUiLabels({ close: 'סגירה', confirm: 'אישור', cancel: 'ביטול', noOptions: 'אין תוצאות' })
+ * @example provideUiLabels({ close: 'סגירה', confirm: 'אישור', cancel: 'ביטול' })
  */
 export function provideUiLabels(labels: Partial<UiLabels>): Provider {
   return { provide: UI_LABELS, useValue: { ...UI_DEFAULT_LABELS, ...labels } };
