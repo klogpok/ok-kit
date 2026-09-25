@@ -163,6 +163,8 @@ describe('UiSelect', () => {
     expect(button.getAttribute('role')).toBe('combobox');
     expect(button.getAttribute('aria-haspopup')).toBe('listbox');
     expect(button.getAttribute('aria-expanded')).toBe('false');
+    // The listbox is not rendered while closed.
+    expect(button.hasAttribute('aria-controls')).toBe(false);
     expect(root.querySelector('label')!.getAttribute('for')).toBe(button.id);
     const hint = document.getElementById(button.getAttribute('aria-describedby')!);
     expect(hint!.textContent).toContain('Approves the plan');
