@@ -138,6 +138,46 @@ const meta: Meta<DialogDemo> = {
   component: DialogDemo,
   argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
   args: { size: 'md' },
+  // The derived snippet would show the story-only demo component; show how an app calls the service.
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component, inject } from '@angular/core';
+import { UiButton } from '@vplans/ui-kit/button';
+import { UiDialog } from '@vplans/ui-kit/dialog';
+import { RenameDialog } from './rename-dialog';
+
+@Component({
+  selector: 'app-demo',
+  imports: [UiButton],
+  template: \`
+    <button ui-button (click)="rename()">Rename plan</button>
+    <button ui-button variant="danger" (click)="remove()">Delete plan</button>\`,
+})
+export class DemoComponent {
+  private readonly dialog = inject(UiDialog);
+
+  rename(): void {
+    this.dialog
+      .open<string>(RenameDialog, { data: { name: 'Tower B, floor 4' }, size: 'md' })
+      .closed.subscribe((name) => console.log(name));
+  }
+
+  async remove(): Promise<void> {
+    const ok = await this.dialog.confirm({
+      title: 'Delete the plan?',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      tone: 'danger',
+    });
+    if (ok) {
+      // delete the plan
+    }
+  }
+}`,
+      },
+    },
+  },
 };
 
 export default meta;
