@@ -14,6 +14,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
+import { ValidationErrors, ValidatorFn } from '@angular/forms';
+import { transformedValue } from '@angular/forms/signals';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -46,8 +48,10 @@ interface Draft {
  * Date field: type a date in the locale format or pick it from a calendar.
  *
  * - The text is parsed with the `locale` label (default `he-IL`, "25.9.2026"). Text that is not a
- *   date, or a date outside `min`/`max`/`dateFilter`, sets the value to `null` and marks the
- *   field invalid until it is fixed.
+ *   date, or a date outside `min`/`max`/`dateFilter`, sets the value to `null` and reports a
+ *   `uiDateParse` error (message `labels().invalidDate`) to Signal Forms or Reactive Forms, so
+ *   the form is invalid and `ui-form-field` shows the message. Without a forms directive the
+ *   message is shown once the user leaves the field.
  * - The calendar button (or Alt+ArrowDown in the field) opens a dialog with `ui-calendar`. Focus
  *   moves to the selected day and is trapped in the dialog; Escape or picking a day closes it
  *   and returns focus to the button.
@@ -171,6 +175,28 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly calendarIcon = uiIconCalendar;
   private readonly draft = signal<Draft | null>(null);
 
+  /**
+   * Parses typed text into the value. Through `transformedValue` Signal Forms receives the parse
+   * errors; they clear when the value changes elsewhere or the form is reset.
+   */
+  private readonly rawText = transformedValue(this.value, {
+    parse: (text: string) => {
+      const parsed = text.trim() ? parseDay(text, this.locale()) : null;
+      const allowed =
+        parsed && isDayEnabled(parsed, this.min(), this.max(), this.dateFilter()) ? parsed : null;
+      const current = this.value();
+      const changed = !sameDay(allowed, current) && !(allowed === null && current === null);
+      return {
+        value: changed ? allowed : undefined,
+        error:
+          text.trim() && !allowed
+            ? { kind: 'uiDateParse', message: this.labels().invalidDate }
+            : undefined,
+      };
+    },
+    format: (value: Date | null) => (value ? formatDay(value, this.locale()) : ''),
+  });
+
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
 
@@ -199,9 +225,30 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected readonly invalidState = computed(() => this.showError() || this.parseError());
 
+  /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
+  private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
+    const [error] = this.rawText.parseErrors();
+    return error ? { [error.kind]: { message: error.message } } : null;
+  };
+
+  /** Without a forms directive, the field itself shows the parse error. */
+  protected override ownErrors(): readonly string[] {
+    return !this.controlState.bound && this.parseError() ? [this.labels().invalidDate] : [];
+  }
+
   writeValue(value: Date | null | undefined): void {
     this.draft.set(null);
     this.value.set(value ?? null);
+    // A new date clears the parse errors by itself; `null` over `null` (reset) does not.
+    if (value == null) this.rawText.set('');
+  }
+
+  override registerOnChange(fn: (value: Date | null) => void): void {
+    const control = this.ngControl?.control;
+    if (control && !control.hasValidator(this.parseValidator)) {
+      control.addValidators(this.parseValidator);
+    }
+    super.registerOnChange(fn);
   }
 
   focus(options?: FocusOptions): void {
@@ -252,11 +299,15 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected onInput(event: Event): void {
     const text = (event.target as HTMLInputElement).value;
-    const parsed = text.trim() ? parseDay(text, this.locale()) : null;
-    const allowed =
-      parsed && isDayEnabled(parsed, this.min(), this.max(), this.dateFilter()) ? parsed : null;
-    this.setValue(allowed);
-    this.draft.set({ text, value: allowed, committed: false });
+    const before = this.value();
+    const hadError = this.rawText.parseErrors().length > 0;
+    this.rawText.set(text);
+    const value = this.value();
+    this.draft.set({ text, value, committed: false });
+    if (value !== before) this.notifyChange(value);
+    else if (hadError !== this.rawText.parseErrors().length > 0) {
+      this.ngControl?.control?.updateValueAndValidity();
+    }
   }
 
   protected onInputKeydown(event: KeyboardEvent): void {

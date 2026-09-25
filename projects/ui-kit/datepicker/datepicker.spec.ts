@@ -98,6 +98,9 @@ describe('UiDatepicker', () => {
     await blur();
     expect(input().value).toBe('31.2.2026');
     expect(input().getAttribute('aria-invalid')).toBe('true');
+    const error = document.getElementById(input().getAttribute('aria-describedby')!);
+    expect(error!.textContent).toContain('תאריך לא תקין');
+    expect(root.querySelector('ui-form-field')!.classList).toContain('ui-form-field--invalid');
 
     await type('');
     await blur();
@@ -208,6 +211,37 @@ describe('UiDatepicker with Reactive Forms', () => {
     expect(error!.textContent).toContain('Choose a date');
   });
 
+  it('reports unparsable text as a uiDateParse error until it is fixed', async () => {
+    const control = fixture.componentInstance.control;
+    input().value = 'abc';
+    input().dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(control.value).toBeNull();
+    expect(control.hasError('uiDateParse')).toBe(true);
+    expect(control.hasError('required')).toBe(true);
+
+    input().dispatchEvent(new FocusEvent('blur'));
+    await settle(fixture);
+    expect(input().getAttribute('aria-invalid')).toBe('true');
+
+    input().value = '7.4.2026';
+    input().dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(control.valid).toBe(true);
+    expect(input().getAttribute('aria-invalid')).toBeNull();
+  });
+
+  it('clears the parse error when the form is reset', async () => {
+    const control = fixture.componentInstance.control;
+    input().value = 'abc';
+    input().dispatchEvent(new Event('input'));
+    await settle(fixture);
+    control.reset(new Date(2026, 3, 1));
+    await settle(fixture);
+    expect(control.valid).toBe(true);
+    expect(input().value).toBe('1.4.2026');
+  });
+
   it('disables the field and the calendar button', async () => {
     fixture.componentInstance.control.disable();
     await settle(fixture);
@@ -263,6 +297,30 @@ describe('UiDatepicker with Signal Forms', () => {
     expect(fixture.componentInstance.f.date().touched()).toBe(true);
     expect(input().getAttribute('aria-invalid')).toBe('true');
     expect(root.textContent).toContain('Choose a date');
+  });
+
+  it('reports unparsable text to the field and shows the message once touched', async () => {
+    const field = fixture.componentInstance.f.date;
+    input().value = '31.2.2026';
+    input().dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(field().invalid()).toBe(true);
+    expect(
+      field()
+        .errors()
+        .map((e) => e.kind),
+    ).toContain('uiDateParse');
+    expect(root.textContent).not.toContain('תאריך לא תקין');
+
+    input().dispatchEvent(new FocusEvent('blur'));
+    await settle(fixture);
+    expect(root.textContent).toContain('תאריך לא תקין');
+
+    input().value = '3.3.2026';
+    input().dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(field().valid()).toBe(true);
+    expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
   it('takes min from minDate() in the schema', async () => {

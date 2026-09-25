@@ -27,6 +27,10 @@ import { UI_FORM_FIELD } from './form-field-control';
 export abstract class UiFormControlBase<T> implements ControlValueAccessor {
   protected readonly controlState = injectControlState();
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
+  /** Reactive / template forms directive on the host, when bound through CVA. */
+  protected readonly ngControl = inject(FORM_FIELD, { self: true, optional: true })
+    ? null
+    : inject(NgControl, { self: true, optional: true });
 
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly required = input(false, { transform: booleanAttribute });
@@ -46,18 +50,19 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled() || this.controlState.disabled(),
   );
   readonly isRequired = computed(() => this.required() || this.controlState.required());
-  readonly showError = computed(() =>
-    this.controlState.bound
-      ? this.controlState.invalid() && this.controlState.touched()
-      : this.invalid(),
+  readonly showError = computed(
+    () =>
+      this.ownErrors().length > 0 ||
+      (this.controlState.bound
+        ? this.controlState.invalid() && this.controlState.touched()
+        : this.invalid()),
   );
-  readonly errorMessages = this.controlState.errorMessages;
+  readonly errorMessages = computed(() => [
+    ...new Set([...this.ownErrors(), ...this.controlState.errorMessages()]),
+  ]);
 
   constructor() {
-    if (!inject(FORM_FIELD, { self: true, optional: true })) {
-      const ngControl = inject(NgControl, { self: true, optional: true });
-      if (ngControl) ngControl.valueAccessor = this;
-    }
+    if (this.ngControl) this.ngControl.valueAccessor = this;
   }
 
   abstract writeValue(value: T | null | undefined): void;
@@ -74,6 +79,14 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor {
 
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  /**
+   * Errors the control finds itself and shows even without a forms directive, e.g. text that does
+   * not parse. Read inside `computed`, so subclasses may read signals.
+   */
+  protected ownErrors(): readonly string[] {
+    return [];
   }
 
   /** Call when the user changes the value. */

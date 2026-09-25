@@ -33,6 +33,8 @@ export interface UiLabels {
   locale: string;
   /** Calendar button and dialog of `ui-datepicker`. */
   chooseDate: string;
+  /** Error of `ui-datepicker` for text that is not an allowed date. */
+  invalidDate: string;
   previousMonth: string;
   nextMonth: string;
   previousYear: string;
@@ -58,6 +60,7 @@ export const UI_LABELS_HE: UiLabels = {
   pageRange: (start, end, length) => `\u2066${start}–${end}\u2069 מתוך ${length}`,
   locale: 'he-IL',
   chooseDate: 'בחירת תאריך',
+  invalidDate: 'תאריך לא תקין',
   previousMonth: 'חודש קודם',
   nextMonth: 'חודש הבא',
   previousYear: 'שנה קודמת',
@@ -81,6 +84,7 @@ export const UI_LABELS_EN: UiLabels = {
   pageRange: (start, end, length) => `${start}–${end} of ${length}`,
   locale: 'en-US',
   chooseDate: 'Choose date',
+  invalidDate: 'Enter a valid date',
   previousMonth: 'Previous month',
   nextMonth: 'Next month',
   previousYear: 'Previous year',
