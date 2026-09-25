@@ -215,25 +215,36 @@ Components use only logical properties (`margin-inline-start`, `inset-inline-end
 Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Directional icons flip with
 `<ui-icon icon="arrow-right" flipRtl />`.
 
+Built-in texts (close buttons, confirm dialogs, empty lists) default to English. Translate them
+once for the whole app:
+
+```ts
+import { provideUiLabels } from '@vplans/ui-kit/core';
+
+providers: [
+  provideUiLabels({ close: 'סגירה', confirm: 'אישור', cancel: 'ביטול', noOptions: 'אין תוצאות' }),
+];
+```
+
 ## Components
 
-| Entry point                 | Exports                                                                                    |
-| --------------------------- | ------------------------------------------------------------------------------------------ |
-| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                 |
-| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                    |
-| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                                                         |
-| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                               |
-| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                  |
-| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                 |
-| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                |
-| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                |
-| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                   |
-| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter` |
-| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                        |
-| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                           |
-| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                |
-| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                           |
-| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract                                     |
+| Entry point                 | Exports                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                    |
+| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                       |
+| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                                                            |
+| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                                  |
+| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                     |
+| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                    |
+| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                   |
+| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                   |
+| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                      |
+| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`    |
+| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                           |
+| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                              |
+| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                   |
+| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                              |
+| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection` |
 
 ## Tokens
 
