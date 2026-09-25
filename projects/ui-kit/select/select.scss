@@ -135,22 +135,6 @@
   }
 }
 
-// Options read these, so their text matches the size of the select.
-.ui-select__panel--sm {
-  --_option-padding: var(--ui-control-padding-inline-sm);
-  --_option-font-size: var(--ui-control-font-size-sm);
-}
-
-.ui-select__panel--md {
-  --_option-padding: var(--ui-control-padding-inline-md);
-  --_option-font-size: var(--ui-control-font-size-md);
-}
-
-.ui-select__panel--lg {
-  --_option-padding: var(--ui-control-padding-inline-lg);
-  --_option-font-size: var(--ui-control-font-size-lg);
-}
-
 .ui-select__panel {
   box-sizing: border-box;
   inline-size: 100%;

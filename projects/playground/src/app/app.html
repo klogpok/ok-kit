@@ -4,6 +4,14 @@
     <button ui-button variant="secondary" (click)="theme.toggle()">
       {{ theme.theme() === 'dark' ? 'Light theme' : 'Dark theme' }}
     </button>
+    <button
+      ui-button
+      variant="ghost"
+      [disabled]="theme.mode() === 'system'"
+      (click)="theme.setMode('system')"
+    >
+      System theme
+    </button>
     <button ui-button variant="secondary" (click)="toggleDirection()">
       {{ rtl() ? 'LTR' : 'RTL' }}
     </button>

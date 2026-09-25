@@ -73,10 +73,12 @@
   (overlayOutsideClick)="onOutsideClick($event)"
 >
   <!-- Options keep focus on the trigger: mousedown must not move it. -->
+  <!-- The --_option-* variables give the options the size of the select. -->
   <div
     role="listbox"
     class="ui-select__panel"
-    [class]="'ui-select__panel--' + size()"
+    [style.--_option-padding]="'var(--ui-control-padding-inline-' + size() + ')'"
+    [style.--_option-font-size]="'var(--ui-control-font-size-' + size() + ')'"
     [id]="panelId()"
     [attr.aria-label]="ariaLabel() || null"
     [attr.aria-labelledby]="listLabelledBy()"

@@ -9,6 +9,7 @@
     "build:playground": "ng build playground",
     "test": "ng test ui-kit --watch=false",
     "test:coverage": "ng test ui-kit --watch=false --coverage",
+    "test:playground": "ng test playground --watch=false",
     "test:watch": "ng test ui-kit",
     "lint": "ng lint && stylelint \"projects/**/*.scss\"",
     "format": "prettier --write \"{projects,scripts}/**/*.{ts,mts,mjs,html,scss,json}\"",

@@ -106,7 +106,8 @@ export class App {
     },
   ];
 
-  protected readonly rtl = signal(false);
+  // The VPlans apps are Hebrew: index.html starts in RTL.
+  protected readonly rtl = signal(this.document.documentElement.dir === 'rtl');
   protected readonly saving = signal(false);
   protected readonly model = signal({
     name: '',
@@ -126,7 +127,9 @@ export class App {
 
   protected toggleDirection(): void {
     this.rtl.update((rtl) => !rtl);
-    this.document.documentElement.dir = this.rtl() ? 'rtl' : 'ltr';
+    const root = this.document.documentElement;
+    root.dir = this.rtl() ? 'rtl' : 'ltr';
+    root.lang = this.rtl() ? 'he' : 'en';
   }
 
   protected async save(event: Event): Promise<void> {
