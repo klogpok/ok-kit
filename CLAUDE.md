@@ -32,8 +32,9 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 
 - **Phase 1 is done.** Delivered: tokens, typography, icon, spinner, button, icon-button, input, textarea, form-field with `uiPrefix`/`uiSuffix`, checkbox, radio group, switch, ThemeService, Storybook, playground.
 - **Phase 2 is done and approved** (2026-09-25). Delivered: divider, badge, card, tabs + `ui-tab-nav` (router links), tooltip, dialog (+ `confirm()`), toast, select (+ `searchable`), `provideUiLabels()`, `resolveDirection()`.
-- **Phase 3 is done and waits for the user's review** (2026-09-25). Delivered: skeleton, accordion, menu (+ submenus), pagination, table (`table[ui-table]`, `[uiSort]`, `th[ui-sort-header]`, message/skeleton rows, `uiSortData()`), multi-select (shared `UiSelectBase`), calendar + date picker, `UiLiveDirectionality`, new labels (pagination, dates, `locale`), icons `chevrons-*` and `arrow-up`/`arrow-down`, and the "Phase 3" playground section.
-- Open questions for the review: the table loading indicator (a pulsing line under the header instead of dimmed rows, which failed contrast); lazy accordion content is kept after closing; the date placeholder is `DD.MM.YYYY`; invalid or out-of-range typed dates set the value to `null`.
+- **Phase 3 is done and approved** (2026-09-25). Delivered: skeleton, accordion, menu (+ submenus), pagination, table (`table[ui-table]`, `[uiSort]`, `th[ui-sort-header]`, message/skeleton rows, `uiSortData()`), multi-select (shared `UiSelectBase`), calendar + date picker, `UiLiveDirectionality`, new labels (pagination, dates, `locale`), icons `chevrons-*` and `arrow-up`/`arrow-down`, and the "Phase 3" playground section.
+- Phase 3 review answers (2026-09-25): keep all current behavior. The table loading indicator stays a pulsing line under the header; lazy accordion content is kept after closing; the date placeholder stays `DD.MM.YYYY`; invalid or out-of-range typed dates set the value to `null`.
+- **Phase 4 is fixes** (started 2026-09-25): audit phases 1–3 (pipeline, browser check of themes/RTL/a11y, code review), get the list approved, then fix one issue per commit (`fix(<name>): ...`).
 
 ## Phase 3 design (as built)
 
