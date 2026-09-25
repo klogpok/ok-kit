@@ -25,8 +25,8 @@ export const UI_FORM_FIELD_CONTROL = new InjectionToken<UiFormFieldControl>('UiF
 
 /** What a control can read from its enclosing `ui-form-field`. */
 export interface UiFormFieldContext {
-  /** Id of the rendered label element. */
-  readonly labelId: string;
+  /** Id of the rendered label element, or `null` when the field has no label. */
+  readonly labelledBy: Signal<string | null>;
   /** Space-separated ids of the hint and visible error messages, or `null`. */
   readonly describedBy: Signal<string | null>;
 }

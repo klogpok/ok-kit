@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  gap: var(--ui-space-sm);
+}
+
+:host(.ui-radio-group--vertical) {
+  flex-direction: column;
+}
+
+:host(.ui-radio-group--horizontal) {
+  flex-flow: row wrap;
+  column-gap: var(--ui-space-lg);
+}

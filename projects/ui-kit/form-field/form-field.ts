@@ -66,7 +66,8 @@ export class UiFormField implements UiFormFieldContext {
   private readonly projectedHints = contentChildren(UiHint, { descendants: true });
   private readonly projectedErrors = contentChildren(UiError, { descendants: true });
 
-  readonly labelId = this.ids.getId('ui-form-field-label-');
+  protected readonly labelId = this.ids.getId('ui-form-field-label-');
+  readonly labelledBy = computed(() => (this.label() ? this.labelId : null));
   protected readonly hintId = this.ids.getId('ui-form-field-hint-');
   protected readonly errorId = this.ids.getId('ui-form-field-error-');
 
