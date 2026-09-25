@@ -164,29 +164,39 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
   template: `
     @for (toast of toasts.active(); track toast.ref.id; let index = $index) {
       <div class="ui-toast" [class]="'ui-toast--' + toast.tone">
-        <ui-icon class="ui-toast__icon" size="md" [icon]="icons[toast.tone]" />
+        <span class="ui-toast__icon"><ui-icon size="md" [icon]="icons[toast.tone]" /></span>
         <div class="ui-toast__body">
           @if (toast.title) {
             <div class="ui-toast__title" dir="auto">{{ toast.title }}</div>
           }
           <div class="ui-toast__message" dir="auto">{{ toast.message }}</div>
         </div>
-        @if (toast.action) {
-          <button ui-button variant="ghost" size="sm" (click)="dismiss(toast, index, 'action')">
-            {{ toast.action }}
-          </button>
-        }
-        @if (toast.dismissible) {
-          <button
-            ui-icon-button
-            variant="ghost"
-            size="sm"
-            class="ui-toast__close"
-            [label]="labels().close"
-            (click)="dismiss(toast, index, 'close')"
-          >
-            <ui-icon [icon]="closeIcon" />
-          </button>
+        @if (toast.action || toast.dismissible) {
+          <div class="ui-toast__actions">
+            @if (toast.action) {
+              <button
+                ui-button
+                variant="ghost"
+                size="sm"
+                class="ui-toast__action"
+                (click)="dismiss(toast, index, 'action')"
+              >
+                {{ toast.action }}
+              </button>
+            }
+            @if (toast.dismissible) {
+              <button
+                ui-icon-button
+                variant="ghost"
+                size="sm"
+                class="ui-toast__close"
+                [label]="labels().close"
+                (click)="dismiss(toast, index, 'close')"
+              >
+                <ui-icon size="sm" [icon]="closeIcon" />
+              </button>
+            }
+          </div>
         }
       </div>
     }

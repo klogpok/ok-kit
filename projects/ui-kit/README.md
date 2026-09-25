@@ -634,7 +634,6 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-toast-width`                      | component | `var(--ui-container-width-lg)`                                               | `var(--ui-container-width-lg)`                                         |
 | `--ui-toast-gap`                        | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
 | `--ui-toast-offset`                     | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
-| `--ui-toast-accent-width`               | component | `var(--ui-border-width-strong)`                                              | `var(--ui-border-width-strong)`                                        |
 | `--ui-toast-info-accent`                | component | `var(--ui-color-info)`                                                       | `var(--ui-color-info)`                                                 |
 | `--ui-toast-success-accent`             | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
 | `--ui-toast-warning-accent`             | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |

@@ -2426,12 +2426,6 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-space-lg)"
   },
   {
-    "name": "--ui-toast-accent-width",
-    "layer": "component",
-    "light": "var(--ui-border-width-strong)",
-    "dark": "var(--ui-border-width-strong)"
-  },
-  {
     "name": "--ui-toast-info-accent",
     "layer": "component",
     "light": "var(--ui-color-info)",

@@ -1,4 +1,6 @@
 :host {
+  --_enter-from: var(--ui-space-sm);
+
   display: flex;
   flex-direction: column;
   gap: var(--ui-toast-gap);
@@ -8,18 +10,26 @@
   font-family: var(--ui-font-family-sans);
 }
 
+:host([class*='ui-toast-container--top']) {
+  --_enter-from: calc(var(--ui-space-sm) * -1);
+}
+
 .ui-toast {
+  // In dark mode the default ghost hover equals the toast background.
+  --ui-button-ghost-bg-hover: var(--ui-color-surface-active);
+
   display: flex;
   align-items: flex-start;
   gap: var(--ui-space-sm);
   padding-block: var(--ui-space-md);
   padding-inline: var(--ui-space-md) var(--ui-space-sm);
   border: var(--ui-border-width-default) solid var(--ui-toast-border);
-  border-inline-start: var(--ui-toast-accent-width) solid var(--_accent);
   border-radius: var(--ui-toast-radius);
   background-color: var(--ui-toast-bg);
   color: var(--ui-toast-text);
   box-shadow: var(--ui-toast-shadow);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-snug);
   animation: ui-toast-enter var(--ui-motion-duration-normal) var(--ui-motion-easing-enter);
 }
 
@@ -39,8 +49,16 @@
   --_accent: var(--ui-toast-danger-accent);
 }
 
-.ui-toast__icon {
+// The icon and the buttons are centred on the first text line; taller buttons overflow evenly.
+.ui-toast__icon,
+.ui-toast__actions {
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  block-size: 1lh;
+}
+
+.ui-toast__icon {
   color: var(--_accent);
 }
 
@@ -50,9 +68,6 @@
   flex-direction: column;
   gap: var(--ui-space-3xs);
   min-inline-size: 0;
-  padding-block-start: var(--ui-space-3xs);
-  font-size: var(--ui-font-size-sm);
-  line-height: var(--ui-line-height-snug);
   overflow-wrap: anywhere;
 }
 
@@ -60,15 +75,26 @@
   font-weight: var(--ui-font-weight-semibold);
 }
 
+.ui-toast__title + .ui-toast__message {
+  color: var(--ui-color-text-muted);
+}
+
+.ui-toast__actions {
+  gap: var(--ui-space-3xs);
+}
+
+.ui-toast__action {
+  --ui-button-ghost-text: var(--ui-color-primary-text);
+}
+
 .ui-toast__close {
-  flex-shrink: 0;
-  margin-block: calc(var(--ui-space-2xs) * -1);
+  --ui-button-ghost-text: var(--ui-color-text-muted);
 }
 
 @keyframes ui-toast-enter {
   from {
     opacity: 0;
-    transform: translateY(var(--ui-space-sm));
+    transform: translateY(var(--_enter-from));
   }
 }
 
