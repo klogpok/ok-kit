@@ -268,3 +268,28 @@ describe('UiCheckbox required', () => {
     expect(host.privacy.valid).toBe(true);
   });
 });
+
+@Component({
+  imports: [ReactiveFormsModule, UiCheckbox],
+  template: `<ui-checkbox [formControl]="control">Terms ({{ reason() }})</ui-checkbox>`,
+})
+class ConditionalRequiredHost {
+  readonly control = new FormControl(false);
+  readonly reason = signal('optional');
+  requireTerms(): void {
+    this.control.setValidators(Validators.requiredTrue);
+    this.reason.set('required for new plans');
+  }
+}
+
+describe('UiCheckbox validators set at runtime', () => {
+  it('shows the required state after setValidators, which emits no event', async () => {
+    const fixture = TestBed.createComponent(ConditionalRequiredHost);
+    await settle(fixture);
+    const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
+    expect(input.required).toBe(false);
+    fixture.componentInstance.requireTerms();
+    await settle(fixture);
+    expect(input.required).toBe(true);
+  });
+});

@@ -1,4 +1,5 @@
 import {
+  DoCheck,
   Directive,
   booleanAttribute,
   computed,
@@ -24,7 +25,7 @@ import { UI_FORM_FIELD } from './form-field-control';
  * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`.
  */
 @Directive()
-export abstract class UiFormControlBase<T> implements ControlValueAccessor {
+export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCheck {
   protected readonly controlState = injectControlState();
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
   /** Reactive / template forms directive on the host, when bound through CVA. */
@@ -68,6 +69,11 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor {
 
   constructor() {
     if (this.ngControl) this.ngControl.valueAccessor = this;
+  }
+
+  /** `setValidators()` and `addValidators()` emit no event, so re-read the control state here. */
+  ngDoCheck(): void {
+    this.controlState.sync();
   }
 
   abstract writeValue(value: T | null | undefined): void;
