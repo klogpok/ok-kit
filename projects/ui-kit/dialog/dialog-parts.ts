@@ -1,9 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   Directive,
+  HostAttributeToken,
   booleanAttribute,
+  effect,
   inject,
   input,
 } from '@angular/core';
@@ -31,9 +32,12 @@ export class UiDialogTitle {
   constructor() {
     const container = inject(DialogRef, { optional: true })?.containerInstance;
     if (!(container instanceof CdkDialogContainer)) return;
-    // Register after inputs are set, so a custom id is used.
-    queueMicrotask(() => container._addAriaLabelledBy(this.id()));
-    inject(DestroyRef).onDestroy(() => container._removeAriaLabelledBy(this.id()));
+    // Runs after inputs are set and again when the id changes; cleanup also runs on destroy.
+    effect((onCleanup) => {
+      const id = this.id();
+      container._addAriaLabelledBy(id);
+      onCleanup(() => container._removeAriaLabelledBy(id));
+    });
   }
 }
 
@@ -108,10 +112,12 @@ export class UiDialogActions {
  */
 @Directive({
   selector: 'button[uiDialogClose]',
-  host: { '(click)': 'close()' },
+  // A close button inside a <form> must not submit it. `ui-button` binds the same value.
+  host: { '[attr.type]': 'type', '(click)': 'close()' },
 })
 export class UiDialogClose {
   private readonly dialogRef = inject(DialogRef, { optional: true });
+  protected readonly type = inject(new HostAttributeToken('type'), { optional: true }) ?? 'button';
 
   readonly result = input<unknown>(undefined, { alias: 'uiDialogClose' });
 

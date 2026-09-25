@@ -2,12 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  EnvironmentProviders,
   EventEmitter,
   Injectable,
+  InjectionToken,
   Injector,
   TemplateRef,
   ViewContainerRef,
   inject,
+  makeEnvironmentProviders,
   signal,
 } from '@angular/core';
 import { _IdGenerator } from '@angular/cdk/a11y';
@@ -46,6 +49,26 @@ export interface UiDialogOptions<D = unknown> {
   viewContainerRef?: ViewContainerRef;
 }
 
+/** Options that `provideUiDialog()` can set for every dialog. */
+export type UiDialogDefaults = Pick<
+  UiDialogOptions,
+  'size' | 'disableClose' | 'autoFocus' | 'restoreFocus'
+>;
+
+export const UI_DIALOG_DEFAULT_OPTIONS = new InjectionToken<UiDialogDefaults>(
+  'UiDialogDefaultOptions',
+  { providedIn: 'root', factory: () => ({}) },
+);
+
+/**
+ * Sets default options of `UiDialog.open()`; options passed to `open()` win.
+ *
+ * @example provideUiDialog({ size: 'lg', disableClose: true })
+ */
+export function provideUiDialog(defaults: UiDialogDefaults): EnvironmentProviders {
+  return makeEnvironmentProviders([{ provide: UI_DIALOG_DEFAULT_OPTIONS, useValue: defaults }]);
+}
+
 /** A fixed `Directionality`, the same shape CDK Dialog provides for `config.direction`. */
 function fixedDirectionality(value: Direction): Partial<Directionality> {
   const change = new EventEmitter<Direction>();
@@ -62,6 +85,9 @@ export interface UiConfirmOptions {
   cancelLabel?: string;
   /** `danger` styles the confirm button as destructive and focuses Cancel first. */
   tone?: 'primary' | 'danger';
+  /** Where the dialog reads its providers from, e.g. labels set with `provideUiLabels()`. */
+  injector?: Injector;
+  viewContainerRef?: ViewContainerRef;
 }
 
 interface UiConfirmData extends UiConfirmOptions {
@@ -130,11 +156,13 @@ export class UiDialog {
   private readonly dialog = inject(Dialog);
   private readonly document = inject(DOCUMENT);
   private readonly ids = inject(_IdGenerator);
+  private readonly defaults = inject(UI_DIALOG_DEFAULT_OPTIONS);
 
   open<R = unknown, D = unknown, C = unknown>(
     content: ComponentType<C> | TemplateRef<C>,
-    options: UiDialogOptions<D> = {},
+    openOptions: UiDialogOptions<D> = {},
   ): DialogRef<R, C> {
+    const options: UiDialogOptions<D> = { ...this.defaults, ...openOptions };
     const autoFocus = options.autoFocus ?? 'first-field';
     const restoreToOpener = (options.restoreFocus ?? true) === true;
     // Resolved per dialog: the CDK Directionality misses runtime changes of `dir` on <html>.
@@ -165,8 +193,11 @@ export class UiDialog {
   /** Asks a yes/no question. Resolves `true` when confirmed, `false` when cancelled or dismissed. */
   async confirm(options: UiConfirmOptions): Promise<boolean> {
     const messageId = this.ids.getId('ui-confirm-message-');
+    const { injector, viewContainerRef, ...texts } = options;
     const ref = this.open<boolean, UiConfirmData>(UiConfirmDialog, {
-      data: { ...options, messageId },
+      data: { ...texts, messageId },
+      injector,
+      viewContainerRef,
       size: 'sm',
       role: 'alertdialog',
       // An alert dialog is described by its message (APG).

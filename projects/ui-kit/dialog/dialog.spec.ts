@@ -5,7 +5,7 @@ import { Directionality } from '@angular/cdk/bidi';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { provideUiLabels } from '@vplans/ui-kit/core';
 import { UiMenu, UiMenuItem, UiMenuTrigger } from '@vplans/ui-kit/menu';
-import { UiDialog } from './dialog';
+import { UiDialog, provideUiDialog } from './dialog';
 import {
   UiDialogActions,
   UiDialogClose,
@@ -70,6 +70,16 @@ class MenuHost {
   `,
 })
 class MenuDialog {}
+
+@Component({
+  imports: [UiDialogContent, UiDialogClose],
+  template: `
+    <ui-dialog-content>
+      <form><input aria-label="Name" /><button uiDialogClose>Cancel</button></form>
+    </ui-dialog-content>
+  `,
+})
+class FormDialog {}
 
 // jsdom has no layout, so the real checker treats every element as hidden.
 const FOCUSABLE = 'button, input, select, textarea, a[href], [tabindex]';
@@ -263,7 +273,24 @@ describe('UiDialog', () => {
     expect(container()).not.toBeNull();
   });
 
+  it('gives a plain uiDialogClose button type="button" so it does not submit a form', async () => {
+    dialog.open(FormDialog);
+    await settle();
+    expect(container()!.querySelector('button')!.getAttribute('type')).toBe('button');
+  });
+
   describe('confirm', () => {
+    it('reads its labels from the given injector', async () => {
+      const injector = Injector.create({
+        providers: [provideUiLabels({ cancel: 'Not now' })],
+        parent: TestBed.inject(Injector),
+      });
+      void dialog.confirm({ title: 'Leave?', injector });
+      await settle();
+      const [cancel] = container()!.querySelectorAll<HTMLButtonElement>('ui-dialog-actions button');
+      expect(cancel.textContent!.trim()).toBe('Not now');
+    });
+
     it('resolves true on confirm', async () => {
       const result = dialog.confirm({
         title: 'Send the plan?',
@@ -305,5 +332,32 @@ describe('UiDialog', () => {
       dialog.closeAll();
       await expect(result).resolves.toBe(false);
     });
+  });
+});
+
+describe('provideUiDialog', () => {
+  it('sets default options that open() overrides', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideUiDialog({ size: 'lg', disableClose: true }),
+        { provide: InteractivityChecker, useValue: layoutFreeChecker },
+      ],
+    });
+    const dialog = TestBed.inject(UiDialog);
+    const container = () => document.querySelector('ui-dialog-container');
+    dialog.open(NoticeDialog);
+    TestBed.tick();
+    expect(container()!.classList).toContain('ui-dialog-container--lg');
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }),
+    );
+    expect(container()).not.toBeNull();
+    dialog.closeAll();
+    await new Promise((resolve) => setTimeout(resolve));
+
+    dialog.open(NoticeDialog, { size: 'sm' });
+    TestBed.tick();
+    expect(container()!.classList).toContain('ui-dialog-container--sm');
+    dialog.closeAll();
   });
 });
