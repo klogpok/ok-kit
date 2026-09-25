@@ -134,6 +134,10 @@ Every control supports `disabled`, `readonly` (also from a Signal Forms `readonl
 `aria-readonly`. A `required` checkbox or switch is invalid until checked, also in Reactive and
 template forms.
 
+The model outputs (`valueChange`, `checkedChange`) also fire when a forms directive writes a value
+(`setValue()`, `reset()`, a Signal Forms model change), not only for user input. With a forms
+directive bound, react to the form (`valueChanges`, the field signal) instead of these outputs.
+
 `ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
 `aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
 once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `submit()`).

@@ -22,7 +22,9 @@ import { UI_FORM_FIELD } from './form-field-control';
  * - **Reactive / template forms**: registers itself as the `ControlValueAccessor` of the host's
  *   `NgControl` (instead of `NG_VALUE_ACCESSOR`, which would force `[formField]` into CVA interop).
  *
- * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`.
+ * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`. `writeValue` sets the
+ * model, so its output (`valueChange` / `checkedChange`) also fires for values written by the
+ * forms directive; only `notifyChange` is limited to user changes.
  */
 @Directive()
 export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCheck {
