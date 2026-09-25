@@ -33,7 +33,8 @@ The kit is not published. Apps in this monorepo use it from source:
   ```
 
 - **Dependencies**: the app needs the peer dependencies of `projects/ui-kit/package.json`
-  (`@angular/cdk`, `@angular/forms`, `@angular/router`, …) in the same major version.
+  (`@angular/cdk`, `@angular/forms`, …) in the same major version. `@angular/router` is optional:
+  only `ui-tab-nav` (`@vplans/ui-kit/tabs`) needs it.
 
 The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
 Hebrew and Latin. If the app does not load the font already, add it together with the global
