@@ -34,7 +34,7 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 - **Phase 2 is done and approved** (2026-09-25). Delivered: divider, badge, card, tabs + `ui-tab-nav` (router links), tooltip, dialog (+ `confirm()`), toast, select (+ `searchable`), `provideUiLabels()`, `resolveDirection()`.
 - **Phase 3 is done and approved** (2026-09-25). Delivered: skeleton, accordion, menu (+ submenus), pagination, table (`table[ui-table]`, `[uiSort]`, `th[ui-sort-header]`, message/skeleton rows, `uiSortData()`), multi-select (shared `UiSelectBase`), calendar + date picker, `UiLiveDirectionality`, new labels (pagination, dates, `locale`), icons `chevrons-*` and `arrow-up`/`arrow-down`, and the "Phase 3" playground section.
 - Phase 3 review answers (2026-09-25): keep all current behavior. The table loading indicator stays a pulsing line under the header; lazy accordion content is kept after closing; the date placeholder stays `DD.MM.YYYY`; invalid or out-of-range typed dates set the value to `null`.
-- **Phase 4 is fixes** (started 2026-09-25): audit phases 1–3 (pipeline, browser check of themes/RTL/a11y, code review), get the list approved, then fix one issue per commit (`fix(<name>): ...`).
+- **Phase 4 is fixes** (started 2026-09-25). The audit list (34 items, P1–P3) was approved in full. Decisions: an unparsable or out-of-range date keeps the text, sets the value to `null` and reports a `uiDateParse` form error shown by `ui-form-field` (`labels().invalidDate`); component tokens are also generated on `.ui-theme-scope` so semantic tokens can be overridden locally; option labels track text changes with a `MutationObserver`. One fix per commit (`fix(<name>): ...`).
 
 ## Phase 3 design (as built)
 
