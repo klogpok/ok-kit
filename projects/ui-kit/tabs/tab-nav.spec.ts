@@ -12,13 +12,16 @@ class Page {}
     <nav ui-tab-nav aria-label="Plan">
       <a ui-tab-link routerLink="/details" routerLinkActive>Details</a>
       <a ui-tab-link routerLink="/history" routerLinkActive>History</a>
-      <a ui-tab-link routerLink="/billing" routerLinkActive disabled>Billing</a>
+      <a ui-tab-link routerLink="/billing" routerLinkActive [disabled]="billingDisabled()">
+        Billing
+      </a>
       <a ui-tab-link href="#help" [active]="helpActive()">Help</a>
     </nav>
   `,
 })
 class Host {
   readonly helpActive = signal(false);
+  readonly billingDisabled = signal(true);
 }
 
 describe('UiTabNav', () => {
@@ -70,6 +73,17 @@ describe('UiTabNav', () => {
     billing.click();
     await settle();
     expect(router.url).toBe('/details');
+    const middle = new MouseEvent('auxclick', { button: 1, cancelable: true });
+    billing.dispatchEvent(middle);
+    expect(middle.defaultPrevented).toBe(true);
+  });
+
+  it('removes the href while disabled and restores it when enabled', async () => {
+    const billing = links()[2];
+    expect(billing.hasAttribute('href')).toBe(false);
+    fixture.componentInstance.billingDisabled.set(false);
+    await settle();
+    expect(billing.getAttribute('href')).toBe('/billing');
   });
 
   it('accepts an explicit active state', () => {

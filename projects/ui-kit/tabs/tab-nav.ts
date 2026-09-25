@@ -5,11 +5,13 @@ import {
   ElementRef,
   booleanAttribute,
   computed,
+  effect,
   inject,
   input,
   signal,
+  untracked,
 } from '@angular/core';
-import { RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 /**
  * Tab-styled navigation between pages. Use it when each tab is its own route; use
@@ -53,6 +55,9 @@ export class UiTabNav {}
 export class UiTabLink {
   private readonly routerLinkActive = inject(RouterLinkActive, { self: true, optional: true });
   private readonly routerActive = signal(false);
+  private readonly routerLink = inject(RouterLink, { self: true, optional: true });
+  /** The router href while the link is disabled. */
+  private hiddenHref: string | null | undefined;
 
   /** Marks the link as the current page. Overrides `RouterLinkActive` when set. */
   readonly active = input<boolean | undefined>(undefined);
@@ -73,10 +78,31 @@ export class UiTabLink {
         event.stopImmediatePropagation();
       }
     };
-    host.addEventListener('click', blockWhileDisabled, { capture: true });
+    // `auxclick`: a middle click opens the link in a new tab without a `click` event.
+    for (const type of ['click', 'auxclick']) {
+      host.addEventListener(type, blockWhileDisabled, { capture: true });
+    }
     inject(DestroyRef).onDestroy(() => {
       subscription?.unsubscribe();
-      host.removeEventListener('click', blockWhileDisabled, { capture: true });
+      for (const type of ['click', 'auxclick']) {
+        host.removeEventListener(type, blockWhileDisabled, { capture: true });
+      }
+    });
+
+    // A disabled link has no href, so "Open in new tab" is not offered either.
+    effect(() => {
+      const disabled = this.disabled();
+      const routerLink = this.routerLink;
+      if (!routerLink) return;
+      untracked(() => {
+        if (disabled && this.hiddenHref === undefined) {
+          this.hiddenHref = routerLink.href;
+          routerLink.href = null;
+        } else if (!disabled && this.hiddenHref !== undefined) {
+          routerLink.href = this.hiddenHref;
+          this.hiddenHref = undefined;
+        }
+      });
     });
   }
 }
