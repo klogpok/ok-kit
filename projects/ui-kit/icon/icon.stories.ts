@@ -20,6 +20,8 @@ export const Default: Story = {};
 export const Labelled: Story = { args: { icon: 'alert-circle', label: 'Error' } };
 
 export const Gallery: Story = {
+  // The icon list is built in code, so a docs snippet cannot show it.
+  parameters: { docs: { source: { code: null } } },
   render: () => ({
     props: { icons: UI_ICONS_ALL.map((i) => i.name) },
     template: `
