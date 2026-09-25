@@ -1,4 +1,5 @@
 :host {
+  position: relative;
   display: block;
   box-sizing: border-box;
   max-inline-size: var(--ui-tooltip-max-width);
@@ -30,6 +31,37 @@
 
 :host(.ui-tooltip--end) {
   margin-inline-start: var(--ui-tooltip-offset);
+}
+
+// Transparent bridge over the gap: the pointer on its way to the tooltip stays over the panel,
+// so the tooltip does not hide (WCAG 1.4.13 hoverable).
+:host::before {
+  position: absolute;
+  content: '';
+}
+
+:host(.ui-tooltip--top)::before {
+  inset-block-start: 100%;
+  inset-inline: 0;
+  block-size: var(--ui-tooltip-offset);
+}
+
+:host(.ui-tooltip--bottom)::before {
+  inset-block-end: 100%;
+  inset-inline: 0;
+  block-size: var(--ui-tooltip-offset);
+}
+
+:host(.ui-tooltip--start)::before {
+  inset-block: 0;
+  inset-inline-start: 100%;
+  inline-size: var(--ui-tooltip-offset);
+}
+
+:host(.ui-tooltip--end)::before {
+  inset-block: 0;
+  inset-inline-end: 100%;
+  inline-size: var(--ui-tooltip-offset);
 }
 
 @keyframes ui-tooltip-enter {
