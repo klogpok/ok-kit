@@ -20,138 +20,6 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#000000"
   },
   {
-    "name": "--ui-ref-color-indigo-50",
-    "layer": "primitive",
-    "light": "#eef2ff",
-    "dark": "#eef2ff"
-  },
-  {
-    "name": "--ui-ref-color-indigo-100",
-    "layer": "primitive",
-    "light": "#e0e7ff",
-    "dark": "#e0e7ff"
-  },
-  {
-    "name": "--ui-ref-color-indigo-200",
-    "layer": "primitive",
-    "light": "#c7d2fe",
-    "dark": "#c7d2fe"
-  },
-  {
-    "name": "--ui-ref-color-indigo-300",
-    "layer": "primitive",
-    "light": "#a5b4fc",
-    "dark": "#a5b4fc"
-  },
-  {
-    "name": "--ui-ref-color-indigo-400",
-    "layer": "primitive",
-    "light": "#818cf8",
-    "dark": "#818cf8"
-  },
-  {
-    "name": "--ui-ref-color-indigo-500",
-    "layer": "primitive",
-    "light": "#6366f1",
-    "dark": "#6366f1"
-  },
-  {
-    "name": "--ui-ref-color-indigo-600",
-    "layer": "primitive",
-    "light": "#4f46e5",
-    "dark": "#4f46e5"
-  },
-  {
-    "name": "--ui-ref-color-indigo-700",
-    "layer": "primitive",
-    "light": "#4338ca",
-    "dark": "#4338ca"
-  },
-  {
-    "name": "--ui-ref-color-indigo-800",
-    "layer": "primitive",
-    "light": "#3730a3",
-    "dark": "#3730a3"
-  },
-  {
-    "name": "--ui-ref-color-indigo-900",
-    "layer": "primitive",
-    "light": "#312e81",
-    "dark": "#312e81"
-  },
-  {
-    "name": "--ui-ref-color-indigo-950",
-    "layer": "primitive",
-    "light": "#1e1b4b",
-    "dark": "#1e1b4b"
-  },
-  {
-    "name": "--ui-ref-color-slate-50",
-    "layer": "primitive",
-    "light": "#f8fafc",
-    "dark": "#f8fafc"
-  },
-  {
-    "name": "--ui-ref-color-slate-100",
-    "layer": "primitive",
-    "light": "#f1f5f9",
-    "dark": "#f1f5f9"
-  },
-  {
-    "name": "--ui-ref-color-slate-200",
-    "layer": "primitive",
-    "light": "#e2e8f0",
-    "dark": "#e2e8f0"
-  },
-  {
-    "name": "--ui-ref-color-slate-300",
-    "layer": "primitive",
-    "light": "#cbd5e1",
-    "dark": "#cbd5e1"
-  },
-  {
-    "name": "--ui-ref-color-slate-400",
-    "layer": "primitive",
-    "light": "#94a3b8",
-    "dark": "#94a3b8"
-  },
-  {
-    "name": "--ui-ref-color-slate-500",
-    "layer": "primitive",
-    "light": "#64748b",
-    "dark": "#64748b"
-  },
-  {
-    "name": "--ui-ref-color-slate-600",
-    "layer": "primitive",
-    "light": "#475569",
-    "dark": "#475569"
-  },
-  {
-    "name": "--ui-ref-color-slate-700",
-    "layer": "primitive",
-    "light": "#334155",
-    "dark": "#334155"
-  },
-  {
-    "name": "--ui-ref-color-slate-800",
-    "layer": "primitive",
-    "light": "#1e293b",
-    "dark": "#1e293b"
-  },
-  {
-    "name": "--ui-ref-color-slate-900",
-    "layer": "primitive",
-    "light": "#0f172a",
-    "dark": "#0f172a"
-  },
-  {
-    "name": "--ui-ref-color-slate-950",
-    "layer": "primitive",
-    "light": "#020617",
-    "dark": "#020617"
-  },
-  {
     "name": "--ui-ref-color-red-50",
     "layer": "primitive",
     "light": "#fef2f2",
@@ -220,200 +88,266 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-ref-color-green-50",
     "layer": "primitive",
-    "light": "#f0fdf4",
-    "dark": "#f0fdf4"
+    "light": "#e8f6ef",
+    "dark": "#e8f6ef"
   },
   {
     "name": "--ui-ref-color-green-100",
     "layer": "primitive",
-    "light": "#dcfce7",
-    "dark": "#dcfce7"
+    "light": "#c9ebd9",
+    "dark": "#c9ebd9"
   },
   {
     "name": "--ui-ref-color-green-200",
     "layer": "primitive",
-    "light": "#bbf7d0",
-    "dark": "#bbf7d0"
+    "light": "#95d6b4",
+    "dark": "#95d6b4"
   },
   {
     "name": "--ui-ref-color-green-300",
     "layer": "primitive",
-    "light": "#86efac",
-    "dark": "#86efac"
+    "light": "#5fbf8f",
+    "dark": "#5fbf8f"
   },
   {
     "name": "--ui-ref-color-green-400",
     "layer": "primitive",
-    "light": "#4ade80",
-    "dark": "#4ade80"
+    "light": "#3fae7c",
+    "dark": "#3fae7c"
   },
   {
     "name": "--ui-ref-color-green-500",
     "layer": "primitive",
-    "light": "#22c55e",
-    "dark": "#22c55e"
+    "light": "#0f9a61",
+    "dark": "#0f9a61"
   },
   {
     "name": "--ui-ref-color-green-600",
     "layer": "primitive",
-    "light": "#16a34a",
-    "dark": "#16a34a"
+    "light": "#008752",
+    "dark": "#008752"
   },
   {
     "name": "--ui-ref-color-green-700",
     "layer": "primitive",
-    "light": "#15803d",
-    "dark": "#15803d"
+    "light": "#006c42",
+    "dark": "#006c42"
   },
   {
     "name": "--ui-ref-color-green-800",
     "layer": "primitive",
-    "light": "#166534",
-    "dark": "#166534"
+    "light": "#055636",
+    "dark": "#055636"
   },
   {
     "name": "--ui-ref-color-green-900",
     "layer": "primitive",
-    "light": "#14532d",
-    "dark": "#14532d"
+    "light": "#07472e",
+    "dark": "#07472e"
   },
   {
     "name": "--ui-ref-color-green-950",
     "layer": "primitive",
-    "light": "#052e16",
-    "dark": "#052e16"
+    "light": "#032819",
+    "dark": "#032819"
   },
   {
-    "name": "--ui-ref-color-amber-50",
+    "name": "--ui-ref-color-brand-50",
     "layer": "primitive",
-    "light": "#fffbeb",
-    "dark": "#fffbeb"
+    "light": "#e9f4fc",
+    "dark": "#e9f4fc"
   },
   {
-    "name": "--ui-ref-color-amber-100",
+    "name": "--ui-ref-color-brand-100",
     "layer": "primitive",
-    "light": "#fef3c7",
-    "dark": "#fef3c7"
+    "light": "#d3e9fa",
+    "dark": "#d3e9fa"
   },
   {
-    "name": "--ui-ref-color-amber-200",
+    "name": "--ui-ref-color-brand-200",
     "layer": "primitive",
-    "light": "#fde68a",
-    "dark": "#fde68a"
+    "light": "#a8d3f6",
+    "dark": "#a8d3f6"
   },
   {
-    "name": "--ui-ref-color-amber-300",
+    "name": "--ui-ref-color-brand-300",
     "layer": "primitive",
-    "light": "#fcd34d",
-    "dark": "#fcd34d"
+    "light": "#72b8f2",
+    "dark": "#72b8f2"
   },
   {
-    "name": "--ui-ref-color-amber-400",
+    "name": "--ui-ref-color-brand-400",
     "layer": "primitive",
-    "light": "#fbbf24",
-    "dark": "#fbbf24"
+    "light": "#4aa3ef",
+    "dark": "#4aa3ef"
   },
   {
-    "name": "--ui-ref-color-amber-500",
+    "name": "--ui-ref-color-brand-500",
     "layer": "primitive",
-    "light": "#f59e0b",
-    "dark": "#f59e0b"
+    "light": "#2490ed",
+    "dark": "#2490ed"
   },
   {
-    "name": "--ui-ref-color-amber-600",
+    "name": "--ui-ref-color-brand-600",
     "layer": "primitive",
-    "light": "#d97706",
-    "dark": "#d97706"
+    "light": "#1a74c9",
+    "dark": "#1a74c9"
   },
   {
-    "name": "--ui-ref-color-amber-700",
+    "name": "--ui-ref-color-brand-700",
     "layer": "primitive",
-    "light": "#b45309",
-    "dark": "#b45309"
+    "light": "#155ea6",
+    "dark": "#155ea6"
   },
   {
-    "name": "--ui-ref-color-amber-800",
+    "name": "--ui-ref-color-brand-800",
     "layer": "primitive",
-    "light": "#92400e",
-    "dark": "#92400e"
+    "light": "#004b9e",
+    "dark": "#004b9e"
   },
   {
-    "name": "--ui-ref-color-amber-900",
+    "name": "--ui-ref-color-brand-900",
     "layer": "primitive",
-    "light": "#78350f",
-    "dark": "#78350f"
+    "light": "#0d3d6e",
+    "dark": "#0d3d6e"
   },
   {
-    "name": "--ui-ref-color-amber-950",
+    "name": "--ui-ref-color-brand-950",
     "layer": "primitive",
-    "light": "#451a03",
-    "dark": "#451a03"
+    "light": "#0a2747",
+    "dark": "#0a2747"
   },
   {
-    "name": "--ui-ref-color-sky-50",
+    "name": "--ui-ref-color-gray-50",
     "layer": "primitive",
-    "light": "#f0f9ff",
-    "dark": "#f0f9ff"
+    "light": "#f8f9fb",
+    "dark": "#f8f9fb"
   },
   {
-    "name": "--ui-ref-color-sky-100",
+    "name": "--ui-ref-color-gray-100",
     "layer": "primitive",
-    "light": "#e0f2fe",
-    "dark": "#e0f2fe"
+    "light": "#f1f3f6",
+    "dark": "#f1f3f6"
   },
   {
-    "name": "--ui-ref-color-sky-200",
+    "name": "--ui-ref-color-gray-200",
     "layer": "primitive",
-    "light": "#bae6fd",
-    "dark": "#bae6fd"
+    "light": "#e4e7ed",
+    "dark": "#e4e7ed"
   },
   {
-    "name": "--ui-ref-color-sky-300",
+    "name": "--ui-ref-color-gray-300",
     "layer": "primitive",
-    "light": "#7dd3fc",
-    "dark": "#7dd3fc"
+    "light": "#cdd2db",
+    "dark": "#cdd2db"
   },
   {
-    "name": "--ui-ref-color-sky-400",
+    "name": "--ui-ref-color-gray-400",
     "layer": "primitive",
-    "light": "#38bdf8",
-    "dark": "#38bdf8"
+    "light": "#a7acaf",
+    "dark": "#a7acaf"
   },
   {
-    "name": "--ui-ref-color-sky-500",
+    "name": "--ui-ref-color-gray-500",
     "layer": "primitive",
-    "light": "#0ea5e9",
-    "dark": "#0ea5e9"
+    "light": "#848d9d",
+    "dark": "#848d9d"
   },
   {
-    "name": "--ui-ref-color-sky-600",
+    "name": "--ui-ref-color-gray-600",
     "layer": "primitive",
-    "light": "#0284c7",
-    "dark": "#0284c7"
+    "light": "#636d7e",
+    "dark": "#636d7e"
   },
   {
-    "name": "--ui-ref-color-sky-700",
+    "name": "--ui-ref-color-gray-700",
     "layer": "primitive",
-    "light": "#0369a1",
-    "dark": "#0369a1"
+    "light": "#4a5466",
+    "dark": "#4a5466"
   },
   {
-    "name": "--ui-ref-color-sky-800",
+    "name": "--ui-ref-color-gray-800",
     "layer": "primitive",
-    "light": "#075985",
-    "dark": "#075985"
+    "light": "#2b3549",
+    "dark": "#2b3549"
   },
   {
-    "name": "--ui-ref-color-sky-900",
+    "name": "--ui-ref-color-gray-900",
     "layer": "primitive",
-    "light": "#0c4a6e",
-    "dark": "#0c4a6e"
+    "light": "#1d2535",
+    "dark": "#1d2535"
   },
   {
-    "name": "--ui-ref-color-sky-950",
+    "name": "--ui-ref-color-gray-950",
     "layer": "primitive",
-    "light": "#082f49",
-    "dark": "#082f49"
+    "light": "#111723",
+    "dark": "#111723"
+  },
+  {
+    "name": "--ui-ref-color-olive-50",
+    "layer": "primitive",
+    "light": "#faf8e8",
+    "dark": "#faf8e8"
+  },
+  {
+    "name": "--ui-ref-color-olive-100",
+    "layer": "primitive",
+    "light": "#f3efc6",
+    "dark": "#f3efc6"
+  },
+  {
+    "name": "--ui-ref-color-olive-200",
+    "layer": "primitive",
+    "light": "#e6dd8e",
+    "dark": "#e6dd8e"
+  },
+  {
+    "name": "--ui-ref-color-olive-300",
+    "layer": "primitive",
+    "light": "#d4c65a",
+    "dark": "#d4c65a"
+  },
+  {
+    "name": "--ui-ref-color-olive-400",
+    "layer": "primitive",
+    "light": "#bfae38",
+    "dark": "#bfae38"
+  },
+  {
+    "name": "--ui-ref-color-olive-500",
+    "layer": "primitive",
+    "light": "#a19329",
+    "dark": "#a19329"
+  },
+  {
+    "name": "--ui-ref-color-olive-600",
+    "layer": "primitive",
+    "light": "#857820",
+    "dark": "#857820"
+  },
+  {
+    "name": "--ui-ref-color-olive-700",
+    "layer": "primitive",
+    "light": "#685e1b",
+    "dark": "#685e1b"
+  },
+  {
+    "name": "--ui-ref-color-olive-800",
+    "layer": "primitive",
+    "light": "#554c1a",
+    "dark": "#554c1a"
+  },
+  {
+    "name": "--ui-ref-color-olive-900",
+    "layer": "primitive",
+    "light": "#483f19",
+    "dark": "#483f19"
+  },
+  {
+    "name": "--ui-ref-color-olive-950",
+    "layer": "primitive",
+    "light": "#29230a",
+    "dark": "#29230a"
   },
   {
     "name": "--ui-ref-space-0",
@@ -1223,145 +1157,145 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-color-bg",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#020617"
+    "dark": "#111723"
   },
   {
     "name": "--ui-color-surface",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#0f172a"
+    "dark": "#1d2535"
   },
   {
     "name": "--ui-color-surface-subtle",
     "layer": "semantic",
-    "light": "#f8fafc",
-    "dark": "#0f172a"
+    "light": "#f8f9fb",
+    "dark": "#1d2535"
   },
   {
     "name": "--ui-color-surface-muted",
     "layer": "semantic",
-    "light": "#f1f5f9",
-    "dark": "#1e293b"
+    "light": "#f1f3f6",
+    "dark": "#2b3549"
   },
   {
     "name": "--ui-color-surface-raised",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#1e293b"
+    "dark": "#2b3549"
   },
   {
     "name": "--ui-color-surface-hover",
     "layer": "semantic",
-    "light": "#f1f5f9",
-    "dark": "#1e293b"
+    "light": "#f1f3f6",
+    "dark": "#2b3549"
   },
   {
     "name": "--ui-color-surface-active",
     "layer": "semantic",
-    "light": "#e2e8f0",
-    "dark": "#334155"
+    "light": "#e4e7ed",
+    "dark": "#4a5466"
   },
   {
     "name": "--ui-color-text",
     "layer": "semantic",
-    "light": "#0f172a",
-    "dark": "#f8fafc"
+    "light": "#1d2535",
+    "dark": "#f8f9fb"
   },
   {
     "name": "--ui-color-text-muted",
     "layer": "semantic",
-    "light": "#475569",
-    "dark": "#94a3b8"
+    "light": "#636d7e",
+    "dark": "#a7acaf"
   },
   {
     "name": "--ui-color-text-subtle",
     "layer": "semantic",
-    "light": "#64748b",
-    "dark": "#94a3b8"
+    "light": "#636d7e",
+    "dark": "#a7acaf"
   },
   {
     "name": "--ui-color-text-disabled",
     "layer": "semantic",
-    "light": "#94a3b8",
-    "dark": "#475569"
+    "light": "#a7acaf",
+    "dark": "#636d7e"
   },
   {
     "name": "--ui-color-text-inverse",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#0f172a"
+    "dark": "#1d2535"
   },
   {
     "name": "--ui-color-border",
     "layer": "semantic",
-    "light": "#e2e8f0",
-    "dark": "#1e293b"
+    "light": "#e4e7ed",
+    "dark": "#2b3549"
   },
   {
     "name": "--ui-color-border-control",
     "layer": "semantic",
-    "light": "#64748b",
-    "dark": "#64748b"
+    "light": "#848d9d",
+    "dark": "#848d9d"
   },
   {
     "name": "--ui-color-border-control-hover",
     "layer": "semantic",
-    "light": "#334155",
-    "dark": "#cbd5e1"
+    "light": "#4a5466",
+    "dark": "#cdd2db"
   },
   {
     "name": "--ui-color-control-bg",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#0f172a"
+    "dark": "#1d2535"
   },
   {
     "name": "--ui-color-control-bg-disabled",
     "layer": "semantic",
-    "light": "#f1f5f9",
-    "dark": "#1e293b"
+    "light": "#f1f3f6",
+    "dark": "#2b3549"
   },
   {
     "name": "--ui-color-primary",
     "layer": "semantic",
-    "light": "#4f46e5",
-    "dark": "#818cf8"
+    "light": "#1a74c9",
+    "dark": "#4aa3ef"
   },
   {
     "name": "--ui-color-primary-hover",
     "layer": "semantic",
-    "light": "#4338ca",
-    "dark": "#a5b4fc"
+    "light": "#155ea6",
+    "dark": "#72b8f2"
   },
   {
     "name": "--ui-color-primary-active",
     "layer": "semantic",
-    "light": "#3730a3",
-    "dark": "#c7d2fe"
+    "light": "#004b9e",
+    "dark": "#a8d3f6"
   },
   {
     "name": "--ui-color-primary-contrast",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#020617"
+    "dark": "#111723"
   },
   {
     "name": "--ui-color-primary-subtle",
     "layer": "semantic",
-    "light": "#eef2ff",
-    "dark": "#1e1b4b"
+    "light": "#e9f4fc",
+    "dark": "#0a2747"
   },
   {
     "name": "--ui-color-primary-subtle-hover",
     "layer": "semantic",
-    "light": "#e0e7ff",
-    "dark": "#312e81"
+    "light": "#d3e9fa",
+    "dark": "#0d3d6e"
   },
   {
     "name": "--ui-color-primary-text",
     "layer": "semantic",
-    "light": "#4338ca",
-    "dark": "#a5b4fc"
+    "light": "#155ea6",
+    "dark": "#72b8f2"
   },
   {
     "name": "--ui-color-danger",
@@ -1385,7 +1319,7 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-color-danger-contrast",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#020617"
+    "dark": "#111723"
   },
   {
     "name": "--ui-color-danger-subtle",
@@ -1402,80 +1336,80 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-color-success",
     "layer": "semantic",
-    "light": "#15803d",
-    "dark": "#4ade80"
+    "light": "#008752",
+    "dark": "#3fae7c"
   },
   {
     "name": "--ui-color-success-contrast",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#020617"
+    "dark": "#111723"
   },
   {
     "name": "--ui-color-success-subtle",
     "layer": "semantic",
-    "light": "#f0fdf4",
-    "dark": "#052e16"
+    "light": "#e8f6ef",
+    "dark": "#032819"
   },
   {
     "name": "--ui-color-success-text",
     "layer": "semantic",
-    "light": "#15803d",
-    "dark": "#86efac"
+    "light": "#006c42",
+    "dark": "#5fbf8f"
   },
   {
     "name": "--ui-color-warning",
     "layer": "semantic",
-    "light": "#f59e0b",
-    "dark": "#fbbf24"
+    "light": "#685e1b",
+    "dark": "#bfae38"
   },
   {
     "name": "--ui-color-warning-contrast",
     "layer": "semantic",
-    "light": "#020617",
-    "dark": "#020617"
+    "light": "#ffffff",
+    "dark": "#111723"
   },
   {
     "name": "--ui-color-warning-subtle",
     "layer": "semantic",
-    "light": "#fffbeb",
-    "dark": "#451a03"
+    "light": "#faf8e8",
+    "dark": "#29230a"
   },
   {
     "name": "--ui-color-warning-text",
     "layer": "semantic",
-    "light": "#92400e",
-    "dark": "#fcd34d"
+    "light": "#554c1a",
+    "dark": "#d4c65a"
   },
   {
     "name": "--ui-color-info",
     "layer": "semantic",
-    "light": "#0369a1",
-    "dark": "#38bdf8"
+    "light": "#155ea6",
+    "dark": "#4aa3ef"
   },
   {
     "name": "--ui-color-info-contrast",
     "layer": "semantic",
     "light": "#ffffff",
-    "dark": "#020617"
+    "dark": "#111723"
   },
   {
     "name": "--ui-color-info-subtle",
     "layer": "semantic",
-    "light": "#f0f9ff",
-    "dark": "#082f49"
+    "light": "#e9f4fc",
+    "dark": "#0a2747"
   },
   {
     "name": "--ui-color-info-text",
     "layer": "semantic",
-    "light": "#075985",
-    "dark": "#7dd3fc"
+    "light": "#004b9e",
+    "dark": "#72b8f2"
   },
   {
     "name": "--ui-color-focus-ring",
     "layer": "semantic",
-    "light": "#4f46e5",
-    "dark": "#818cf8"
+    "light": "#2490ed",
+    "dark": "#4aa3ef"
   },
   {
     "name": "--ui-color-backdrop",
