@@ -253,3 +253,17 @@ describe('UiFormField affixes', () => {
     expect(query(fixture, 'ui-form-field').classList).toContain('ui-form-field--invalid');
   });
 });
+
+@Component({
+  imports: [UiFormField, UiInput],
+  template: ` <ui-form-field label="Name" required><input ui-input /></ui-form-field> `,
+})
+class BareRequiredHost {}
+
+describe('UiFormField with a bare required attribute', () => {
+  it('shows the required marker', async () => {
+    const fixture = TestBed.createComponent(BareRequiredHost);
+    await settle(fixture);
+    expect(query(fixture, '.ui-form-field__required')).not.toBeNull();
+  });
+});

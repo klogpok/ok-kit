@@ -5,6 +5,7 @@ import {
   contentChild,
   contentChildren,
   Directive,
+  booleanAttribute,
   forwardRef,
   inject,
   input,
@@ -81,7 +82,9 @@ export class UiFormField implements UiFormFieldContext {
   readonly label = input('');
   readonly hint = input('');
   /** Show the required marker. Defaults to the control's required state. */
-  readonly required = input<boolean | undefined>(undefined);
+  readonly required = input<boolean | undefined, unknown>(undefined, {
+    transform: (value: unknown) => (value === undefined ? undefined : booleanAttribute(value)),
+  });
 
   protected readonly control = contentChild(UI_FORM_FIELD_CONTROL, { descendants: true });
   private readonly projectedHints = contentChildren(UiHint, { descendants: true });
