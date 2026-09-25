@@ -55,10 +55,7 @@
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
     >
-      <span
-        class="ui-select__value"
-        [class.ui-select__value--placeholder]="!selectedOptions().length"
-      >
+      <span class="ui-select__value" [class.ui-select__value--placeholder]="!displayLabel()">
         {{ displayLabel() || placeholder() }}
       </span>
     </button>

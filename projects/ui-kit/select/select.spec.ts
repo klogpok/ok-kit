@@ -75,6 +75,7 @@ class Host {
       searchable
       [filterOptions]="false"
       [(value)]="value"
+      [displayWith]="display"
       (searchChange)="search($event)"
     >
       @for (name of results(); track name) {
@@ -86,7 +87,10 @@ class Host {
 class ServerSearchHost {
   readonly value = signal<string | null>(null);
   readonly results = signal(['Avi', 'Batya']);
+  readonly searches: string[] = [];
+  readonly display = (name: string) => `#${name}`;
   search(text: string): void {
+    this.searches.push(text);
     this.results.set(text ? ['Dana', 'Dvora'] : ['Avi', 'Batya']);
   }
 }
@@ -136,6 +140,33 @@ describe('UiSelect with server-side search', () => {
     await settle(fixture);
     expect(fixture.componentInstance.value()).toBe('Dana');
     root.remove();
+  });
+
+  it('keeps the label of the selected value and resets the search when the list closes', async () => {
+    const fixture = TestBed.createComponent(ServerSearchHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    const control = root.querySelector<HTMLInputElement>('.ui-select__control')!;
+    control.value = 'd';
+    control.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    keydown(control, 'Enter');
+    await settle(fixture);
+
+    const host = fixture.componentInstance;
+    expect(host.searches.at(-1)).toBe('');
+    expect(host.results()).toEqual(['Avi', 'Batya']);
+    expect(control.value).toBe('Dana');
+    root.remove();
+  });
+
+  it('labels a value that is not in the list with displayWith', async () => {
+    const fixture = TestBed.createComponent(ServerSearchHost);
+    fixture.componentInstance.value.set('Zeev');
+    await settle(fixture);
+    const control = (fixture.nativeElement as HTMLElement).querySelector('input')!;
+    expect(control.value).toBe('#Zeev');
   });
 });
 

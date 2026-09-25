@@ -39,11 +39,16 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   readonly value = model<readonly T[]>([]);
   readonly multiple = true;
 
-  protected readonly displayLabel = computed(() =>
-    this.selectedOptions()
-      .map((option) => option.getLabel())
-      .join(', '),
-  );
+  /** Labels in list order, then the selected values that are not in the list. */
+  protected readonly displayLabel = computed(() => {
+    const listed = this.selectedOptions();
+    const missing = this.value().filter(
+      (value) => !listed.some((option) => this.matches(option.value(), value)),
+    );
+    return [...listed.map((option) => option.getLabel()), ...missing.map((v) => this.labelFor(v))]
+      .filter(Boolean)
+      .join(', ');
+  });
 
   protected isSelected(value: unknown): boolean {
     return this.value().some((selected) => this.matches(value, selected));

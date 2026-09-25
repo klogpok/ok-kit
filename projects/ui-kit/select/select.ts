@@ -41,7 +41,7 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
   readonly value = model<T | null>(null);
   readonly multiple = false;
 
-  protected readonly displayLabel = computed(() => this.selectedOptions()[0]?.getLabel() ?? '');
+  protected readonly displayLabel = computed(() => this.labelFor(this.value()));
 
   protected isSelected(value: unknown): boolean {
     return this.matches(value, this.value());

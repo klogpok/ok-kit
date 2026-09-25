@@ -147,8 +147,10 @@ Without a forms directive, use the `invalid` input to show the error state manua
 
 `ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values, e.g.
 `(option: City, selected: City) => option.id === selected.id`. It is called as
-`compareWith(option, selected)` and never with `null`; a `null` value matches only `null`. `ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with
-the `invalidDate` label as its message; the value is `null` meanwhile.
+`compareWith(option, selected)` and never with `null`; a `null` value matches only `null`.
+
+`ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with the
+`invalidDate` label as its message; the value is `null` meanwhile.
 
 ### Prefix and suffix
 
@@ -337,6 +339,11 @@ this.toast.show({ message: 'Plan deleted', action: 'Undo' }).onAction.subscribe(
 
 Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
 `minLength(path.recipients, 1)` next to `required()`.
+
+For server-side search, set `[filterOptions]="false"` and load the options from `(searchChange)`.
+It emits `''` when the list closes, so the full list can come back. The trigger keeps the label of
+a selected option after it leaves the results. For a value that was never in the list (e.g. an
+initial value), give `[displayWith]="nameOf"`.
 
 Change the toast position, duration or stack size with
 `provideUiToast({ position: 'top-center', duration: 4000, max: 3 })`.

@@ -10,6 +10,7 @@ import {
   contentChildren,
   effect,
   inject,
+  linkedSignal,
   input,
   output,
   signal,
@@ -81,9 +82,18 @@ export abstract class UiSelectBase<T, V>
    */
   readonly compareWith = input<(option: T, selected: T) => boolean>(Object.is);
 
+  /**
+   * Label of a selected value that is not among the options and was never shown in the list,
+   * e.g. an initial value before server-side search results arrive.
+   */
+  readonly displayWith = input<((value: T) => string) | null>(null);
+
   readonly opened = output<void>();
   readonly closed = output<void>();
-  /** Emits the search text as the user types (`searchable` only). */
+  /**
+   * Emits the search text as the user types (`searchable` only), and `''` when the list closes
+   * with a search, so server-side results can be reset.
+   */
   readonly searchChange = output<string>();
 
   protected readonly options = contentChildren<UiOption<T>>(UiOption, { descendants: true });
@@ -110,6 +120,20 @@ export abstract class UiSelectBase<T, V>
   protected readonly listLabelledBy = computed(() =>
     this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
   );
+  /** Labels of selected values seen in the list, kept while the options change. */
+  private readonly knownLabels = linkedSignal<
+    readonly (readonly [unknown, string])[],
+    readonly (readonly [unknown, string])[]
+  >({
+    source: () =>
+      this.selectedOptions().map((option) => [option.value(), option.getLabel()] as const),
+    computation: (seen, previous) => {
+      const kept = (previous?.value ?? []).filter(
+        ([value]) => this.isSelected(value) && !seen.some(([shown]) => this.matches(shown, value)),
+      );
+      return [...kept, ...seen];
+    },
+  });
   protected readonly noResults = computed(() =>
     this.options().every((option) => option.filteredOut()),
   );
@@ -164,6 +188,18 @@ export abstract class UiSelectBase<T, V>
       : this.compareWith()(option as T, selected as T);
   }
 
+  /** Label of a selected value: from its option, from the list before it changed, or `displayWith`. */
+  protected labelFor(value: unknown): string {
+    // Read every time, so the labels are recorded before their options go away.
+    const known = this.knownLabels();
+    const option = this.options().find((item) => this.matches(item.value(), value));
+    if (option) return option.getLabel();
+    const label = known.find(([shown]) => this.matches(shown, value));
+    if (label) return label[1];
+    const displayWith = this.displayWith();
+    return value != null && displayWith ? displayWith(value as T) : '';
+  }
+
   protected isFilteredOut(label: string): boolean {
     const query = this.query().trim().toLocaleLowerCase();
     if (!query || !this.searchable() || !this.filterOptions()) return false;
@@ -188,7 +224,10 @@ export abstract class UiSelectBase<T, V>
   close(): void {
     if (!this.isOpen()) return;
     this.isOpen.set(false);
-    this.query.set('');
+    if (this.query()) {
+      this.query.set('');
+      this.searchChange.emit('');
+    }
     this.keyManager.setActiveItem(-1);
     this.closed.emit();
   }
@@ -272,7 +311,11 @@ export abstract class UiSelectBase<T, V>
 
   /** Selects an option the user chose, unless the value cannot change. */
   private pick(value: unknown): void {
-    if (!this.readonly()) this.selectOption(value);
+    if (this.readonly()) return;
+    // Server-side search may replace the options in the same tick (closing resets the search).
+    const option = this.options().find((item) => this.matches(item.value(), value));
+    if (option) this.knownLabels.update((known) => [...known, [value, option.getLabel()]]);
+    this.selectOption(value);
   }
 
   private activateSelected(): void {
