@@ -2436,5 +2436,107 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-space-lg)",
     "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-menu-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-raised)",
+    "dark": "var(--ui-color-surface-raised)"
+  },
+  {
+    "name": "--ui-menu-border",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-menu-divider",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-menu-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-menu-shadow",
+    "layer": "component",
+    "light": "var(--ui-shadow-md)",
+    "dark": "var(--ui-shadow-md)"
+  },
+  {
+    "name": "--ui-menu-padding-block",
+    "layer": "component",
+    "light": "var(--ui-space-2xs)",
+    "dark": "var(--ui-space-2xs)"
+  },
+  {
+    "name": "--ui-menu-min-width",
+    "layer": "component",
+    "light": "12rem",
+    "dark": "12rem"
+  },
+  {
+    "name": "--ui-menu-max-width",
+    "layer": "component",
+    "light": "20rem",
+    "dark": "20rem"
+  },
+  {
+    "name": "--ui-menu-item-height",
+    "layer": "component",
+    "light": "var(--ui-control-height-md)",
+    "dark": "var(--ui-control-height-md)"
+  },
+  {
+    "name": "--ui-menu-item-padding-inline",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-menu-item-gap",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-menu-item-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-menu-item-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-menu-item-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-menu-item-icon-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-menu-item-danger-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-text)",
+    "dark": "var(--ui-color-danger-text)"
+  },
+  {
+    "name": "--ui-menu-item-danger-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-danger-subtle)",
+    "dark": "var(--ui-color-danger-subtle)"
   }
 ];

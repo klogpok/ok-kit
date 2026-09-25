@@ -1,0 +1,87 @@
+@use '../styles/mixins' as ui;
+
+:host {
+  --_text: var(--ui-menu-item-text);
+  --_hover-bg: var(--ui-menu-item-hover-bg);
+  --_icon: var(--ui-menu-item-icon-color);
+
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--ui-menu-item-gap);
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--ui-menu-item-height);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--ui-menu-item-padding-inline);
+  border: 0;
+  background: none;
+  color: var(--_text);
+  font: inherit;
+  font-size: var(--ui-menu-item-font-size);
+  line-height: var(--ui-line-height-snug);
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+
+  @include ui.transition(background-color);
+
+  // CDK Menu moves focus through the items; the focused item is the highlighted one.
+  &:hover,
+  &:focus,
+  &[aria-expanded='true'] {
+    background-color: var(--_hover-bg);
+    outline: none;
+  }
+
+  &:focus-visible {
+    @include ui.focus-ring(calc(var(--ui-focus-ring-width) * -1));
+  }
+}
+
+:host(.ui-menu-item--danger) {
+  --_text: var(--ui-menu-item-danger-text);
+  --_hover-bg: var(--ui-menu-item-danger-hover-bg);
+  --_icon: currentcolor;
+}
+
+:host([aria-disabled='true']) {
+  --_text: var(--ui-color-text-disabled);
+  --_icon: currentcolor;
+
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.ui-menu-item__icon:empty {
+  display: none;
+}
+
+.ui-menu-item__label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-menu-item__icon,
+.ui-menu-item__submenu {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--_icon);
+}
+
+@media (forced-colors: active) {
+  :host(:focus) {
+    outline: var(--ui-focus-ring-width) solid Highlight;
+  }
+
+  :host([aria-disabled='true']) {
+    color: GrayText;
+  }
+}

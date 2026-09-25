@@ -1,0 +1,38 @@
+// Unencapsulated: spaces projected dividers. Every selector is scoped under `.ui-menu`.
+.ui-menu {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-inline-size: var(--ui-menu-min-width);
+  max-inline-size: var(--ui-menu-max-width);
+  padding-block: var(--ui-menu-padding-block);
+  overflow: auto;
+  border: var(--ui-border-width-default) solid var(--ui-menu-border);
+  border-radius: var(--ui-menu-radius);
+  background-color: var(--ui-menu-bg);
+  box-shadow: var(--ui-menu-shadow);
+  font-family: var(--ui-font-family-sans);
+  animation: ui-menu-enter var(--ui-motion-duration-fast) var(--ui-motion-easing-enter);
+
+  &:focus {
+    outline: none;
+  }
+
+  > .ui-divider {
+    --ui-divider-color: var(--ui-menu-divider);
+
+    margin-block: var(--ui-menu-padding-block);
+  }
+}
+
+@keyframes ui-menu-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-menu {
+    animation: none;
+  }
+}

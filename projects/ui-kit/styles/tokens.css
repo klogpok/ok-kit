@@ -519,4 +519,21 @@
   --ui-accordion-icon-color: var(--ui-color-text-muted);
   --ui-accordion-panel-padding-block: var(--ui-space-md);
   --ui-accordion-panel-padding-inline: var(--ui-space-lg);
+  --ui-menu-bg: var(--ui-color-surface-raised);
+  --ui-menu-border: var(--ui-color-surface-active);
+  --ui-menu-divider: var(--ui-color-surface-active);
+  --ui-menu-radius: var(--ui-radius-control);
+  --ui-menu-shadow: var(--ui-shadow-md);
+  --ui-menu-padding-block: var(--ui-space-2xs);
+  --ui-menu-min-width: 12rem;
+  --ui-menu-max-width: 20rem;
+  --ui-menu-item-height: var(--ui-control-height-md);
+  --ui-menu-item-padding-inline: var(--ui-space-md);
+  --ui-menu-item-gap: var(--ui-space-sm);
+  --ui-menu-item-font-size: var(--ui-font-size-sm);
+  --ui-menu-item-text: var(--ui-color-text);
+  --ui-menu-item-hover-bg: var(--ui-color-surface-active);
+  --ui-menu-item-icon-color: var(--ui-color-text-muted);
+  --ui-menu-item-danger-text: var(--ui-color-danger-text);
+  --ui-menu-item-danger-hover-bg: var(--ui-color-danger-subtle);
 }

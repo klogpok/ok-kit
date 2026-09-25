@@ -305,6 +305,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/accordion`  | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                |
 | `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                          |
 | `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
+| `@vplans/ui-kit/menu`       | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                               |
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |
 | `@vplans/ui-kit/select`     | `UiSelect`, `UiOption`, `UiOptionGroup`                                                                                               |
@@ -597,6 +598,23 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-accordion-icon-color`            | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-accordion-panel-padding-block`   | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-accordion-panel-padding-inline`  | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-menu-bg`                         | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
+| `--ui-menu-border`                     | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-menu-divider`                    | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-menu-radius`                     | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-menu-shadow`                     | component | `var(--ui-shadow-md)`                                                        | `var(--ui-shadow-md)`                                                  |
+| `--ui-menu-padding-block`              | component | `var(--ui-space-2xs)`                                                        | `var(--ui-space-2xs)`                                                  |
+| `--ui-menu-min-width`                  | component | `12rem`                                                                      | `12rem`                                                                |
+| `--ui-menu-max-width`                  | component | `20rem`                                                                      | `20rem`                                                                |
+| `--ui-menu-item-height`                | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
+| `--ui-menu-item-padding-inline`        | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
+| `--ui-menu-item-gap`                   | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
+| `--ui-menu-item-font-size`             | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-menu-item-text`                  | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-menu-item-hover-bg`              | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-menu-item-icon-color`            | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-menu-item-danger-text`           | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
+| `--ui-menu-item-danger-hover-bg`       | component | `var(--ui-color-danger-subtle)`                                              | `var(--ui-color-danger-subtle)`                                        |
 
 <!-- tokens:end -->
 
