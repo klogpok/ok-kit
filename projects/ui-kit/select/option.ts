@@ -15,6 +15,8 @@ import { UiIcon, uiIconCheck } from '@vplans/ui-kit/icon';
 
 /** What an option needs from the list that owns it. Internal. */
 export interface UiOptionParent {
+  /** Multiple selection: options show a checkbox. */
+  readonly multiple: boolean;
   isSelected(value: unknown): boolean;
   isFilteredOut(label: string): boolean;
   selectOption(value: unknown): void;
@@ -23,7 +25,7 @@ export interface UiOptionParent {
 export const UI_OPTION_PARENT = new InjectionToken<UiOptionParent>('UiOptionParent');
 
 /**
- * Option of a `ui-select`. The projected text is the label; pass `label` when the content is
+ * Option of a `ui-select` or `ui-multi-select`. The projected text is the label; pass `label` when the content is
  * richer than the text that should appear in the trigger.
  *
  * @example <ui-option [value]="plan.id">{{ plan.name }}</ui-option>
@@ -32,8 +34,15 @@ export const UI_OPTION_PARENT = new InjectionToken<UiOptionParent>('UiOptionPare
   selector: 'ui-option',
   imports: [UiIcon],
   template: `
+    @if (multiple) {
+      <span class="ui-option__checkbox" aria-hidden="true">
+        @if (selected()) {
+          <ui-icon [icon]="checkIcon" />
+        }
+      </span>
+    }
     <span class="ui-option__label"><ng-content /></span>
-    @if (selected()) {
+    @if (selected() && !multiple) {
       <ui-icon class="ui-option__check" [icon]="checkIcon" />
     }
   `,
@@ -64,6 +73,7 @@ export class UiOption<T = unknown> implements Highlightable {
   readonly label = input('');
 
   readonly id = inject(_IdGenerator).getId('ui-option-');
+  protected readonly multiple = this.parent.multiple;
   readonly active = signal(false);
   readonly selected = computed(() => this.parent.isSelected(this.value()));
   readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel()));

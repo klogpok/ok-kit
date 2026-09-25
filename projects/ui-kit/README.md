@@ -286,7 +286,19 @@ this.toast.show({ message: 'Plan deleted', action: 'Undo' }).onAction.subscribe(
     }
   </ui-select>
 </ui-form-field>
+
+<!-- Multi-select: the value is an array; the list stays open while toggling -->
+<ui-form-field label="Recipients">
+  <ui-multi-select [formField]="form.recipients" placeholder="Choose">
+    @for (c of coordinators; track c.id) {
+    <ui-option [value]="c.id">{{ c.name }}</ui-option>
+    }
+  </ui-multi-select>
+</ui-form-field>
 ```
+
+Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
+`minLength(path.recipients, 1)` next to `required()`.
 
 Change the toast position, duration or stack size with
 `provideUiToast({ position: 'top-center', duration: 4000, max: 3 })`.
@@ -314,7 +326,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/menu`       | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                               |
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |
-| `@vplans/ui-kit/select`     | `UiSelect`, `UiOption`, `UiOptionGroup`                                                                                               |
+| `@vplans/ui-kit/select`     | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                              |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`, `provideUiLiveDirectionality`          |

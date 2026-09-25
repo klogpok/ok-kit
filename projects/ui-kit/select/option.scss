@@ -50,6 +50,31 @@
   overflow-wrap: anywhere;
 }
 
+// Multiple selection: a checkbox-like box before the label.
+.ui-option__checkbox {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-checkbox-size);
+  block-size: var(--ui-checkbox-size);
+  border: var(--ui-border-width-default) solid var(--ui-checkbox-border);
+  border-radius: var(--ui-checkbox-radius);
+  background-color: var(--ui-checkbox-bg);
+  color: var(--ui-checkbox-checked-color);
+  font-size: var(--ui-checkbox-size);
+
+  :host(.ui-option--selected) & {
+    border-color: var(--ui-checkbox-checked-bg);
+    background-color: var(--ui-checkbox-checked-bg);
+  }
+
+  :host(.ui-option--disabled) & {
+    opacity: 0.5;
+  }
+}
+
 .ui-option__check {
   flex-shrink: 0;
   color: var(--ui-select-option-selected-text);
@@ -75,5 +100,9 @@
 
   :host(.ui-option--selected) {
     color: Highlight;
+  }
+
+  .ui-option__checkbox {
+    border-color: CanvasText;
   }
 }
