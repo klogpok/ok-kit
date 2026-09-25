@@ -11,10 +11,11 @@
     "test:coverage": "ng test ui-kit --watch=false --coverage",
     "test:watch": "ng test ui-kit",
     "lint": "ng lint && stylelint \"projects/**/*.scss\"",
-    "format": "prettier --write \"projects/**/*.{ts,mts,html,scss,json}\"",
-    "format:check": "prettier --check \"projects/**/*.{ts,mts,html,scss,json}\"",
+    "format": "prettier --write \"{projects,scripts}/**/*.{ts,mts,mjs,html,scss,json}\"",
+    "format:check": "prettier --check \"{projects,scripts}/**/*.{ts,mts,mjs,html,scss,json}\"",
     "storybook": "ng run ui-kit:storybook",
-    "build-storybook": "ng run ui-kit:build-storybook"
+    "build-storybook": "ng run ui-kit:build-storybook",
+    "test-storybook": "node scripts/check-stories.mjs"
   },
   "private": true,
   "packageManager": "pnpm@12.3.4",
@@ -46,6 +47,7 @@
     "@types/node": "^26.6.2",
     "@vitest/coverage-v8": "^5.0.1",
     "angular-eslint": "22.5.0",
+    "axe-core": "^4.13.0",
     "eslint": "^10.9.1",
     "jsdom": "^30.0.0",
     "ng-packagr": "^22.2.0",

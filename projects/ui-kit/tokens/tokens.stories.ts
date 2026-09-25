@@ -12,7 +12,6 @@ const scale = UI_TOKENS.filter(
 
 const meta: Meta = {
   title: 'Foundations/Tokens',
-  parameters: { a11y: { test: 'todo' } },
 };
 
 export default meta;
