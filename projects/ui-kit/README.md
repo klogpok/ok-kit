@@ -482,6 +482,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-surface-raised`             | semantic  | `#ffffff`                                                                    | `#2b3549`                                                              |
 | `--ui-color-surface-hover`              | semantic  | `#f1f3f6`                                                                    | `#364054`                                                              |
 | `--ui-color-surface-active`             | semantic  | `#e4e7ed`                                                                    | `#4a5466`                                                              |
+| `--ui-color-surface-emphasis`           | semantic  | `#cdd2db`                                                                    | `#4a5466`                                                              |
 | `--ui-color-text`                       | semantic  | `#1d2535`                                                                    | `#f8f9fb`                                                              |
 | `--ui-color-text-muted`                 | semantic  | `#636d7e`                                                                    | `#a7acaf`                                                              |
 | `--ui-color-text-subtle`                | semantic  | `#636d7e`                                                                    | `#a7acaf`                                                              |
@@ -672,7 +673,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-select-option-hover-bg`           | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
 | `--ui-select-option-active-bg`          | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
 | `--ui-select-option-selected-text`      | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
-| `--ui-skeleton-bg`                      | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-skeleton-bg`                      | component | `var(--ui-color-surface-emphasis)`                                           | `var(--ui-color-surface-emphasis)`                                     |
 | `--ui-skeleton-highlight`               | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
 | `--ui-skeleton-radius-text`             | component | `var(--ui-radius-sm)`                                                        | `var(--ui-radius-sm)`                                                  |
 | `--ui-skeleton-radius-rect`             | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |

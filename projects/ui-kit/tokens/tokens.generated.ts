@@ -1370,6 +1370,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#4a5466"
   },
   {
+    "name": "--ui-color-surface-emphasis",
+    "layer": "semantic",
+    "light": "#cdd2db",
+    "dark": "#4a5466"
+  },
+  {
     "name": "--ui-color-text",
     "layer": "semantic",
     "light": "#1d2535",
@@ -2512,8 +2518,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-skeleton-bg",
     "layer": "component",
-    "light": "var(--ui-color-surface-active)",
-    "dark": "var(--ui-color-surface-active)"
+    "light": "var(--ui-color-surface-emphasis)",
+    "dark": "var(--ui-color-surface-emphasis)"
   },
   {
     "name": "--ui-skeleton-highlight",
