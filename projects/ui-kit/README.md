@@ -791,7 +791,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `pnpm test:watch`       | Unit tests in watch mode                                               |
 | `pnpm test:coverage`    | Unit tests with coverage; fails below the thresholds in `angular.json` |
 | `pnpm test:playground`  | Playground smoke tests                                                 |
-| `pnpm lint`             | ESLint (TS, type-aware bug rules, templates, a11y) and Stylelint       |
+| `pnpm lint`             | ESLint (strictTypeChecked, templates, a11y) and Stylelint              |
 | `pnpm format`           | Prettier (write)                                                       |
 | `pnpm format:check`     | Prettier (check only)                                                  |
 | `pnpm build`            | Tokens and the library build into `dist/ui-kit`                        |

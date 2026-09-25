@@ -44,7 +44,7 @@ so versions mark review points rather than releases.
 - **tokens:** `surface-emphasis`, `--ui-menu-max-height`, `--ui-badge-font-size-md`.
 - **labels:** `required`.
 - Tooling: coverage thresholds (`pnpm test:coverage`), the story accessibility check
-  (`pnpm test-storybook`), type-aware ESLint rules, stricter Stylelint, playground smoke tests.
+  (`pnpm test-storybook`), ESLint `strictTypeChecked`, stricter Stylelint, playground smoke tests.
 
 ### Fixed
 
