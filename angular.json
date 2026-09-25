@@ -48,7 +48,10 @@
             "configDir": "projects/ui-kit/.storybook",
             "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
             "styles": [
-              "node_modules/@fontsource-variable/inter/index.css",
+              "node_modules/@fontsource/assistant/400.css",
+              "node_modules/@fontsource/assistant/500.css",
+              "node_modules/@fontsource/assistant/600.css",
+              "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss"
             ],
             "port": 6006
@@ -60,7 +63,10 @@
             "configDir": "projects/ui-kit/.storybook",
             "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
             "styles": [
-              "node_modules/@fontsource-variable/inter/index.css",
+              "node_modules/@fontsource/assistant/400.css",
+              "node_modules/@fontsource/assistant/500.css",
+              "node_modules/@fontsource/assistant/600.css",
+              "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss"
             ],
             "outputDir": "dist/storybook/ui-kit"
@@ -92,7 +98,10 @@
               }
             ],
             "styles": [
-              "node_modules/@fontsource-variable/inter/index.css",
+              "node_modules/@fontsource/assistant/400.css",
+              "node_modules/@fontsource/assistant/500.css",
+              "node_modules/@fontsource/assistant/600.css",
+              "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss",
               "projects/playground/src/styles.scss"
             ]

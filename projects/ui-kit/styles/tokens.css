@@ -90,7 +90,7 @@
   --ui-ref-radius-lg: 0.5rem;
   --ui-ref-radius-xl: 0.75rem;
   --ui-ref-radius-full: 9999px;
-  --ui-ref-font-family-sans: 'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif;
+  --ui-ref-font-family-sans: Assistant, Roboto, "Helvetica Neue", sans-serif;
   --ui-ref-font-family-mono: ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
   --ui-ref-font-size-xs: 0.75rem;
   --ui-ref-font-size-sm: 0.875rem;

@@ -550,8 +550,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-ref-font-family-sans",
     "layer": "primitive",
-    "light": "'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif",
-    "dark": "'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif"
+    "light": "Assistant, Roboto, \"Helvetica Neue\", sans-serif",
+    "dark": "Assistant, Roboto, \"Helvetica Neue\", sans-serif"
   },
   {
     "name": "--ui-ref-font-family-mono",
@@ -778,8 +778,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-font-family-sans",
     "layer": "semantic",
-    "light": "'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif",
-    "dark": "'Inter', 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif"
+    "light": "Assistant, Roboto, \"Helvetica Neue\", sans-serif",
+    "dark": "Assistant, Roboto, \"Helvetica Neue\", sans-serif"
   },
   {
     "name": "--ui-font-family-mono",
