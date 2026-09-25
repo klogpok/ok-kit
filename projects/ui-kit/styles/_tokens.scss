@@ -501,4 +501,9 @@
   --ui-select-option-hover-bg: var(--ui-color-primary-subtle);
   --ui-select-option-active-bg: var(--ui-color-primary-subtle);
   --ui-select-option-selected-text: var(--ui-color-primary-text);
+  --ui-skeleton-bg: var(--ui-color-surface-active);
+  --ui-skeleton-highlight: var(--ui-color-surface-muted);
+  --ui-skeleton-radius-text: var(--ui-radius-sm);
+  --ui-skeleton-radius-rect: var(--ui-radius-control);
+  --ui-skeleton-line-gap: var(--ui-space-xs);
 }

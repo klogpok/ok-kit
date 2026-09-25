@@ -2328,5 +2328,35 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-primary-text)",
     "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-skeleton-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-skeleton-highlight",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-skeleton-radius-text",
+    "layer": "component",
+    "light": "var(--ui-radius-sm)",
+    "dark": "var(--ui-radius-sm)"
+  },
+  {
+    "name": "--ui-skeleton-radius-rect",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-skeleton-line-gap",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
   }
 ];

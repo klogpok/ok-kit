@@ -298,6 +298,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                                                             |
 | `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                                                            |
 | `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                                                           |
+| `@vplans/ui-kit/skeleton`   | `UiSkeleton`, `UiSkeletonShape`                                                                                                       |
 | `@vplans/ui-kit/divider`    | `UiDivider`                                                                                                                           |
 | `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                                                              |
 | `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                            |
@@ -577,6 +578,11 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-select-option-hover-bg`       | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
 | `--ui-select-option-active-bg`      | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
 | `--ui-select-option-selected-text`  | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-skeleton-bg`                  | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-skeleton-highlight`           | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
+| `--ui-skeleton-radius-text`         | component | `var(--ui-radius-sm)`                                                        | `var(--ui-radius-sm)`                                                  |
+| `--ui-skeleton-radius-rect`         | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-skeleton-line-gap`            | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
 
 <!-- tokens:end -->
 
