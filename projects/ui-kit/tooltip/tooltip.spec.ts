@@ -1,6 +1,7 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FocusMonitor } from '@angular/cdk/a11y';
+import { UiIconButton } from '@vplans/ui-kit/button';
 import { UiTooltip } from './tooltip';
 
 @Component({
@@ -130,5 +131,41 @@ describe('UiTooltip', () => {
     fixture.componentInstance.disabled.set(true);
     fixture.detectChanges();
     expect(panel()).toBeNull();
+  });
+});
+
+@Component({
+  imports: [UiIconButton, UiTooltip],
+  template: `
+    <button ui-icon-button label="Delete" [uiTooltip]="message()" [uiTooltipDisabled]="disabled()">
+      x
+    </button>
+    <button ui-icon-button label="Close" id="plain">x</button>
+  `,
+})
+class IconHost {
+  readonly message = signal('Delete the plan');
+  readonly disabled = signal(false);
+}
+
+describe('UiTooltip on ui-icon-button', () => {
+  it('removes the native title while the tooltip is active', () => {
+    const fixture = TestBed.createComponent(IconHost);
+    fixture.detectChanges();
+    const [button, plain] = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    );
+    expect(button.hasAttribute('title')).toBe(false);
+    expect(button.getAttribute('aria-label')).toBe('Delete');
+    expect(plain.getAttribute('title')).toBe('Close');
+
+    fixture.componentInstance.disabled.set(true);
+    fixture.detectChanges();
+    expect(button.getAttribute('title')).toBe('Delete');
+
+    fixture.componentInstance.disabled.set(false);
+    fixture.componentInstance.message.set('');
+    fixture.detectChanges();
+    expect(button.getAttribute('title')).toBe('Delete');
   });
 });

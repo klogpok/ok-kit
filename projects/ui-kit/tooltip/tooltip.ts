@@ -7,6 +7,7 @@ import {
   ElementRef,
   Injector,
   booleanAttribute,
+  computed,
   effect,
   inject,
   input,
@@ -24,7 +25,7 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { resolveDirection } from '@vplans/ui-kit/core';
+import { UI_TOOLTIP_HOST, UiTooltipHost, resolveDirection } from '@vplans/ui-kit/core';
 
 export type UiTooltipPosition = 'top' | 'bottom' | 'start' | 'end';
 
@@ -87,13 +88,14 @@ export class UiTooltipPanel {
 @Directive({
   selector: '[uiTooltip]',
   exportAs: 'uiTooltip',
+  providers: [{ provide: UI_TOOLTIP_HOST, useExisting: UiTooltip }],
   host: {
     '(mouseenter)': 'onMouseEnter()',
     '(mouseleave)': 'onMouseLeave()',
     '(keydown.escape)': 'onEscape($event)',
   },
 })
-export class UiTooltip {
+export class UiTooltip implements UiTooltipHost {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
   private readonly describer = inject(AriaDescriber);
@@ -106,6 +108,9 @@ export class UiTooltip {
   readonly showDelay = input(300, { alias: 'uiTooltipShowDelay', transform: numberAttribute });
   /** Milliseconds before the tooltip hides after the pointer leaves. */
   readonly hideDelay = input(100, { alias: 'uiTooltipHideDelay', transform: numberAttribute });
+
+  /** Whether the tooltip has a message and is not disabled. */
+  readonly active = computed(() => !this.disabled() && !!this.message().trim());
 
   private overlayRef: OverlayRef | null = null;
   private positionStrategy: FlexibleConnectedPositionStrategy | null = null;
