@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   DestroyRef,
   ElementRef,
   Injector,
@@ -33,6 +34,7 @@ import { UiCalendar } from './calendar';
 import {
   UiDateFilter,
   formatDay,
+  datePattern,
   formatHint,
   isDayEnabled,
   parseDay,
@@ -84,6 +86,8 @@ interface Draft {
         type="text"
         class="ui-datepicker__input"
         autocomplete="off"
+        dir="ltr"
+        [attr.inputmode]="inputMode()"
         [id]="controlId()"
         [value]="text()"
         [placeholder]="placeholder() || hint()"
@@ -161,6 +165,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly labels = inject(UI_LABELS);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
 
   readonly value = model<Date | null>(null);
   readonly min = input<Date | null | undefined>(null);
@@ -233,6 +238,10 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   private readonly locale = computed(() => this.labels().locale);
   protected readonly hint = computed(() => formatHint(this.locale()));
+  /** Numeric keypad with a dot on phones, when the locale separates the date with dots. */
+  protected readonly inputMode = computed(() =>
+    datePattern(this.locale()).separator === '.' ? 'decimal' : null,
+  );
 
   /** The value when it is a valid `Date`; a string from an API or an Invalid Date is shown empty. */
   protected readonly day = computed(() => validDay(this.value()));
@@ -310,9 +319,9 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   close(): void {
     if (!this.isOpen()) return;
     // Focus inside the panel (or lost with it, after Escape) returns to the button.
-    const active = document.activeElement;
+    const active = this.document.activeElement;
     const focusInPanel =
-      !active || active === document.body || !!this.panel()?.nativeElement.contains(active);
+      !active || active === this.document.body || !!this.panel()?.nativeElement.contains(active);
     this.isOpen.set(false);
     this.closed.emit();
     if (focusInPanel) this.toggleButton().nativeElement.focus();

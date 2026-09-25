@@ -76,6 +76,12 @@
   }
 }
 
+// The date is LTR (dir="ltr" on the input), so "25." does not show as ".25" while typing in
+// RTL. It still lines up with the other fields at the start side of an RTL form.
+:host(:dir(rtl)) .ui-datepicker__input {
+  text-align: end;
+}
+
 .ui-datepicker__toggle {
   flex-shrink: 0;
 }

@@ -446,6 +446,11 @@ describe('UiDatepicker with Signal Forms', () => {
     ).not.toContain('uiDateParse');
   });
 
+  it('keeps the date text LTR and asks phones for a numeric keypad', () => {
+    expect(input().getAttribute('dir')).toBe('ltr');
+    expect(input().getAttribute('inputmode')).toBe('decimal');
+  });
+
   it('takes min from minDate() in the schema', async () => {
     input().value = '31.12.2025';
     input().dispatchEvent(new Event('input'));
