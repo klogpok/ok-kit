@@ -7,7 +7,7 @@ import {
   afterNextRender,
   inject,
 } from '@angular/core';
-import { InteractivityChecker } from '@angular/cdk/a11y';
+import { FocusMonitor, InteractivityChecker } from '@angular/cdk/a11y';
 import { CdkDialogContainer, DialogConfig } from '@angular/cdk/dialog';
 import { CdkPortalOutlet, ComponentPortal } from '@angular/cdk/portal';
 
@@ -18,6 +18,11 @@ export interface UiDialogConfig<D = unknown, R = unknown> extends DialogConfig<D
   size?: UiDialogSize;
   /** Focus `[cdkFocusInitial]`, else the first form field, else the first tabbable element. */
   focusFirstField?: boolean;
+  /**
+   * Return focus to the element that opened the dialog. Replaces the CDK `restoreFocus: true`,
+   * which loses focus when that element is gone by then (a menu item of a closed menu).
+   */
+  restoreToOpener?: boolean;
 }
 
 const FIELDS = [
@@ -50,6 +55,8 @@ const TABBABLE = 'button, [href], input, select, textarea, [tabindex]';
 export class UiDialogContainer extends CdkDialogContainer<UiDialogConfig> {
   private readonly checker = inject(InteractivityChecker);
   private readonly injector = inject(Injector);
+  private readonly focusMonitor = inject(FocusMonitor);
+  private opener: HTMLElement | null = null;
   protected readonly size: UiDialogSize = this._config.size ?? 'md';
 
   override attachComponentPortal<T>(portal: ComponentPortal<T>): ComponentRef<T> {
@@ -60,12 +67,38 @@ export class UiDialogContainer extends CdkDialogContainer<UiDialogConfig> {
   }
 
   protected override _captureInitialFocus(): void {
+    this.opener = this.focusedOutside();
     // Runs before the CDK's own callback, which then leaves the focus alone ('dialog' mode
     // only focuses the container when nothing inside has focus).
-    if (this._config.focusFirstField) {
-      afterNextRender(() => this.focusFirstField(), { injector: this.injector });
-    }
+    afterNextRender(
+      () => {
+        // A menu item that opened the dialog is removed when its menu closes, and the menu has
+        // moved focus to its trigger by now.
+        if (!this.opener?.isConnected) this.opener = this.focusedOutside();
+        if (this._config.focusFirstField) this.focusFirstField();
+      },
+      { injector: this.injector },
+    );
     super._captureInitialFocus();
+  }
+
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    if (!this._config.restoreToOpener || !this.opener?.isConnected) return;
+    const active = this._document.activeElement;
+    const root = this._elementRef.nativeElement;
+    if (!active || active === this._document.body || root.contains(active)) {
+      this.focusMonitor.focusVia(this.opener, this._closeInteractionType);
+    }
+  }
+
+  private focusedOutside(): HTMLElement | null {
+    const active = this._document.activeElement;
+    return active instanceof HTMLElement &&
+      active !== this._document.body &&
+      !this._elementRef.nativeElement.contains(active)
+      ? active
+      : null;
   }
 
   private focusFirstField(): void {

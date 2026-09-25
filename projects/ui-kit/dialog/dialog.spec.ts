@@ -4,6 +4,7 @@ import { InteractivityChecker } from '@angular/cdk/a11y';
 import { Directionality } from '@angular/cdk/bidi';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { provideUiLabels } from '@vplans/ui-kit/core';
+import { UiMenu, UiMenuItem, UiMenuTrigger } from '@vplans/ui-kit/menu';
 import { UiDialog } from './dialog';
 import {
   UiDialogActions,
@@ -39,6 +40,22 @@ class RenameDialog {
   `,
 })
 class NoticeDialog {}
+
+@Component({
+  imports: [UiMenu, UiMenuItem, UiMenuTrigger],
+  template: `
+    <button type="button" class="menu-trigger" [uiMenuTriggerFor]="menu">Actions</button>
+    <ng-template #menu>
+      <ui-menu><button ui-menu-item (triggered)="rename()">Rename</button></ui-menu>
+    </ng-template>
+  `,
+})
+class MenuHost {
+  private readonly dialog = inject(UiDialog);
+  rename(): void {
+    this.dialog.open(RenameDialog, { data: { name: 'A' } });
+  }
+}
 
 // jsdom has no layout, so the real checker treats every element as hidden.
 const FOCUSABLE = 'button, input, select, textarea, a[href], [tabindex]';
@@ -137,6 +154,28 @@ describe('UiDialog', () => {
     expect(closed).toHaveBeenCalledWith('saved');
     expect(container()).toBeNull();
     expect(document.activeElement).toBe(trigger);
+  });
+
+  it('returns focus to the menu trigger when a menu item opened the dialog', async () => {
+    const fixture = TestBed.createComponent(MenuHost);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    const menuTrigger = document.querySelector<HTMLButtonElement>('.menu-trigger')!;
+    menuTrigger.focus();
+    menuTrigger.click();
+    await settle();
+    const item = document.querySelector<HTMLButtonElement>('[ui-menu-item]')!;
+    item.focus();
+    item.click();
+    await settle();
+    expect(container()).not.toBeNull();
+    expect(item.isConnected).toBe(false);
+
+    dialog.closeAll();
+    await settle();
+    expect(document.activeElement).toBe(menuTrigger);
+    fixture.destroy();
+    (fixture.nativeElement as HTMLElement).remove();
   });
 
   it('closes without a result from a bare uiDialogClose', async () => {

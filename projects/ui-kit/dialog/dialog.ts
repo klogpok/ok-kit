@@ -120,11 +120,15 @@ export class UiDialog {
     options: UiDialogOptions<D> = {},
   ): DialogRef<R, C> {
     const autoFocus = options.autoFocus ?? 'first-field';
+    const restoreToOpener = (options.restoreFocus ?? true) === true;
     const config: UiDialogConfig<D, DialogRef<R, C>> = {
       ...options,
       // With 'dialog' the CDK only focuses the container when the kit found nothing to focus.
       autoFocus: autoFocus === 'first-field' ? 'dialog' : autoFocus,
       focusFirstField: autoFocus === 'first-field',
+      // The container returns focus to the opener itself (see `restoreToOpener`).
+      restoreFocus: restoreToOpener ? false : options.restoreFocus,
+      restoreToOpener,
       size: options.size ?? 'md',
       // Resolved per dialog: the CDK Directionality misses runtime changes of `dir` on <html>.
       direction:
