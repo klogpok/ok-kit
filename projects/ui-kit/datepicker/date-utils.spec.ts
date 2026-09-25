@@ -44,6 +44,12 @@ describe('date utils', () => {
     expect(parseDay('tomorrow', 'he-IL')).toBeNull();
   });
 
+  it('treats a year of 1 or 3 digits as still being typed', () => {
+    expect(parseDay('1.1.2', 'he-IL')).toBeNull();
+    expect(parseDay('1.1.202', 'he-IL')).toBeNull();
+    expect(parseDay('1.1.20260', 'he-IL')).toBeNull();
+  });
+
   it('checks min, max and the filter', () => {
     const min = new Date(2026, 8, 10);
     const max = new Date(2026, 8, 20);

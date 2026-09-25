@@ -96,7 +96,7 @@ export function formatDay(date: Date, locale: string): string {
 /**
  * Parses a numeric date typed in the locale's order ("25.9.2026", "25/09/26", "25-9-2026").
  * Any non-digit separates the parts; two-digit years mean 20xx. Returns `null` when the text is
- * not a real date.
+ * not a real date, or the year has 1 or 3 digits (still being typed: "1.1.202" is not year 202).
  */
 export function parseDay(text: string, locale: string): Date | null {
   const numbers = text.match(/\d+/g);
@@ -106,8 +106,10 @@ export function parseDay(text: string, locale: string): Date | null {
   const value = (part: DatePart) => Number(numbers[order.indexOf(part)]);
   const day = value('day');
   const month = value('month');
+  const yearDigits = numbers[order.indexOf('year')].length;
+  if (yearDigits !== 2 && yearDigits !== 4) return null;
   let year = value('year');
-  if (numbers[order.indexOf('year')].length <= 2) year += 2000;
+  if (yearDigits === 2) year += 2000;
 
   if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month - 1)) return null;
   const date = new Date(year, month - 1, day);
