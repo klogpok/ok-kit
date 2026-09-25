@@ -3,6 +3,7 @@ import {
   clampDay,
   datePattern,
   firstDayOfWeek,
+  firstDayOfWeekFallback,
   formatDay,
   formatHint,
   isDayEnabled,
@@ -20,6 +21,23 @@ describe('date utils', () => {
     expect(firstDayOfWeek('he-IL')).toBe(0);
     expect(firstDayOfWeek('en-US')).toBe(0);
     expect(firstDayOfWeek('de-DE')).toBe(1);
+  });
+
+  it('falls back to a region table when Intl has no week info', () => {
+    expect(firstDayOfWeekFallback('he-IL')).toBe(0);
+    expect(firstDayOfWeekFallback('he')).toBe(0);
+    expect(firstDayOfWeekFallback('en-US')).toBe(0);
+    expect(firstDayOfWeekFallback('ar-EG')).toBe(6);
+    expect(firstDayOfWeekFallback('de-DE')).toBe(1);
+  });
+
+  it('reads a two-digit year within 50 years from now', () => {
+    const now = new Date().getFullYear();
+    const soon = (now + 10) % 100;
+    const past = (now + 60) % 100;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    expect(parseDay(`1.1.${pad(soon)}`, 'he-IL')!.getFullYear()).toBe(now + 10);
+    expect(parseDay(`1.1.${pad(past)}`, 'he-IL')!.getFullYear()).toBe(now + 60 - 100);
   });
 
   it('reads the numeric date order and separator', () => {

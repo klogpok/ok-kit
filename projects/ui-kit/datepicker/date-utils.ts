@@ -64,6 +64,27 @@ interface WeekInfo {
   firstDay: number;
 }
 
+// Regions whose week does not start on Monday (CLDR), for browsers without Intl week info.
+const SUNDAY_REGIONS = new Set(
+  'AG AS BR BS BT BW BZ CA CN CO DM DO ET GT GU HK HN ID IL IN JM JP KE KH KR LA MH MM MO MT MX MZ NI NP PA PE PH PK PR PT PY SA SG SV TH TT TW UM US VE VI WS YE ZA ZW'.split(
+    ' ',
+  ),
+);
+const SATURDAY_REGIONS = new Set('AE AF BH DJ DZ EG IQ IR JO KW LY OM QA SD SY'.split(' '));
+
+/** First day of the week from the locale's region, when Intl has no week info. */
+export function firstDayOfWeekFallback(locale: string): number {
+  let region: string | undefined;
+  try {
+    region = new Intl.Locale(locale).maximize().region;
+  } catch {
+    return 1;
+  }
+  if (!region) return 1;
+  if (SUNDAY_REGIONS.has(region)) return 0;
+  return SATURDAY_REGIONS.has(region) ? 6 : 1;
+}
+
 /** First day of the week for a locale as a JS day number (0 = Sunday). */
 export function firstDayOfWeek(locale: string): number {
   try {
@@ -73,9 +94,9 @@ export function firstDayOfWeek(locale: string): number {
     };
     const info = intl.getWeekInfo?.() ?? intl.weekInfo;
     // Intl uses 1 = Monday ... 7 = Sunday.
-    return (info?.firstDay ?? 1) % 7;
+    return info ? info.firstDay % 7 : firstDayOfWeekFallback(locale);
   } catch {
-    return 1;
+    return firstDayOfWeekFallback(locale);
   }
 }
 
@@ -100,7 +121,8 @@ export function formatDay(date: Date, locale: string): string {
 
 /**
  * Parses a numeric date typed in the locale's order ("25.9.2026", "25/09/26", "25-9-2026").
- * Any non-digit separates the parts; two-digit years mean 20xx. Returns `null` when the text is
+ * Any non-digit separates the parts; a two-digit year is the one within 50 years from now
+ * ("85" is 1985, "30" is 2030). Returns `null` when the text is
  * not a real date, or the year has 1 or 3 digits (still being typed: "1.1.202" is not year 202).
  */
 export function parseDay(text: string, locale: string): Date | null {
@@ -114,7 +136,10 @@ export function parseDay(text: string, locale: string): Date | null {
   const yearDigits = numbers[order.indexOf('year')].length;
   if (yearDigits !== 2 && yearDigits !== 4) return null;
   let year = value('year');
-  if (yearDigits === 2) year += 2000;
+  if (yearDigits === 2) {
+    year += 2000;
+    if (year > new Date().getFullYear() + 50) year -= 100;
+  }
 
   if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month - 1)) return null;
   const date = new Date(year, month - 1, day);
