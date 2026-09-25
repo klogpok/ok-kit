@@ -229,6 +229,7 @@ Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Direction
 | `@vplans/ui-kit/divider`    | `UiDivider`                                                                                |
 | `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                   |
 | `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter` |
+| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`                                        |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                           |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract                                     |
@@ -449,6 +450,18 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-card-title-font-size`         | component | `var(--ui-font-size-lg)`                                                     | `var(--ui-font-size-lg)`                                               |
 | `--ui-card-title-font-weight`       | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 | `--ui-card-subtitle-color`          | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-tabs-border`                  | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
+| `--ui-tabs-text`                    | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-tabs-text-hover`              | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-tabs-text-selected`           | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-tabs-indicator`               | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-tabs-indicator-thickness`     | component | `var(--ui-border-width-strong)`                                              | `var(--ui-border-width-strong)`                                        |
+| `--ui-tabs-height`                  | component | `var(--ui-control-height-lg)`                                                | `var(--ui-control-height-lg)`                                          |
+| `--ui-tabs-padding-inline`          | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-tabs-gap`                     | component | `var(--ui-space-2xs)`                                                        | `var(--ui-space-2xs)`                                                  |
+| `--ui-tabs-font-size`               | component | `var(--ui-font-size-md)`                                                     | `var(--ui-font-size-md)`                                               |
+| `--ui-tabs-font-weight`             | component | `var(--ui-font-weight-medium)`                                               | `var(--ui-font-weight-medium)`                                         |
+| `--ui-tabs-panel-padding`           | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
 
 <!-- tokens:end -->
 

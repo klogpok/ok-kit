@@ -450,4 +450,16 @@
   --ui-card-title-font-size: var(--ui-font-size-lg);
   --ui-card-title-font-weight: var(--ui-font-weight-semibold);
   --ui-card-subtitle-color: var(--ui-color-text-muted);
+  --ui-tabs-border: var(--ui-color-border);
+  --ui-tabs-text: var(--ui-color-text-muted);
+  --ui-tabs-text-hover: var(--ui-color-text);
+  --ui-tabs-text-selected: var(--ui-color-primary-text);
+  --ui-tabs-indicator: var(--ui-color-primary);
+  --ui-tabs-indicator-thickness: var(--ui-border-width-strong);
+  --ui-tabs-height: var(--ui-control-height-lg);
+  --ui-tabs-padding-inline: var(--ui-space-lg);
+  --ui-tabs-gap: var(--ui-space-2xs);
+  --ui-tabs-font-size: var(--ui-font-size-md);
+  --ui-tabs-font-weight: var(--ui-font-weight-medium);
+  --ui-tabs-panel-padding: var(--ui-space-lg);
 }

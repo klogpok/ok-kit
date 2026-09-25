@@ -2022,5 +2022,77 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-text-muted)",
     "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-tabs-border",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-tabs-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-tabs-text-hover",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-tabs-text-selected",
+    "layer": "component",
+    "light": "var(--ui-color-primary-text)",
+    "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-tabs-indicator",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-tabs-indicator-thickness",
+    "layer": "component",
+    "light": "var(--ui-border-width-strong)",
+    "dark": "var(--ui-border-width-strong)"
+  },
+  {
+    "name": "--ui-tabs-height",
+    "layer": "component",
+    "light": "var(--ui-control-height-lg)",
+    "dark": "var(--ui-control-height-lg)"
+  },
+  {
+    "name": "--ui-tabs-padding-inline",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-tabs-gap",
+    "layer": "component",
+    "light": "var(--ui-space-2xs)",
+    "dark": "var(--ui-space-2xs)"
+  },
+  {
+    "name": "--ui-tabs-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-md)",
+    "dark": "var(--ui-font-size-md)"
+  },
+  {
+    "name": "--ui-tabs-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-medium)",
+    "dark": "var(--ui-font-weight-medium)"
+  },
+  {
+    "name": "--ui-tabs-panel-padding",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
   }
 ];
