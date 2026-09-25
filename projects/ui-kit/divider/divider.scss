@@ -31,6 +31,19 @@
   }
 }
 
+// A vertical label: the text sits between two vertical lines.
+:host(.ui-divider--vertical.ui-divider--labelled) {
+  display: inline-flex;
+  flex-direction: column;
+  border-inline-start: 0;
+
+  &::before,
+  &::after {
+    border-block-start: 0;
+    border-inline-start: var(--_line);
+  }
+}
+
 @media (forced-colors: active) {
   :host {
     --_line: var(--ui-divider-thickness) solid CanvasText;
