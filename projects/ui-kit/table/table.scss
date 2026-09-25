@@ -1,0 +1,144 @@
+@use '../styles/mixins' as ui;
+
+// Unencapsulated: styles projected rows and cells. Every selector is scoped under `.ui-table`.
+.ui-table {
+  --_pad-block: var(--ui-table-cell-padding-block);
+  --_pad-inline: var(--ui-table-cell-padding-inline);
+
+  inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--ui-table-bg);
+  color: var(--ui-table-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-table-font-size);
+  line-height: var(--ui-line-height-snug);
+
+  &.ui-table--compact {
+    --_pad-block: var(--ui-table-cell-padding-block-compact);
+  }
+
+  > caption {
+    padding-block-end: var(--ui-space-sm);
+    font-weight: var(--ui-font-weight-semibold);
+    text-align: start;
+  }
+
+  th,
+  td {
+    padding-block: var(--_pad-block);
+    padding-inline: var(--_pad-inline);
+    border-block-end: var(--ui-border-width-default) solid var(--ui-table-border);
+    text-align: start;
+    vertical-align: middle;
+  }
+
+  > thead th {
+    background-color: var(--ui-table-header-bg);
+    color: var(--ui-table-header-text);
+    font-weight: var(--ui-table-header-font-weight);
+    white-space: nowrap;
+  }
+
+  > tbody > tr:not(.ui-table-message, .ui-table-skeleton):hover > td {
+    background-color: var(--ui-table-row-hover-bg);
+  }
+
+  > tbody > tr:last-child > td {
+    border-block-end: 0;
+  }
+
+  .ui-table-numeric {
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+
+  &.ui-table--sticky-header > thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--ui-z-sticky);
+  }
+
+  // Busy: the header's bottom edge becomes a pulsing primary line. The rows keep full contrast.
+  &.ui-table--loading > thead > tr:last-child > th {
+    box-shadow: inset 0 calc(var(--ui-border-width-strong) * -1) 0 var(--ui-color-primary);
+    animation: ui-table-busy calc(var(--ui-motion-duration-slow) * 2)
+      var(--ui-motion-easing-standard) infinite alternate;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+// Empty and error rows.
+.ui-table .ui-table-message__cell {
+  padding-block: var(--ui-table-message-padding);
+  color: var(--ui-table-message-text);
+  text-align: center;
+}
+
+// Sortable headers: the whole cell content is a button.
+.ui-table .ui-sort-header {
+  padding: 0;
+}
+
+.ui-table .ui-sort-header__button {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2xs);
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin: 0;
+  padding-block: var(--_pad-block);
+  padding-inline: var(--_pad-inline);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  @include ui.focus-visible(calc(var(--ui-focus-ring-width) * -1));
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.ui-table .ui-sort-header.ui-table-numeric .ui-sort-header__button {
+  justify-content: flex-end;
+}
+
+.ui-table .ui-sort-header__icon {
+  flex-shrink: 0;
+  color: var(--ui-table-sort-icon);
+  opacity: 0;
+
+  @include ui.transition(opacity);
+}
+
+.ui-table .ui-sort-header__button:is(:hover, :focus-visible):not(:disabled) .ui-sort-header__icon {
+  opacity: 1;
+}
+
+.ui-table .ui-sort-header--active {
+  color: var(--ui-table-text);
+
+  .ui-sort-header__icon {
+    color: var(--ui-table-sort-icon-active);
+    opacity: 1;
+  }
+}
+
+@keyframes ui-table-busy {
+  to {
+    box-shadow: inset 0 calc(var(--ui-border-width-strong) * -1) 0 transparent;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-table .ui-sort-header--active .ui-sort-header__icon {
+    color: CanvasText;
+  }
+}

@@ -547,4 +547,19 @@
   --ui-pagination-page-current-text: var(--ui-color-primary-contrast);
   --ui-pagination-summary-text: var(--ui-color-text-muted);
   --ui-pagination-summary-font-size: var(--ui-font-size-sm);
+  --ui-table-bg: var(--ui-color-surface);
+  --ui-table-border: var(--ui-color-border);
+  --ui-table-text: var(--ui-color-text);
+  --ui-table-font-size: var(--ui-font-size-sm);
+  --ui-table-header-bg: var(--ui-color-surface-muted);
+  --ui-table-header-text: var(--ui-color-text-muted);
+  --ui-table-header-font-weight: var(--ui-font-weight-semibold);
+  --ui-table-row-hover-bg: var(--ui-color-surface-hover);
+  --ui-table-cell-padding-inline: var(--ui-space-md);
+  --ui-table-cell-padding-block: var(--ui-space-md);
+  --ui-table-cell-padding-block-compact: var(--ui-space-xs);
+  --ui-table-message-padding: var(--ui-space-2xl);
+  --ui-table-message-text: var(--ui-color-text-muted);
+  --ui-table-sort-icon: var(--ui-color-text-subtle);
+  --ui-table-sort-icon-active: var(--ui-color-primary-text);
 }

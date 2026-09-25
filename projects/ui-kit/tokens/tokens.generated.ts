@@ -2604,5 +2604,95 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-font-size-sm)",
     "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-table-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-table-border",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-table-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-table-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-table-header-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-table-header-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-table-header-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-table-row-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-hover)",
+    "dark": "var(--ui-color-surface-hover)"
+  },
+  {
+    "name": "--ui-table-cell-padding-inline",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-table-cell-padding-block",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-table-cell-padding-block-compact",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-table-message-padding",
+    "layer": "component",
+    "light": "var(--ui-space-2xl)",
+    "dark": "var(--ui-space-2xl)"
+  },
+  {
+    "name": "--ui-table-message-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-table-sort-icon",
+    "layer": "component",
+    "light": "var(--ui-color-text-subtle)",
+    "dark": "var(--ui-color-text-subtle)"
+  },
+  {
+    "name": "--ui-table-sort-icon-active",
+    "layer": "component",
+    "light": "var(--ui-color-primary-text)",
+    "dark": "var(--ui-color-primary-text)"
   }
 ];
