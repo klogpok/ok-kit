@@ -83,9 +83,10 @@ export const ManyTabs: Story = {
 };
 
 /** Tabs as page navigation (`nav[ui-tab-nav]`). In an app, use `routerLink` + `routerLinkActive`. */
-export const Navigation: Story = {
-  render: () => ({
-    props: { current: 'details' },
+export const Navigation: StoryObj<{ current: string }> = {
+  args: { current: 'details' },
+  render: (args) => ({
+    props: args,
     template: `
       <nav ui-tab-nav aria-label="Plan pages">
         @for (page of ['details', 'documents', 'history']; track page) {
