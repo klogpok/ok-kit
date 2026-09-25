@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from 
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiIcon } from '@vplans/ui-kit/icon';
-import { UI_OPTION_PARENT } from './option';
+import { UiOptionParent } from './option';
 import { UiSelectBase } from './select-base';
 
 /**
@@ -33,7 +33,7 @@ import { UiSelectBase } from './select-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSelect) },
-    { provide: UI_OPTION_PARENT, useExisting: forwardRef(() => UiSelect) },
+    UiOptionParent,
   ],
   host: { class: 'ui-select' },
 })
@@ -43,11 +43,11 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
 
   protected readonly displayLabel = computed(() => this.selectedOptions()[0]?.getLabel() ?? '');
 
-  isSelected(value: unknown): boolean {
+  protected isSelected(value: unknown): boolean {
     return this.compareWith()(value, this.value());
   }
 
-  selectOption(value: unknown): void {
+  protected selectOption(value: unknown): void {
     this.value.set(value as T);
     this.notifyChange(value as T);
     this.close();

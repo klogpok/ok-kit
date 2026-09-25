@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from 
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiIcon } from '@vplans/ui-kit/icon';
-import { UI_OPTION_PARENT } from './option';
+import { UiOptionParent } from './option';
 import { UiSelectBase } from './select-base';
 
 /**
@@ -31,7 +31,7 @@ import { UiSelectBase } from './select-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiMultiSelect) },
-    { provide: UI_OPTION_PARENT, useExisting: forwardRef(() => UiMultiSelect) },
+    UiOptionParent,
   ],
   host: { class: 'ui-select ui-multi-select' },
 })
@@ -45,13 +45,13 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
       .join(', '),
   );
 
-  isSelected(value: unknown): boolean {
+  protected isSelected(value: unknown): boolean {
     const compare = this.compareWith();
     return this.value().some((selected) => compare(value, selected));
   }
 
   /** Adds the value, or removes it when it is already selected. */
-  selectOption(value: unknown): void {
+  protected selectOption(value: unknown): void {
     const compare = this.compareWith();
     const current = this.value();
     const next = this.isSelected(value)

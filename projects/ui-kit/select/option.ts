@@ -3,7 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  InjectionToken,
+  Injectable,
   booleanAttribute,
   computed,
   contentChildren,
@@ -14,16 +14,43 @@ import {
 import { Highlightable, _IdGenerator } from '@angular/cdk/a11y';
 import { UiIcon, uiIconCheck } from '@vplans/ui-kit/icon';
 
-/** What an option needs from the list that owns it. Internal. */
-export interface UiOptionParent {
+/** What an option needs from the list that owns it. */
+export interface UiOptionOwner {
   /** Multiple selection: options show a checkbox. */
-  readonly multiple: boolean;
+  multiple(): boolean;
   isSelected(value: unknown): boolean;
   isFilteredOut(label: string): boolean;
   selectOption(value: unknown): void;
 }
 
-export const UI_OPTION_PARENT = new InjectionToken<UiOptionParent>('UiOptionParent');
+/**
+ * Connects options to the select that owns them without making these calls part of the
+ * select's public API. Provided by `ui-select` / `ui-multi-select`. Internal.
+ */
+@Injectable()
+export class UiOptionParent {
+  private owner: UiOptionOwner | null = null;
+
+  connect(owner: UiOptionOwner): void {
+    this.owner = owner;
+  }
+
+  get multiple(): boolean {
+    return this.owner?.multiple() ?? false;
+  }
+
+  isSelected(value: unknown): boolean {
+    return this.owner?.isSelected(value) ?? false;
+  }
+
+  isFilteredOut(label: string): boolean {
+    return this.owner?.isFilteredOut(label) ?? false;
+  }
+
+  selectOption(value: unknown): void {
+    this.owner?.selectOption(value);
+  }
+}
 
 /**
  * Option of a `ui-select` or `ui-multi-select`. The projected text is the label; pass `label` when the content is
@@ -66,7 +93,7 @@ export const UI_OPTION_PARENT = new InjectionToken<UiOptionParent>('UiOptionPare
 })
 export class UiOption<T = unknown> implements Highlightable {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly parent = inject(UI_OPTION_PARENT);
+  private readonly parent = inject(UiOptionParent);
 
   readonly value = input.required<T>();
   readonly isDisabled = input(false, { alias: 'disabled', transform: booleanAttribute });

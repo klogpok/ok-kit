@@ -53,7 +53,7 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
 })
 export abstract class UiSelectBase<T, V>
   extends UiFormControlBase<V>
-  implements UiFormFieldControl, UiOptionParent
+  implements UiFormFieldControl
 {
   protected readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   protected readonly injector = inject(Injector);
@@ -120,6 +120,12 @@ export abstract class UiSelectBase<T, V>
 
   constructor() {
     super();
+    inject(UiOptionParent).connect({
+      multiple: () => this.multiple,
+      isSelected: (value) => this.isSelected(value),
+      isFilteredOut: (label) => this.isFilteredOut(label),
+      selectOption: (value) => this.selectOption(value),
+    });
     this.keyManager.change.subscribe(() =>
       this.activeId.set(this.keyManager.activeItem?.id ?? null),
     );
@@ -136,12 +142,12 @@ export abstract class UiSelectBase<T, V>
     });
   }
 
-  // --- UiOptionParent -------------------------------------------------------------------
+  // --- Options --------------------------------------------------------------------------
 
-  abstract isSelected(value: unknown): boolean;
-  abstract selectOption(value: unknown): void;
+  protected abstract isSelected(value: unknown): boolean;
+  protected abstract selectOption(value: unknown): void;
 
-  isFilteredOut(label: string): boolean {
+  protected isFilteredOut(label: string): boolean {
     const query = this.query().trim().toLocaleLowerCase();
     if (!query || !this.searchable() || !this.filterOptions()) return false;
     return !label.toLocaleLowerCase().includes(query);
