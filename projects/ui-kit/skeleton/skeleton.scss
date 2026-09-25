@@ -38,7 +38,7 @@
   gap: var(--ui-skeleton-line-gap);
 
   .ui-skeleton__bone {
-    block-size: 0.8em;
+    block-size: var(--ui-skeleton-text-height);
     border-radius: var(--ui-skeleton-radius-text);
   }
 
@@ -48,13 +48,13 @@
 }
 
 :host(.ui-skeleton--rect) {
-  block-size: 6em;
+  block-size: var(--ui-skeleton-rect-height);
 }
 
 :host(.ui-skeleton--circle) {
   display: inline-block;
-  inline-size: var(--_circle-size, 2.5em);
-  block-size: var(--_circle-size, 2.5em);
+  inline-size: var(--_circle-size, var(--ui-skeleton-circle-size));
+  block-size: var(--_circle-size, var(--ui-skeleton-circle-size));
   vertical-align: middle;
 
   .ui-skeleton__bone {

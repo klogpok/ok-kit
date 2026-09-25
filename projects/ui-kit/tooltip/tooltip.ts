@@ -212,11 +212,24 @@ export class UiTooltip {
     clearTimeout(this.hideTimer);
   }
 
+  /** `--ui-tooltip-viewport-margin` in pixels, as CDK needs a number. */
+  private viewportMargin(): number {
+    const view = this.host.ownerDocument.defaultView;
+    if (!view) return 0;
+    const value = view.getComputedStyle(this.host).getPropertyValue('--ui-tooltip-viewport-margin');
+    const size = parseFloat(value);
+    if (Number.isNaN(size)) return 0;
+    if (!value.trim().endsWith('rem')) return size;
+    return (
+      size * parseFloat(view.getComputedStyle(this.host.ownerDocument.documentElement).fontSize)
+    );
+  }
+
   private createOverlay(): OverlayRef {
     const strategy = createFlexibleConnectedPositionStrategy(this.injector, this.host)
       .withFlexibleDimensions(false)
       .withPush(true)
-      .withViewportMargin(8);
+      .withViewportMargin(this.viewportMargin());
     const overlayRef = createOverlayRef(this.injector, {
       positionStrategy: strategy,
       scrollStrategy: createRepositionScrollStrategy(this.injector, { scrollThrottle: 20 }),

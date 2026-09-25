@@ -8,7 +8,7 @@
 :host(.ui-divider--vertical) {
   display: inline-block;
   align-self: stretch;
-  min-block-size: 1em;
+  min-block-size: var(--ui-divider-vertical-min-height);
   border-block-start: 0;
   border-inline-start: var(--_line);
 }

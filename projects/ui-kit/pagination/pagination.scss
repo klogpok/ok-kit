@@ -20,7 +20,7 @@
 
 .ui-pagination__size {
   inline-size: auto;
-  min-inline-size: 5em;
+  min-inline-size: var(--ui-pagination-size-min-width);
 }
 
 .ui-pagination__range {

@@ -350,6 +350,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#29230a"
   },
   {
+    "name": "--ui-ref-color-scrim-light",
+    "layer": "primitive",
+    "light": "rgb(15 23 42 / 0.5)",
+    "dark": "rgb(15 23 42 / 0.5)"
+  },
+  {
+    "name": "--ui-ref-color-scrim-dark",
+    "layer": "primitive",
+    "light": "rgb(0 0 0 / 0.6)",
+    "dark": "rgb(0 0 0 / 0.6)"
+  },
+  {
     "name": "--ui-ref-space-0",
     "layer": "primitive",
     "light": "0",
@@ -488,6 +500,54 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "2.75rem"
   },
   {
+    "name": "--ui-ref-size-48",
+    "layer": "primitive",
+    "light": "12rem",
+    "dark": "12rem"
+  },
+  {
+    "name": "--ui-ref-size-60",
+    "layer": "primitive",
+    "light": "15rem",
+    "dark": "15rem"
+  },
+  {
+    "name": "--ui-ref-size-72",
+    "layer": "primitive",
+    "light": "18rem",
+    "dark": "18rem"
+  },
+  {
+    "name": "--ui-ref-size-80",
+    "layer": "primitive",
+    "light": "20rem",
+    "dark": "20rem"
+  },
+  {
+    "name": "--ui-ref-size-96",
+    "layer": "primitive",
+    "light": "24rem",
+    "dark": "24rem"
+  },
+  {
+    "name": "--ui-ref-size-100",
+    "layer": "primitive",
+    "light": "25rem",
+    "dark": "25rem"
+  },
+  {
+    "name": "--ui-ref-size-140",
+    "layer": "primitive",
+    "light": "35rem",
+    "dark": "35rem"
+  },
+  {
+    "name": "--ui-ref-size-200",
+    "layer": "primitive",
+    "light": "50rem",
+    "dark": "50rem"
+  },
+  {
     "name": "--ui-ref-size-px",
     "layer": "primitive",
     "light": "1px",
@@ -510,6 +570,36 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "primitive",
     "light": "1.125rem",
     "dark": "1.125rem"
+  },
+  {
+    "name": "--ui-ref-em-1",
+    "layer": "primitive",
+    "light": "1em",
+    "dark": "1em"
+  },
+  {
+    "name": "--ui-ref-em-5",
+    "layer": "primitive",
+    "light": "5em",
+    "dark": "5em"
+  },
+  {
+    "name": "--ui-ref-em-6",
+    "layer": "primitive",
+    "light": "6em",
+    "dark": "6em"
+  },
+  {
+    "name": "--ui-ref-em-0-8",
+    "layer": "primitive",
+    "light": "0.8em",
+    "dark": "0.8em"
+  },
+  {
+    "name": "--ui-ref-em-2-5",
+    "layer": "primitive",
+    "light": "2.5em",
+    "dark": "2.5em"
   },
   {
     "name": "--ui-ref-radius-none",
@@ -1068,6 +1158,84 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "semantic",
     "light": "1.5rem",
     "dark": "1.5rem"
+  },
+  {
+    "name": "--ui-container-width-xs",
+    "layer": "semantic",
+    "light": "12rem",
+    "dark": "12rem"
+  },
+  {
+    "name": "--ui-container-width-sm",
+    "layer": "semantic",
+    "light": "15rem",
+    "dark": "15rem"
+  },
+  {
+    "name": "--ui-container-width-md",
+    "layer": "semantic",
+    "light": "20rem",
+    "dark": "20rem"
+  },
+  {
+    "name": "--ui-container-width-lg",
+    "layer": "semantic",
+    "light": "24rem",
+    "dark": "24rem"
+  },
+  {
+    "name": "--ui-container-width-xl",
+    "layer": "semantic",
+    "light": "25rem",
+    "dark": "25rem"
+  },
+  {
+    "name": "--ui-container-width-2xl",
+    "layer": "semantic",
+    "light": "35rem",
+    "dark": "35rem"
+  },
+  {
+    "name": "--ui-container-width-3xl",
+    "layer": "semantic",
+    "light": "50rem",
+    "dark": "50rem"
+  },
+  {
+    "name": "--ui-panel-max-height",
+    "layer": "semantic",
+    "light": "18rem",
+    "dark": "18rem"
+  },
+  {
+    "name": "--ui-em-1",
+    "layer": "semantic",
+    "light": "1em",
+    "dark": "1em"
+  },
+  {
+    "name": "--ui-em-5",
+    "layer": "semantic",
+    "light": "5em",
+    "dark": "5em"
+  },
+  {
+    "name": "--ui-em-6",
+    "layer": "semantic",
+    "light": "6em",
+    "dark": "6em"
+  },
+  {
+    "name": "--ui-em-0-8",
+    "layer": "semantic",
+    "light": "0.8em",
+    "dark": "0.8em"
+  },
+  {
+    "name": "--ui-em-2-5",
+    "layer": "semantic",
+    "light": "2.5em",
+    "dark": "2.5em"
   },
   {
     "name": "--ui-z-raised",
@@ -1820,6 +1988,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-space-md)"
   },
   {
+    "name": "--ui-divider-vertical-min-height",
+    "layer": "component",
+    "light": "var(--ui-em-1)",
+    "dark": "var(--ui-em-1)"
+  },
+  {
     "name": "--ui-badge-radius",
     "layer": "component",
     "light": "var(--ui-radius-full)",
@@ -2122,14 +2296,20 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-tooltip-max-width",
     "layer": "component",
-    "light": "20em",
-    "dark": "20em"
+    "light": "var(--ui-container-width-sm)",
+    "dark": "var(--ui-container-width-sm)"
   },
   {
     "name": "--ui-tooltip-offset",
     "layer": "component",
     "light": "var(--ui-space-xs)",
     "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-tooltip-viewport-margin",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
   },
   {
     "name": "--ui-dialog-bg",
@@ -2170,20 +2350,20 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-dialog-width-sm",
     "layer": "component",
-    "light": "25rem",
-    "dark": "25rem"
+    "light": "var(--ui-container-width-xl)",
+    "dark": "var(--ui-container-width-xl)"
   },
   {
     "name": "--ui-dialog-width-md",
     "layer": "component",
-    "light": "35rem",
-    "dark": "35rem"
+    "light": "var(--ui-container-width-2xl)",
+    "dark": "var(--ui-container-width-2xl)"
   },
   {
     "name": "--ui-dialog-width-lg",
     "layer": "component",
-    "light": "50rem",
-    "dark": "50rem"
+    "light": "var(--ui-container-width-3xl)",
+    "dark": "var(--ui-container-width-3xl)"
   },
   {
     "name": "--ui-dialog-title-font-size",
@@ -2230,8 +2410,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-toast-width",
     "layer": "component",
-    "light": "24rem",
-    "dark": "24rem"
+    "light": "var(--ui-container-width-lg)",
+    "dark": "var(--ui-container-width-lg)"
   },
   {
     "name": "--ui-toast-gap",
@@ -2302,8 +2482,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-select-panel-max-height",
     "layer": "component",
-    "light": "18rem",
-    "dark": "18rem"
+    "light": "var(--ui-panel-max-height)",
+    "dark": "var(--ui-panel-max-height)"
   },
   {
     "name": "--ui-select-option-height",
@@ -2358,6 +2538,24 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-space-xs)",
     "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-skeleton-text-height",
+    "layer": "component",
+    "light": "var(--ui-em-0-8)",
+    "dark": "var(--ui-em-0-8)"
+  },
+  {
+    "name": "--ui-skeleton-rect-height",
+    "layer": "component",
+    "light": "var(--ui-em-6)",
+    "dark": "var(--ui-em-6)"
+  },
+  {
+    "name": "--ui-skeleton-circle-size",
+    "layer": "component",
+    "light": "var(--ui-em-2-5)",
+    "dark": "var(--ui-em-2-5)"
   },
   {
     "name": "--ui-accordion-bg",
@@ -2476,14 +2674,14 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-menu-min-width",
     "layer": "component",
-    "light": "12rem",
-    "dark": "12rem"
+    "light": "var(--ui-container-width-xs)",
+    "dark": "var(--ui-container-width-xs)"
   },
   {
     "name": "--ui-menu-max-width",
     "layer": "component",
-    "light": "20rem",
-    "dark": "20rem"
+    "light": "var(--ui-container-width-md)",
+    "dark": "var(--ui-container-width-md)"
   },
   {
     "name": "--ui-menu-item-height",
@@ -2604,6 +2802,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-font-size-sm)",
     "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-pagination-size-min-width",
+    "layer": "component",
+    "light": "var(--ui-em-5)",
+    "dark": "var(--ui-em-5)"
   },
   {
     "name": "--ui-table-bg",
