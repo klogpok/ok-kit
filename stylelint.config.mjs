@@ -30,8 +30,10 @@ export default {
         'unit-disallowed-list': [['px', 'rem', 'pt'], { ignoreProperties: { px: [] } }],
         'declaration-property-value-disallowed-list': {
           '/^(z-index|transition-duration|animation-duration)$/': ['/^[1-9]/'],
+          // Logical values (start/end) mirror in RTL; physical ones do not.
+          'text-align': ['left', 'right'],
         },
-        'property-disallowed-list': ['margin-left', 'margin-right', 'padding-left', 'padding-right', 'left', 'right', 'border-left', 'border-right', 'text-align'],
+        'property-disallowed-list': ['margin-left', 'margin-right', 'padding-left', 'padding-right', 'left', 'right', 'border-left', 'border-right'],
       },
     },
   ],
