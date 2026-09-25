@@ -106,8 +106,10 @@
   }
 }
 
+// The icon goes before the label, so the label lines up with the numbers at the end.
 .ui-table .ui-sort-header.ui-table-numeric .ui-sort-header__button {
-  justify-content: flex-end;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
 .ui-table .ui-sort-header__icon {
