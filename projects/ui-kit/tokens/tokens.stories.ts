@@ -29,8 +29,8 @@ export const SemanticColors: Story = {
             <span [style.background]="'var(' + t.name + ')'"
               style="inline-size:40px;block-size:40px;flex:none;border-radius:var(--ui-radius-control);border:1px solid var(--ui-color-border)"></span>
             <span style="display:grid;min-inline-size:0">
-              <code class="ui-code">{{ t.name }}</code>
-              <span class="ui-caption">{{ t.light }} / {{ t.dark }}</span>
+              <code dir="ltr" class="ui-code">{{ t.name }}</code>
+              <span class="ui-caption" dir="ltr">{{ t.light }} / {{ t.dark }}</span>
             </span>
           </div>
         }
@@ -45,8 +45,8 @@ export const Scale: Story = {
       <table class="ui-body-sm" style="border-collapse:collapse">
         @for (t of tokens; track t.name) {
           <tr style="border-block-end:1px solid var(--ui-color-border)">
-            <td style="padding:8px"><code class="ui-code">{{ t.name }}</code></td>
-            <td style="padding:8px" class="ui-text-muted">{{ t.light }}</td>
+            <td style="padding:8px"><code dir="ltr" class="ui-code">{{ t.name }}</code></td>
+            <td style="padding:8px" class="ui-text-muted" dir="ltr">{{ t.light }}</td>
             <td style="padding:8px">
               @if (t.name.includes('shadow')) {
                 <div [style.box-shadow]="'var(' + t.name + ')'" style="inline-size:64px;block-size:32px;background:var(--ui-color-surface-raised);border-radius:var(--ui-radius-control)"></div>
@@ -72,8 +72,8 @@ export const ComponentTokens: Story = {
         <tr><th style="text-align:start;padding:8px">Token</th><th style="text-align:start;padding:8px">Default</th></tr>
         @for (t of tokens; track t.name) {
           <tr style="border-block-end:1px solid var(--ui-color-border)">
-            <td style="padding:8px"><code class="ui-code">{{ t.name }}</code></td>
-            <td style="padding:8px"><code class="ui-code ui-text-muted">{{ t.light }}</code></td>
+            <td style="padding:8px"><code dir="ltr" class="ui-code">{{ t.name }}</code></td>
+            <td style="padding:8px"><code dir="ltr" class="ui-code ui-text-muted">{{ t.light }}</code></td>
           </tr>
         }
       </table>`,
@@ -89,9 +89,9 @@ export const Typography: Story = {
         <h2 class="ui-heading-2">Heading 2 — Order summary</h2>
         <h3 class="ui-heading-3">Heading 3 — Order summary</h3>
         <h4 class="ui-heading-4">Heading 4 — Order summary</h4>
-        <p class="ui-body-lg">Body large. The quick brown fox jumps over the lazy dog.</p>
-        <p class="ui-body">Body. The quick brown fox jumps over the lazy dog.</p>
-        <p class="ui-body-sm">Body small. The quick brown fox jumps over the lazy dog.</p>
+        <p class="ui-body-lg" lang="en" dir="ltr">Body large. The quick brown fox jumps over the lazy dog.</p>
+        <p class="ui-body" lang="en" dir="ltr">Body. The quick brown fox jumps over the lazy dog.</p>
+        <p class="ui-body-sm" lang="en" dir="ltr">Body small. The quick brown fox jumps over the lazy dog.</p>
         <span class="ui-label">Label</span>
         <span class="ui-caption">Caption — updated 5 minutes ago</span>
         <p class="ui-body" dir="rtl" lang="he">עברית: השועל החום המהיר קופץ מעל הכלב העצלן.</p>
