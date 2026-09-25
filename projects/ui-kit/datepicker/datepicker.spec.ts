@@ -18,6 +18,12 @@ function keydown(target: Element, key: string, init: KeyboardEventInit = {}): vo
   );
 }
 
+/** Focus leaves the element to outside the datepicker. */
+function leave(target: Element, relatedTarget: Element | null = null): void {
+  target.dispatchEvent(new FocusEvent('blur', { relatedTarget }));
+  target.dispatchEvent(new FocusEvent('focusout', { relatedTarget, bubbles: true }));
+}
+
 const dialog = () => document.querySelector<HTMLElement>('.ui-datepicker__panel');
 
 @Component({
@@ -49,7 +55,7 @@ describe('UiDatepicker', () => {
     await settle(fixture);
   };
   const blur = async () => {
-    input().dispatchEvent(new FocusEvent('blur'));
+    leave(input());
     await settle(fixture);
   };
 
@@ -214,7 +220,7 @@ describe('UiDatepicker with Reactive Forms', () => {
 
   it('marks touched on blur and links the error', async () => {
     fixture.componentInstance.control.setValue(null);
-    input().dispatchEvent(new FocusEvent('blur'));
+    leave(input());
     await settle(fixture);
     expect(fixture.componentInstance.control.touched).toBe(true);
     expect(input().getAttribute('aria-invalid')).toBe('true');
@@ -231,7 +237,7 @@ describe('UiDatepicker with Reactive Forms', () => {
     expect(control.hasError('uiDateParse')).toBe(true);
     expect(control.hasError('required')).toBe(true);
 
-    input().dispatchEvent(new FocusEvent('blur'));
+    leave(input());
     await settle(fixture);
     expect(input().getAttribute('aria-invalid')).toBe('true');
 
@@ -251,6 +257,23 @@ describe('UiDatepicker with Reactive Forms', () => {
     await settle(fixture);
     expect(control.valid).toBe(true);
     expect(input().value).toBe('1.4.2026');
+  });
+
+  it('is not touched while focus moves to its own calendar button', async () => {
+    const control = fixture.componentInstance.control;
+    leave(input(), root.querySelector('.ui-datepicker__toggle'));
+    await settle(fixture);
+    expect(control.touched).toBe(false);
+  });
+
+  it('is touched when the calendar closes without a pick', async () => {
+    const control = fixture.componentInstance.control;
+    root.querySelector<HTMLButtonElement>('.ui-datepicker__toggle')!.click();
+    await settle(fixture);
+    keydown(dialog()!, 'Escape');
+    await settle(fixture);
+    expect(dialog()).toBeNull();
+    expect(control.touched).toBe(true);
   });
 
   it('disables the field and the calendar button', async () => {
@@ -303,7 +326,7 @@ describe('UiDatepicker with Signal Forms', () => {
 
   it('shows the required state and the error once touched', async () => {
     expect(input().getAttribute('aria-required')).toBe('true');
-    input().dispatchEvent(new FocusEvent('blur'));
+    leave(input());
     await settle(fixture);
     expect(fixture.componentInstance.f.date().touched()).toBe(true);
     expect(input().getAttribute('aria-invalid')).toBe('true');
@@ -323,7 +346,7 @@ describe('UiDatepicker with Signal Forms', () => {
     ).toContain('uiDateParse');
     expect(root.textContent).not.toContain('תאריך לא תקין');
 
-    input().dispatchEvent(new FocusEvent('blur'));
+    leave(input());
     await settle(fixture);
     expect(root.textContent).toContain('תאריך לא תקין');
 
@@ -337,7 +360,7 @@ describe('UiDatepicker with Signal Forms', () => {
   it('takes min from minDate() in the schema', async () => {
     input().value = '31.12.2025';
     input().dispatchEvent(new Event('input'));
-    input().dispatchEvent(new FocusEvent('blur'));
+    leave(input());
     await settle(fixture);
     expect(fixture.componentInstance.model().date).toBeNull();
     expect(input().getAttribute('aria-invalid')).toBe('true');

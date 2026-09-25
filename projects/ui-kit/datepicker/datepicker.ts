@@ -140,6 +140,7 @@ interface Draft {
     '[class.ui-datepicker--disabled]': 'isDisabled()',
     '[class.ui-datepicker--invalid]': 'invalidState()',
     '[attr.id]': 'id()',
+    '(focusout)': 'onFocusOut($event)',
   },
 })
 export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFormFieldControl {
@@ -277,6 +278,8 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
     this.isOpen.set(false);
     this.closed.emit();
     if (focusInPanel) this.toggleButton().nativeElement.focus();
+    // The user has dealt with the field, even when no day was picked.
+    this.notifyTouched();
   }
 
   protected toggle(): void {
@@ -327,6 +330,12 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected onBlur(): void {
     this.commitDraft();
+  }
+
+  /** Touched once focus leaves the field, its button and the calendar. */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && (this.host.contains(next) || this.panel()?.nativeElement.contains(next))) return;
     this.notifyTouched();
   }
 
