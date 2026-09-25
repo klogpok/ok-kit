@@ -24,7 +24,7 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
     '[class.ui-input--affixed]': 'formField?.hasAffixes() ?? false',
     '[id]': 'id()',
     '[attr.aria-invalid]': 'showError() ? "true" : null',
-    '[attr.aria-describedby]': 'formField?.describedBy() ?? null',
+    '[attr.aria-describedby]': 'describedBy()',
     '[attr.aria-required]': 'isRequired() ? "true" : null',
   },
 })
@@ -43,6 +43,8 @@ export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
    * is derived from the control (invalid and touched).
    */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Ids of the app's own descriptions, kept before the hint / error of `ui-form-field`. */
+  readonly ariaDescribedBy = input<string | null>(null, { alias: 'aria-describedby' });
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => this.id());
@@ -52,6 +54,9 @@ export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
     this.state.bound ? this.state.invalid() && this.state.touched() : this.invalid(),
   );
   readonly errorMessages = this.state.errorMessages;
+  protected readonly describedBy = computed(
+    () => [this.ariaDescribedBy(), this.formField?.describedBy()].filter(Boolean).join(' ') || null,
+  );
 
   ngDoCheck(): void {
     this.state.sync();

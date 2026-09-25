@@ -2,6 +2,7 @@ import { Component, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { UiSize } from '@vplans/ui-kit/core';
+import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiInput } from './input';
 import { UiTextarea } from './textarea';
 
@@ -74,5 +75,30 @@ describe('UiInput / UiTextarea', () => {
     expect(textarea.classList).not.toContain('ui-textarea--autosize');
     await update((h) => h.autosize.set(true));
     expect(textarea.classList).toContain('ui-textarea--autosize');
+  });
+});
+
+@Component({
+  imports: [UiInput, UiFormField],
+  template: `
+    <input ui-input aria-describedby="rules" />
+    <ui-form-field label="Password" hint="8 characters">
+      <input ui-input aria-describedby="rules" />
+    </ui-form-field>
+  `,
+})
+class DescribedHost {}
+
+describe('UiInput aria-describedby', () => {
+  it('keeps the app description and adds the field hint after it', async () => {
+    const fixture = TestBed.createComponent(DescribedHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const [alone, inField] = (fixture.nativeElement as HTMLElement).querySelectorAll('input');
+    expect(alone.getAttribute('aria-describedby')).toBe('rules');
+    const [own, hint] = inField.getAttribute('aria-describedby')!.split(' ');
+    expect(own).toBe('rules');
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector(`#${hint}`)!.textContent).toContain('8 characters');
   });
 });
