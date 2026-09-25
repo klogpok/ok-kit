@@ -30,7 +30,17 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/ui-kit/tsconfig.spec.json"
+            "tsConfig": "projects/ui-kit/tsconfig.spec.json",
+            "coverageExclude": [
+              "**/*.stories.ts",
+              "**/tokens.generated.ts"
+            ],
+            "coverageThresholds": {
+              "statements": 94,
+              "branches": 90,
+              "functions": 88,
+              "lines": 96
+            }
           }
         },
         "lint": {
