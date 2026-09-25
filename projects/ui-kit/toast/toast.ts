@@ -73,39 +73,65 @@ export function provideUiToast(config: Partial<UiToastConfig>): EnvironmentProvi
 /** Why a toast was dismissed. */
 export type UiToastDismissReason = 'timeout' | 'close' | 'action' | 'programmatic' | 'overflow';
 
-/** Handle of a shown toast. */
-export class UiToastRef {
-  private readonly dismissed = new Subject<UiToastDismissReason>();
-  private readonly actions = new Subject<void>();
+/** What a ref keeps out of its public API. */
+interface UiToastRefState {
+  readonly dismissed: Subject<UiToastDismissReason>;
+  readonly actions: Subject<void>;
+  readonly remove: (reason: UiToastDismissReason) => void;
+}
 
+const refStates = new WeakMap<UiToastRef, UiToastRefState>();
+
+/** Handle of a shown toast. Created by `UiToast`. */
+export class UiToastRef {
   /** Emits once, when the toast is dismissed, then completes. */
-  readonly afterDismissed: Observable<UiToastDismissReason> = this.dismissed.asObservable();
+  readonly afterDismissed: Observable<UiToastDismissReason>;
   /** Emits when the action button is clicked. The toast is dismissed right after. */
-  readonly onAction: Observable<void> = this.actions.asObservable();
+  readonly onAction: Observable<void>;
 
   constructor(
     readonly id: number,
-    private readonly remove: (ref: UiToastRef, reason: UiToastDismissReason) => void,
-  ) {}
+    remove: (ref: UiToastRef, reason: UiToastDismissReason) => void,
+  ) {
+    const state: UiToastRefState = {
+      dismissed: new Subject(),
+      actions: new Subject(),
+      remove: (reason) => remove(this, reason),
+    };
+    refStates.set(this, state);
+    this.afterDismissed = state.dismissed.asObservable();
+    this.onAction = state.actions.asObservable();
+  }
 
   dismiss(): void {
-    this.remove(this, 'programmatic');
-  }
-
-  /** @internal */
-  _triggerAction(): void {
-    this.actions.next();
-    this.actions.complete();
-    this.remove(this, 'action');
-  }
-
-  /** @internal */
-  _finish(reason: UiToastDismissReason): void {
-    this.dismissed.next(reason);
-    this.dismissed.complete();
-    this.actions.complete();
+    refStates.get(this)?.remove('programmatic');
   }
 }
+
+function triggerAction(ref: UiToastRef): void {
+  const state = refStates.get(ref);
+  if (!state) return;
+  state.actions.next();
+  state.actions.complete();
+  state.remove('action');
+}
+
+function finish(ref: UiToastRef, reason: UiToastDismissReason): void {
+  const state = refStates.get(ref);
+  if (!state) return;
+  state.dismissed.next(reason);
+  state.dismissed.complete();
+  state.actions.complete();
+}
+
+/** What the container may do with the stack, kept out of the public `UiToast` API. */
+interface UiToastControl {
+  close(ref: UiToastRef): void;
+  pause(source: 'pointer' | 'focus'): void;
+  resume(source: 'pointer' | 'focus'): void;
+}
+
+const UI_TOAST_CONTROL = new InjectionToken<UiToastControl>('UiToastControl');
 
 /** A toast as rendered by the container. */
 export interface UiToastItem {
@@ -172,14 +198,15 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
     role: 'region',
     '[class]': '"ui-toast-container--" + position',
     '[attr.aria-label]': 'labels().notifications',
-    '(mouseenter)': 'toasts.pause("pointer")',
-    '(mouseleave)': 'toasts.resume("pointer")',
+    '(mouseenter)': 'control.pause("pointer")',
+    '(mouseleave)': 'control.resume("pointer")',
     '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'onFocusOut($event)',
   },
 })
 export class UiToastContainer {
   protected readonly toasts = inject(UiToast);
+  protected readonly control = inject(UI_TOAST_CONTROL);
   protected readonly labels = inject(UI_LABELS);
   protected readonly position = inject(UI_TOAST_CONFIG).position;
   protected readonly icons = ICONS;
@@ -192,7 +219,7 @@ export class UiToastContainer {
   protected onFocusIn(event: FocusEvent): void {
     const from = event.relatedTarget;
     if (from instanceof HTMLElement && !this.host.contains(from)) this.returnTo = from;
-    this.toasts.pause('focus');
+    this.control.pause('focus');
   }
 
   /**
@@ -209,13 +236,13 @@ export class UiToastContainer {
         (this.returnTo?.isConnected ? this.returnTo : null);
       target?.focus();
     }
-    if (reason === 'action') toast.ref._triggerAction();
-    else this.toasts.close(toast.ref);
+    if (reason === 'action') triggerAction(toast.ref);
+    else this.control.close(toast.ref);
   }
 
   protected onFocusOut(event: FocusEvent): void {
     const next = event.relatedTarget as Node | null;
-    if (!next || !(event.currentTarget as HTMLElement).contains(next)) this.toasts.resume('focus');
+    if (!next || !(event.currentTarget as HTMLElement).contains(next)) this.control.resume('focus');
   }
 }
 
@@ -296,13 +323,14 @@ export class UiToast {
     this.items().forEach((item) => this.remove(item.ref, 'programmatic'));
   }
 
-  /** @internal Close button. */
-  close(ref: UiToastRef): void {
-    this.remove(ref, 'close');
-  }
+  private readonly control: UiToastControl = {
+    close: (ref) => this.remove(ref, 'close'),
+    pause: (source) => this.pause(source),
+    resume: (source) => this.resume(source),
+  };
 
-  /** @internal Pauses all timers while the pointer or focus is on the stack. */
-  pause(source: 'pointer' | 'focus'): void {
+  /** Pauses all timers while the pointer or focus is on the stack. */
+  private pause(source: 'pointer' | 'focus'): void {
     if (!this.pausedBy.size) {
       for (const timer of this.timers.values()) {
         clearTimeout(timer.handle);
@@ -313,8 +341,7 @@ export class UiToast {
     this.pausedBy.add(source);
   }
 
-  /** @internal */
-  resume(source: 'pointer' | 'focus'): void {
+  private resume(source: 'pointer' | 'focus'): void {
     this.pausedBy.delete(source);
     if (!this.pausedBy.size) this.timers.forEach((_, ref) => this.startTimer(ref));
   }
@@ -343,14 +370,18 @@ export class UiToast {
       // The stack is gone, so nothing can hold the pause any more.
       this.pausedBy.clear();
     }
-    ref._finish(reason);
+    finish(ref, reason);
   }
 
   private attach(): void {
     const overlayRef = (this.overlayRef ??= this.createOverlay());
     overlayRef.setDirection(resolveDirection(this.document.documentElement));
     if (!overlayRef.hasAttached()) {
-      overlayRef.attach(new ComponentPortal(UiToastContainer, null, this.injector));
+      const injector = Injector.create({
+        providers: [{ provide: UI_TOAST_CONTROL, useValue: this.control }],
+        parent: this.injector,
+      });
+      overlayRef.attach(new ComponentPortal(UiToastContainer, null, injector));
     } else {
       this.raise(overlayRef.hostElement);
     }
