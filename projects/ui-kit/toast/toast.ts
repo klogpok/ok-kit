@@ -167,9 +167,9 @@ const ICONS: Record<UiToastTone, UiIconDefinition> = {
         <ui-icon class="ui-toast__icon" size="md" [icon]="icons[toast.tone]" />
         <div class="ui-toast__body">
           @if (toast.title) {
-            <div class="ui-toast__title">{{ toast.title }}</div>
+            <div class="ui-toast__title" dir="auto">{{ toast.title }}</div>
           }
-          <div class="ui-toast__message">{{ toast.message }}</div>
+          <div class="ui-toast__message" dir="auto">{{ toast.message }}</div>
         </div>
         @if (toast.action) {
           <button ui-button variant="ghost" size="sm" (click)="dismiss(toast, index, 'action')">
