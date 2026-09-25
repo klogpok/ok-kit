@@ -1,21 +1,30 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
-import { UiTooltip } from './tooltip';
+import { UiTooltip, UiTooltipPosition } from './tooltip';
 
-const meta: Meta<UiTooltip> = {
+// Arg names differ from the directive's fields: Storybook writes args onto the component instance.
+interface TooltipArgs {
+  text: string;
+  placement: UiTooltipPosition;
+  off: boolean;
+  showAfter: number;
+  hideAfter: number;
+}
+
+const meta: Meta<TooltipArgs> = {
   title: 'Overlays/Tooltip',
   component: UiTooltip,
   decorators: [moduleMetadata({ imports: [UiButton, UiIconButton, UiIcon] })],
   argTypes: {
-    position: { control: 'inline-radio', options: ['top', 'bottom', 'start', 'end'] },
+    placement: { control: 'inline-radio', options: ['top', 'bottom', 'start', 'end'] },
   },
   args: {
-    message: 'Delete the plan',
-    position: 'top',
-    disabled: false,
-    showDelay: 300,
-    hideDelay: 100,
+    text: 'Delete the plan',
+    placement: 'top',
+    off: false,
+    showAfter: 300,
+    hideAfter: 100,
   },
   render: (args) => ({
     props: args,
@@ -25,11 +34,11 @@ const meta: Meta<UiTooltip> = {
           ui-icon-button
           variant="ghost"
           label="Delete"
-          [uiTooltip]="message"
-          [uiTooltipPosition]="position"
-          [uiTooltipDisabled]="disabled"
-          [uiTooltipShowDelay]="showDelay"
-          [uiTooltipHideDelay]="hideDelay"
+          [uiTooltip]="text"
+          [uiTooltipPosition]="placement"
+          [uiTooltipDisabled]="off"
+          [uiTooltipShowDelay]="showAfter"
+          [uiTooltipHideDelay]="hideAfter"
         >
           <ui-icon icon="trash" />
         </button>
@@ -38,17 +47,17 @@ const meta: Meta<UiTooltip> = {
 };
 
 export default meta;
-type Story = StoryObj<UiTooltip>;
+type Story = StoryObj<TooltipArgs>;
 
 export const Default: Story = {};
-export const Bottom: Story = { args: { position: 'bottom' } };
-export const Start: Story = { args: { position: 'start' } };
-export const End: Story = { args: { position: 'end' } };
-export const Disabled: Story = { args: { disabled: true } };
+export const Bottom: Story = { args: { placement: 'bottom' } };
+export const Start: Story = { args: { placement: 'start' } };
+export const End: Story = { args: { placement: 'end' } };
+export const Disabled: Story = { args: { off: true } };
 
 export const LongText: Story = {
   args: {
-    message:
+    text:
       'The plan is locked while the owner signs it. You can edit it again once it is signed or returned.',
   },
 };

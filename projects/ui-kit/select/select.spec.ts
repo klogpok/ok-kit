@@ -155,6 +155,15 @@ describe('UiSelect', () => {
     expect(control().hasAttribute('aria-activedescendant')).toBe(false);
   });
 
+  it('keeps keys pressed before the list rendered', async () => {
+    control().focus();
+    keydown(control(), 'ArrowDown');
+    keydown(control(), 'ArrowDown');
+    keydown(control(), 'ArrowDown');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[2].id);
+  });
+
   it('opens at the selected option', async () => {
     fixture.componentInstance.value.set('yael');
     await settle(fixture);

@@ -268,6 +268,8 @@ export class UiSelect<T = unknown>
   }
 
   private activateSelected(): void {
+    // Keys pressed before the list rendered have already moved the active option.
+    if (this.keyManager.activeItem) return;
     const selected = this.options().findIndex(
       (option) => option === this.selectedOption() && !option.disabled,
     );
