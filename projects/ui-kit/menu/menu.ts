@@ -1,7 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   Directive,
+  ElementRef,
+  Renderer2,
   ViewEncapsulation,
   booleanAttribute,
   inject,
@@ -84,7 +87,19 @@ export class UiMenuTrigger {
   providers: [provideUiLiveDirectionality()],
   host: { class: 'ui-menu' },
 })
-export class UiMenu {}
+export class UiMenu {
+  constructor() {
+    // CDK Menu only prevents the default on Escape, so the overlay keyboard dispatcher on <body>
+    // would also close a surrounding dialog. A host binding cannot stop it: CDK Menu closes the
+    // menu first and the view drops its listeners. Listening here runs before CDK Menu's handler
+    // on the same element, which still runs.
+    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    const unlisten = inject(Renderer2).listen(host, 'keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Escape') event.stopPropagation();
+    });
+    inject(DestroyRef).onDestroy(unlisten);
+  }
+}
 
 /**
  * Action in a `ui-menu`. Icons projected as `<ui-icon>` go before the label. With

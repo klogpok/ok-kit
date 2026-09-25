@@ -58,6 +58,19 @@ class MenuHost {
   }
 }
 
+@Component({
+  imports: [UiDialogContent, UiMenu, UiMenuItem, UiMenuTrigger],
+  template: `
+    <ui-dialog-content>
+      <button type="button" class="menu-trigger" [uiMenuTriggerFor]="menu">Actions</button>
+      <ng-template #menu>
+        <ui-menu><button ui-menu-item>Rename</button></ui-menu>
+      </ng-template>
+    </ui-dialog-content>
+  `,
+})
+class MenuDialog {}
+
 // jsdom has no layout, so the real checker treats every element as hidden.
 const FOCUSABLE = 'button, input, select, textarea, a[href], [tabindex]';
 const focusable = (el: HTMLElement) => el.matches(FOCUSABLE) && !el.hasAttribute('disabled');
@@ -233,6 +246,21 @@ describe('UiDialog', () => {
     escape();
     await settle();
     expect(container()).toBeNull();
+  });
+
+  it('stays open when Escape closes a menu inside it', async () => {
+    dialog.open(MenuDialog);
+    await settle();
+    const menuTrigger = container()!.querySelector<HTMLButtonElement>('.menu-trigger')!;
+    menuTrigger.click();
+    await settle();
+    const item = document.querySelector<HTMLButtonElement>('[ui-menu-item]')!;
+    item.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true, cancelable: true }),
+    );
+    await settle();
+    expect(document.querySelector('ui-menu')).toBeNull();
+    expect(container()).not.toBeNull();
   });
 
   describe('confirm', () => {
