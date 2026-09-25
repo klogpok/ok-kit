@@ -327,6 +327,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |
 | `@vplans/ui-kit/select`     | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                              |
+| `@vplans/ui-kit/datepicker` | `UiDatepicker`, `UiCalendar`, `UiDateFilter`                                                                                          |
 | `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
 | `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
 | `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`, `provideUiLiveDirectionality`          |
@@ -659,6 +660,22 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-message-text`               | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-sort-icon`                  | component | `var(--ui-color-text-subtle)`                                                | `var(--ui-color-text-subtle)`                                          |
 | `--ui-table-sort-icon-active`           | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-calendar-cell-size`               | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
+| `--ui-calendar-cell-radius`             | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
+| `--ui-calendar-gap`                     | component | `var(--ui-space-3xs)`                                                        | `var(--ui-space-3xs)`                                                  |
+| `--ui-calendar-cell-hover-bg`           | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-calendar-selected-bg`             | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-calendar-selected-text`           | component | `var(--ui-color-primary-contrast)`                                           | `var(--ui-color-primary-contrast)`                                     |
+| `--ui-calendar-today-border`            | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-calendar-weekday-text`            | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-calendar-weekday-height`          | component | `var(--ui-control-height-sm)`                                                | `var(--ui-control-height-sm)`                                          |
+| `--ui-calendar-title-font-size`         | component | `var(--ui-font-size-md)`                                                     | `var(--ui-font-size-md)`                                               |
+| `--ui-calendar-title-font-weight`       | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-datepicker-panel-bg`              | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
+| `--ui-datepicker-panel-border`          | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-datepicker-panel-radius`          | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-datepicker-panel-shadow`          | component | `var(--ui-shadow-md)`                                                        | `var(--ui-shadow-md)`                                                  |
+| `--ui-datepicker-panel-padding`         | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 
 <!-- tokens:end -->
 

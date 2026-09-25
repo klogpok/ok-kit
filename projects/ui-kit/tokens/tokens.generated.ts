@@ -2694,5 +2694,101 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-primary-text)",
     "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-calendar-cell-size",
+    "layer": "component",
+    "light": "var(--ui-control-height-md)",
+    "dark": "var(--ui-control-height-md)"
+  },
+  {
+    "name": "--ui-calendar-cell-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-full)",
+    "dark": "var(--ui-radius-full)"
+  },
+  {
+    "name": "--ui-calendar-gap",
+    "layer": "component",
+    "light": "var(--ui-space-3xs)",
+    "dark": "var(--ui-space-3xs)"
+  },
+  {
+    "name": "--ui-calendar-cell-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-calendar-selected-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-calendar-selected-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-contrast)",
+    "dark": "var(--ui-color-primary-contrast)"
+  },
+  {
+    "name": "--ui-calendar-today-border",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-calendar-weekday-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-calendar-weekday-height",
+    "layer": "component",
+    "light": "var(--ui-control-height-sm)",
+    "dark": "var(--ui-control-height-sm)"
+  },
+  {
+    "name": "--ui-calendar-title-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-md)",
+    "dark": "var(--ui-font-size-md)"
+  },
+  {
+    "name": "--ui-calendar-title-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-datepicker-panel-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-raised)",
+    "dark": "var(--ui-color-surface-raised)"
+  },
+  {
+    "name": "--ui-datepicker-panel-border",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-datepicker-panel-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-datepicker-panel-shadow",
+    "layer": "component",
+    "light": "var(--ui-shadow-md)",
+    "dark": "var(--ui-shadow-md)"
+  },
+  {
+    "name": "--ui-datepicker-panel-padding",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
   }
 ];

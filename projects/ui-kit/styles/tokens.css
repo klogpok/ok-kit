@@ -562,4 +562,20 @@
   --ui-table-message-text: var(--ui-color-text-muted);
   --ui-table-sort-icon: var(--ui-color-text-subtle);
   --ui-table-sort-icon-active: var(--ui-color-primary-text);
+  --ui-calendar-cell-size: var(--ui-control-height-md);
+  --ui-calendar-cell-radius: var(--ui-radius-full);
+  --ui-calendar-gap: var(--ui-space-3xs);
+  --ui-calendar-cell-hover-bg: var(--ui-color-surface-active);
+  --ui-calendar-selected-bg: var(--ui-color-primary);
+  --ui-calendar-selected-text: var(--ui-color-primary-contrast);
+  --ui-calendar-today-border: var(--ui-color-primary);
+  --ui-calendar-weekday-text: var(--ui-color-text-muted);
+  --ui-calendar-weekday-height: var(--ui-control-height-sm);
+  --ui-calendar-title-font-size: var(--ui-font-size-md);
+  --ui-calendar-title-font-weight: var(--ui-font-weight-semibold);
+  --ui-datepicker-panel-bg: var(--ui-color-surface-raised);
+  --ui-datepicker-panel-border: var(--ui-color-surface-active);
+  --ui-datepicker-panel-radius: var(--ui-radius-container);
+  --ui-datepicker-panel-shadow: var(--ui-shadow-md);
+  --ui-datepicker-panel-padding: var(--ui-space-md);
 }

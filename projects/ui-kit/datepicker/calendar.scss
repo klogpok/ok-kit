@@ -1,0 +1,89 @@
+@use '../styles/mixins' as ui;
+
+:host {
+  display: inline-block;
+  color: var(--ui-color-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-font-size-sm);
+}
+
+.ui-calendar__header {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3xs);
+  margin-block-end: var(--ui-space-xs);
+}
+
+.ui-calendar__title {
+  flex: 1;
+  font-size: var(--ui-calendar-title-font-size);
+  font-weight: var(--ui-calendar-title-font-weight);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ui-calendar__grid {
+  border-collapse: separate;
+  border-spacing: var(--ui-calendar-gap);
+  margin-inline: calc(var(--ui-calendar-gap) * -1);
+}
+
+th {
+  block-size: var(--ui-calendar-weekday-height);
+  padding: 0;
+  color: var(--ui-calendar-weekday-text);
+  font-size: var(--ui-font-size-xs);
+  font-weight: var(--ui-font-weight-semibold);
+  text-align: center;
+}
+
+td {
+  inline-size: var(--ui-calendar-cell-size);
+  block-size: var(--ui-calendar-cell-size);
+  padding: 0;
+  text-align: center;
+}
+
+.ui-calendar__day {
+  border: var(--ui-border-width-default) solid transparent;
+  border-radius: var(--ui-calendar-cell-radius);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+
+  @include ui.transition(background-color, color);
+  @include ui.focus-visible;
+
+  &:hover:not(.ui-calendar__day--selected, .ui-calendar__day--disabled) {
+    background-color: var(--ui-calendar-cell-hover-bg);
+  }
+}
+
+.ui-calendar__day--today {
+  border-color: var(--ui-calendar-today-border);
+  font-weight: var(--ui-font-weight-semibold);
+}
+
+.ui-calendar__day--selected {
+  background-color: var(--ui-calendar-selected-bg);
+  color: var(--ui-calendar-selected-text);
+  font-weight: var(--ui-font-weight-semibold);
+}
+
+.ui-calendar__day--disabled {
+  color: var(--ui-color-text-disabled);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  .ui-calendar__day--selected {
+    border-color: Highlight;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .ui-calendar__day--disabled {
+    color: GrayText;
+  }
+}
