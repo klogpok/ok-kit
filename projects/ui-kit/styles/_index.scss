@@ -1,4 +1,4 @@
-// Import mixins in application SCSS: @use '@vplans/ui-kit/styles' as ui;
+// Import mixins in application SCSS: @use 'ui-kit/styles' as ui; (includePaths: ["projects"])
 @forward 'mixins';
 
 /// Elements that re-declare the component tokens. Override component tokens on all of them, or

@@ -20,13 +20,25 @@ Our in-house Angular design system. Standalone, `OnPush`, zoneless-ready compone
 
 ## Installation
 
-```bash
-pnpm add @vplans/ui-kit @angular/cdk
-```
+The kit is not published. Apps in this monorepo use it from source:
+
+- **TypeScript**: the root `tsconfig.json` maps the package to the sources, so
+  `import { UiButton } from '@vplans/ui-kit/button'` works in every project:
+
+  ```jsonc
+  "paths": {
+    "@vplans/ui-kit": ["./projects/ui-kit/src/public-api.ts"],
+    "@vplans/ui-kit/*": ["./projects/ui-kit/*/public-api.ts"]
+  }
+  ```
+
+- **Dependencies**: the app needs the peer dependencies of `projects/ui-kit/package.json`
+  (`@angular/cdk`, `@angular/forms`, `@angular/router`, …) in the same major version.
 
 The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
 Hebrew and Latin. If the app does not load the font already, add it together with the global
-stylesheet (tokens, document defaults, typography) to `angular.json`:
+stylesheet (tokens, document defaults, typography) to the app's build options in
+`angular.json`. `includePaths` lets app SCSS use the mixins with `@use 'ui-kit/styles' as ui`:
 
 ```bash
 pnpm add @fontsource/assistant
@@ -38,12 +50,14 @@ pnpm add @fontsource/assistant
   "node_modules/@fontsource/assistant/500.css",
   "node_modules/@fontsource/assistant/600.css",
   "node_modules/@fontsource/assistant/700.css",
-  "node_modules/@vplans/ui-kit/styles/ui-kit.scss",
+  "projects/ui-kit/styles/ui-kit.scss",
   "src/styles.scss"
-]
+],
+"stylePreprocessorOptions": { "includePaths": ["projects"] }
 ```
 
-If you only need the CSS variables and not the document defaults, use `styles/tokens.css`.
+If you only need the CSS variables and not the document defaults, use
+`projects/ui-kit/styles/tokens.css`.
 
 Register the icons you use and (optionally) configure the theme:
 
@@ -126,6 +140,10 @@ once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `
 
 Without a forms directive, use the `invalid` input to show the error state manually.
 
+`ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values (e.g. by
+id). `ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with
+the `invalidDate` label as its message; the value is `null` meanwhile.
+
 ### Prefix and suffix
 
 Mark content with `uiPrefix` / `uiSuffix` to place it inside the border of a text control:
@@ -196,7 +214,7 @@ the nearest scope:
   are recomputed there.
 
 ```scss
-@use '@vplans/ui-kit/styles' as ui;
+@use 'ui-kit/styles' as ui;
 
 #{ui.$theme-scopes} {
   --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
@@ -210,7 +228,7 @@ the nearest scope:
 Use the mixins in application SCSS:
 
 ```scss
-@use '@vplans/ui-kit/styles' as ui;
+@use 'ui-kit/styles' as ui;
 
 .card-link {
   @include ui.focus-visible;
@@ -315,32 +333,32 @@ Change the toast position, duration or stack size with
 
 ## Components
 
-| Entry point                 | Exports                                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                                                            |
-| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                                                               |
-| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`                                                                                                    |
-| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                                                                          |
-| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                                                             |
-| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                                                            |
-| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                                                           |
-| `@vplans/ui-kit/skeleton`   | `UiSkeleton`, `UiSkeletonShape`                                                                                                       |
-| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                                                           |
-| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                                                              |
-| `@vplans/ui-kit/table`      | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, sort types                                    |
-| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                            |
-| `@vplans/ui-kit/accordion`  | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                |
-| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                          |
-| `@vplans/ui-kit/pagination` | `UiPagination`, `UiPageEvent`, `uiPageItems`                                                                                          |
-| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                      |
-| `@vplans/ui-kit/menu`       | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                               |
-| `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
-| `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                             |
-| `@vplans/ui-kit/select`     | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                              |
-| `@vplans/ui-kit/datepicker` | `UiDatepicker`, `UiCalendar`, `UiDateFilter`                                                                                          |
-| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `uiIcon*` icons                                                                                           |
-| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`                                                                                                      |
-| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, form-field contract, `provideUiLabels`, `resolveDirection`, `provideUiLiveDirectionality`          |
+| Entry point                 | Exports                                                                                                                                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@vplans/ui-kit/button`     | `UiButton`, `UiIconButton`                                                                                                                                                                   |
+| `@vplans/ui-kit/input`      | `UiInput`, `UiTextarea`                                                                                                                                                                      |
+| `@vplans/ui-kit/form-field` | `UiFormField`, `UiHint`, `UiError`, `UiPrefix`, `UiSuffix`                                                                                                                                   |
+| `@vplans/ui-kit/checkbox`   | `UiCheckbox`                                                                                                                                                                                 |
+| `@vplans/ui-kit/radio`      | `UiRadioGroup`, `UiRadio`                                                                                                                                                                    |
+| `@vplans/ui-kit/switch`     | `UiSwitch`                                                                                                                                                                                   |
+| `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                                                                                                                  |
+| `@vplans/ui-kit/skeleton`   | `UiSkeleton`, `UiSkeletonShape`                                                                                                                                                              |
+| `@vplans/ui-kit/divider`    | `UiDivider`                                                                                                                                                                                  |
+| `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                                                                                                                     |
+| `@vplans/ui-kit/table`      | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                         |
+| `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                   |
+| `@vplans/ui-kit/accordion`  | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                       |
+| `@vplans/ui-kit/tabs`       | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                                                                                 |
+| `@vplans/ui-kit/pagination` | `UiPagination`, `UiPageEvent`, `UiPageItem`, `uiPageItems`                                                                                                                                   |
+| `@vplans/ui-kit/tooltip`    | `UiTooltip`, `UiTooltipPosition`                                                                                                                                                             |
+| `@vplans/ui-kit/menu`       | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                                                                                      |
+| `@vplans/ui-kit/dialog`     | `UiDialog`, `UiDialogOptions`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
+| `@vplans/ui-kit/toast`      | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                                                                                    |
+| `@vplans/ui-kit/select`     | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                                                                                     |
+| `@vplans/ui-kit/datepicker` | `UiDatepicker`, `UiCalendar`, `UiDateFilter`                                                                                                                                                 |
+| `@vplans/ui-kit/icon`       | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`                                                                                            |
+| `@vplans/ui-kit/theme`      | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                     |
+| `@vplans/ui-kit/core`       | shared types, `UiFormControlBase`, `injectControlState`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`            |
 
 ## Tokens
 
