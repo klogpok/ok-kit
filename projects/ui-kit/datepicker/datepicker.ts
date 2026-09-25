@@ -186,7 +186,10 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   readonly closed = output<void>();
 
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
-  private readonly toggleButton = viewChild.required('toggleButton', { read: ElementRef });
+  private readonly toggleButton = viewChild.required<string, ElementRef<HTMLButtonElement>>(
+    'toggleButton',
+    { read: ElementRef },
+  );
   private readonly overlay = viewChild(CdkConnectedOverlay);
   private readonly calendar = viewChild(UiCalendar);
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');

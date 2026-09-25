@@ -68,7 +68,8 @@ export class UiRadioGroup<T = unknown>
   extends UiFormControlBase<T | null>
   implements UiFormFieldControl
 {
-  private readonly radios = contentChildren(
+  // forwardRef hides the type, so name it: UiRadio is declared below.
+  private readonly radios = contentChildren<UiRadio<T>>(
     forwardRef(() => UiRadio),
     { descendants: true },
   );

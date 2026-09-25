@@ -110,7 +110,7 @@ class Host {
 describe('UiTable', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
-  const table = () => fixture.nativeElement.querySelector('table') as HTMLTableElement;
+  const table = () => (fixture.nativeElement as HTMLElement).querySelector('table')!;
   const header = (i: number) => table().tHead!.rows[0].cells[i];
   const sortButton = (i: number) => header(i).querySelector('button')!;
   const firstColumn = () => [...table().tBodies[0].rows].map((r) => r.cells[0].textContent!.trim());
@@ -228,9 +228,9 @@ describe('UiTable', () => {
       other.componentInstance.loading.set(true);
       other.detectChanges();
       await other.whenStable();
-      expect(other.nativeElement.querySelectorAll('tr.ui-table-skeleton').length).toBeGreaterThan(
-        1,
-      );
+      expect(
+        (other.nativeElement as HTMLElement).querySelectorAll('tr.ui-table-skeleton').length,
+      ).toBeGreaterThan(1);
       expect(created).toBe(1);
     } finally {
       globalThis.MutationObserver = Original;

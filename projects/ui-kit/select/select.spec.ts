@@ -538,7 +538,7 @@ class ReadonlySelectHost {
   readonly locked = signal(true);
   readonly model = signal({ coordinator: 'dana' });
   readonly f = form(this.model, (p) => {
-    readonly(p.coordinator, () => this.locked());
+    readonly(p.coordinator, { when: () => this.locked() });
   });
 }
 

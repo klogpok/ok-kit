@@ -48,7 +48,8 @@ class Host {
 describe('UiPagination', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
-  const root = () => fixture.nativeElement.querySelector('ui-pagination') as HTMLElement;
+  const root = () =>
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('ui-pagination')!;
   const button = (label: string) =>
     root().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
   const pages = () =>

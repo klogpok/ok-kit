@@ -10,7 +10,8 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { LocationStrategy } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 /**
  * Tab-styled navigation between pages. Use it when each tab is its own route; use
@@ -62,6 +63,16 @@ export class UiTabLink {
 
   readonly isActive = computed(() => this.active() ?? this.routerActive());
 
+  private readonly router = inject(Router, { optional: true });
+  private readonly locationStrategy = inject(LocationStrategy, { optional: true });
+
+  /** The href RouterLink would render now (its own getter is deprecated). */
+  private currentRouterHref(): string | null {
+    const tree = this.routerLink?.urlTree;
+    if (!tree || !this.router || !this.locationStrategy) return null;
+    return this.locationStrategy.prepareExternalUrl(this.router.serializeUrl(tree));
+  }
+
   constructor() {
     const subscription = this.routerLinkActive?.isActiveChange.subscribe((active) =>
       this.routerActive.set(active),
@@ -97,7 +108,7 @@ export class UiTabLink {
           removedHref = href;
           host.removeAttribute('href');
         } else if (removedHref !== null) {
-          host.setAttribute('href', this.routerLink?.href ?? removedHref);
+          host.setAttribute('href', this.currentRouterHref() ?? removedHref);
           removedHref = null;
         }
       },
