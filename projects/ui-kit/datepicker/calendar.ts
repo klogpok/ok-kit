@@ -32,6 +32,7 @@ import {
   isDayEnabled,
   sameDay,
   startOfDay,
+  validDay,
 } from './date-utils';
 
 /** A Sunday, used to list the weekday names from the first day of the week. */
@@ -124,7 +125,7 @@ const REFERENCE_SUNDAY = new Date(2026, 0, 4);
                   [class.ui-calendar__day--today]="isToday(day)"
                   [class.ui-calendar__day--disabled]="!isEnabled(day)"
                   [attr.tabindex]="isActive(day) ? 0 : -1"
-                  [attr.aria-selected]="isSelected(day)"
+                  [attr.aria-selected]="isSelected(day) ? 'true' : null"
                   [attr.aria-current]="isToday(day) ? 'date' : null"
                   [attr.aria-disabled]="isEnabled(day) ? null : 'true'"
                   [attr.aria-label]="dayLabel(day)"
@@ -166,7 +167,7 @@ export class UiCalendar {
   /** Return `false` for days that cannot be picked (e.g. weekends). */
   readonly dateFilter = input<UiDateFilter | null>(null);
   /** Day shown when nothing is selected. Defaults to today. */
-  readonly startAt = input<Date | null>(null);
+  readonly startAt = input<Date | null | undefined>(null);
 
   /** Emits on every pick, also when the same day is picked again. */
   readonly dateSelected = output<Date>();
@@ -175,7 +176,11 @@ export class UiCalendar {
 
   /** The focusable day; it decides the month shown. Resets when the selection changes. */
   protected readonly active = linkedSignal(() =>
-    clampDay(startOfDay(this.selected() ?? this.startAt() ?? this.today), this.min(), this.max()),
+    clampDay(
+      startOfDay(validDay(this.selected()) ?? validDay(this.startAt()) ?? this.today),
+      this.min(),
+      this.max(),
+    ),
   );
 
   private readonly locale = computed(() => this.labels().locale);
@@ -224,7 +229,7 @@ export class UiCalendar {
   }
 
   protected isSelected(day: Date): boolean {
-    return sameDay(day, this.selected());
+    return sameDay(day, validDay(this.selected()));
   }
 
   protected isToday(day: Date): boolean {

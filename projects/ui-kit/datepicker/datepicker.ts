@@ -168,7 +168,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   /** Return `false` for days that cannot be picked or typed. */
   readonly dateFilter = input<UiDateFilter | null>(null);
   /** Month shown when the calendar opens without a value. Defaults to today. */
-  readonly startAt = input<Date | null>(null);
+  readonly startAt = input<Date | null | undefined>(null);
   /** Defaults to the expected format, e.g. "DD.MM.YYYY". */
   readonly placeholder = input('');
   readonly size = input<UiSize>('md');

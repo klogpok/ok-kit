@@ -97,6 +97,7 @@ describe('UiCalendar', () => {
     await create();
     const selected = cell('2026-09-16');
     expect(selected.getAttribute('aria-selected')).toBe('true');
+    expect(root().querySelectorAll('td[aria-selected]')).toHaveLength(1);
     expect(selected.getAttribute('tabindex')).toBe('0');
     expect(selected.getAttribute('aria-label')).toBe('Wednesday, September 16, 2026');
     expect(root().querySelectorAll('td[tabindex="0"]')).toHaveLength(1);
@@ -180,6 +181,14 @@ describe('UiCalendar', () => {
     expect(focused()).toBe('2025-10-19');
     await key(' ');
     expect(host.selected()).toEqual(new Date(2025, 9, 19));
+  });
+
+  it('shows the current month for an Invalid Date', async () => {
+    await create();
+    host.selected.set(new Date('not a date'));
+    await settle();
+    expect(root().querySelectorAll('td[data-date]').length).toBeGreaterThan(27);
+    expect(root().querySelectorAll('td[tabindex="0"]')).toHaveLength(1);
   });
 
   it('keeps the active day inside min and max', async () => {
