@@ -250,6 +250,13 @@ export const uiIconFile = {
   ),
 } as const satisfies UiIconDefinition;
 
+export const uiIconFileUpload = {
+  name: 'file-upload',
+  svg: svg(
+    '<path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-10l-5-5zM14 3.5v5h5"/><path d="M12 17.5v-6M9.5 14l2.5-2.5 2.5 2.5"/>',
+  ),
+} as const satisfies UiIconDefinition;
+
 export const uiIconPaperclip = {
   name: 'paperclip',
   svg: svg(
@@ -309,6 +316,7 @@ export const UI_ICONS_ALL = [
   uiIconLock,
   uiIconLogOut,
   uiIconFile,
+  uiIconFileUpload,
   uiIconPaperclip,
   uiIconArrowsUpDown,
 ] as const satisfies readonly UiIconDefinition[];

@@ -7,6 +7,7 @@ so versions mark review points rather than releases.
 
 ### Added
 
+- **icon:** `file-upload` (`uiIconFileUpload`).
 - **table:** a click on `th[ui-sort-header]` announces the new order through `LiveAnnouncer`.
 - **labels:** `sortedAscending`, `sortedDescending`, `sortedNone`.
 - **table:** row selection: `[(uiTableSelection)]` on the table, `th[ui-table-select-all]`
