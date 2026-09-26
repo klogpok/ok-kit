@@ -7,6 +7,21 @@
   (mousedown)="onTriggerMousedown($event)"
   (click)="toggle($event)"
 >
+  @if (chipList().length) {
+    <!-- The chips repeat the labels of the control for sighted users; their x buttons are for the mouse. -->
+    <span class="ui-select__chips" aria-hidden="true" (click)="onChipsClick($event)">
+      @for (chip of chipList(); track $index) {
+        <ui-chip
+          [removable]="!isDisabled() && !readonly()"
+          [disabled]="isDisabled()"
+          [label]="chip.label"
+          (removed)="removeChip(chip.value)"
+        >
+          {{ chip.label }}
+        </ui-chip>
+      }
+    </span>
+  }
   @if (searchable()) {
     <input
       #control
@@ -54,7 +69,11 @@
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
     >
-      <span class="ui-select__value" [class.ui-select__value--placeholder]="!displayLabel()">
+      <span
+        class="ui-select__value"
+        [class.ui-select__value--placeholder]="!displayLabel()"
+        [class.ui-select__value--hidden]="chipList().length"
+      >
         {{ displayLabel() || placeholder() }}
       </span>
     </button>
@@ -101,6 +120,11 @@
     [attr.aria-busy]="loading() ? 'true' : null"
     (mousedown)="$event.preventDefault()"
   >
+    @if (showSelectAll()) {
+      <ui-option #selectAllOption class="ui-select__all" [value]="selectAllValue">{{
+        labels().selectAll
+      }}</ui-option>
+    }
     <ng-content />
     @if (loading()) {
       <div class="ui-select__empty ui-select__loading">

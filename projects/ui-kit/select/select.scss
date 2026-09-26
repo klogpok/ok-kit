@@ -93,6 +93,32 @@
   white-space: nowrap;
 }
 
+// With chips the text stays for screen readers only.
+.ui-select__value--hidden {
+  @include mixins.visually-hidden;
+}
+
+// Chips of the selected values, before the control; the trigger grows to more lines.
+.ui-select__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-2xs);
+  min-inline-size: 0;
+  padding-block: var(--ui-space-2xs);
+  padding-inline-start: var(--ui-space-2xs);
+
+  + .ui-select__control {
+    flex: 0 1 auto;
+    min-inline-size: var(--ui-space-2xl);
+    padding-inline-start: var(--ui-space-2xs);
+  }
+}
+
+:host(.ui-select--chips) .ui-select__trigger {
+  flex-wrap: wrap;
+  padding-inline-end: calc(var(--_padding) + var(--ui-icon-size-sm) + var(--ui-space-xs));
+}
+
 .ui-select__value--placeholder {
   color: var(--ui-input-placeholder);
 }
@@ -168,6 +194,12 @@
 }
 
 @include panel.styles;
+
+// "Select all" is set off from the options below it.
+.ui-select__all {
+  margin-block-end: var(--ui-space-2xs);
+  border-block-end: var(--ui-border-width-default) solid var(--ui-select-panel-border);
+}
 
 @media (forced-colors: active) {
   :host(.ui-select--invalid) .ui-select__trigger {

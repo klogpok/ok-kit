@@ -3,11 +3,16 @@ import {
   Signal,
   booleanAttribute,
   computed,
+  effect,
   input,
   output,
   signal,
+  viewChild,
+  viewChildren,
 } from '@angular/core';
+import { UiChip } from '@vplans/ui-kit/chip';
 import { uiIconChevronDown, uiIconX } from '@vplans/ui-kit/icon';
+import { UiOption } from './option';
 import { UiOptionPanel } from './option-panel';
 
 /** Keys that navigate the list; in `searchable` mode all other keys edit the search text. */
@@ -27,6 +32,7 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
     '[class.ui-select--readonly]': 'readonly()',
     '[class.ui-select--invalid]': 'showError()',
     '[class.ui-select--clearable]': 'showClear()',
+    '[class.ui-select--chips]': 'chipList().length > 0',
   },
 })
 export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
@@ -53,12 +59,31 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
   protected abstract readonly displayLabel: Signal<string>;
   /** Whether a value is selected. */
   protected abstract readonly hasValue: Signal<boolean>;
+  /** Selected values shown as chips in the trigger (`ui-multi-select` with `chips`). */
+  protected readonly chipList: Signal<readonly { value: unknown; label: string }[]> = computed(
+    () => [],
+  );
+  protected readonly removeChip: (value: unknown) => void = () => undefined;
+  /** The "select all" option of `ui-multi-select`. */
+  protected readonly showSelectAll: Signal<boolean> = computed(() => false);
+  protected readonly selectAllValue: unknown = null;
+  private readonly chipViews = viewChildren(UiChip);
+  protected readonly selectAllOption = viewChild<UiOption>('selectAllOption');
+
   protected readonly showClear = computed(
     () => this.clearable() && this.hasValue() && !this.isDisabled() && !this.readonly(),
   );
 
   /** Sets the empty value (`null` or `[]`) and reports it to the form. */
   protected abstract clearValue(): void;
+
+  constructor() {
+    super();
+    // The chip buttons are for the mouse; the keyboard deselects in the list.
+    effect(() => {
+      for (const chip of this.chipViews()) chip.tabIndex.set(-1);
+    });
+  }
 
   override close(): void {
     if (!this.isOpen()) return;
@@ -86,6 +111,11 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
     if (!this.showClear()) return;
     this.clearValue();
     this.focus();
+  }
+
+  /** A click on a chip's x removes it without toggling the list. */
+  protected onChipsClick(event: MouseEvent): void {
+    if ((event.target as Element).closest('.ui-chip__remove')) event.stopPropagation();
   }
 
   /** Keeps focus on the control when the chevron or padding of the trigger is pressed. */

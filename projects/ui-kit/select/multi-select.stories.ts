@@ -99,3 +99,56 @@ export const Hebrew: Story = {
       </div>`,
   }),
 };
+
+const TRADES = ['חשמל', 'אינסטלציה', 'צבע', 'ריצוף', 'גבס', 'מיזוג אוויר'];
+
+/** The selected values as chips in the trigger; their x removes a value with the mouse. */
+export const Chips: Story = {
+  render: () => ({
+    props: { trades: TRADES },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:360px;min-block-size:18rem">
+        <ui-form-field label="מקצועות">
+          <ui-multi-select chips [value]="['חשמל', 'צבע', 'גבס']" placeholder="בחירת מקצועות">
+            @for (trade of trades; track trade) {
+              <ui-option [value]="trade">{{ trade }}</ui-option>
+            }
+          </ui-multi-select>
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
+/** "Select all" is the first option; it is mixed while some options are selected. */
+export const SelectAll: Story = {
+  render: () => ({
+    props: { trades: TRADES },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:360px;min-block-size:18rem">
+        <ui-form-field label="מקצועות">
+          <ui-multi-select selectAll searchable [value]="['חשמל']" placeholder="בחירת מקצועות">
+            @for (trade of trades; track trade) {
+              <ui-option [value]="trade">{{ trade }}</ui-option>
+            }
+          </ui-multi-select>
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
+/** With `maxSelections`, the other options are disabled once the limit is reached. */
+export const MaxSelections: Story = {
+  render: () => ({
+    props: { trades: TRADES },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:360px;min-block-size:18rem">
+        <ui-form-field label="עד שני מקצועות" hint="אפשר לבחור עד 2">
+          <ui-multi-select maxSelections="2" chips [value]="['חשמל', 'צבע']">
+            @for (trade of trades; track trade) {
+              <ui-option [value]="trade">{{ trade }}</ui-option>
+            }
+          </ui-multi-select>
+        </ui-form-field>
+      </div>`,
+  }),
+};

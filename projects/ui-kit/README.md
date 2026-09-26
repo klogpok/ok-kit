@@ -511,6 +511,16 @@ picks the active option, Escape closes the list or clears the field. Without mat
 hidden in free-text mode; a pick-only field says `noOptions` and clears text that was not picked
 when it loses focus.
 
+`ui-multi-select` extras: `chips` shows the selected values as chips in the trigger (their x is for
+the mouse; the keyboard deselects in the list), `selectAll` adds a first option that toggles
+every enabled option the search shows (mixed while some are selected), and `maxSelections`
+disables the other options once reached (it hides "select all").
+
+```html
+<ui-multi-select [formField]="form.trades" chips selectAll searchable>...</ui-multi-select>
+<ui-multi-select [formField]="form.leads" chips maxSelections="2">...</ui-multi-select>
+```
+
 Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
 `minLength(path.recipients, 1)` next to `required()`.
 

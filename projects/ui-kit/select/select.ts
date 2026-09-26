@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from '@angular/core';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
+import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
-import { UiOptionParent } from './option';
+import { UiOption, UiOptionParent } from './option';
 import { UiSelectBase } from './select-base';
 
 /**
@@ -28,7 +29,7 @@ import { UiSelectBase } from './select-base';
  */
 @Component({
   selector: 'ui-select',
-  imports: [CdkConnectedOverlay, CdkOverlayOrigin, UiIcon, UiSpinner],
+  imports: [CdkConnectedOverlay, CdkOverlayOrigin, UiChip, UiIcon, UiOption, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

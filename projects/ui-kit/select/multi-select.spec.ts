@@ -301,3 +301,131 @@ describe('UiMultiSelect clearable', () => {
     expect(root.querySelector('.ui-select__clear')).toBeNull();
   });
 });
+
+@Component({
+  imports: [UiMultiSelect, UiOption],
+  template: `
+    <ui-multi-select
+      aria-label="Trades"
+      searchable
+      [(value)]="value"
+      [selectAll]="selectAll()"
+      [maxSelections]="max()"
+      [chips]="chips()"
+    >
+      <ui-option value="electric">Electric</ui-option>
+      <ui-option value="plumbing">Plumbing</ui-option>
+      <ui-option value="paint">Paint</ui-option>
+      <ui-option value="roof" disabled>Roof</ui-option>
+    </ui-multi-select>
+  `,
+})
+class ExtrasHost {
+  readonly value = signal<readonly string[]>([]);
+  readonly selectAll = signal(true);
+  readonly max = signal<number | null>(null);
+  readonly chips = signal(false);
+}
+
+describe('UiMultiSelect extras', () => {
+  let fixture: ComponentFixture<ExtrasHost>;
+  let host: ExtrasHost;
+  let root: HTMLElement;
+  const control = () => root.querySelector<HTMLInputElement>('.ui-select__control')!;
+  const all = () => document.querySelector<HTMLElement>('ui-option.ui-select__all');
+  const option = (text: string) => options().find((o) => o.textContent.includes(text))!;
+  const open = async () => {
+    keydown(control(), 'ArrowDown');
+    await settle(fixture);
+  };
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ExtrasHost);
+    host = fixture.componentInstance;
+    root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+  });
+
+  afterEach(() => {
+    fixture.destroy();
+    root.remove();
+  });
+
+  it('selects and deselects every enabled option with "select all"', async () => {
+    await open();
+    expect(all()!.textContent.trim()).toBe('בחירת הכול');
+    expect(options()[0]).toBe(all());
+    all()!.click();
+    await settle(fixture);
+    expect(host.value()).toEqual(['electric', 'plumbing', 'paint']);
+    expect(all()!.getAttribute('aria-selected')).toBe('true');
+
+    option('Paint').click();
+    await settle(fixture);
+    expect(all()!.getAttribute('aria-selected')).toBe('false');
+    expect(all()!.classList).toContain('ui-option--selected');
+
+    all()!.click();
+    await settle(fixture);
+    expect(host.value()).toEqual(['electric', 'plumbing', 'paint']);
+    all()!.click();
+    await settle(fixture);
+    expect(host.value()).toEqual([]);
+  });
+
+  it('acts on the options the search shows and stays visible', async () => {
+    host.value.set(['paint']);
+    await settle(fixture);
+    control().value = 'p';
+    control().dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(all()!.hidden).toBe(false);
+    all()!.click();
+    await settle(fixture);
+    expect(host.value()).toEqual(['paint', 'plumbing']);
+  });
+
+  it('is the first option for the keyboard', async () => {
+    await open();
+    keydown(control(), 'ArrowUp');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(all()!.id);
+    keydown(control(), 'Enter');
+    await settle(fixture);
+    expect(host.value()).toHaveLength(3);
+  });
+
+  it('blocks more options once maxSelections is reached and hides "select all"', async () => {
+    host.max.set(2);
+    await settle(fixture);
+    await open();
+    expect(all()).toBeNull();
+    option('Electric').click();
+    option('Plumbing').click();
+    await settle(fixture);
+    expect(option('Paint').getAttribute('aria-disabled')).toBe('true');
+    option('Paint').click();
+    await settle(fixture);
+    expect(host.value()).toEqual(['electric', 'plumbing']);
+
+    option('Electric').click();
+    await settle(fixture);
+    expect(option('Paint').hasAttribute('aria-disabled')).toBe(false);
+  });
+
+  it('shows the values as chips whose x removes them without opening the list', async () => {
+    host.chips.set(true);
+    host.value.set(['plumbing', 'electric']);
+    await settle(fixture);
+    const chips = [...root.querySelectorAll('.ui-select__chips ui-chip')];
+    expect(chips.map((c) => c.textContent.trim())).toEqual(['Plumbing', 'Electric']);
+    expect(root.querySelector('.ui-select__chips')!.getAttribute('aria-hidden')).toBe('true');
+    const remove = root.querySelector<HTMLButtonElement>('.ui-select__chips .ui-chip__remove')!;
+    expect(remove.tabIndex).toBe(-1);
+    remove.click();
+    await settle(fixture);
+    expect(host.value()).toEqual(['electric']);
+    expect(listbox()).toBeNull();
+  });
+});

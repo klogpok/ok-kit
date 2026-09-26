@@ -43,6 +43,8 @@ so versions mark review points rather than releases.
   `maxSize` / `maxFiles` reported as `uiFileType` / `uiFileSize` / `uiFileCount` form errors;
   `UiFileUploadHarness` in testing.
 - **tokens:** `--ui-file-upload-*`.
+- **multi-select:** `chips` (selected values as `ui-chip`s in the trigger), `selectAll` (a
+  tri-state first option for the options the search shows) and `maxSelections`.
 - **labels:** `dropFiles`, `chooseFiles`, `removeFile`, `fileRemoved`, `fileTooLarge`,
   `fileTypeNotAllowed`, `tooManyFiles`.
 

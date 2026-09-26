@@ -12,14 +12,26 @@ import {
   signal,
 } from '@angular/core';
 import { Highlightable, _IdGenerator } from '@angular/cdk/a11y';
-import { UiIcon, uiIconCheck } from '@vplans/ui-kit/icon';
+import { UiIcon, uiIconCheck, uiIconMinus } from '@vplans/ui-kit/icon';
+
+/** An option as the list sees it; its required `value` may not be set yet. Internal. */
+export interface UiOptionHandle {
+  value(): unknown;
+}
 
 /** What an option needs from the list that owns it. */
 export interface UiOptionOwner {
   /** Multiple selection: options show a checkbox. */
   multiple(): boolean;
   isSelected(value: unknown): boolean;
-  isFilteredOut(label: string): boolean;
+  /** Mixed state of the "select all" option. */
+  isIndeterminate(option: UiOptionHandle): boolean;
+  isFilteredOut(label: string, option: UiOptionHandle): boolean;
+  /**
+   * The option cannot be selected now, e.g. `maxSelections` is reached. Options are passed
+   * whole: their required `value` may not be set yet when this runs.
+   */
+  isBlocked(option: UiOptionHandle): boolean;
   selectOption(value: unknown): void;
 }
 
@@ -43,8 +55,16 @@ export class UiOptionParent {
     return this.owner?.isSelected(value) ?? false;
   }
 
-  isFilteredOut(label: string): boolean {
-    return this.owner?.isFilteredOut(label) ?? false;
+  isIndeterminate(option: UiOptionHandle): boolean {
+    return this.owner?.isIndeterminate(option) ?? false;
+  }
+
+  isFilteredOut(label: string, option: UiOptionHandle): boolean {
+    return this.owner?.isFilteredOut(label, option) ?? false;
+  }
+
+  isBlocked(option: UiOptionHandle): boolean {
+    return this.owner?.isBlocked(option) ?? false;
   }
 
   selectOption(value: unknown): void {
@@ -73,7 +93,9 @@ export class UiOptionParent {
   template: `
     @if (multiple) {
       <span class="ui-option__checkbox" aria-hidden="true">
-        @if (selected()) {
+        @if (indeterminate()) {
+          <ui-icon [icon]="mixedIcon" />
+        } @else if (selected()) {
           <ui-icon [icon]="checkIcon" />
         }
       </span>
@@ -94,10 +116,10 @@ export class UiOptionParent {
     class: 'ui-option',
     '[id]': 'id',
     '[attr.aria-selected]': 'selected()',
-    '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
+    '[attr.aria-disabled]': 'unavailable() ? "true" : null',
     '[class.ui-option--active]': 'active()',
-    '[class.ui-option--selected]': 'selected()',
-    '[class.ui-option--disabled]': 'isDisabled()',
+    '[class.ui-option--selected]': 'selected() || indeterminate()',
+    '[class.ui-option--disabled]': 'unavailable()',
     '[hidden]': 'filteredOut()',
     '(click)': 'onClick()',
     // Keep focus on the trigger while clicking an option.
@@ -120,8 +142,12 @@ export class UiOption<T = unknown> implements Highlightable {
   protected readonly multiple = this.parent.multiple;
   readonly active = signal(false);
   readonly selected = computed(() => this.parent.isSelected(this.value()));
-  readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel()));
+  readonly indeterminate = computed(() => this.parent.isIndeterminate(this));
+  readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel(), this));
+  /** Disabled, or blocked by the list (e.g. `maxSelections` is reached). */
+  readonly unavailable = computed(() => this.isDisabled() || this.parent.isBlocked(this));
   protected readonly checkIcon = uiIconCheck;
+  protected readonly mixedIcon = uiIconMinus;
   /** Content text after the first DOM change; `null` until then (read live). */
   private readonly observedText = signal<string | null>(null);
 
@@ -137,7 +163,7 @@ export class UiOption<T = unknown> implements Highlightable {
 
   /** For the CDK key manager. */
   get disabled(): boolean {
-    return this.isDisabled();
+    return this.unavailable();
   }
 
   getLabel(): string {
@@ -161,7 +187,7 @@ export class UiOption<T = unknown> implements Highlightable {
   }
 
   protected onClick(): void {
-    if (!this.isDisabled()) this.parent.selectOption(this.value());
+    if (!this.unavailable()) this.parent.selectOption(this.value());
   }
 }
 

@@ -17,6 +17,7 @@ import {
   signal,
   untracked,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 import { ActiveDescendantKeyManager, _IdGenerator } from '@angular/cdk/a11y';
 import { CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
@@ -27,7 +28,7 @@ import {
   UiSize,
   resolveDirection,
 } from '@vplans/ui-kit/core';
-import { UiOption, UiOptionParent } from './option';
+import { UiOption, UiOptionHandle, UiOptionParent } from './option';
 
 const POSITIONS: ConnectedPosition[] = [
   { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
@@ -89,6 +90,10 @@ export abstract class UiOptionPanel<T, V>
   readonly closed = output();
 
   protected readonly options = contentChildren<UiOption<T>>(UiOption, { descendants: true });
+  /** Options of the control's own template, e.g. "select all"; listed before the app's options. */
+  private readonly ownOptions = viewChildren<UiOption<T>>(UiOption);
+  /** Every option the keyboard moves through. */
+  private readonly listOptions = computed(() => [...this.ownOptions(), ...this.options()]);
   protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
   private readonly overlay = viewChild(CdkConnectedOverlay);
 
@@ -130,7 +135,7 @@ export abstract class UiOptionPanel<T, V>
   );
 
   protected readonly keyManager = new ActiveDescendantKeyManager<UiOption<T>>(
-    this.options,
+    this.listOptions,
     this.injector,
   )
     .withVerticalOrientation()
@@ -144,7 +149,9 @@ export abstract class UiOptionPanel<T, V>
     inject(UiOptionParent).connect({
       multiple: () => this.multiple,
       isSelected: (value) => this.isSelected(value),
-      isFilteredOut: (label) => this.isFilteredOut(label),
+      isIndeterminate: (option) => this.isIndeterminate(option),
+      isFilteredOut: (label, option) => this.isFilteredOut(label, option),
+      isBlocked: (option) => this.isBlocked(option),
       selectOption: (value) => this.pick(value),
     });
     this.keyManager.change.subscribe(() =>
@@ -157,7 +164,7 @@ export abstract class UiOptionPanel<T, V>
     inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
     // The key manager keeps an active option that was removed (e.g. new server-side results).
     effect(() => {
-      const options = this.options();
+      const options = this.listOptions();
       untracked(() => {
         const active = this.keyManager.activeItem;
         if (!active || options.includes(active)) return;
@@ -200,9 +207,16 @@ export abstract class UiOptionPanel<T, V>
     return value != null && displayWith ? displayWith(value as T) : '';
   }
 
-  protected isFilteredOut(label: string): boolean {
+  /** Mixed state of an option (only "select all" of `ui-multi-select`). */
+  protected readonly isIndeterminate: (option: UiOptionHandle) => boolean = () => false;
+  /** Whether an option cannot be selected now (`maxSelections` of `ui-multi-select`). */
+  protected readonly isBlocked: (option: UiOptionHandle) => boolean = () => false;
+  /** An option the search never hides ("select all"). */
+  protected readonly alwaysShown: (option: UiOptionHandle) => boolean = () => false;
+
+  protected isFilteredOut(label: string, option: UiOptionHandle): boolean {
     const query = this.filterText().trim().toLocaleLowerCase();
-    if (!query || !this.filterOptions()) return false;
+    if (!query || !this.filterOptions() || this.alwaysShown(option)) return false;
     return !label.toLocaleLowerCase().includes(query);
   }
 
@@ -263,7 +277,7 @@ export abstract class UiOptionPanel<T, V>
     // Keys pressed before the list rendered have already moved the active option.
     if (this.keyManager.activeItem) return;
     const first = this.selectedOptions().find((option) => !option.disabled);
-    const index = first ? this.options().indexOf(first) : -1;
+    const index = first ? this.listOptions().indexOf(first) : -1;
     if (index >= 0) this.keyManager.setActiveItem(index);
     else this.keyManager.setFirstItemActive();
   }
