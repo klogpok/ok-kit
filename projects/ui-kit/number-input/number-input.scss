@@ -1,0 +1,162 @@
+@use '../styles/mixins';
+
+// The field shares the input tokens, so it looks like a text input in a form.
+
+:host {
+  display: block;
+  inline-size: 100%;
+  font-family: var(--ui-font-family-sans);
+}
+
+:host(.ui-number-input--sm) {
+  --_height: var(--ui-control-height-sm);
+  --_padding: var(--ui-control-padding-inline-sm);
+  --_font-size: var(--ui-control-font-size-sm);
+}
+
+:host(.ui-number-input--md) {
+  --_height: var(--ui-control-height-md);
+  --_padding: var(--ui-control-padding-inline-md);
+  --_font-size: var(--ui-control-font-size-md);
+}
+
+:host(.ui-number-input--lg) {
+  --_height: var(--ui-control-height-lg);
+  --_padding: var(--ui-control-padding-inline-lg);
+  --_font-size: var(--ui-control-font-size-lg);
+}
+
+.ui-number-input__field {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-block-size: var(--_height);
+  border: var(--ui-border-width-default) solid var(--ui-input-border);
+  border-radius: var(--ui-input-radius);
+  background-color: var(--ui-input-bg);
+  color: var(--ui-input-text);
+  @include mixins.transition(border-color, box-shadow, background-color);
+
+  &:hover {
+    border-color: var(--ui-input-border-hover);
+  }
+
+  &:focus-within {
+    border-color: var(--ui-input-border-focus);
+    outline: var(--ui-focus-ring-width) solid var(--ui-color-focus-ring);
+    outline-offset: calc(var(--ui-border-width-default) * -1);
+  }
+}
+
+.ui-number-input__input {
+  flex: 1;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  align-self: stretch;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--_padding);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--_font-size);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--ui-line-height-normal);
+  outline: none;
+
+  &::placeholder {
+    color: var(--ui-input-placeholder);
+    opacity: 1;
+  }
+}
+
+// The number is LTR (dir="ltr" on the input), so "-5" does not show as "5-" in RTL. It still
+// lines up with the other fields at the start side of an RTL form.
+:host(:dir(rtl)) .ui-number-input__input {
+  text-align: end;
+}
+
+.ui-number-input__steppers {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--ui-space-3xs);
+  padding-inline-end: var(--ui-space-2xs);
+}
+
+.ui-number-input__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: calc(var(--_height) - var(--ui-space-sm));
+  block-size: calc(var(--_height) - var(--ui-space-sm));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  background: none;
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-icon-size-sm);
+  cursor: pointer;
+  touch-action: manipulation;
+  @include mixins.transition(background-color, color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--ui-color-surface-hover);
+    color: var(--ui-color-text);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--ui-color-surface-active);
+  }
+
+  &:disabled {
+    color: var(--ui-color-text-disabled);
+    cursor: default;
+  }
+}
+
+:host(.ui-number-input--invalid) .ui-number-input__field {
+  border-color: var(--ui-input-border-invalid);
+
+  &:focus-within {
+    outline-color: var(--ui-input-border-invalid);
+  }
+}
+
+:host(.ui-number-input--readonly) .ui-number-input__field {
+  border-color: var(--ui-input-border);
+  background-color: var(--ui-color-surface-subtle);
+}
+
+:host(.ui-number-input--disabled) .ui-number-input__field {
+  border-color: var(--ui-color-border);
+  background-color: var(--ui-input-bg-disabled);
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+// Inside a ui-form-field with uiPrefix/uiSuffix the field box draws the border and focus ring.
+:host(.ui-number-input--affixed) {
+  flex: 1;
+  min-inline-size: 0;
+
+  .ui-number-input__field {
+    min-block-size: calc(var(--_height) - var(--ui-border-width-default) * 2);
+    border-width: 0;
+    border-radius: 0;
+    background-color: transparent;
+    outline: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :host(.ui-number-input--invalid) .ui-number-input__field {
+    border-style: dashed;
+  }
+
+  .ui-number-input__step:disabled {
+    color: GrayText;
+  }
+}

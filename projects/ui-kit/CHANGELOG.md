@@ -23,6 +23,10 @@ so versions mark review points rather than releases.
   columns, several per side.
 - **tokens:** `--ui-table-scroll-shadow`, `--ui-table-scroll-shadow-size`.
 - **labels:** `scrollableTable`.
+- **number-input:** new entry point with `ui-number-input`: locale parsing and formatting,
+  `min`/`max`/`step`, fraction digits, grouping, arrow/page/Home/End keys, stepper buttons that
+  repeat while held, a `uiNumberParse` error, affixes; `UiNumberInputHarness` in testing.
+- **labels:** `increment`, `decrement`, `invalidNumber`.
 
 ## Unreleased (phase 6.0: test infrastructure)
 

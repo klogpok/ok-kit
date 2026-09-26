@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UiDatepicker } from '@vplans/ui-kit/datepicker';
+import { UiNumberInput } from '@vplans/ui-kit/number-input';
 import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
 import { UiMultiSelect, UiOption, UiSelect } from '@vplans/ui-kit/select';
 import { UiSwitch } from '@vplans/ui-kit/switch';
@@ -22,6 +23,7 @@ const CONTROLS = [
   UiMultiSelect,
   UiOption,
   UiDatepicker,
+  UiNumberInput,
 ];
 
 @Component({
@@ -43,6 +45,7 @@ const CONTROLS = [
         <ui-option value="b">B</ui-option>
       </ui-multi-select>
       <ui-datepicker formControlName="date" aria-label="Date" />
+      <ui-number-input formControlName="units" aria-label="Units" />
     </form>
   `,
 })
@@ -54,11 +57,21 @@ class NamedHost {
     city: new FormControl<string | null>('eilat'),
     tags: new FormControl<string[]>(['b']),
     date: new FormControl<Date | null>(new Date(2026, 8, 25)),
+    units: new FormControl<number | null>(1200),
   });
 }
 
 @Component({
-  imports: [FormsModule, UiCheckbox, UiRadioGroup, UiRadio, UiSelect, UiOption, UiDatepicker],
+  imports: [
+    FormsModule,
+    UiCheckbox,
+    UiRadioGroup,
+    UiRadio,
+    UiSelect,
+    UiOption,
+    UiDatepicker,
+    UiNumberInput,
+  ],
   template: `
     <ui-checkbox name="terms" [(ngModel)]="terms">Terms</ui-checkbox>
     <ui-radio-group name="size" aria-label="Size" [(ngModel)]="size">
@@ -70,6 +83,7 @@ class NamedHost {
       <ui-option value="eilat">Eilat</ui-option>
     </ui-select>
     <ui-datepicker name="date" aria-label="Date" [(ngModel)]="date" />
+    <ui-number-input name="units" aria-label="Units" [(ngModel)]="units" />
   `,
 })
 class NgModelHost {
@@ -77,6 +91,7 @@ class NgModelHost {
   readonly size = signal<string | null>('s');
   readonly city = signal<string | null>('haifa');
   readonly date = signal<Date | null>(null);
+  readonly units = signal<number | null>(3);
 }
 
 describe('Custom form controls with formControlName', () => {
@@ -94,6 +109,8 @@ describe('Custom form controls with formControlName', () => {
     expect(city.textContent).toContain('Eilat');
     expect(tags.textContent).toContain('B');
     expect(root.querySelector<HTMLInputElement>('.ui-datepicker__input')!.value).toBe('25.9.2026');
+    const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
+    expect(units.value).toBe('1,200');
 
     alerts.click();
     inputs[2].click();
@@ -101,6 +118,10 @@ describe('Custom form controls with formControlName', () => {
     const form = fixture.componentInstance.form;
     expect(form.value.alerts).toBe(true);
     expect(form.value.size).toBe('s');
+    units.value = '15';
+    units.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(form.value.units).toBe(15);
 
     form.disable();
     await settle(fixture);
@@ -135,6 +156,11 @@ describe('Custom form controls with ngModel', () => {
     expect(host.terms()).toBe(true);
     expect(host.size()).toBe('m');
     expect(host.date()).toEqual(new Date(2026, 9, 1));
+    const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
+    expect(units.value).toBe('3');
+    units.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', cancelable: true }));
+    await settle(fixture);
+    expect(host.units()).toBe(4);
 
     host.city.set('eilat');
     await settle(fixture);
