@@ -66,8 +66,9 @@
   }
 }
 
+// A display chip is text, not a control: it stays readable (AA) while disabled.
 :host(.ui-chip--disabled) {
-  color: var(--ui-color-text-disabled);
+  color: var(--ui-color-text-muted);
 
   .ui-chip__remove {
     color: var(--ui-color-text-disabled);
