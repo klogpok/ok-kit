@@ -134,6 +134,7 @@ All form controls work with **Signal Forms**, **Reactive Forms** and **template-
 | `ui-datepicker`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-number-input`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-chip-input`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| `ui-autocomplete`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 
 Every control supports `disabled`, `readonly` (also from a Signal Forms `readonly()` rule),
 `required` and `aria-describedby`. A readonly control stays focusable and reports
@@ -459,6 +460,36 @@ leaves it. Use `uiPopoverLabel` when the trigger text does not describe the cont
 Space toggles checkbox and radio items and keeps the menu open. A link item closes the menu
 after the click has followed the link.
 
+```html
+<!-- Autocomplete: free text with suggestions; the value is the text -->
+<ui-form-field label="City">
+  <ui-autocomplete [formField]="form.city">
+    @for (city of cities; track city) {
+    <ui-option [value]="city">{{ city }}</ui-option>
+    }
+  </ui-autocomplete>
+</ui-form-field>
+
+<!-- Pick one: with displayWith the value is the picked object; typing only searches -->
+<ui-autocomplete
+  [(value)]="owner"
+  [displayWith]="nameOf"
+  [filterOptions]="false"
+  [loading]="searching()"
+  (searchChange)="search($event)"
+>
+  @for (user of results(); track user.id) {
+  <ui-option [value]="user">{{ user.name }}</ui-option>
+  }
+</ui-autocomplete>
+```
+
+`ui-autocomplete` opens its list while the user types and filters it by label (unless
+`filterOptions` is off). No option is active until the user moves with the arrow keys; Enter
+picks the active option, Escape closes the list or clears the field. Without matches the list is
+hidden in free-text mode; a pick-only field says `noOptions` and clears text that was not picked
+when it loses focus.
+
 Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
 `minLength(path.recipients, 1)` next to `required()`.
 
@@ -673,17 +704,18 @@ With more links than `maxItems` (default 4), the links after the first one and b
 built on `@angular/cdk/testing`. Tests that use them do not depend on the internal DOM of the kit,
 so they keep working when that DOM changes.
 
-| Harness                | Finds                                                | Filters                                  |
-| ---------------------- | ---------------------------------------------------- | ---------------------------------------- |
-| `UiButtonHarness`      | `ui-button`, `ui-icon-button` (`<button>` and `<a>`) | `text`, `label`, `variant`, `disabled`   |
-| `UiInputHarness`       | `input[ui-input]`, `textarea[ui-textarea]`           | `label`, `value`, `placeholder`          |
-| `UiCheckboxHarness`    | `ui-checkbox`                                        | `label`, `name`, `checked`, `disabled`   |
-| `UiSelectHarness`      | `ui-select`, `ui-multi-select`                       | `label`, `value`, `disabled`, `multiple` |
-| `UiOptionHarness`      | `ui-option` (from `UiSelectHarness.getOptions()`)    | `text`, `selected`, `disabled`           |
-| `UiDialogHarness`      | dialogs and drawers opened with `UiDialog`           | `title`, `drawer`                        |
-| `UiChipHarness`        | `ui-chip`, `button[ui-filter-chip]`                  | `text`, `selected`, `disabled`           |
-| `UiChipInputHarness`   | `ui-chip-input`                                      | `label`, `disabled`                      |
-| `UiNumberInputHarness` | `ui-number-input`                                    | `label`, `value` (text), `disabled`      |
+| Harness                 | Finds                                                | Filters                                  |
+| ----------------------- | ---------------------------------------------------- | ---------------------------------------- |
+| `UiButtonHarness`       | `ui-button`, `ui-icon-button` (`<button>` and `<a>`) | `text`, `label`, `variant`, `disabled`   |
+| `UiInputHarness`        | `input[ui-input]`, `textarea[ui-textarea]`           | `label`, `value`, `placeholder`          |
+| `UiCheckboxHarness`     | `ui-checkbox`                                        | `label`, `name`, `checked`, `disabled`   |
+| `UiSelectHarness`       | `ui-select`, `ui-multi-select`                       | `label`, `value`, `disabled`, `multiple` |
+| `UiOptionHarness`       | `ui-option` (from `UiSelectHarness.getOptions()`)    | `text`, `selected`, `disabled`           |
+| `UiDialogHarness`       | dialogs and drawers opened with `UiDialog`           | `title`, `drawer`                        |
+| `UiChipHarness`         | `ui-chip`, `button[ui-filter-chip]`                  | `text`, `selected`, `disabled`           |
+| `UiChipInputHarness`    | `ui-chip-input`                                      | `label`, `disabled`                      |
+| `UiAutocompleteHarness` | `ui-autocomplete`                                    | `label`, `value` (text), `disabled`      |
+| `UiNumberInputHarness`  | `ui-number-input`                                    | `label`, `value` (text), `disabled`      |
 
 `label` matches the `aria-label` or the text of the `label[for]`, so the label of `ui-form-field`
 works (without the required marker). Every harness extends `UiHarness`: `focus()`, `blur()`,
@@ -746,7 +778,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/datepicker`   | `UiDatepicker`, `UiCalendar`, `UiCalendarView`, `UiDateFilter`                                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/icon`         | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                         |
 | `@vplans/ui-kit/theme`        | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                                                                                                                                |
-| `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, `UiChipHarness`, `UiChipInputHarness`, their `*HarnessFilters`                                                                                  |
+| `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, `UiChipHarness`, `UiChipInputHarness`, `UiAutocompleteHarness`, their `*HarnessFilters`                                                         |
 | `@vplans/ui-kit/core`         | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`                                                                       |
 
 ## Tokens

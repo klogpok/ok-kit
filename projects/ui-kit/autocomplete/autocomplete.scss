@@ -1,0 +1,105 @@
+@use '../styles/mixins';
+@use '../select/panel';
+
+// The field shares the input tokens, so it looks like a text input in a form.
+
+:host {
+  display: block;
+  inline-size: 100%;
+  font-family: var(--ui-font-family-sans);
+}
+
+:host(.ui-autocomplete--sm) {
+  --_height: var(--ui-control-height-sm);
+  --_padding: var(--ui-control-padding-inline-sm);
+  --_font-size: var(--ui-control-font-size-sm);
+}
+
+:host(.ui-autocomplete--md) {
+  --_height: var(--ui-control-height-md);
+  --_padding: var(--ui-control-padding-inline-md);
+  --_font-size: var(--ui-control-font-size-md);
+}
+
+:host(.ui-autocomplete--lg) {
+  --_height: var(--ui-control-height-lg);
+  --_padding: var(--ui-control-padding-inline-lg);
+  --_font-size: var(--ui-control-font-size-lg);
+}
+
+.ui-autocomplete__field {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-block-size: var(--_height);
+  border: var(--ui-border-width-default) solid var(--ui-input-border);
+  border-radius: var(--ui-input-radius);
+  background-color: var(--ui-input-bg);
+  color: var(--ui-input-text);
+  @include mixins.transition(border-color, box-shadow, background-color);
+
+  &:hover {
+    border-color: var(--ui-input-border-hover);
+  }
+
+  &:focus-within {
+    border-color: var(--ui-input-border-focus);
+    outline: var(--ui-focus-ring-width) solid var(--ui-color-focus-ring);
+    outline-offset: calc(var(--ui-border-width-default) * -1);
+  }
+}
+
+.ui-autocomplete__input {
+  flex: 1;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  align-self: stretch;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--_padding);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--_font-size);
+  line-height: var(--ui-line-height-normal);
+  outline: none;
+
+  &::placeholder {
+    color: var(--ui-input-placeholder);
+    opacity: 1;
+  }
+}
+
+.ui-autocomplete__spinner {
+  flex-shrink: 0;
+  margin-inline-end: var(--_padding);
+}
+
+:host(.ui-autocomplete--invalid) .ui-autocomplete__field {
+  border-color: var(--ui-input-border-invalid);
+
+  &:focus-within {
+    outline-color: var(--ui-input-border-invalid);
+  }
+}
+
+:host(.ui-autocomplete--readonly) .ui-autocomplete__field {
+  border-color: var(--ui-input-border);
+  background-color: var(--ui-color-surface-subtle);
+}
+
+:host(.ui-autocomplete--disabled) .ui-autocomplete__field {
+  border-color: var(--ui-color-border);
+  background-color: var(--ui-input-bg-disabled);
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+@include panel.styles;
+
+@media (forced-colors: active) {
+  :host(.ui-autocomplete--invalid) .ui-autocomplete__field {
+    border-style: dashed;
+  }
+}

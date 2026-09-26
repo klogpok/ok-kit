@@ -6,3 +6,4 @@ export * from './select-harness';
 export * from './dialog-harness';
 export * from './number-input-harness';
 export * from './chip-harness';
+export * from './autocomplete-harness';

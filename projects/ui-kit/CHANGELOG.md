@@ -33,6 +33,11 @@ so versions mark review points rather than releases.
   `UiChipHarness` and `UiChipInputHarness` in testing.
 - **tokens:** `--ui-chip-*`.
 - **labels:** `removeChip`, `chipRemoved`.
+- **select:** the listbox overlay, active option, filtering and labels moved into a shared
+  internal base (`ɵUiOptionPanel`) used by select, multi-select and autocomplete. No API change.
+- **autocomplete:** new entry point with `ui-autocomplete`: free text with suggestions, or a
+  pick-one mode with `displayWith` for objects; `(searchChange)`, `filterOptions`, `loading`,
+  `compareWith`; `UiAutocompleteHarness` in testing.
 
 ## Unreleased (phase 6.0: test infrastructure)
 
