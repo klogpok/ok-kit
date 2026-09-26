@@ -14,6 +14,11 @@ so versions mark review points rather than releases.
 - **empty-state:** `ui-empty-state` with icon or illustration slots, a heading title, description
   and actions; `size="sm"` for cards and `tr[ui-table-message]`.
 - **progress:** `ui-progress-bar`, determinate or indeterminate, with sizes and tones.
+- **avatar:** `ui-avatar` (image, initials or icon; 8 colors from the name) and
+  `ui-avatar-group` with `max` and a "+N" counter.
+- **tokens:** `--ui-color-accent-1-*` … `--ui-color-accent-8-*` (bg/text pairs) and
+  `--ui-media-size-*`.
+- **labels:** `moreCount`.
 
 ## Phase 5: second audit
 

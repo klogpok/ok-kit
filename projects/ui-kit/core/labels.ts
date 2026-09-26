@@ -36,6 +36,8 @@ export interface UiLabels {
   pageLabel: (page: number) => string;
   /** Range summary of `ui-pagination`, e.g. "11–20 of 57". `start` is 1-based; 0 when empty. */
   pageRange: (start: number, end: number, length: number) => string;
+  /** Accessible name of the "+N" counter of `ui-avatar-group`, e.g. "3 more". */
+  moreCount: (count: number) => string;
   /** BCP 47 locale for dates: parsing, formatting, month and weekday names, first day of week. */
   locale: string;
   /** Calendar button and dialog of `ui-datepicker`. */
@@ -67,6 +69,7 @@ export const UI_LABELS_HE: UiLabels = {
   pageLabel: (page) => `עמוד ${page}`,
   // The isolate (LRI…PDI) keeps "51–75" from being reordered to "75–51" in RTL text.
   pageRange: (start, end, length) => `\u2066${start}–${end}\u2069 מתוך ${length}`,
+  moreCount: (count) => `עוד ${count}`,
   locale: 'he-IL',
   chooseDate: 'בחירת תאריך',
   invalidDate: 'תאריך לא תקין',
@@ -93,6 +96,7 @@ export const UI_LABELS_EN: UiLabels = {
   itemsPerPage: 'Items per page',
   pageLabel: (page) => `Page ${page}`,
   pageRange: (start, end, length) => `${start}–${end} of ${length}`,
+  moreCount: (count) => `${count} more`,
   locale: 'en-US',
   chooseDate: 'Choose date',
   invalidDate: 'Enter a valid date',

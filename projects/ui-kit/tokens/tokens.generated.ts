@@ -356,6 +356,102 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#29230a"
   },
   {
+    "name": "--ui-ref-color-purple-100",
+    "layer": "primitive",
+    "light": "#ede9fe",
+    "dark": "#ede9fe"
+  },
+  {
+    "name": "--ui-ref-color-purple-200",
+    "layer": "primitive",
+    "light": "#ddd6fe",
+    "dark": "#ddd6fe"
+  },
+  {
+    "name": "--ui-ref-color-purple-800",
+    "layer": "primitive",
+    "light": "#5b21b6",
+    "dark": "#5b21b6"
+  },
+  {
+    "name": "--ui-ref-color-purple-900",
+    "layer": "primitive",
+    "light": "#4c1d95",
+    "dark": "#4c1d95"
+  },
+  {
+    "name": "--ui-ref-color-teal-100",
+    "layer": "primitive",
+    "light": "#ccfbf1",
+    "dark": "#ccfbf1"
+  },
+  {
+    "name": "--ui-ref-color-teal-200",
+    "layer": "primitive",
+    "light": "#99f6e4",
+    "dark": "#99f6e4"
+  },
+  {
+    "name": "--ui-ref-color-teal-800",
+    "layer": "primitive",
+    "light": "#115e59",
+    "dark": "#115e59"
+  },
+  {
+    "name": "--ui-ref-color-teal-900",
+    "layer": "primitive",
+    "light": "#134e4a",
+    "dark": "#134e4a"
+  },
+  {
+    "name": "--ui-ref-color-orange-100",
+    "layer": "primitive",
+    "light": "#ffedd5",
+    "dark": "#ffedd5"
+  },
+  {
+    "name": "--ui-ref-color-orange-200",
+    "layer": "primitive",
+    "light": "#fed7aa",
+    "dark": "#fed7aa"
+  },
+  {
+    "name": "--ui-ref-color-orange-800",
+    "layer": "primitive",
+    "light": "#9a3412",
+    "dark": "#9a3412"
+  },
+  {
+    "name": "--ui-ref-color-orange-900",
+    "layer": "primitive",
+    "light": "#7c2d12",
+    "dark": "#7c2d12"
+  },
+  {
+    "name": "--ui-ref-color-pink-100",
+    "layer": "primitive",
+    "light": "#fce7f3",
+    "dark": "#fce7f3"
+  },
+  {
+    "name": "--ui-ref-color-pink-200",
+    "layer": "primitive",
+    "light": "#fbcfe8",
+    "dark": "#fbcfe8"
+  },
+  {
+    "name": "--ui-ref-color-pink-800",
+    "layer": "primitive",
+    "light": "#9d174d",
+    "dark": "#9d174d"
+  },
+  {
+    "name": "--ui-ref-color-pink-900",
+    "layer": "primitive",
+    "light": "#831843",
+    "dark": "#831843"
+  },
+  {
     "name": "--ui-ref-color-scrim-light",
     "layer": "primitive",
     "light": "rgb(15 23 42 / 0.5)",
@@ -504,6 +600,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "primitive",
     "light": "2.75rem",
     "dark": "2.75rem"
+  },
+  {
+    "name": "--ui-ref-size-12",
+    "layer": "primitive",
+    "light": "3rem",
+    "dark": "3rem"
   },
   {
     "name": "--ui-ref-size-48",
@@ -1166,6 +1268,30 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "50rem"
   },
   {
+    "name": "--ui-media-size-sm",
+    "layer": "semantic",
+    "light": "1.5rem",
+    "dark": "1.5rem"
+  },
+  {
+    "name": "--ui-media-size-md",
+    "layer": "semantic",
+    "light": "2rem",
+    "dark": "2rem"
+  },
+  {
+    "name": "--ui-media-size-lg",
+    "layer": "semantic",
+    "light": "2.5rem",
+    "dark": "2.5rem"
+  },
+  {
+    "name": "--ui-media-size-xl",
+    "layer": "semantic",
+    "light": "3rem",
+    "dark": "3rem"
+  },
+  {
     "name": "--ui-panel-max-height",
     "layer": "semantic",
     "light": "18rem",
@@ -1488,6 +1614,102 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "semantic",
     "light": "#155ea6",
     "dark": "#72b8f2"
+  },
+  {
+    "name": "--ui-color-accent-1-bg",
+    "layer": "semantic",
+    "light": "#d3e9fa",
+    "dark": "#0d3d6e"
+  },
+  {
+    "name": "--ui-color-accent-1-text",
+    "layer": "semantic",
+    "light": "#004b9e",
+    "dark": "#a8d3f6"
+  },
+  {
+    "name": "--ui-color-accent-2-bg",
+    "layer": "semantic",
+    "light": "#c9ebd9",
+    "dark": "#07472e"
+  },
+  {
+    "name": "--ui-color-accent-2-text",
+    "layer": "semantic",
+    "light": "#055636",
+    "dark": "#95d6b4"
+  },
+  {
+    "name": "--ui-color-accent-3-bg",
+    "layer": "semantic",
+    "light": "#f3efc6",
+    "dark": "#483f19"
+  },
+  {
+    "name": "--ui-color-accent-3-text",
+    "layer": "semantic",
+    "light": "#554c1a",
+    "dark": "#e6dd8e"
+  },
+  {
+    "name": "--ui-color-accent-4-bg",
+    "layer": "semantic",
+    "light": "#fee2e2",
+    "dark": "#7f1d1d"
+  },
+  {
+    "name": "--ui-color-accent-4-text",
+    "layer": "semantic",
+    "light": "#991b1b",
+    "dark": "#fecaca"
+  },
+  {
+    "name": "--ui-color-accent-5-bg",
+    "layer": "semantic",
+    "light": "#ede9fe",
+    "dark": "#4c1d95"
+  },
+  {
+    "name": "--ui-color-accent-5-text",
+    "layer": "semantic",
+    "light": "#5b21b6",
+    "dark": "#ddd6fe"
+  },
+  {
+    "name": "--ui-color-accent-6-bg",
+    "layer": "semantic",
+    "light": "#ccfbf1",
+    "dark": "#134e4a"
+  },
+  {
+    "name": "--ui-color-accent-6-text",
+    "layer": "semantic",
+    "light": "#115e59",
+    "dark": "#99f6e4"
+  },
+  {
+    "name": "--ui-color-accent-7-bg",
+    "layer": "semantic",
+    "light": "#ffedd5",
+    "dark": "#7c2d12"
+  },
+  {
+    "name": "--ui-color-accent-7-text",
+    "layer": "semantic",
+    "light": "#9a3412",
+    "dark": "#fed7aa"
+  },
+  {
+    "name": "--ui-color-accent-8-bg",
+    "layer": "semantic",
+    "light": "#fce7f3",
+    "dark": "#831843"
+  },
+  {
+    "name": "--ui-color-accent-8-text",
+    "layer": "semantic",
+    "light": "#9d174d",
+    "dark": "#fbcfe8"
   },
   {
     "name": "--ui-color-focus-ring",
@@ -2304,6 +2526,192 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-danger)",
     "dark": "var(--ui-color-danger)"
+  },
+  {
+    "name": "--ui-avatar-radius-square",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-avatar-size-sm",
+    "layer": "component",
+    "light": "var(--ui-media-size-sm)",
+    "dark": "var(--ui-media-size-sm)"
+  },
+  {
+    "name": "--ui-avatar-size-md",
+    "layer": "component",
+    "light": "var(--ui-media-size-md)",
+    "dark": "var(--ui-media-size-md)"
+  },
+  {
+    "name": "--ui-avatar-size-lg",
+    "layer": "component",
+    "light": "var(--ui-media-size-lg)",
+    "dark": "var(--ui-media-size-lg)"
+  },
+  {
+    "name": "--ui-avatar-size-xl",
+    "layer": "component",
+    "light": "var(--ui-media-size-xl)",
+    "dark": "var(--ui-media-size-xl)"
+  },
+  {
+    "name": "--ui-avatar-font-size-sm",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
+    "name": "--ui-avatar-font-size-md",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-avatar-font-size-lg",
+    "layer": "component",
+    "light": "var(--ui-font-size-md)",
+    "dark": "var(--ui-font-size-md)"
+  },
+  {
+    "name": "--ui-avatar-font-size-xl",
+    "layer": "component",
+    "light": "var(--ui-font-size-lg)",
+    "dark": "var(--ui-font-size-lg)"
+  },
+  {
+    "name": "--ui-avatar-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-avatar-fallback-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-avatar-fallback-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-avatar-group-ring",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-avatar-group-ring-width",
+    "layer": "component",
+    "light": "var(--ui-border-width-strong)",
+    "dark": "var(--ui-border-width-strong)"
+  },
+  {
+    "name": "--ui-avatar-group-overlap",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-avatar-color-1-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-1-bg)",
+    "dark": "var(--ui-color-accent-1-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-1-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-1-text)",
+    "dark": "var(--ui-color-accent-1-text)"
+  },
+  {
+    "name": "--ui-avatar-color-2-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-2-bg)",
+    "dark": "var(--ui-color-accent-2-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-2-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-2-text)",
+    "dark": "var(--ui-color-accent-2-text)"
+  },
+  {
+    "name": "--ui-avatar-color-3-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-3-bg)",
+    "dark": "var(--ui-color-accent-3-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-3-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-3-text)",
+    "dark": "var(--ui-color-accent-3-text)"
+  },
+  {
+    "name": "--ui-avatar-color-4-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-4-bg)",
+    "dark": "var(--ui-color-accent-4-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-4-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-4-text)",
+    "dark": "var(--ui-color-accent-4-text)"
+  },
+  {
+    "name": "--ui-avatar-color-5-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-5-bg)",
+    "dark": "var(--ui-color-accent-5-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-5-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-5-text)",
+    "dark": "var(--ui-color-accent-5-text)"
+  },
+  {
+    "name": "--ui-avatar-color-6-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-6-bg)",
+    "dark": "var(--ui-color-accent-6-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-6-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-6-text)",
+    "dark": "var(--ui-color-accent-6-text)"
+  },
+  {
+    "name": "--ui-avatar-color-7-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-7-bg)",
+    "dark": "var(--ui-color-accent-7-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-7-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-7-text)",
+    "dark": "var(--ui-color-accent-7-text)"
+  },
+  {
+    "name": "--ui-avatar-color-8-bg",
+    "layer": "component",
+    "light": "var(--ui-color-accent-8-bg)",
+    "dark": "var(--ui-color-accent-8-bg)"
+  },
+  {
+    "name": "--ui-avatar-color-8-text",
+    "layer": "component",
+    "light": "var(--ui-color-accent-8-text)",
+    "dark": "var(--ui-color-accent-8-text)"
   },
   {
     "name": "--ui-card-bg",

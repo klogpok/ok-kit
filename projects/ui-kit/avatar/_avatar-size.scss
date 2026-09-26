@@ -1,0 +1,33 @@
+// Size and base look shared by ui-avatar and the "+N" counter of ui-avatar-group.
+
+@mixin size($size) {
+  --_size: var(--ui-avatar-size-#{$size});
+  --_font-size: var(--ui-avatar-font-size-#{$size});
+}
+
+@mixin base {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  overflow: hidden;
+  border-radius: var(--ui-radius-full);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--_font-size);
+  font-weight: var(--ui-avatar-font-weight);
+  line-height: 1;
+  vertical-align: middle;
+  user-select: none;
+}
+
+/// Ring and overlap inside a group; the first item does not overlap.
+@mixin grouped {
+  box-shadow: 0 0 0 var(--ui-avatar-group-ring-width) var(--ui-avatar-group-ring);
+
+  &:not(:first-child) {
+    margin-inline-start: calc(var(--ui-avatar-group-overlap) * -1);
+  }
+}

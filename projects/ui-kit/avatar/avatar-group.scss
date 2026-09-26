@@ -1,0 +1,28 @@
+@use 'avatar-size';
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  // Room for the ring of the first avatar.
+  padding-inline-start: var(--ui-avatar-group-ring-width);
+}
+
+.ui-avatar-group__more {
+  @include avatar-size.base;
+  @include avatar-size.grouped;
+
+  background-color: var(--ui-avatar-fallback-bg);
+  color: var(--ui-avatar-fallback-text);
+}
+
+@each $size in sm, md, lg, xl {
+  .ui-avatar-group__more--#{$size} {
+    @include avatar-size.size($size);
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-avatar-group__more {
+    border: var(--ui-border-width-default) solid CanvasText;
+  }
+}

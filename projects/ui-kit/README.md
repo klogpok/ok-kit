@@ -16,6 +16,7 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - [RTL](#rtl)
 - [Overlays](#overlays)
 - [Feedback](#feedback)
+- [Data display](#data-display)
 - [Components](#components)
 - [Tokens](#tokens)
 - [Contributing](#contributing)
@@ -427,6 +428,21 @@ Mark an image or SVG with `uiEmptyStateMedia` to show it without the circle.
 
 The bar is named by `label`, by `aria-labelledby`, or by the `loading` label.
 
+## Data display
+
+```html
+<!-- Avatar: the image, else the initials on a color from the name, else a person icon -->
+<ui-avatar name="Dana Levi" [src]="user.photoUrl" size="lg" />
+
+<ui-avatar-group max="3" aria-label="Coordinators">
+  @for (user of users; track user.id) {
+  <ui-avatar [name]="user.name" [src]="user.photo" />
+  }
+</ui-avatar-group>
+```
+
+The name is the accessible name. Set `decorative` when the name is shown next to the avatar.
+
 ## Components
 
 | Entry point                  | Exports                                                                                                                                                                                                                                                          |
@@ -443,6 +459,7 @@ The bar is named by `label`, by `aria-labelledby`, or by the `loading` label.
 | `@vplans/ui-kit/alert`       | `UiAlert`, `UiAlertTone`, `UiAlertLive`                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/empty-state` | `UiEmptyState`                                                                                                                                                                                                                                                   |
 | `@vplans/ui-kit/progress`    | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                |
+| `@vplans/ui-kit/avatar`      | `UiAvatar`, `UiAvatarGroup`, `UiAvatarSize`, `uiInitials`, `uiAvatarColor`                                                                                                                                                                                       |
 | `@vplans/ui-kit/badge`       | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                         |
 | `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                                                                                             |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                       |
@@ -523,6 +540,10 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-container-width-xl`                | semantic  | `25rem`                                                                      | `25rem`                                                                |
 | `--ui-container-width-2xl`               | semantic  | `35rem`                                                                      | `35rem`                                                                |
 | `--ui-container-width-3xl`               | semantic  | `50rem`                                                                      | `50rem`                                                                |
+| `--ui-media-size-sm`                     | semantic  | `1.5rem`                                                                     | `1.5rem`                                                               |
+| `--ui-media-size-md`                     | semantic  | `2rem`                                                                       | `2rem`                                                                 |
+| `--ui-media-size-lg`                     | semantic  | `2.5rem`                                                                     | `2.5rem`                                                               |
+| `--ui-media-size-xl`                     | semantic  | `3rem`                                                                       | `3rem`                                                                 |
 | `--ui-panel-max-height`                  | semantic  | `18rem`                                                                      | `18rem`                                                                |
 | `--ui-em-1`                              | semantic  | `1em`                                                                        | `1em`                                                                  |
 | `--ui-em-5`                              | semantic  | `5em`                                                                        | `5em`                                                                  |
@@ -577,6 +598,22 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-info`                        | semantic  | `#155ea6`                                                                    | `#4aa3ef`                                                              |
 | `--ui-color-info-subtle`                 | semantic  | `#e9f4fc`                                                                    | `#0a2747`                                                              |
 | `--ui-color-info-text`                   | semantic  | `#155ea6`                                                                    | `#72b8f2`                                                              |
+| `--ui-color-accent-1-bg`                 | semantic  | `#d3e9fa`                                                                    | `#0d3d6e`                                                              |
+| `--ui-color-accent-1-text`               | semantic  | `#004b9e`                                                                    | `#a8d3f6`                                                              |
+| `--ui-color-accent-2-bg`                 | semantic  | `#c9ebd9`                                                                    | `#07472e`                                                              |
+| `--ui-color-accent-2-text`               | semantic  | `#055636`                                                                    | `#95d6b4`                                                              |
+| `--ui-color-accent-3-bg`                 | semantic  | `#f3efc6`                                                                    | `#483f19`                                                              |
+| `--ui-color-accent-3-text`               | semantic  | `#554c1a`                                                                    | `#e6dd8e`                                                              |
+| `--ui-color-accent-4-bg`                 | semantic  | `#fee2e2`                                                                    | `#7f1d1d`                                                              |
+| `--ui-color-accent-4-text`               | semantic  | `#991b1b`                                                                    | `#fecaca`                                                              |
+| `--ui-color-accent-5-bg`                 | semantic  | `#ede9fe`                                                                    | `#4c1d95`                                                              |
+| `--ui-color-accent-5-text`               | semantic  | `#5b21b6`                                                                    | `#ddd6fe`                                                              |
+| `--ui-color-accent-6-bg`                 | semantic  | `#ccfbf1`                                                                    | `#134e4a`                                                              |
+| `--ui-color-accent-6-text`               | semantic  | `#115e59`                                                                    | `#99f6e4`                                                              |
+| `--ui-color-accent-7-bg`                 | semantic  | `#ffedd5`                                                                    | `#7c2d12`                                                              |
+| `--ui-color-accent-7-text`               | semantic  | `#9a3412`                                                                    | `#fed7aa`                                                              |
+| `--ui-color-accent-8-bg`                 | semantic  | `#fce7f3`                                                                    | `#831843`                                                              |
+| `--ui-color-accent-8-text`               | semantic  | `#9d174d`                                                                    | `#fbcfe8`                                                              |
 | `--ui-color-focus-ring`                  | semantic  | `#1a74c9`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-backdrop`                    | semantic  | `rgb(15 23 42 / 0.5)`                                                        | `rgb(0 0 0 / 0.6)`                                                     |
 | `--ui-shadow-sm`                         | semantic  | `0 1px 2px 0 rgb(15 23 42 / 0.06)`                                           | `0 1px 2px 0 rgb(0 0 0 / 0.4)`                                         |
@@ -713,6 +750,37 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-progress-success`                  | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
 | `--ui-progress-warning`                  | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
 | `--ui-progress-danger`                   | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
+| `--ui-avatar-radius-square`              | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-avatar-size-sm`                    | component | `var(--ui-media-size-sm)`                                                    | `var(--ui-media-size-sm)`                                              |
+| `--ui-avatar-size-md`                    | component | `var(--ui-media-size-md)`                                                    | `var(--ui-media-size-md)`                                              |
+| `--ui-avatar-size-lg`                    | component | `var(--ui-media-size-lg)`                                                    | `var(--ui-media-size-lg)`                                              |
+| `--ui-avatar-size-xl`                    | component | `var(--ui-media-size-xl)`                                                    | `var(--ui-media-size-xl)`                                              |
+| `--ui-avatar-font-size-sm`               | component | `var(--ui-font-size-xs)`                                                     | `var(--ui-font-size-xs)`                                               |
+| `--ui-avatar-font-size-md`               | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-avatar-font-size-lg`               | component | `var(--ui-font-size-md)`                                                     | `var(--ui-font-size-md)`                                               |
+| `--ui-avatar-font-size-xl`               | component | `var(--ui-font-size-lg)`                                                     | `var(--ui-font-size-lg)`                                               |
+| `--ui-avatar-font-weight`                | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-avatar-fallback-bg`                | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
+| `--ui-avatar-fallback-text`              | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-avatar-group-ring`                 | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
+| `--ui-avatar-group-ring-width`           | component | `var(--ui-border-width-strong)`                                              | `var(--ui-border-width-strong)`                                        |
+| `--ui-avatar-group-overlap`              | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
+| `--ui-avatar-color-1-bg`                 | component | `var(--ui-color-accent-1-bg)`                                                | `var(--ui-color-accent-1-bg)`                                          |
+| `--ui-avatar-color-1-text`               | component | `var(--ui-color-accent-1-text)`                                              | `var(--ui-color-accent-1-text)`                                        |
+| `--ui-avatar-color-2-bg`                 | component | `var(--ui-color-accent-2-bg)`                                                | `var(--ui-color-accent-2-bg)`                                          |
+| `--ui-avatar-color-2-text`               | component | `var(--ui-color-accent-2-text)`                                              | `var(--ui-color-accent-2-text)`                                        |
+| `--ui-avatar-color-3-bg`                 | component | `var(--ui-color-accent-3-bg)`                                                | `var(--ui-color-accent-3-bg)`                                          |
+| `--ui-avatar-color-3-text`               | component | `var(--ui-color-accent-3-text)`                                              | `var(--ui-color-accent-3-text)`                                        |
+| `--ui-avatar-color-4-bg`                 | component | `var(--ui-color-accent-4-bg)`                                                | `var(--ui-color-accent-4-bg)`                                          |
+| `--ui-avatar-color-4-text`               | component | `var(--ui-color-accent-4-text)`                                              | `var(--ui-color-accent-4-text)`                                        |
+| `--ui-avatar-color-5-bg`                 | component | `var(--ui-color-accent-5-bg)`                                                | `var(--ui-color-accent-5-bg)`                                          |
+| `--ui-avatar-color-5-text`               | component | `var(--ui-color-accent-5-text)`                                              | `var(--ui-color-accent-5-text)`                                        |
+| `--ui-avatar-color-6-bg`                 | component | `var(--ui-color-accent-6-bg)`                                                | `var(--ui-color-accent-6-bg)`                                          |
+| `--ui-avatar-color-6-text`               | component | `var(--ui-color-accent-6-text)`                                              | `var(--ui-color-accent-6-text)`                                        |
+| `--ui-avatar-color-7-bg`                 | component | `var(--ui-color-accent-7-bg)`                                                | `var(--ui-color-accent-7-bg)`                                          |
+| `--ui-avatar-color-7-text`               | component | `var(--ui-color-accent-7-text)`                                              | `var(--ui-color-accent-7-text)`                                        |
+| `--ui-avatar-color-8-bg`                 | component | `var(--ui-color-accent-8-bg)`                                                | `var(--ui-color-accent-8-bg)`                                          |
+| `--ui-avatar-color-8-text`               | component | `var(--ui-color-accent-8-text)`                                              | `var(--ui-color-accent-8-text)`                                        |
 | `--ui-card-bg`                           | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
 | `--ui-card-border`                       | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-card-radius`                       | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
