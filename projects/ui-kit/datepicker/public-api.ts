@@ -1,3 +1,4 @@
 export * from './calendar';
 export * from './datepicker';
-export type { UiDateFilter } from './date-utils';
+export * from './date-range-picker';
+export type { UiDateFilter, UiDateRange } from './date-utils';

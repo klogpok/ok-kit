@@ -6,9 +6,13 @@ import {
   firstDayOfWeekFallback,
   formatDay,
   formatHint,
+  isBetween,
   isDayEnabled,
+  monthsBetween,
   parseDay,
   sameDay,
+  sameRange,
+  validRange,
 } from './date-utils';
 
 describe('date utils', () => {
@@ -76,5 +80,34 @@ describe('date utils', () => {
     expect(isDayEnabled(new Date(2026, 8, 10, 15), min, max, null)).toBe(true);
     expect(isDayEnabled(new Date(2026, 8, 18), min, max, noFridays)).toBe(false);
     expect(sameDay(clampDay(new Date(2026, 8, 30), min, max), max)).toBe(true);
+  });
+
+  it('normalizes a range: valid dates at midnight, in order, null when empty', () => {
+    const a = new Date(2026, 8, 10, 15);
+    const b = new Date(2026, 8, 3);
+    expect(validRange({ start: a, end: b })).toEqual({ start: b, end: new Date(2026, 8, 10) });
+    expect(validRange({ start: null, end: b })).toEqual({ start: null, end: b });
+    expect(validRange({ start: new Date(Number.NaN), end: 'x' })).toBeNull();
+    expect(validRange('2026-09-10')).toBeNull();
+    expect(validRange(null)).toBeNull();
+  });
+
+  it('compares ranges by day', () => {
+    const range = { start: new Date(2026, 8, 1), end: null };
+    expect(sameRange(range, { start: new Date(2026, 8, 1, 12), end: null })).toBe(true);
+    expect(sameRange(range, { start: new Date(2026, 8, 1), end: new Date(2026, 8, 2) })).toBe(
+      false,
+    );
+    expect(sameRange(range, null)).toBe(false);
+    expect(sameRange(null, null)).toBe(true);
+  });
+
+  it('finds days inside a range and counts months', () => {
+    const start = new Date(2026, 8, 1);
+    const end = new Date(2026, 8, 5);
+    expect(isBetween(new Date(2026, 8, 3), start, end)).toBe(true);
+    expect(isBetween(start, start, end)).toBe(false);
+    expect(isBetween(new Date(2026, 8, 3), start, null)).toBe(false);
+    expect(monthsBetween(new Date(2025, 10, 30), new Date(2026, 1, 1))).toBe(3);
   });
 });

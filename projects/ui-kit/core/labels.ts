@@ -68,6 +68,14 @@ export interface UiLabels {
   chooseYear: string;
   /** Button of the `ui-datepicker` calendar that picks today. */
   today: string;
+  /** Calendar button and dialog of `ui-date-range-picker`. */
+  chooseDateRange: string;
+  /** Start field of `ui-date-range-picker` and the first day of a calendar range. */
+  startDate: string;
+  /** End field of `ui-date-range-picker` and the last day of a calendar range. */
+  endDate: string;
+  /** Group of preset buttons in the `ui-date-range-picker` dialog. */
+  dateRangePresets: string;
   /** Remove button of a removable `ui-chip`, e.g. "Remove Haifa". */
   removeChip: (label: string) => string;
   /** Announced when a chip is removed, e.g. "Haifa removed". */
@@ -93,6 +101,8 @@ export interface UiLabels {
   invalidNumber: string;
   /** Error of `ui-datepicker` for text that is not an allowed date. */
   invalidDate: string;
+  /** Error of `ui-date-range-picker` when the end is before the start. */
+  invalidDateRange: string;
   /** Start thumb of `ui-range-slider`, read after the field label. */
   rangeStart: string;
   /** End thumb of `ui-range-slider`, read after the field label. */
@@ -138,6 +148,10 @@ export const UI_LABELS_HE: UiLabels = {
   chooseMonth: 'בחירת חודש',
   chooseYear: 'בחירת שנה',
   today: 'היום',
+  chooseDateRange: 'בחירת טווח תאריכים',
+  startDate: 'תאריך התחלה',
+  endDate: 'תאריך סיום',
+  dateRangePresets: 'טווחים מוכנים',
   removeChip: (label) => `הסרת ${label}`,
   chipRemoved: (label) => `${label} הוסר`,
   dropFiles: 'גררו קבצים לכאן או לחצו לבחירה',
@@ -152,6 +166,7 @@ export const UI_LABELS_HE: UiLabels = {
   decrement: 'הקטנה',
   invalidNumber: 'מספר לא תקין',
   invalidDate: 'תאריך לא תקין',
+  invalidDateRange: 'תאריך הסיום מוקדם מתאריך ההתחלה',
   rangeStart: 'מינימום',
   rangeEnd: 'מקסימום',
   previousMonth: 'חודש קודם',
@@ -193,6 +208,10 @@ export const UI_LABELS_EN: UiLabels = {
   chooseMonth: 'Choose month',
   chooseYear: 'Choose year',
   today: 'Today',
+  chooseDateRange: 'Choose dates',
+  startDate: 'Start date',
+  endDate: 'End date',
+  dateRangePresets: 'Quick ranges',
   removeChip: (label) => `Remove ${label}`,
   chipRemoved: (label) => `${label} removed`,
   dropFiles: 'Drop files here or click to browse',
@@ -206,6 +225,7 @@ export const UI_LABELS_EN: UiLabels = {
   decrement: 'Decrease',
   invalidNumber: 'Enter a valid number',
   invalidDate: 'Enter a valid date',
+  invalidDateRange: 'The end date is before the start date',
   rangeStart: 'Minimum',
   rangeEnd: 'Maximum',
   previousMonth: 'Previous month',

@@ -8,6 +8,12 @@
   font-size: var(--ui-font-size-sm);
 }
 
+// Months of the day view side by side; the month and year views have one column.
+.ui-calendar__months {
+  display: flex;
+  gap: var(--ui-calendar-month-gap);
+}
+
 .ui-calendar__header {
   display: flex;
   align-items: center;
@@ -79,9 +85,12 @@ td {
   text-align: center;
 }
 
-// The month and year grids fill the width of the day grid.
+// The month and year grids fill the width of the day grids.
 .ui-calendar__periods td {
-  inline-size: calc((var(--ui-calendar-cell-size) * 7 + var(--ui-calendar-gap) * 6) / 4);
+  --_grid: calc(var(--ui-calendar-cell-size) * 7 + var(--ui-calendar-gap) * 6);
+  --_gaps: calc(var(--ui-calendar-month-gap) * (var(--_months, 1) - 1));
+
+  inline-size: calc((var(--_grid) * var(--_months, 1) + var(--_gaps)) / 4);
 }
 
 .ui-calendar__day,
@@ -111,6 +120,25 @@ td {
   font-weight: var(--ui-font-weight-semibold);
 }
 
+// Days between the start and the end of a range: a band, drawn over the gaps between cells.
+.ui-calendar__day--in-range {
+  border-radius: 0;
+  background-color: var(--ui-calendar-range-bg);
+  box-shadow:
+    var(--ui-calendar-gap) 0 0 0 var(--ui-calendar-range-bg),
+    calc(var(--ui-calendar-gap) * -1) 0 0 0 var(--ui-calendar-range-bg);
+
+  &:hover:not(.ui-calendar__day--disabled) {
+    background-color: var(--ui-calendar-range-bg);
+  }
+}
+
+// The end the pointer or the focus previews, before it is picked.
+.ui-calendar__day--preview {
+  border-style: dashed;
+  border-color: var(--ui-calendar-today-border);
+}
+
 .ui-calendar__day--disabled {
   color: var(--ui-color-text-disabled);
   text-decoration: line-through;
@@ -118,6 +146,11 @@ td {
 }
 
 @media (forced-colors: active) {
+  .ui-calendar__day--in-range {
+    border-color: Highlight;
+    box-shadow: none;
+  }
+
   .ui-calendar__day--selected {
     border-color: Highlight;
     background-color: Highlight;

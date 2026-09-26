@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiCalendar } from './calendar';
-import { UiDateFilter } from './date-utils';
+import { UiDateFilter, UiDateRange } from './date-utils';
 
 @Component({
   imports: [UiCalendar],
@@ -306,5 +306,204 @@ describe('UiCalendar', () => {
     await settle();
     expect(title()).toBe('2026');
     expect(button('Previous year').getAttribute('aria-disabled')).toBe('true');
+  });
+});
+
+@Component({
+  imports: [UiCalendar],
+  template: `
+    <ui-calendar
+      range
+      [(selectedRange)]="range"
+      [months]="months()"
+      [min]="min()"
+      [max]="max()"
+      (rangeSelected)="picked.push($event)"
+    />
+  `,
+})
+class RangeHost {
+  readonly range = signal<UiDateRange | null>(null);
+  readonly months = signal(1);
+  readonly min = signal<Date | null>(null);
+  readonly max = signal<Date | null>(null);
+  readonly picked: UiDateRange[] = [];
+}
+
+describe('UiCalendar range', () => {
+  let fixture: ComponentFixture<RangeHost>;
+  let host: RangeHost;
+  const root = () => fixture.nativeElement as HTMLElement;
+  const cell = (key: string) => root().querySelector<HTMLElement>(`td[data-date="${key}"]`)!;
+  const titles = () =>
+    [...root().querySelectorAll('.ui-calendar__title')].map((t) => t.textContent.trim());
+  const keys = (selector: string) =>
+    [...root().querySelectorAll<HTMLElement>(selector)].map((td) => td.dataset['date']);
+  const focused = () => (document.activeElement as HTMLElement | null)?.dataset['date'];
+  const button = (label: string) =>
+    root().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
+  const settle = async () => {
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  };
+  const key = async (key: string) => {
+    (document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+    );
+    await settle();
+  };
+
+  beforeEach(async () => {
+    TestBed.configureTestingModule({ providers: [provideUiLabels(UI_LABELS_EN)] });
+    fixture = TestBed.createComponent(RangeHost);
+    host = fixture.componentInstance;
+    host.range.set({ start: new Date(2026, 8, 10), end: null });
+    document.body.appendChild(root());
+    await settle();
+  });
+
+  afterEach(() => root().remove());
+
+  it('picks the start and then the end', async () => {
+    cell('2026-09-14').click();
+    await settle();
+    expect(host.range()).toEqual({ start: new Date(2026, 8, 10), end: new Date(2026, 8, 14) });
+    expect(host.picked.at(-1)).toEqual(host.range());
+
+    // A third pick starts a new range.
+    cell('2026-09-20').click();
+    await settle();
+    expect(host.range()).toEqual({ start: new Date(2026, 8, 20), end: null });
+  });
+
+  it('starts again when the second day is before the start', async () => {
+    cell('2026-09-03').click();
+    await settle();
+    expect(host.range()).toEqual({ start: new Date(2026, 8, 3), end: null });
+  });
+
+  it('marks the range and names its ends', async () => {
+    host.range.set({ start: new Date(2026, 8, 10), end: new Date(2026, 8, 13) });
+    await settle();
+    expect(keys('.ui-calendar__day--in-range')).toEqual(['2026-09-11', '2026-09-12']);
+    expect(keys('.ui-calendar__day--selected')).toEqual(['2026-09-10', '2026-09-13']);
+    expect(keys('[aria-selected="true"]')).toEqual([
+      '2026-09-10',
+      '2026-09-11',
+      '2026-09-12',
+      '2026-09-13',
+    ]);
+    expect(cell('2026-09-10').classList).toContain('ui-calendar__day--range-start');
+    expect(cell('2026-09-13').classList).toContain('ui-calendar__day--range-end');
+    expect(cell('2026-09-10').getAttribute('aria-label')).toBe(
+      'Thursday, September 10, 2026, Start date',
+    );
+    expect(cell('2026-09-13').getAttribute('aria-label')).toBe(
+      'Sunday, September 13, 2026, End date',
+    );
+  });
+
+  it('previews the end under the pointer and on the focused day', async () => {
+    cell('2026-09-12').dispatchEvent(new Event('pointerenter'));
+    await settle();
+    expect(keys('.ui-calendar__day--in-range')).toEqual(['2026-09-11']);
+    expect(cell('2026-09-12').classList).toContain('ui-calendar__day--preview');
+    // A preview is not a selection.
+    expect(keys('[aria-selected="true"]')).toEqual(['2026-09-10']);
+
+    root().querySelector('table')!.dispatchEvent(new Event('pointerleave'));
+    cell('2026-09-10').focus();
+    await key('ArrowRight');
+    await key('ArrowRight');
+    expect(focused()).toBe('2026-09-12');
+    expect(keys('.ui-calendar__day--in-range')).toEqual(['2026-09-11']);
+    await key('Enter');
+    expect(host.range()).toEqual({ start: new Date(2026, 8, 10), end: new Date(2026, 8, 12) });
+    expect(keys('.ui-calendar__day--preview')).toEqual([]);
+  });
+
+  it('does not preview days before the start or days that cannot be picked', async () => {
+    cell('2026-09-05').dispatchEvent(new Event('pointerenter'));
+    await settle();
+    expect(keys('.ui-calendar__day--in-range')).toEqual([]);
+    host.max.set(new Date(2026, 8, 20));
+    cell('2026-09-24').dispatchEvent(new Event('pointerenter'));
+    await settle();
+    expect(keys('.ui-calendar__day--in-range')).toEqual([]);
+  });
+
+  it('shows several months and moves them together', async () => {
+    host.months.set(2);
+    await settle();
+    expect(titles()).toEqual(['September 2026', 'October 2026']);
+    const grids = [...root().querySelectorAll('table')];
+    expect(grids).toHaveLength(2);
+    expect(document.getElementById(grids[1].getAttribute('aria-labelledby')!)!.textContent).toBe(
+      'October 2026',
+    );
+    expect(root().querySelector('.ui-calendar__live')!.textContent).toBe(
+      'September 2026 – October 2026',
+    );
+    expect(root().querySelectorAll('td[tabindex="0"]')).toHaveLength(1);
+    // The previous buttons are on the first month, the next buttons on the last.
+    const headers = [...root().querySelectorAll('.ui-calendar__header')];
+    expect(headers[0].querySelector('[aria-label="Previous month"]')).not.toBeNull();
+    expect(headers[0].querySelector('[aria-label="Next month"]')).toBeNull();
+    expect(headers[1].querySelector('[aria-label="Next month"]')).not.toBeNull();
+
+    button('Next month').click();
+    await settle();
+    expect(titles()).toEqual(['October 2026', 'November 2026']);
+    button('Previous year').click();
+    await settle();
+    expect(titles()).toEqual(['October 2025', 'November 2025']);
+  });
+
+  it('moves the focus into the next month without moving the months', async () => {
+    host.months.set(2);
+    host.range.set({ start: new Date(2026, 8, 30), end: null });
+    await settle();
+    cell('2026-09-30').focus();
+    await key('ArrowRight');
+    expect(focused()).toBe('2026-10-01');
+    expect(titles()).toEqual(['September 2026', 'October 2026']);
+    // A pick in the second month keeps the months and the focus.
+    await key('Enter');
+    expect(host.range()!.end).toEqual(new Date(2026, 9, 1));
+    expect(titles()).toEqual(['September 2026', 'October 2026']);
+    expect(focused()).toBe('2026-10-01');
+
+    await key('PageDown');
+    expect(focused()).toBe('2026-11-01');
+    expect(titles()).toEqual(['October 2026', 'November 2026']);
+    await key('PageUp');
+    await key('PageUp');
+    expect(focused()).toBe('2026-09-01');
+    expect(titles()).toEqual(['September 2026', 'October 2026']);
+  });
+
+  it('disables moving to months outside the limits', async () => {
+    host.months.set(2);
+    host.max.set(new Date(2026, 9, 20));
+    await settle();
+    expect(button('Next month').getAttribute('aria-disabled')).toBe('true');
+    host.max.set(new Date(2026, 10, 2));
+    await settle();
+    expect(button('Next month').getAttribute('aria-disabled')).toBeNull();
+  });
+
+  it('widens the month and year grids to the months shown', async () => {
+    host.months.set(2);
+    await settle();
+    const calendar = root().querySelector<HTMLElement>('ui-calendar')!;
+    expect(calendar.style.getPropertyValue('--_months')).toBe('2');
+    root().querySelector<HTMLButtonElement>('.ui-calendar__title')!.click();
+    await settle();
+    expect(root().querySelectorAll('table')).toHaveLength(1);
+    // Picking a month shows it first.
+    root().querySelector<HTMLElement>('td[data-period="2026-12"]')!.click();
+    await settle();
+    expect(titles()).toEqual(['December 2026', 'January 2027']);
   });
 });

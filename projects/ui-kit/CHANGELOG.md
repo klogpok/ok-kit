@@ -14,6 +14,14 @@ so versions mark review points rather than releases.
   `valueCommit` output; `UiSliderHarness` in testing.
 - **tokens:** `--ui-slider-*`.
 - **labels:** `rangeStart`, `rangeEnd`.
+- **datepicker:** `ui-date-range-picker`: a `{ start, end }` value, start and end fields that
+  parse typed dates, a calendar dialog with two months (one on narrow screens), a hover and focus
+  preview of the range, `presets`, `minDate` / `maxDate` / `dateFilter`, `uiDateParse` and
+  `uiDateRangeOrder` errors; `UiDateRangePickerHarness` in testing.
+- **datepicker:** `ui-calendar` `range` mode (`[(selectedRange)]`, `rangeSelected`) and `months`
+  for several months side by side.
+- **tokens:** `--ui-calendar-month-gap`, `--ui-calendar-range-bg`.
+- **labels:** `chooseDateRange`, `startDate`, `endDate`, `dateRangePresets`, `invalidDateRange`.
 
 ## Unreleased (phase 7: data)
 

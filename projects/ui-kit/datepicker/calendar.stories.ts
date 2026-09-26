@@ -115,3 +115,28 @@ export class DemoComponent {
     template: `<div dir="rtl" lang="he"><ui-calendar [(selected)]="selected" /></div>`,
   }),
 };
+
+/** Range mode with two months: the first pick sets the start, the second the end. */
+export const Range: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `import { Component } from '@angular/core';
+import { UiCalendar, UiDateRange } from '@vplans/ui-kit/datepicker';
+
+@Component({
+  selector: 'app-demo',
+  imports: [UiCalendar],
+  template: \`<ui-calendar range months="2" [(selectedRange)]="range" />\`,
+})
+export class DemoComponent {
+  range: UiDateRange | null = { start: new Date(2026, 8, 20), end: new Date(2026, 9, 6) };
+}`,
+      },
+    },
+  },
+  render: () => ({
+    props: { range: { start: new Date(2026, 8, 20), end: new Date(2026, 9, 6) } },
+    template: `<ui-calendar range months="2" [(selectedRange)]="range" />`,
+  }),
+};

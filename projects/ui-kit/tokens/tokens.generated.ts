@@ -4040,6 +4040,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-weight-semibold)"
   },
   {
+    "name": "--ui-calendar-month-gap",
+    "layer": "component",
+    "light": "var(--ui-space-xl)",
+    "dark": "var(--ui-space-xl)"
+  },
+  {
+    "name": "--ui-calendar-range-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
     "name": "--ui-datepicker-panel-bg",
     "layer": "component",
     "light": "var(--ui-color-surface-raised)",

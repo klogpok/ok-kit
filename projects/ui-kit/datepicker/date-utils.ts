@@ -48,6 +48,50 @@ export function clampDay(date: Date, min?: Date | null, max?: Date | null): Date
 
 export type UiDateFilter = (date: Date) => boolean;
 
+/** A range of days. `start` is not after `end`; either end may be open (`null`). */
+export interface UiDateRange {
+  readonly start: Date | null;
+  readonly end: Date | null;
+}
+
+/** First day of the month of `date`. */
+export function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+/** Months from the month of `a` to the month of `b`. */
+export function monthsBetween(a: Date, b: Date): number {
+  return (b.getFullYear() - a.getFullYear()) * 12 + b.getMonth() - a.getMonth();
+}
+
+/** Whether a day lies strictly between `start` and `end`. */
+export function isBetween(day: Date, start: Date | null, end: Date | null): boolean {
+  return !!start && !!end && compareDays(day, start) > 0 && compareDays(day, end) < 0;
+}
+
+/**
+ * The range as a usable value: `start` and `end` as valid dates at midnight (or `null`), in order.
+ * Anything that is not such an object, or has no date at all, is `null`.
+ */
+export function validRange(value: unknown): UiDateRange | null {
+  if (typeof value !== 'object' || value === null) return null;
+  const range = value as Partial<Record<'start' | 'end', unknown>>;
+  let start = validDay(range.start);
+  let end = validDay(range.end);
+  if (start) start = startOfDay(start);
+  if (end) end = startOfDay(end);
+  if (!start && !end) return null;
+  if (start && end && compareDays(end, start) < 0) [start, end] = [end, start];
+  return { start, end };
+}
+
+/** Whether two ranges hold the same days. `null` equals only `null`. */
+export function sameRange(a: UiDateRange | null, b: UiDateRange | null): boolean {
+  if (!a || !b) return a === b;
+  const same = (x: Date | null, y: Date | null) => (x === null ? y === null : sameDay(x, y));
+  return same(a.start, b.start) && same(a.end, b.end);
+}
+
 /** Whether a day can be picked: inside `min`/`max` and accepted by `filter`. */
 export function isDayEnabled(
   date: Date,

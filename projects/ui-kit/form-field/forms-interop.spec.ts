@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UiChipInput } from '@vplans/ui-kit/chip';
-import { UiDatepicker } from '@vplans/ui-kit/datepicker';
+import { UiDateRange, UiDateRangePicker, UiDatepicker } from '@vplans/ui-kit/datepicker';
 import { UiFileUpload } from '@vplans/ui-kit/file-upload';
 import { UiNumberInput } from '@vplans/ui-kit/number-input';
 import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
@@ -26,6 +26,7 @@ const CONTROLS = [
   UiMultiSelect,
   UiOption,
   UiDatepicker,
+  UiDateRangePicker,
   UiNumberInput,
   UiChipInput,
   UiFileUpload,
@@ -52,6 +53,7 @@ const CONTROLS = [
         <ui-option value="b">B</ui-option>
       </ui-multi-select>
       <ui-datepicker formControlName="date" aria-label="Date" />
+      <ui-date-range-picker formControlName="period" aria-label="Period" />
       <ui-number-input formControlName="units" aria-label="Units" />
       <ui-chip-input formControlName="labels" aria-label="Labels" />
       <ui-file-upload formControlName="plans" aria-label="Plans" multiple />
@@ -68,6 +70,7 @@ class NamedHost {
     city: new FormControl<string | null>('eilat'),
     tags: new FormControl<string[]>(['b']),
     date: new FormControl<Date | null>(new Date(2026, 8, 25)),
+    period: new FormControl<UiDateRange | null>({ start: new Date(2026, 8, 1), end: null }),
     units: new FormControl<number | null>(1200),
     labels: new FormControl<readonly string[]>(['north']),
     plans: new FormControl<readonly File[]>([new File(['x'], 'a.pdf')]),
@@ -85,6 +88,7 @@ class NamedHost {
     UiSelect,
     UiOption,
     UiDatepicker,
+    UiDateRangePicker,
     UiNumberInput,
     UiChipInput,
     UiFileUpload,
@@ -100,6 +104,7 @@ class NamedHost {
       <ui-option value="eilat">Eilat</ui-option>
     </ui-select>
     <ui-datepicker name="date" aria-label="Date" [(ngModel)]="date" />
+    <ui-date-range-picker name="period" aria-label="Period" [(ngModel)]="period" />
     <ui-number-input name="units" aria-label="Units" [(ngModel)]="units" />
     <ui-chip-input name="labels" aria-label="Labels" [(ngModel)]="labels" />
     <ui-file-upload name="plans" aria-label="Plans" [(ngModel)]="plans" />
@@ -110,6 +115,7 @@ class NgModelHost {
   readonly size = signal<string | null>('s');
   readonly city = signal<string | null>('haifa');
   readonly date = signal<Date | null>(null);
+  readonly period = signal<UiDateRange | null>(null);
   readonly units = signal<number | null>(3);
   readonly labels = signal<readonly string[]>([]);
   readonly plans = signal<readonly File[]>([]);
@@ -130,6 +136,10 @@ describe('Custom form controls with formControlName', () => {
     expect(city.textContent).toContain('Eilat');
     expect(tags.textContent).toContain('B');
     expect(root.querySelector<HTMLInputElement>('.ui-datepicker__input')!.value).toBe('25.9.2026');
+    const [periodStart, periodEnd] = [
+      ...root.querySelectorAll<HTMLInputElement>('.ui-date-range-picker__input'),
+    ];
+    expect(periodStart.value).toBe('1.9.2026');
     const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
     expect(units.value).toBe('1,200');
     expect(root.querySelector('ui-chip')!.textContent).toContain('north');
@@ -149,6 +159,10 @@ describe('Custom form controls with formControlName', () => {
     units.dispatchEvent(new Event('input'));
     await settle(fixture);
     expect(form.value.units).toBe(15);
+    periodEnd.value = '3.9.2026';
+    periodEnd.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(form.value.period).toEqual({ start: new Date(2026, 8, 1), end: new Date(2026, 8, 3) });
     root.querySelector<HTMLButtonElement>('.ui-chip__remove')!.click();
     await settle(fixture);
     expect(form.value.labels).toEqual([]);
@@ -194,6 +208,11 @@ describe('Custom form controls with ngModel', () => {
     expect(host.terms()).toBe(true);
     expect(host.size()).toBe('m');
     expect(host.date()).toEqual(new Date(2026, 9, 1));
+    const period = root.querySelector<HTMLInputElement>('.ui-date-range-picker__input')!;
+    period.value = '2.10.2026';
+    period.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(host.period()).toEqual({ start: new Date(2026, 9, 2), end: null });
     const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
     expect(units.value).toBe('3');
     units.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', cancelable: true }));
