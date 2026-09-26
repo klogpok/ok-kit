@@ -10,6 +10,7 @@ paths:
 - A template listener that returns `false` calls `preventDefault()`. Keep handlers returning void.
 - `model()` has no transform. Under `strictTemplates` a bare boolean attribute on a model is a compile error. Coerce on read where needed.
 - A static attribute that an input consumes (`<button ui-menu-item disabled>`) still stays on the native element. Bind `'[attr.disabled]': 'null'` when the native state is wrong (menu items must stay focusable).
+- `ui-button` / `ui-icon-button` bind `[attr.tabindex]` on the host, which removes a static `tabindex="-1"`. A control that must not add a tab stop uses no button (`ui-time-input` shows a decorative icon and opens on a click in the field).
 - A `computed()` over DOM reads (`textContent`, header cells) runs once. Track DOM changes with a `MutationObserver` into a signal.
 - Parent hooks called from a child's `computed()` may run before the child's required inputs are set (the key manager effect reads new options early). Pass the child instance and read its inputs only when needed (see `UiOptionHandle`).
 - Internal cross-component calls (option → select, radio → group, item → accordion, container → toast) go through a non-exported `@Injectable()` provided by the parent, so they stay out of the public class API.
