@@ -3,7 +3,16 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
-## Unreleased (phase 5: second audit)
+## Unreleased (phase 6: everyday blocks)
+
+### Added
+
+- **alert:** `ui-alert` with tones, title, `[uiAlertActions]`, `dismissible` and an opt-in live
+  region (`live`).
+- **tokens:** `--ui-color-info-subtle` and `--ui-color-info-text` are back (used by the alert).
+- **labels:** `dismiss`.
+
+## Phase 5: second audit
 
 ### Breaking
 

@@ -182,6 +182,17 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.danger-text', 'color.danger-subtle', TEXT],
   ['color.success-text', 'color.success-subtle', TEXT],
   ['color.warning-text', 'color.warning-subtle', TEXT],
+  ['color.info-text', 'color.info-subtle', TEXT],
+  // Alert text on the tinted tone backgrounds.
+  ['color.text', 'color.info-subtle', TEXT],
+  ['color.text', 'color.success-subtle', TEXT],
+  ['color.text', 'color.warning-subtle', TEXT],
+  ['color.text', 'color.danger-subtle', TEXT],
+  // Alert borders.
+  ['color.info', 'color.info-subtle', UI],
+  ['color.success', 'color.success-subtle', UI],
+  ['color.warning', 'color.warning-subtle', UI],
+  ['color.danger', 'color.danger-subtle', UI],
   ['color.border-control', 'color.bg', UI],
   ['color.border-control', 'color.surface', UI],
   ['color.border-control', 'color.control-bg', UI],

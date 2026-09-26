@@ -7,6 +7,8 @@ import { InjectionToken, Provider, Signal, computed, isSignal, signal } from '@a
 export interface UiLabels {
   /** Close buttons of dialogs and toasts. */
   close: string;
+  /** Close button of a dismissible `ui-alert`. */
+  dismiss: string;
   /** Confirm button of `UiDialog.confirm()`. */
   confirm: string;
   /** Cancel button of `UiDialog.confirm()`. */
@@ -49,6 +51,7 @@ export interface UiLabels {
 /** Hebrew texts, the default: the VPlans apps are in Hebrew. */
 export const UI_LABELS_HE: UiLabels = {
   close: 'סגירה',
+  dismiss: 'סגירת ההודעה',
   confirm: 'אישור',
   cancel: 'ביטול',
   noOptions: 'אין תוצאות',
@@ -75,6 +78,7 @@ export const UI_LABELS_HE: UiLabels = {
 
 export const UI_LABELS_EN: UiLabels = {
   close: 'Close',
+  dismiss: 'Dismiss',
   confirm: 'Confirm',
   cancel: 'Cancel',
   noOptions: 'No options',

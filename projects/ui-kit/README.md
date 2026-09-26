@@ -15,6 +15,7 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - [Theming](#theming)
 - [RTL](#rtl)
 - [Overlays](#overlays)
+- [Feedback](#feedback)
 - [Components](#components)
 - [Tokens](#tokens)
 - [Contributing](#contributing)
@@ -393,6 +394,20 @@ Change the toast position, duration or stack size with
 `provideUiToast({ position: 'top-center', duration: 4000, max: 3 })`. Set dialog defaults with
 `provideUiDialog({ size: 'lg', disableClose: true })`; options passed to `open()` win.
 
+## Feedback
+
+```html
+<!-- Alert: plain content by default; set live when it appears after a user action -->
+<ui-alert tone="warning" title="The plan is not signed" dismissible (dismissed)="hide()">
+  Send it to the owner before the deadline.
+  <button uiAlertActions ui-button size="sm">Send</button>
+</ui-alert>
+```
+
+Alert tones are `info` (default), `success`, `warning` and `danger`, with the toast icons.
+`live="polite"` makes the alert a `status` region and `live="assertive"` an `alert` region.
+Screen readers announce a region when it is added, so render a live alert with `@if`.
+
 ## Components
 
 | Entry point                 | Exports                                                                                                                                                                                                                                                          |
@@ -406,6 +421,7 @@ Change the toast position, duration or stack size with
 | `@vplans/ui-kit/spinner`    | `UiSpinner`                                                                                                                                                                                                                                                      |
 | `@vplans/ui-kit/skeleton`   | `UiSkeleton`, `UiSkeletonShape`                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/divider`    | `UiDivider`                                                                                                                                                                                                                                                      |
+| `@vplans/ui-kit/alert`      | `UiAlert`, `UiAlertTone`, `UiAlertLive`                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/badge`      | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                         |
 | `@vplans/ui-kit/table`      | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                                                                                             |
 | `@vplans/ui-kit/card`       | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                       |
@@ -538,6 +554,8 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-color-warning-subtle`             | semantic  | `#faf8e8`                                                                    | `#29230a`                                                              |
 | `--ui-color-warning-text`               | semantic  | `#554c1a`                                                                    | `#d4c65a`                                                              |
 | `--ui-color-info`                       | semantic  | `#155ea6`                                                                    | `#4aa3ef`                                                              |
+| `--ui-color-info-subtle`                | semantic  | `#e9f4fc`                                                                    | `#0a2747`                                                              |
+| `--ui-color-info-text`                  | semantic  | `#155ea6`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-focus-ring`                 | semantic  | `#1a74c9`                                                                    | `#72b8f2`                                                              |
 | `--ui-color-backdrop`                   | semantic  | `rgb(15 23 42 / 0.5)`                                                        | `rgb(0 0 0 / 0.6)`                                                     |
 | `--ui-shadow-sm`                        | semantic  | `0 1px 2px 0 rgb(15 23 42 / 0.06)`                                           | `0 1px 2px 0 rgb(0 0 0 / 0.4)`                                         |
@@ -632,6 +650,25 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-badge-danger-soft-text`           | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
 | `--ui-badge-danger-solid-bg`            | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
 | `--ui-badge-danger-solid-text`          | component | `var(--ui-color-danger-contrast)`                                            | `var(--ui-color-danger-contrast)`                                      |
+| `--ui-alert-radius`                     | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-alert-padding-block`              | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
+| `--ui-alert-padding-inline`             | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-alert-gap`                        | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
+| `--ui-alert-text`                       | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-alert-font-size`                  | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-alert-title-font-weight`          | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-alert-info-bg`                    | component | `var(--ui-color-info-subtle)`                                                | `var(--ui-color-info-subtle)`                                          |
+| `--ui-alert-info-border`                | component | `var(--ui-color-info)`                                                       | `var(--ui-color-info)`                                                 |
+| `--ui-alert-info-icon`                  | component | `var(--ui-color-info-text)`                                                  | `var(--ui-color-info-text)`                                            |
+| `--ui-alert-success-bg`                 | component | `var(--ui-color-success-subtle)`                                             | `var(--ui-color-success-subtle)`                                       |
+| `--ui-alert-success-border`             | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
+| `--ui-alert-success-icon`               | component | `var(--ui-color-success-text)`                                               | `var(--ui-color-success-text)`                                         |
+| `--ui-alert-warning-bg`                 | component | `var(--ui-color-warning-subtle)`                                             | `var(--ui-color-warning-subtle)`                                       |
+| `--ui-alert-warning-border`             | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
+| `--ui-alert-warning-icon`               | component | `var(--ui-color-warning-text)`                                               | `var(--ui-color-warning-text)`                                         |
+| `--ui-alert-danger-bg`                  | component | `var(--ui-color-danger-subtle)`                                              | `var(--ui-color-danger-subtle)`                                        |
+| `--ui-alert-danger-border`              | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
+| `--ui-alert-danger-icon`                | component | `var(--ui-color-danger-text)`                                                | `var(--ui-color-danger-text)`                                          |
 | `--ui-card-bg`                          | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
 | `--ui-card-border`                      | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-card-radius`                      | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |

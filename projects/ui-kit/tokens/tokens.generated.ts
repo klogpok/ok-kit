@@ -1478,6 +1478,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "#4aa3ef"
   },
   {
+    "name": "--ui-color-info-subtle",
+    "layer": "semantic",
+    "light": "#e9f4fc",
+    "dark": "#0a2747"
+  },
+  {
+    "name": "--ui-color-info-text",
+    "layer": "semantic",
+    "light": "#155ea6",
+    "dark": "#72b8f2"
+  },
+  {
     "name": "--ui-color-focus-ring",
     "layer": "semantic",
     "light": "#1a74c9",
@@ -2040,6 +2052,120 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-danger-contrast)",
     "dark": "var(--ui-color-danger-contrast)"
+  },
+  {
+    "name": "--ui-alert-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-alert-padding-block",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-alert-padding-inline",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-alert-gap",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-alert-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-alert-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-alert-title-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-alert-info-bg",
+    "layer": "component",
+    "light": "var(--ui-color-info-subtle)",
+    "dark": "var(--ui-color-info-subtle)"
+  },
+  {
+    "name": "--ui-alert-info-border",
+    "layer": "component",
+    "light": "var(--ui-color-info)",
+    "dark": "var(--ui-color-info)"
+  },
+  {
+    "name": "--ui-alert-info-icon",
+    "layer": "component",
+    "light": "var(--ui-color-info-text)",
+    "dark": "var(--ui-color-info-text)"
+  },
+  {
+    "name": "--ui-alert-success-bg",
+    "layer": "component",
+    "light": "var(--ui-color-success-subtle)",
+    "dark": "var(--ui-color-success-subtle)"
+  },
+  {
+    "name": "--ui-alert-success-border",
+    "layer": "component",
+    "light": "var(--ui-color-success)",
+    "dark": "var(--ui-color-success)"
+  },
+  {
+    "name": "--ui-alert-success-icon",
+    "layer": "component",
+    "light": "var(--ui-color-success-text)",
+    "dark": "var(--ui-color-success-text)"
+  },
+  {
+    "name": "--ui-alert-warning-bg",
+    "layer": "component",
+    "light": "var(--ui-color-warning-subtle)",
+    "dark": "var(--ui-color-warning-subtle)"
+  },
+  {
+    "name": "--ui-alert-warning-border",
+    "layer": "component",
+    "light": "var(--ui-color-warning)",
+    "dark": "var(--ui-color-warning)"
+  },
+  {
+    "name": "--ui-alert-warning-icon",
+    "layer": "component",
+    "light": "var(--ui-color-warning-text)",
+    "dark": "var(--ui-color-warning-text)"
+  },
+  {
+    "name": "--ui-alert-danger-bg",
+    "layer": "component",
+    "light": "var(--ui-color-danger-subtle)",
+    "dark": "var(--ui-color-danger-subtle)"
+  },
+  {
+    "name": "--ui-alert-danger-border",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
+  },
+  {
+    "name": "--ui-alert-danger-icon",
+    "layer": "component",
+    "light": "var(--ui-color-danger-text)",
+    "dark": "var(--ui-color-danger-text)"
   },
   {
     "name": "--ui-card-bg",

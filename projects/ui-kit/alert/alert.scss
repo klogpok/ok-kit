@@ -1,0 +1,71 @@
+:host {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ui-alert-gap);
+  box-sizing: border-box;
+  padding-block: var(--ui-alert-padding-block);
+  padding-inline: var(--ui-alert-padding-inline) var(--ui-alert-padding-block);
+  border: var(--ui-border-width-default) solid var(--_border);
+  border-radius: var(--ui-alert-radius);
+  background-color: var(--_bg);
+  color: var(--ui-alert-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-alert-font-size);
+  line-height: var(--ui-line-height-snug);
+}
+
+@each $tone in info, success, warning, danger {
+  :host(.ui-alert--#{$tone}) {
+    --_bg: var(--ui-alert-#{$tone}-bg);
+    --_border: var(--ui-alert-#{$tone}-border);
+    --_icon: var(--ui-alert-#{$tone}-icon);
+  }
+}
+
+// The icon and the close button are centred on the first text line.
+.ui-alert__icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  block-size: 1lh;
+  color: var(--_icon);
+}
+
+.ui-alert__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.ui-alert__title {
+  font-weight: var(--ui-alert-title-font-weight);
+}
+
+.ui-alert__message:empty {
+  display: none;
+}
+
+.ui-alert__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-sm);
+  margin-block-start: var(--ui-space-xs);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.ui-alert__close {
+  flex-shrink: 0;
+  margin-block: calc((1lh - var(--ui-control-height-sm)) / 2);
+}
+
+@media (forced-colors: active) {
+  :host {
+    border-color: CanvasText;
+  }
+}
