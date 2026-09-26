@@ -46,6 +46,8 @@ export interface UiLabels {
   selectAll: string;
   /** Row checkbox of a table selection (`td[ui-table-select-row]`). */
   selectRow: string;
+  /** Button of `td[ui-row-toggle]` that shows the detail row of a table row. */
+  rowDetails: string;
   /** Announced when a `th[ui-sort-header]` sorts its column in ascending order. */
   sortedAscending: (column: string) => string;
   /** Announced when a `th[ui-sort-header]` sorts its column in descending order. */
@@ -96,6 +98,7 @@ export const UI_LABELS_HE: UiLabels = {
   pageRange: (start, end, length) => `\u2066${start}–${end}\u2069 מתוך ${length}`,
   selectAll: 'בחירת הכול',
   selectRow: 'בחירת שורה',
+  rowDetails: 'פרטים',
   sortedAscending: (column) => `ממוין לפי ${column}, בסדר עולה`,
   sortedDescending: (column) => `ממוין לפי ${column}, בסדר יורד`,
   sortedNone: 'המיון בוטל',
@@ -134,6 +137,7 @@ export const UI_LABELS_EN: UiLabels = {
   pageRange: (start, end, length) => `${start}–${end} of ${length}`,
   selectAll: 'Select all',
   selectRow: 'Select row',
+  rowDetails: 'Details',
   sortedAscending: (column) => `Sorted by ${column}, ascending`,
   sortedDescending: (column) => `Sorted by ${column}, descending`,
   sortedNone: 'Sort removed',

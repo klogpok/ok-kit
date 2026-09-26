@@ -4,6 +4,7 @@ import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiPagination } from '@vplans/ui-kit/pagination';
+import { UiExpandableRow, UiRowDetail, UiRowToggle } from './expandable-row';
 import { UiTableSelectAll, UiTableSelectRow, UiTableSelection } from './selection';
 import { UiSort, UiSortHeader, UiSortState, uiSortData } from './sort';
 import { UiTable, UiTableDensity, UiTableMessage, UiTableSkeleton } from './table';
@@ -161,6 +162,50 @@ class SelectionTable {
   readonly selected = signal<readonly Plan[]>([PLANS[1], PLANS[2]]);
 }
 
+/** Rows that open a detail row. */
+@Component({
+  selector: 'ui-story-expandable-table',
+  imports: [UiTable, UiExpandableRow, UiRowToggle, UiRowDetail, UiBadge],
+  template: `
+    <table ui-table>
+      <caption class="ui-visually-hidden">
+        תוכניות
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col"><span class="ui-visually-hidden">פרטים</span></th>
+          <th scope="col">שם</th>
+          <th scope="col">בעלים</th>
+          <th scope="col">סטטוס</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (plan of rows; track plan.id) {
+          <tr uiExpandableRow #row="uiExpandableRow" [expanded]="plan.id === 2">
+            <td ui-row-toggle [label]="'פרטי ' + plan.name"></td>
+            <td>{{ plan.name }}</td>
+            <td>{{ plan.owner }}</td>
+            <td>
+              <ui-badge [tone]="plan.status.tone">{{ plan.status.text }}</ui-badge>
+            </td>
+          </tr>
+          <tr [ui-row-detail]="row">
+            <dl style="display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:0">
+              <dt>יחידות</dt>
+              <dd style="margin:0">{{ plan.units }}</dd>
+              <dt>עודכן</dt>
+              <dd style="margin:0">לפני {{ plan.id + 1 }} ימים</dd>
+            </dl>
+          </tr>
+        }
+      </tbody>
+    </table>
+  `,
+})
+class ExpandableTable {
+  readonly rows = PLANS.slice(0, 4);
+}
+
 interface TableArgs {
   isLoading: boolean;
   rowDensity: UiTableDensity;
@@ -174,6 +219,7 @@ const meta: Meta<TableArgs> = {
       imports: [
         PlansTable,
         SelectionTable,
+        ExpandableTable,
         UiTable,
         UiSort,
         UiSortHeader,
@@ -239,4 +285,9 @@ export const StickyHeader: Story = {
  */
 export const Selection: Story = {
   render: () => ({ template: `<ui-story-selection-table dir="rtl" lang="he" />` }),
+};
+
+/** Expandable rows: the button reports `aria-expanded` and controls the detail row below. */
+export const ExpandableRows: Story = {
+  render: () => ({ template: `<ui-story-expandable-table dir="rtl" lang="he" />` }),
 };

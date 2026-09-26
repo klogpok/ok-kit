@@ -552,6 +552,26 @@ the `ui-table-row--selected` class. The checkboxes use the `selectAll` and `sele
 unless you pass `label`. `UiTableSelection` (`exportAs: 'uiTableSelection'`) also has
 `select()`, `deselect()`, `toggle()` and `clear()`.
 
+```html
+<!-- Expandable rows: the detail row spans every column and is hidden while collapsed -->
+@for (plan of rows(); track plan.id) {
+<tr uiExpandableRow #row="uiExpandableRow">
+  <td ui-row-toggle [label]="'Details of ' + plan.name"></td>
+  <td>{{ plan.name }}</td>
+</tr>
+<tr [ui-row-detail]="row">
+  @if (row.expanded()) {
+  <app-plan-history [plan]="plan" />
+  }
+</tr>
+}
+```
+
+The toggle button reports `aria-expanded` and controls the detail row (the `rowDetails` label
+unless you pass `label`). Bind `[(expanded)]` to keep the state across pages or reloads.
+The detail content is rendered while hidden; wrap it in `@if (row.expanded())` to create it
+on demand.
+
 ## Navigation
 
 ```html
@@ -625,7 +645,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/progress`    | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                                                       |
 | `@vplans/ui-kit/avatar`      | `UiAvatar`, `UiAvatarGroup`, `UiAvatarSize`, `uiInitials`, `uiAvatarColor`                                                                                                                                                                                                                              |
 | `@vplans/ui-kit/badge`       | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                                                                |
-| `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`                                                                                                                        |
+| `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`, `UiExpandableRow`, `UiRowToggle`, `UiRowDetail`                                                                       |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                                                              |
 | `@vplans/ui-kit/accordion`   | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/breadcrumbs` | `UiBreadcrumbs`, `UiBreadcrumb`                                                                                                                                                                                                                                                                         |
@@ -1099,6 +1119,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-header-font-weight`          | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 | `--ui-table-row-hover-bg`                | component | `var(--ui-color-surface-hover)`                                              | `var(--ui-color-surface-hover)`                                        |
 | `--ui-table-row-selected-bg`             | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
+| `--ui-table-detail-bg`                   | component | `var(--ui-color-surface-subtle)`                                             | `var(--ui-color-surface-subtle)`                                       |
 | `--ui-table-cell-padding-inline`         | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block`          | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block-compact`  | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |

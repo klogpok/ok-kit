@@ -40,7 +40,7 @@
     white-space: nowrap;
   }
 
-  > tbody > tr:not(.ui-table-message, .ui-table-skeleton):hover > td {
+  > tbody > tr:not(.ui-table-message, .ui-table-skeleton, .ui-row-detail):hover > td {
     background-color: var(--ui-table-row-hover-bg);
   }
 
@@ -50,7 +50,9 @@
     background-color: var(--ui-table-row-selected-bg);
   }
 
-  > tbody > tr:last-child > td {
+  > tbody > tr:last-child > td,
+  // The last row before a collapsed (hidden) detail row at the end.
+  > tbody > tr:has(+ tr.ui-row-detail[hidden]:last-child) > td {
     border-block-end: 0;
   }
 
@@ -89,6 +91,30 @@
   inline-size: 0;
   padding-inline-end: 0;
   line-height: 0;
+}
+
+// Expandable rows: the toggle column is as narrow as its button.
+.ui-table .ui-row-toggle {
+  inline-size: 0;
+  padding-block: 0;
+  padding-inline-end: 0;
+}
+
+.ui-table .ui-row-toggle__icon {
+  @include ui.transition(rotate);
+}
+
+.ui-table .ui-expandable-row--expanded .ui-row-toggle__icon {
+  rotate: 180deg;
+}
+
+// The detail continues its row: no line between them.
+.ui-table > tbody > tr.ui-expandable-row--expanded > td {
+  border-block-end-color: transparent;
+}
+
+.ui-table .ui-row-detail__cell {
+  background-color: var(--ui-table-detail-bg);
 }
 
 // Sortable headers: the whole cell content is a button.

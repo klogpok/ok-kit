@@ -14,6 +14,10 @@ so versions mark review points rather than releases.
   `selectionDisabled`; selected rows get `aria-selected` and `ui-table-row--selected`.
 - **tokens:** `--ui-table-row-selected-bg`.
 - **labels:** `selectAll`, `selectRow`.
+- **table:** expandable rows: `tr[uiExpandableRow]` (`expanded` model), `td[ui-row-toggle]` and
+  `tr[ui-row-detail]` spanning every column.
+- **tokens:** `--ui-table-detail-bg`.
+- **labels:** `rowDetails`.
 
 ## Unreleased (phase 6.0: test infrastructure)
 
