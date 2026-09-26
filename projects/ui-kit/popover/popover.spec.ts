@@ -175,6 +175,27 @@ describe('UiPopoverTrigger', () => {
     expect(panel()).toBeNull();
   });
 
+  it('closes on Escape while focus is still on the trigger', async () => {
+    fixture.componentInstance.trigger().open();
+    await settle();
+    trigger().focus();
+    escape(trigger());
+    await settle();
+    expect(panel()).toBeNull();
+    expect(fixture.componentInstance.events).toEqual(['opened', 'closed']);
+  });
+
+  it('reads the viewport margin token in rem', async () => {
+    document.documentElement.style.setProperty('--ui-popover-viewport-margin', '0.5rem');
+    try {
+      fixture.componentInstance.trigger().open();
+      await settle();
+      expect(panel()).not.toBeNull();
+    } finally {
+      document.documentElement.style.removeProperty('--ui-popover-viewport-margin');
+    }
+  });
+
   it('closes only itself on Escape inside a dialog', async () => {
     @Component({
       imports: [UiPopoverTrigger],
