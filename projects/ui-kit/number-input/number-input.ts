@@ -62,11 +62,12 @@ const optionalNumber = (value: unknown): number | null =>
  *   do the same).
  *
  * The value is a `number` or `null`. Implements `FormValueControl` (Signal Forms) and
- * `ControlValueAccessor`. Signal Forms `min()` and `max()` rules also set `min` and `max`.
+ * `ControlValueAccessor`. With Signal Forms, set the limits with `min()` and `max()` rules:
+ * `[formField]` does not allow `min`/`max` attributes on the same element.
  *
  * @example
  * <ui-form-field label="Area">
- *   <ui-number-input [formField]="form.area" min="0" maxFractionDigits="2" />
+ *   <ui-number-input [formField]="form.area" maxFractionDigits="2" />
  *   <span uiSuffix>m²</span>
  * </ui-form-field>
  */

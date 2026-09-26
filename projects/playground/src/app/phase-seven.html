@@ -1,0 +1,121 @@
+<h2 class="ui-heading-3">Phase 7</h2>
+
+<div class="grid">
+  <section aria-labelledby="order-title">
+    <h3 id="order-title" class="ui-heading-4">Work order (Signal Forms)</h3>
+    <form class="popover" novalidate (submit)="save($event)">
+      <ui-form-field label="City">
+        <ui-autocomplete [formField]="order.city" placeholder="Type a city">
+          @for (city of cities; track city) {
+            <ui-option [value]="city">{{ city }}</ui-option>
+          }
+        </ui-autocomplete>
+      </ui-form-field>
+      <ui-form-field label="Owner">
+        <ui-autocomplete [formField]="order.owner" [displayWith]="nameOf" [compareWith]="byId">
+          @for (person of people; track person.id) {
+            <ui-option [value]="person">{{ person.name }}</ui-option>
+          }
+        </ui-autocomplete>
+      </ui-form-field>
+      <div class="row">
+        <ui-form-field label="Units">
+          <ui-number-input [formField]="order.units" maxFractionDigits="0" />
+          <span uiSuffix>units</span>
+        </ui-form-field>
+        <ui-form-field label="Price">
+          <span uiPrefix>₪</span>
+          <ui-number-input
+            [formField]="order.price"
+            minFractionDigits="2"
+            maxFractionDigits="2"
+            [steppers]="false"
+          />
+        </ui-form-field>
+      </div>
+      <ui-form-field label="Tags" hint="Enter or a comma after each tag">
+        <ui-chip-input [formField]="order.tags" placeholder="Add a tag" />
+      </ui-form-field>
+      <ui-form-field label="Trades">
+        <ui-multi-select [formField]="order.trades" chips selectAll placeholder="Choose">
+          @for (trade of trades; track trade) {
+            <ui-option [value]="trade">{{ trade }}</ui-option>
+          }
+        </ui-multi-select>
+      </ui-form-field>
+      <ui-form-field label="Plans" hint="PDF, up to 10 MB">
+        <ui-file-upload
+          [formField]="order.files"
+          accept=".pdf"
+          multiple
+          [maxSize]="10 * 1024 * 1024"
+          [progress]="uploads()"
+        />
+      </ui-form-field>
+      <button ui-button type="submit">Save the work order</button>
+    </form>
+    <pre>{{ model() | json }}</pre>
+  </section>
+
+  <section aria-labelledby="units-title">
+    <h3 id="units-title" class="ui-heading-4">Units</h3>
+    <ui-chip-set aria-label="Filters">
+      <button ui-filter-chip [(selected)]="onlyWaiting">Waiting only</button>
+    </ui-chip-set>
+    <div class="row">
+      <span>{{ selected().length }} selected</span>
+      @if (selected().length) {
+        <ui-chip removable (removed)="selected.set([])">Clear the selection</ui-chip>
+      }
+    </div>
+    <ui-table-container style="max-block-size: 24rem">
+      <table ui-table stickyHeader uiSort [(sort)]="sort" [(uiTableSelection)]="selected">
+        <caption class="ui-visually-hidden">
+          Units
+        </caption>
+        <thead>
+          <tr>
+            <th ui-table-select-all uiSticky></th>
+            <th scope="col" uiSticky><span class="ui-visually-hidden">Details</span></th>
+            <th scope="col" uiSticky ui-sort-header="name">Unit</th>
+            <th scope="col" ui-sort-header="floor" class="ui-table-numeric">Floor</th>
+            <th scope="col" ui-sort-header="area" class="ui-table-numeric">Area (m²)</th>
+            <th scope="col" ui-sort-header="owner">Owner</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (unit of rows(); track unit.id) {
+            <tr uiExpandableRow #row="uiExpandableRow">
+              <td [ui-table-select-row]="unit" uiSticky [label]="'Select ' + unit.name"></td>
+              <td ui-row-toggle uiSticky [label]="'Details of ' + unit.name"></td>
+              <td uiSticky>{{ unit.name }}</td>
+              <td class="ui-table-numeric">{{ unit.floor }}</td>
+              <td class="ui-table-numeric">{{ unit.area }}</td>
+              <td style="white-space: nowrap">{{ unit.owner }}</td>
+              <td style="white-space: nowrap">
+                <ui-badge [tone]="unit.status.tone">{{ unit.status.text }}</ui-badge>
+              </td>
+            </tr>
+            <tr [ui-row-detail]="row">
+              {{
+                unit.name
+              }}
+              is on floor
+              {{
+                unit.floor
+              }},
+              {{
+                unit.area
+              }}
+              m², owned by
+              {{
+                unit.owner
+              }}.
+            </tr>
+          }
+        </tbody>
+      </table>
+    </ui-table-container>
+  </section>
+</div>

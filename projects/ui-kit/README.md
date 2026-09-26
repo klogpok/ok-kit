@@ -184,13 +184,14 @@ Without a forms directive, use the `invalid` input to show the error state manua
 `ui-number-input` reads and shows numbers in the format of the `locale` label ("1,234.5" in
 he-IL). The value is a `number` or `null`. Text that is not a number sets `null` and reports a
 `uiNumberParse` error with the `invalidNumber` label. Leaving the field formats the text, rounds
-to `maxFractionDigits` and clamps to `min`/`max` (Signal Forms `min()` and `max()` rules set
-them too). ArrowUp/Down step by `step`, PageUp/Down by ten steps, Home/End go to the limits; the
+to `maxFractionDigits` and clamps to `min`/`max`. With Signal Forms, set the limits with the
+`min()` and `max()` rules: `[formField]` does not allow `min`/`max` attributes on the same element. ArrowUp/Down step by `step`, PageUp/Down by ten steps, Home/End go to the limits; the
 − and + buttons repeat while held.
 
 ```html
 <ui-form-field label="Area">
-  <ui-number-input [formField]="form.area" min="0" maxFractionDigits="2" />
+  <!-- form(model, (p) => { min(p.area, 0); }) -->
+  <ui-number-input [formField]="form.area" maxFractionDigits="2" />
   <span uiSuffix>m²</span>
 </ui-form-field>
 <ui-form-field label="Price">
