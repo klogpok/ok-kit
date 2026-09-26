@@ -79,7 +79,8 @@ export const Limits: Story = {
   args: {
     ...Default.args,
     label: 'שעת ביקור',
-    hintText: '08:00–18:00',
+    // The isolate (LRI…PDI) keeps the range from being reordered in RTL.
+    hintText: '\u206608:00–18:00\u2069',
     minArg: '08:00',
     maxArg: '18:00',
     intervalArg: 15,
