@@ -5,6 +5,7 @@ import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiPagination } from '@vplans/ui-kit/pagination';
 import { UiExpandableRow, UiRowDetail, UiRowToggle } from './expandable-row';
+import { UiSticky, UiTableContainer } from './sticky';
 import { UiTableSelectAll, UiTableSelectRow, UiTableSelection } from './selection';
 import { UiSort, UiSortHeader, UiSortState, uiSortData } from './sort';
 import { UiTable, UiTableDensity, UiTableMessage, UiTableSkeleton } from './table';
@@ -206,6 +207,66 @@ class ExpandableTable {
   readonly rows = PLANS.slice(0, 4);
 }
 
+/** A wide table in a scrolling container with sticky columns on both sides. */
+@Component({
+  selector: 'ui-story-wide-table',
+  imports: [
+    UiTable,
+    UiTableContainer,
+    UiSticky,
+    UiTableSelection,
+    UiTableSelectAll,
+    UiTableSelectRow,
+    UiBadge,
+    UiIcon,
+    UiIconButton,
+  ],
+  template: `
+    <ui-table-container style="max-block-size:22rem;max-inline-size:40rem">
+      <table ui-table stickyHeader [(uiTableSelection)]="selected">
+        <caption class="ui-visually-hidden">
+          יחידות
+        </caption>
+        <thead>
+          <tr>
+            <th ui-table-select-all uiSticky></th>
+            <th scope="col" uiSticky>שם</th>
+            @for (column of columns; track column) {
+              <th scope="col" class="ui-table-numeric">{{ column }}</th>
+            }
+            <th scope="col">סטטוס</th>
+            <th scope="col" uiSticky="end"><span class="ui-visually-hidden">פעולות</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (plan of rows; track plan.id) {
+            <tr>
+              <td [ui-table-select-row]="plan" uiSticky [label]="'בחירת ' + plan.name"></td>
+              <td uiSticky style="white-space:nowrap">{{ plan.name }}</td>
+              @for (column of columns; track column) {
+                <td class="ui-table-numeric">{{ plan.units * ($index + 2) }}</td>
+              }
+              <td style="white-space:nowrap">
+                <ui-badge [tone]="plan.status.tone">{{ plan.status.text }}</ui-badge>
+              </td>
+              <td uiSticky="end">
+                <button ui-icon-button size="sm" [label]="'עריכת ' + plan.name">
+                  <ui-icon icon="edit" />
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </ui-table-container>
+  `,
+})
+class WideTable {
+  readonly columns = ['קומה 1', 'קומה 2', 'קומה 3', 'קומה 4', 'קומה 5', 'קומה 6'];
+  readonly rows = PLANS.slice(0, 12);
+  readonly selected = signal<readonly Plan[]>([PLANS[0]]);
+}
+
 interface TableArgs {
   isLoading: boolean;
   rowDensity: UiTableDensity;
@@ -220,6 +281,7 @@ const meta: Meta<TableArgs> = {
         PlansTable,
         SelectionTable,
         ExpandableTable,
+        WideTable,
         UiTable,
         UiSort,
         UiSortHeader,
@@ -290,4 +352,13 @@ export const Selection: Story = {
 /** Expandable rows: the button reports `aria-expanded` and controls the detail row below. */
 export const ExpandableRows: Story = {
   render: () => ({ template: `<ui-story-expandable-table dir="rtl" lang="he" />` }),
+};
+
+/**
+ * A wide table in `ui-table-container`: the selection and name columns stick to the start, the
+ * actions to the end, and a shadow marks the side with more content. The scrolling area is a
+ * focusable region named by the caption.
+ */
+export const WideWithStickyColumns: Story = {
+  render: () => ({ template: `<ui-story-wide-table dir="rtl" lang="he" />` }),
 };

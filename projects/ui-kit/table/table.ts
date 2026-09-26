@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { UiSkeleton } from '@vplans/ui-kit/skeleton';
 import { UiTableColumns, injectColumnCount } from './columns';
+import { UiTableSticky } from './sticky';
 
 /** Row density of `table[ui-table]`. */
 export type UiTableDensity = 'default' | 'compact';
@@ -21,6 +22,8 @@ export type UiTableDensity = 'default' | 'compact';
  *   first load and `tr[ui-table-message]` for empty and error states.
  * - `stickyHeader` keeps the header visible while the page or a scrolling container scrolls.
  * - Sorting: `[uiSort]` on the table and `th[ui-sort-header]`.
+ * - Selection: `[uiTableSelection]`; expandable rows: `tr[uiExpandableRow]`.
+ * - Wide tables: wrap them in `ui-table-container` and mark columns with `uiSticky`.
  *
  * @example
  * <table ui-table uiSort [(sort)]="sort" [loading]="loading()">
@@ -39,7 +42,7 @@ export type UiTableDensity = 'default' | 'compact';
   // Styles must reach the projected rows and cells; selectors are scoped under `.ui-table`.
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [UiTableColumns],
+  providers: [UiTableColumns, UiTableSticky],
   host: {
     class: 'ui-table',
     '[class]': '"ui-table--" + density()',

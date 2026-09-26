@@ -18,6 +18,11 @@ so versions mark review points rather than releases.
   `tr[ui-row-detail]` spanning every column.
 - **tokens:** `--ui-table-detail-bg`.
 - **labels:** `rowDetails`.
+- **table:** `ui-table-container` scrolls wide tables sideways with edge shadows and becomes a
+  focusable, named region while it overflows; `th/td[uiSticky]` (`start` or `end`) sticks
+  columns, several per side.
+- **tokens:** `--ui-table-scroll-shadow`, `--ui-table-scroll-shadow-size`.
+- **labels:** `scrollableTable`.
 
 ## Unreleased (phase 6.0: test infrastructure)
 

@@ -67,6 +67,22 @@
     z-index: var(--ui-z-sticky);
   }
 
+  // Sticky columns (`uiSticky`); the inset comes from the directive.
+  th.ui-sticky,
+  td.ui-sticky {
+    position: sticky;
+    z-index: 0;
+  }
+
+  td.ui-sticky {
+    background-color: var(--ui-table-bg);
+  }
+
+  // Above the other header cells, which are sticky too.
+  &.ui-table--sticky-header > thead th.ui-sticky {
+    z-index: calc(var(--ui-z-sticky) + 1);
+  }
+
   // Busy: the header's bottom edge becomes a pulsing primary line. The rows keep full contrast.
   &.ui-table--loading > thead > tr:last-child > th {
     box-shadow: inset 0 calc(var(--ui-border-width-strong) * -1) 0 var(--ui-color-primary);

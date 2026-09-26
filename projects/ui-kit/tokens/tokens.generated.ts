@@ -3632,6 +3632,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-surface-subtle)"
   },
   {
+    "name": "--ui-table-scroll-shadow",
+    "layer": "component",
+    "light": "var(--ui-color-backdrop)",
+    "dark": "var(--ui-color-backdrop)"
+  },
+  {
+    "name": "--ui-table-scroll-shadow-size",
+    "layer": "component",
+    "light": "var(--ui-space-md)",
+    "dark": "var(--ui-space-md)"
+  },
+  {
     "name": "--ui-table-cell-padding-inline",
     "layer": "component",
     "light": "var(--ui-space-md)",

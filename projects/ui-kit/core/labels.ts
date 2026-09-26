@@ -48,6 +48,8 @@ export interface UiLabels {
   selectRow: string;
   /** Button of `td[ui-row-toggle]` that shows the detail row of a table row. */
   rowDetails: string;
+  /** Name of the scrolling area of a `ui-table-container` whose table has no caption. */
+  scrollableTable: string;
   /** Announced when a `th[ui-sort-header]` sorts its column in ascending order. */
   sortedAscending: (column: string) => string;
   /** Announced when a `th[ui-sort-header]` sorts its column in descending order. */
@@ -99,6 +101,7 @@ export const UI_LABELS_HE: UiLabels = {
   selectAll: 'בחירת הכול',
   selectRow: 'בחירת שורה',
   rowDetails: 'פרטים',
+  scrollableTable: 'טבלה',
   sortedAscending: (column) => `ממוין לפי ${column}, בסדר עולה`,
   sortedDescending: (column) => `ממוין לפי ${column}, בסדר יורד`,
   sortedNone: 'המיון בוטל',
@@ -138,6 +141,7 @@ export const UI_LABELS_EN: UiLabels = {
   selectAll: 'Select all',
   selectRow: 'Select row',
   rowDetails: 'Details',
+  scrollableTable: 'Table',
   sortedAscending: (column) => `Sorted by ${column}, ascending`,
   sortedDescending: (column) => `Sorted by ${column}, descending`,
   sortedNone: 'Sort removed',

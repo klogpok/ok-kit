@@ -572,6 +572,34 @@ unless you pass `label`). Bind `[(expanded)]` to keep the state across pages or 
 The detail content is rendered while hidden; wrap it in `@if (row.expanded())` to create it
 on demand.
 
+```html
+<!-- Wide tables: scroll sideways in a box, with sticky columns on both sides -->
+<ui-table-container style="max-block-size: 30rem">
+  <table ui-table stickyHeader>
+    <thead>
+      <tr>
+        <th scope="col" uiSticky>Name</th>
+        <th scope="col">Floor 1</th>
+        …
+        <th scope="col" uiSticky="end"><span class="ui-visually-hidden">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td uiSticky>{{ plan.name }}</td>
+        …
+      </tr>
+    </tbody>
+  </table>
+</ui-table-container>
+```
+
+Mark the header cell and the body cells of a sticky column; several columns can stick to one
+side (no `colspan` in them). A shadow marks the side with more content. While the table is
+wider than the box, the box is focusable and a region named by `label`, the caption or the
+`scrollableTable` label. With a `max-block-size` the box also scrolls vertically, and
+`stickyHeader` sticks to its top.
+
 ## Navigation
 
 ```html
@@ -645,7 +673,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/progress`    | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                                                       |
 | `@vplans/ui-kit/avatar`      | `UiAvatar`, `UiAvatarGroup`, `UiAvatarSize`, `uiInitials`, `uiAvatarColor`                                                                                                                                                                                                                              |
 | `@vplans/ui-kit/badge`       | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                                                                |
-| `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`, `UiExpandableRow`, `UiRowToggle`, `UiRowDetail`                                                                       |
+| `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`, `UiExpandableRow`, `UiRowToggle`, `UiRowDetail`, `UiTableContainer`, `UiSticky`, `UiStickySide`                       |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                                                              |
 | `@vplans/ui-kit/accordion`   | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/breadcrumbs` | `UiBreadcrumbs`, `UiBreadcrumb`                                                                                                                                                                                                                                                                         |
@@ -1120,6 +1148,8 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-row-hover-bg`                | component | `var(--ui-color-surface-hover)`                                              | `var(--ui-color-surface-hover)`                                        |
 | `--ui-table-row-selected-bg`             | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
 | `--ui-table-detail-bg`                   | component | `var(--ui-color-surface-subtle)`                                             | `var(--ui-color-surface-subtle)`                                       |
+| `--ui-table-scroll-shadow`               | component | `var(--ui-color-backdrop)`                                                   | `var(--ui-color-backdrop)`                                             |
+| `--ui-table-scroll-shadow-size`          | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-inline`         | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block`          | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block-compact`  | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |

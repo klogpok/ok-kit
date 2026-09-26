@@ -1,0 +1,66 @@
+@use '../styles/mixins';
+
+// A box that scrolls the table sideways. Its own stacking context keeps the z-index of sticky
+// cells inside it.
+:host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  isolation: isolate;
+}
+
+.ui-table-container__scroller {
+  flex: 1;
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior-inline: contain;
+  @include mixins.focus-visible;
+}
+
+// Shadows at an edge with content behind it, next to the sticky columns of that side.
+:host::before,
+:host::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  z-index: calc(var(--ui-z-sticky) + 2);
+  inline-size: var(--ui-table-scroll-shadow-size);
+  opacity: 0;
+  pointer-events: none;
+  @include mixins.transition(opacity);
+}
+
+:host::before {
+  inset-inline-start: var(--_sticky-start, 0);
+  background: linear-gradient(to right, var(--_shadow), transparent);
+}
+
+:host::after {
+  inset-inline-end: var(--_sticky-end, 0);
+  background: linear-gradient(to left, var(--_shadow), transparent);
+}
+
+:host(:dir(rtl))::before {
+  background: linear-gradient(to left, var(--_shadow), transparent);
+}
+
+:host(:dir(rtl))::after {
+  background: linear-gradient(to right, var(--_shadow), transparent);
+}
+
+:host {
+  --_shadow: color-mix(in srgb, var(--ui-table-scroll-shadow) 40%, transparent);
+}
+
+:host(.ui-table-container--scroll-start)::before,
+:host(.ui-table-container--scroll-end)::after {
+  opacity: 1;
+}
+
+@media (forced-colors: active) {
+  :host::before,
+  :host::after {
+    display: none;
+  }
+}
