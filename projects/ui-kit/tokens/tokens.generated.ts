@@ -2168,6 +2168,96 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-danger-text)"
   },
   {
+    "name": "--ui-empty-state-gap",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-empty-state-padding-sm",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-empty-state-padding-md",
+    "layer": "component",
+    "light": "var(--ui-space-2xl)",
+    "dark": "var(--ui-space-2xl)"
+  },
+  {
+    "name": "--ui-empty-state-max-width",
+    "layer": "component",
+    "light": "var(--ui-container-width-lg)",
+    "dark": "var(--ui-container-width-lg)"
+  },
+  {
+    "name": "--ui-empty-state-icon-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-empty-state-icon-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-empty-state-icon-padding-sm",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-empty-state-icon-padding-md",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-empty-state-icon-size-sm",
+    "layer": "component",
+    "light": "var(--ui-font-size-2xl)",
+    "dark": "var(--ui-font-size-2xl)"
+  },
+  {
+    "name": "--ui-empty-state-icon-size-md",
+    "layer": "component",
+    "light": "var(--ui-font-size-4xl)",
+    "dark": "var(--ui-font-size-4xl)"
+  },
+  {
+    "name": "--ui-empty-state-title-font-size-sm",
+    "layer": "component",
+    "light": "var(--ui-font-size-md)",
+    "dark": "var(--ui-font-size-md)"
+  },
+  {
+    "name": "--ui-empty-state-title-font-size-md",
+    "layer": "component",
+    "light": "var(--ui-font-size-lg)",
+    "dark": "var(--ui-font-size-lg)"
+  },
+  {
+    "name": "--ui-empty-state-title-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-empty-state-description-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-empty-state-description-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
     "name": "--ui-card-bg",
     "layer": "component",
     "light": "var(--ui-color-surface)",

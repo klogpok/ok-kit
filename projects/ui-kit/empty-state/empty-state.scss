@@ -1,0 +1,78 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ui-empty-state-gap);
+  box-sizing: border-box;
+  padding: var(--_padding);
+  color: var(--ui-color-text);
+  font-family: var(--ui-font-family-sans);
+  text-align: center;
+}
+
+:host(.ui-empty-state--sm) {
+  --_padding: var(--ui-empty-state-padding-sm);
+  --_icon-padding: var(--ui-empty-state-icon-padding-sm);
+  --_icon-size: var(--ui-empty-state-icon-size-sm);
+  --_title-size: var(--ui-empty-state-title-font-size-sm);
+}
+
+:host(.ui-empty-state--md) {
+  --_padding: var(--ui-empty-state-padding-md);
+  --_icon-padding: var(--ui-empty-state-icon-padding-md);
+  --_icon-size: var(--ui-empty-state-icon-size-md);
+  --_title-size: var(--ui-empty-state-title-font-size-md);
+}
+
+.ui-empty-state__icon {
+  display: flex;
+  margin-block-end: var(--ui-space-xs);
+  padding: var(--_icon-padding);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-empty-state-icon-bg);
+  color: var(--ui-empty-state-icon-color);
+  font-size: var(--_icon-size);
+}
+
+.ui-empty-state__media {
+  display: flex;
+  justify-content: center;
+  max-inline-size: 100%;
+  margin-block-end: var(--ui-space-xs);
+}
+
+.ui-empty-state__title {
+  font-size: var(--_title-size);
+  font-weight: var(--ui-empty-state-title-font-weight);
+  line-height: var(--ui-line-height-tight);
+}
+
+.ui-empty-state__description {
+  max-inline-size: var(--ui-empty-state-max-width);
+  color: var(--ui-empty-state-description-color);
+  font-size: var(--ui-empty-state-description-font-size);
+  line-height: var(--ui-line-height-normal);
+}
+
+.ui-empty-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ui-space-sm);
+  margin-block-start: var(--ui-space-xs);
+}
+
+.ui-empty-state__icon,
+.ui-empty-state__media,
+.ui-empty-state__description,
+.ui-empty-state__actions {
+  &:empty {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-empty-state__icon {
+    border: var(--ui-border-width-default) solid CanvasText;
+  }
+}

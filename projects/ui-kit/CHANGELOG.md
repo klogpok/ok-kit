@@ -11,6 +11,8 @@ so versions mark review points rather than releases.
   region (`live`).
 - **tokens:** `--ui-color-info-subtle` and `--ui-color-info-text` are back (used by the alert).
 - **labels:** `dismiss`.
+- **empty-state:** `ui-empty-state` with icon or illustration slots, a heading title, description
+  and actions; `size="sm"` for cards and `tr[ui-table-message]`.
 
 ## Phase 5: second audit
 
