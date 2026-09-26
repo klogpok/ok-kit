@@ -2,14 +2,31 @@ import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vit
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiDivider } from '@vplans/ui-kit/divider';
 import { UiIcon } from '@vplans/ui-kit/icon';
-import { UiMenu, UiMenuItem, UiMenuTrigger } from './menu';
+import {
+  UiMenu,
+  UiMenuGroup,
+  UiMenuItem,
+  UiMenuItemCheckbox,
+  UiMenuItemRadio,
+  UiMenuTrigger,
+} from './menu';
 
 const meta: Meta<UiMenu> = {
   title: 'Navigation/Menu',
   component: UiMenu,
   decorators: [
     moduleMetadata({
-      imports: [UiMenuTrigger, UiMenuItem, UiButton, UiIconButton, UiIcon, UiDivider],
+      imports: [
+        UiMenuTrigger,
+        UiMenuItem,
+        UiMenuGroup,
+        UiMenuItemCheckbox,
+        UiMenuItemRadio,
+        UiButton,
+        UiIconButton,
+        UiIcon,
+        UiDivider,
+      ],
     }),
   ],
   parameters: { layout: 'padded' },
@@ -106,6 +123,34 @@ export const Hebrew: Story = {
           <ui-menu>
             <button ui-menu-item>מתאם</button>
             <button ui-menu-item>בעלים</button>
+          </ui-menu>
+        </ng-template>
+      </div>`,
+  }),
+};
+
+/** Link items, a labelled group of radio items and a checkbox item. */
+export const SelectableItems: StoryObj<{ sort: string; archived: boolean }> = {
+  args: { sort: 'name', archived: false },
+  render: (args) => ({
+    props: args,
+    template: `
+      <div style="min-block-size:20rem">
+        <button ui-button variant="secondary" uiMenuPosition="bottom-end" [uiMenuTriggerFor]="menu">
+          View <ui-icon icon="chevron-down" />
+        </button>
+        <p>Sort: {{ sort }}, archived: {{ archived ? 'shown' : 'hidden' }}</p>
+        <ng-template #menu>
+          <ui-menu>
+            <ui-menu-group label="Sort by">
+              <button ui-menu-item-radio [checked]="sort === 'name'" (triggered)="sort = 'name'">Name</button>
+              <button ui-menu-item-radio [checked]="sort === 'date'" (triggered)="sort = 'date'">Last update</button>
+            </ui-menu-group>
+            <ui-divider />
+            <button ui-menu-item-checkbox [checked]="archived" (triggered)="archived = !archived">Show archived</button>
+            <ui-divider />
+            <a ui-menu-item href="#history"><ui-icon icon="clock" /> History</a>
+            <a ui-menu-item href="#help" disabled>Help (no access)</a>
           </ui-menu>
         </ng-template>
       </div>`,

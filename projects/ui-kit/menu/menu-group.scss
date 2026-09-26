@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-menu-group__label {
+  padding-block: var(--ui-space-xs) var(--ui-space-2xs);
+  padding-inline: var(--ui-menu-item-padding-inline);
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: var(--ui-font-weight-semibold);
+  line-height: var(--ui-line-height-tight);
+  user-select: none;
+}

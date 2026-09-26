@@ -1,6 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UiMenu, UiMenuItem, UiMenuTrigger } from './menu';
+import { CdkMenuTrigger } from '@angular/cdk/menu';
+import { Router, RouterLink, provideRouter } from '@angular/router';
+import {
+  UiMenu,
+  UiMenuGroup,
+  UiMenuItem,
+  UiMenuItemCheckbox,
+  UiMenuItemRadio,
+  UiMenuTrigger,
+} from './menu';
 
 // The CDK key managers read the legacy keyCode.
 const KEY_CODES: Record<string, number> = {
@@ -169,5 +178,166 @@ describe('UiMenu', () => {
     await key(item('More'), 'ArrowLeft');
     expect(menus()).toHaveLength(2);
     expect(menus()[0].closest('[dir]')?.getAttribute('dir')).toBe('rtl');
+  });
+});
+
+@Component({ template: '' })
+class Page {}
+
+@Component({
+  imports: [
+    UiMenu,
+    UiMenuItem,
+    UiMenuTrigger,
+    UiMenuGroup,
+    UiMenuItemCheckbox,
+    UiMenuItemRadio,
+    RouterLink,
+  ],
+  template: `
+    <button id="more" uiMenuPosition="top-end" [uiMenuTriggerFor]="menu">More</button>
+    <ng-template #menu>
+      <ui-menu>
+        <a ui-menu-item routerLink="/history">History</a>
+        <a ui-menu-item href="#locked" disabled>Locked link</a>
+        <button
+          ui-menu-item-checkbox
+          [checked]="archived()"
+          (triggered)="archived.set(!archived())"
+        >
+          Show archived
+        </button>
+        <ui-menu-group label="Sort by">
+          <button ui-menu-item-radio [checked]="sort() === 'name'" (triggered)="sort.set('name')">
+            Name
+          </button>
+          <button ui-menu-item-radio [checked]="sort() === 'date'" (triggered)="sort.set('date')">
+            Date
+          </button>
+        </ui-menu-group>
+      </ui-menu>
+    </ng-template>
+  `,
+})
+class ExtrasHost {
+  readonly archived = signal(false);
+  readonly sort = signal<'name' | 'date'>('name');
+  readonly trigger = viewChild.required(CdkMenuTrigger);
+}
+
+describe('UiMenu links, groups and selectable items', () => {
+  let fixture: ComponentFixture<ExtrasHost>;
+  const open = async () => {
+    document.querySelector<HTMLButtonElement>('#more')!.click();
+    await settle();
+  };
+  const find = (label: string) =>
+    [...document.querySelectorAll<HTMLElement>('.ui-menu-item')].find(
+      (el) => el.textContent.trim() === label,
+    )!;
+  const menus = () => document.querySelectorAll('ui-menu');
+  const settle = async () => {
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  };
+  const press = async (target: Element, key: string, keyCode: number) => {
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', { key, keyCode, bubbles: true, cancelable: true }),
+    );
+    await settle();
+  };
+
+  beforeEach(async () => {
+    TestBed.configureTestingModule({
+      providers: [provideRouter([{ path: '**', component: Page }])],
+    });
+    fixture = TestBed.createComponent(ExtrasHost);
+    document.body.appendChild(fixture.nativeElement);
+    await settle();
+  });
+
+  afterEach(() => {
+    fixture.destroy();
+    (fixture.nativeElement as HTMLElement).remove();
+  });
+
+  it('takes a position preset', () => {
+    const [first] = fixture.componentInstance.trigger().menuPosition;
+    expect(first).toEqual(
+      expect.objectContaining({
+        originY: 'top',
+        overlayY: 'bottom',
+        originX: 'end',
+        overlayX: 'end',
+      }),
+    );
+  });
+
+  it('follows a link item and closes the menu after the click', async () => {
+    vi.useFakeTimers();
+    try {
+      await open();
+      const link = find('History');
+      expect(link.getAttribute('role')).toBe('menuitem');
+      expect(link.hasAttribute('type')).toBe(false);
+      link.click();
+      // Still in the page while the click follows the link.
+      expect(link.isConnected).toBe(true);
+      await vi.runAllTimersAsync();
+      await settle();
+      expect(TestBed.inject(Router).url).toBe('/history');
+      expect(menus()).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('follows a link item with Space', async () => {
+    await open();
+    const link = find('History');
+    const click = vi.fn();
+    link.addEventListener('click', click);
+    await press(link, ' ', 32);
+    expect(click).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not follow a disabled link', async () => {
+    await open();
+    const locked = find('Locked link');
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    locked.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(locked.getAttribute('aria-disabled')).toBe('true');
+  });
+
+  it('labels a group and toggles a checkbox item', async () => {
+    await open();
+    const group = document.querySelector('ui-menu-group')!;
+    expect(group.getAttribute('role')).toBe('group');
+    const labelId = group.getAttribute('aria-labelledby')!;
+    expect(document.getElementById(labelId)?.textContent).toBe('Sort by');
+
+    const archived = find('Show archived');
+    expect(archived.getAttribute('role')).toBe('menuitemcheckbox');
+    expect(archived.getAttribute('aria-checked')).toBe('false');
+    // Space toggles and keeps the menu open.
+    archived.focus();
+    await press(archived, ' ', 32);
+    expect(fixture.componentInstance.archived()).toBe(true);
+    expect(archived.getAttribute('aria-checked')).toBe('true');
+    expect(menus()).toHaveLength(1);
+  });
+
+  it('checks one radio item of a group', async () => {
+    await open();
+    const [name, date] = [find('Name'), find('Date')];
+    expect(name.getAttribute('role')).toBe('menuitemradio');
+    expect(name.getAttribute('aria-checked')).toBe('true');
+    date.focus();
+    await press(date, ' ', 32);
+    expect(fixture.componentInstance.sort()).toBe('date');
+    expect(date.getAttribute('aria-checked')).toBe('true');
+    expect(name.getAttribute('aria-checked')).toBe('false');
   });
 });

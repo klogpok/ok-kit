@@ -85,3 +85,42 @@
     color: GrayText;
   }
 }
+
+// Link items look like the button items.
+:host(a) {
+  text-decoration: none;
+}
+
+// Checkbox and radio items keep the room of the mark, so labels line up.
+.ui-menu-item__indicator {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ui-icon-size-sm);
+  block-size: var(--ui-icon-size-sm);
+  color: var(--ui-color-primary-text);
+  font-size: var(--ui-icon-size-sm);
+  visibility: hidden;
+}
+
+:host([aria-checked='true']) .ui-menu-item__indicator {
+  visibility: visible;
+}
+
+:host([aria-disabled='true']) .ui-menu-item__indicator {
+  color: currentcolor;
+}
+
+.ui-menu-item__dot {
+  inline-size: var(--ui-space-sm);
+  block-size: var(--ui-space-sm);
+  border-radius: var(--ui-radius-full);
+  background-color: currentcolor;
+}
+
+@media (forced-colors: active) {
+  .ui-menu-item__indicator {
+    color: CanvasText;
+  }
+}

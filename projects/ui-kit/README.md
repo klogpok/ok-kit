@@ -405,6 +405,27 @@ this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 The popover focuses `[cdkFocusInitial]` or its first focusable element and closes when focus
 leaves it. Use `uiPopoverLabel` when the trigger text does not describe the content.
 
+```html
+<!-- Menu: link items, a labelled group of radio items, a checkbox item, a position preset -->
+<button ui-button [uiMenuTriggerFor]="view" uiMenuPosition="bottom-end">View</button>
+<ng-template #view>
+  <ui-menu>
+    <ui-menu-group label="Sort by">
+      <button ui-menu-item-radio [checked]="sort() === 'name'" (triggered)="sort.set('name')">
+        Name
+      </button>
+    </ui-menu-group>
+    <button ui-menu-item-checkbox [checked]="archived()" (triggered)="archived.set(!archived())">
+      Show archived
+    </button>
+    <a ui-menu-item routerLink="history">History</a>
+  </ui-menu>
+</ng-template>
+```
+
+Space toggles checkbox and radio items and keeps the menu open. A link item closes the menu
+after the click has followed the link.
+
 Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
 `minLength(path.recipients, 1)` next to `required()`.
 
@@ -510,7 +531,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 | `@vplans/ui-kit/pagination`  | `UiPagination`, `UiPageEvent`, `UiPageItem`, `uiPageItems`                                                                                                                                                                                                                                              |
 | `@vplans/ui-kit/tooltip`     | `UiTooltip`, `UiTooltipPosition`                                                                                                                                                                                                                                                                        |
 | `@vplans/ui-kit/popover`     | `UiPopoverTrigger`, `UiPopoverContext`, `UiPopoverPosition`                                                                                                                                                                                                                                             |
-| `@vplans/ui-kit/menu`        | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                                                                                                                                                                                                 |
+| `@vplans/ui-kit/menu`        | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`, `UiMenuGroup`, `UiMenuItemCheckbox`, `UiMenuItemRadio`, `UiMenuPosition`                                                                                                                                                                                       |
 | `@vplans/ui-kit/dialog`      | `UiDialog`, `provideUiDialog`, `UI_DIALOG_DEFAULT_OPTIONS`, `UiDialogDefaults`, `UiDialogOptions`, `UiDrawerOptions`, `UiDrawerPosition`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`       | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                                                                                                                                                                                               |
 | `@vplans/ui-kit/select`      | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                                                                                                                                                                                                |

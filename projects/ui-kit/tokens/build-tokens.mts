@@ -174,6 +174,8 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.primary-text', 'color.bg', TEXT],
   ['color.primary-text', 'color.primary-subtle', TEXT],
   ['color.primary-text', 'color.surface-raised', TEXT],
+  // Check marks of menu items on hover.
+  ['color.primary-text', 'color.surface-active', UI],
   ['color.text', 'color.primary-subtle', TEXT],
   // Option descriptions on the active option.
   ['color.text-muted', 'color.primary-subtle', TEXT],

@@ -34,6 +34,9 @@ so versions mark review points rather than releases.
 - **calendar / datepicker:** month and year views from the calendar title, and Today and Clear
   buttons in the datepicker dialog.
 - **labels:** `chooseMonth`, `chooseYear`, `today`.
+- **menu:** `a[ui-menu-item]` link items, `ui-menu-group` with a label, `ui-menu-item-checkbox`
+  and `ui-menu-item-radio`, and `uiMenuPosition` presets (`bottom-start`, `bottom-end`,
+  `top-start`, `top-end`).
 
 ## Phase 5: second audit
 
