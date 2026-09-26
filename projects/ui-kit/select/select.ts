@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from 
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiIcon } from '@vplans/ui-kit/icon';
+import { UiSpinner } from '@vplans/ui-kit/spinner';
 import { UiOptionParent } from './option';
 import { UiSelectBase } from './select-base';
 
@@ -27,7 +28,7 @@ import { UiSelectBase } from './select-base';
  */
 @Component({
   selector: 'ui-select',
-  imports: [CdkConnectedOverlay, CdkOverlayOrigin, UiIcon],
+  imports: [CdkConnectedOverlay, CdkOverlayOrigin, UiIcon, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +43,7 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
   readonly multiple = false;
 
   protected readonly displayLabel = computed(() => this.labelFor(this.value()));
+  protected readonly hasValue = computed(() => this.value() !== null);
 
   protected isSelected(value: unknown): boolean {
     return this.matches(value, this.value());
@@ -51,6 +53,11 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
     this.value.set(value as T);
     this.notifyChange(value as T);
     this.close();
+  }
+
+  protected clearValue(): void {
+    this.value.set(null);
+    this.notifyChange(null);
   }
 
   writeValue(value: T | null | undefined): void {

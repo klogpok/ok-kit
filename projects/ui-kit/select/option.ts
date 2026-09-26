@@ -56,7 +56,16 @@ export class UiOptionParent {
  * Option of a `ui-select` or `ui-multi-select`. The projected text is the label; pass `label` when the content is
  * richer than the text that should appear in the trigger.
  *
+ * Mark an icon or avatar with `uiOptionIcon` to show it before the label, and a second line with
+ * `uiOptionDescription`. The description is not part of the label shown in the trigger.
+ *
  * @example <ui-option [value]="plan.id">{{ plan.name }}</ui-option>
+ * @example
+ * <ui-option [value]="user.id">
+ *   <ui-avatar uiOptionIcon size="sm" [name]="user.name" decorative />
+ *   {{ user.name }}
+ *   <span uiOptionDescription>{{ user.role }}</span>
+ * </ui-option>
  */
 @Component({
   selector: 'ui-option',
@@ -69,7 +78,11 @@ export class UiOptionParent {
         }
       </span>
     }
-    <span class="ui-option__label"><ng-content /></span>
+    <span class="ui-option__icon"><ng-content select="[uiOptionIcon]" /></span>
+    <span class="ui-option__text">
+      <span class="ui-option__label"><ng-content /></span>
+      <span class="ui-option__description"><ng-content select="[uiOptionDescription]" /></span>
+    </span>
     @if (selected() && !multiple) {
       <ui-icon class="ui-option__check" [icon]="checkIcon" />
     }
@@ -131,8 +144,10 @@ export class UiOption<T = unknown> implements Highlightable {
     return this.label() || (this.observedText() ?? this.readText());
   }
 
+  /** Text of the label slot, without the icon and the description. */
   private readText(): string {
-    return this.element.textContent.trim();
+    const label = this.element.querySelector('.ui-option__label') ?? this.element;
+    return label.textContent.trim();
   }
 
   setActiveStyles(): void {

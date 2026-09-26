@@ -1,5 +1,7 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { UiAvatar } from '@vplans/ui-kit/avatar';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiOption, UiOptionGroup } from './option';
 import { UiSelect } from './select';
 
@@ -8,7 +10,9 @@ type SelectArgs = UiSelect<string> & { label: string; hint: string };
 const meta: Meta<SelectArgs> = {
   title: 'Forms/Select',
   component: UiSelect,
-  decorators: [moduleMetadata({ imports: [UiOption, UiOptionGroup, UiFormField] })],
+  decorators: [
+    moduleMetadata({ imports: [UiOption, UiOptionGroup, UiFormField, UiAvatar, UiIcon] }),
+  ],
   argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
 };
 
@@ -100,6 +104,59 @@ export const Hebrew: Story = {
             <ui-option value="pending">ממתין לאישור מתאם</ui-option>
             <ui-option value="signing">ממתין לחתימה</ui-option>
             <ui-option value="none">לא הוגדר לו"ז</ui-option>
+          </ui-select>
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
+export const Clearable: Story = {
+  render: () => ({
+    template: `
+      <div style="max-inline-size:320px">
+        <ui-form-field label="Coordinator">
+          <ui-select placeholder="Choose" clearable [value]="'dana'">
+            <ui-option value="dana">Dana Levi</ui-option>
+            <ui-option value="yossi">Yossi Peretz</ui-option>
+          </ui-select>
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
+/** Server-side search in progress: a spinner replaces the chevron and the list is busy. */
+export const Loading: Story = {
+  render: () => ({
+    template: `
+      <div style="max-inline-size:320px">
+        <ui-form-field label="Owner">
+          <ui-select placeholder="Search by name" searchable loading [filterOptions]="false" />
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
+/** Options with an avatar or icon (`uiOptionIcon`) and a second line (`uiOptionDescription`). */
+export const RichOptions: Story = {
+  render: () => ({
+    template: `
+      <div style="max-inline-size:320px;min-block-size:16rem">
+        <ui-form-field label="Coordinator">
+          <ui-select placeholder="Choose" [value]="'dana'">
+            <ui-option value="dana">
+              <ui-avatar uiOptionIcon size="sm" name="Dana Levi" decorative />
+              Dana Levi
+              <span uiOptionDescription>Coordinator, Tower B</span>
+            </ui-option>
+            <ui-option value="yossi">
+              <ui-avatar uiOptionIcon size="sm" name="Yossi Peretz" decorative />
+              Yossi Peretz
+              <span uiOptionDescription>Owner</span>
+            </ui-option>
+            <ui-option value="archive">
+              <ui-icon uiOptionIcon icon="file" />
+              Archive
+            </ui-option>
           </ui-select>
         </ui-form-field>
       </div>`,

@@ -15,6 +15,8 @@ export interface UiLabels {
   cancel: string;
   /** Shown by `ui-select` when no option matches the search. */
   noOptions: string;
+  /** Clear buttons of `ui-select`, `ui-multi-select` and `ui-datepicker`. */
+  clear: string;
   /** Accessible name of the toast region. */
   notifications: string;
   /**
@@ -61,6 +63,7 @@ export const UI_LABELS_HE: UiLabels = {
   confirm: 'אישור',
   cancel: 'ביטול',
   noOptions: 'אין תוצאות',
+  clear: 'ניקוי',
   notifications: 'התראות',
   required: 'חובה',
   loading: 'טוען',
@@ -91,6 +94,7 @@ export const UI_LABELS_EN: UiLabels = {
   confirm: 'Confirm',
   cancel: 'Cancel',
   noOptions: 'No options',
+  clear: 'Clear',
   notifications: 'Notifications',
   required: 'required',
   loading: 'Loading',

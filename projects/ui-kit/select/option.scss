@@ -40,10 +40,33 @@
   }
 }
 
-.ui-option__label {
+.ui-option__text {
+  display: flex;
   flex: 1;
+  flex-direction: column;
   min-inline-size: 0;
   overflow-wrap: anywhere;
+}
+
+.ui-option__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  color: var(--ui-color-text-muted);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.ui-option__description {
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: var(--ui-font-weight-regular);
+
+  &:empty {
+    display: none;
+  }
 }
 
 // Multiple selection: a checkbox-like box before the label.

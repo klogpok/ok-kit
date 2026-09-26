@@ -106,6 +106,37 @@
   @include mixins.transition(rotate);
 }
 
+// Room for the clear button before the chevron.
+:host(.ui-select--clearable) .ui-select__control {
+  padding-inline-end: calc(
+    var(--_padding) + var(--ui-icon-size-sm) * 2 + var(--ui-space-xs) + var(--ui-space-2xs) * 3
+  );
+}
+
+.ui-select__clear {
+  position: absolute;
+  inset-inline-end: calc(var(--_padding) + var(--ui-icon-size-sm) + var(--ui-space-2xs));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--ui-space-3xs);
+  border: 0;
+  border-radius: var(--ui-radius-full);
+  background: none;
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-icon-size-sm);
+  cursor: pointer;
+  @include mixins.transition(background-color, color);
+
+  &:hover {
+    background-color: var(--ui-color-surface-hover);
+    color: var(--ui-color-text);
+  }
+
+  @include mixins.focus-visible;
+}
+
 :host(.ui-select--open) .ui-select__chevron {
   rotate: 180deg;
 }
@@ -148,6 +179,12 @@
   font-family: var(--ui-font-family-sans);
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+.ui-select__loading {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-sm);
 }
 
 .ui-select__empty {

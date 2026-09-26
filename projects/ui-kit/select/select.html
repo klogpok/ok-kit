@@ -59,7 +59,22 @@
       </span>
     </button>
   }
-  <ui-icon class="ui-select__chevron" [icon]="chevron" />
+  @if (showClear()) {
+    <button
+      type="button"
+      class="ui-select__clear"
+      [attr.aria-label]="labels().clear"
+      [attr.title]="labels().clear"
+      (click)="onClear($event)"
+    >
+      <ui-icon [icon]="clearIcon" />
+    </button>
+  }
+  @if (loading()) {
+    <ui-spinner class="ui-select__chevron ui-select__spinner" size="sm" decorative />
+  } @else {
+    <ui-icon class="ui-select__chevron" [icon]="chevron" />
+  }
 </div>
 
 <ng-template
@@ -83,10 +98,16 @@
     [attr.aria-label]="ariaLabel() || null"
     [attr.aria-labelledby]="listLabelledBy()"
     [attr.aria-multiselectable]="multiple || null"
+    [attr.aria-busy]="loading() ? 'true' : null"
     (mousedown)="$event.preventDefault()"
   >
     <ng-content />
-    @if (noResults()) {
+    @if (loading()) {
+      <div class="ui-select__empty ui-select__loading">
+        <ui-spinner size="sm" decorative />
+        {{ labels().loading }}
+      </div>
+    } @else if (noResults()) {
       <div class="ui-select__empty">{{ labels().noOptions }}</div>
     }
   </div>

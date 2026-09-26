@@ -2,6 +2,7 @@ import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormField, form, readonly, required } from '@angular/forms/signals';
+import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiOption, UiOptionGroup } from './option';
 import { UiSelect } from './select';
@@ -582,5 +583,91 @@ describe('UiSelect readonly', () => {
     fixture.componentInstance.locked.set(true);
     await settle(fixture);
     expect(listbox()).toBeNull();
+  });
+});
+
+@Component({
+  imports: [UiSelect, UiOption],
+  template: `
+    <ui-select
+      aria-label="Coordinator"
+      clearable
+      [loading]="loading()"
+      [disabled]="disabled()"
+      [(value)]="value"
+      (valueChange)="changes.push($event)"
+    >
+      <ui-option value="dana">
+        <span uiOptionIcon class="icon">D</span>
+        Dana Levi
+        <span uiOptionDescription>Coordinator</span>
+      </ui-option>
+      <ui-option value="yossi">Yossi</ui-option>
+    </ui-select>
+  `,
+})
+class ExtrasHost {
+  readonly value = signal<string | null>('dana');
+  readonly loading = signal(false);
+  readonly disabled = signal(false);
+  readonly changes: (string | null)[] = [];
+}
+
+describe('UiSelect clearable, loading and option slots', () => {
+  let fixture: ComponentFixture<ExtrasHost>;
+  const root = () => fixture.nativeElement as HTMLElement;
+  const clear = () => root().querySelector<HTMLButtonElement>('.ui-select__clear');
+  const control = () => root().querySelector<HTMLButtonElement>('[role="combobox"]')!;
+
+  beforeEach(async () => {
+    TestBed.configureTestingModule({
+      providers: [provideUiLabels(UI_LABELS_EN)],
+    });
+    fixture = TestBed.createComponent(ExtrasHost);
+    document.body.appendChild(fixture.nativeElement);
+    await settle(fixture);
+  });
+
+  afterEach(() => (fixture.nativeElement as HTMLElement).remove());
+
+  it('shows the label slot only in the trigger', () => {
+    expect(control().textContent.trim()).toBe('Dana Levi');
+  });
+
+  it('clears the value with the clear button without opening the list', async () => {
+    const button = clear()!;
+    expect(button.getAttribute('aria-label')).toBe('Clear');
+    button.click();
+    await settle(fixture);
+    expect(fixture.componentInstance.value()).toBeNull();
+    expect(fixture.componentInstance.changes).toEqual([null]);
+    expect(listbox()).toBeNull();
+    expect(document.activeElement).toBe(control());
+    expect(clear()).toBeNull();
+  });
+
+  it('hides the clear button while disabled', async () => {
+    fixture.componentInstance.disabled.set(true);
+    await settle(fixture);
+    expect(clear()).toBeNull();
+  });
+
+  it('shows a spinner and a busy list while loading', async () => {
+    fixture.componentInstance.loading.set(true);
+    await settle(fixture);
+    expect(root().querySelector('ui-spinner.ui-select__spinner')).not.toBeNull();
+    control().click();
+    await settle(fixture);
+    expect(listbox()?.getAttribute('aria-busy')).toBe('true');
+    expect(listbox()?.querySelector('.ui-select__loading')?.textContent.trim()).toBe('Loading');
+  });
+
+  it('renders the icon and the description of an option', async () => {
+    control().click();
+    await settle(fixture);
+    const [dana] = options();
+    expect(dana.querySelector('.ui-option__icon .icon')?.textContent).toBe('D');
+    expect(dana.querySelector('.ui-option__description')?.textContent).toBe('Coordinator');
+    expect(dana.querySelector('.ui-option__label')?.textContent.trim()).toBe('Dana Levi');
   });
 });

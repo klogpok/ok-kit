@@ -28,6 +28,9 @@ so versions mark review points rather than releases.
   with the dialog parts, focus handling and `provideUiDialog()` defaults.
 - **badge:** the `info` tone, `size="lg"`, `dot`, and `count` with `max` ("99+"); the text
   of a dot or count badge is read by screen readers only.
+- **select / multi-select:** `clearable`, `loading` (spinner and `aria-busy`), and the option
+  slots `[uiOptionIcon]` and `[uiOptionDescription]`.
+- **labels:** `clear`.
 
 ## Phase 5: second audit
 

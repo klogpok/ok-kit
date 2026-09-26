@@ -175,6 +175,8 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.primary-text', 'color.primary-subtle', TEXT],
   ['color.primary-text', 'color.surface-raised', TEXT],
   ['color.text', 'color.primary-subtle', TEXT],
+  // Option descriptions on the active option.
+  ['color.text-muted', 'color.primary-subtle', TEXT],
   ['color.danger-text', 'color.surface', TEXT],
   ['color.danger-text', 'color.surface-raised', TEXT],
   // Danger menu items on hover.

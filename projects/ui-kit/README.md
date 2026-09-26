@@ -410,6 +410,11 @@ It emits `''` when the list closes, so the full list can come back. The trigger 
 a selected option after it leaves the results. For a value that was never in the list (e.g. an
 initial value), give `[displayWith]="nameOf"`.
 
+`clearable` adds a clear button (the `clear` label) while a value is selected. `loading` shows a
+spinner instead of the chevron and marks the list busy, e.g. during server-side search. In an
+option, mark an icon or avatar with `uiOptionIcon` and a second line with `uiOptionDescription`;
+the trigger shows only the label.
+
 Change the toast position, duration or stack size with
 `provideUiToast({ position: 'top-center', duration: 4000, max: 3 })`. Set dialog defaults with
 `provideUiDialog({ size: 'lg', disableClose: true })`; options passed to `open()` win.
@@ -493,7 +498,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 | `@vplans/ui-kit/empty-state` | `UiEmptyState`                                                                                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/progress`    | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                                                       |
 | `@vplans/ui-kit/avatar`      | `UiAvatar`, `UiAvatarGroup`, `UiAvatarSize`, `uiInitials`, `uiAvatarColor`                                                                                                                                                                                                                              |
-| `@vplans/ui-kit/badge` | `UiBadge`, `UiBadgeTone` |
+| `@vplans/ui-kit/badge`       | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                                                                |
 | `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                                                                                                                                    |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                                                              |
 | `@vplans/ui-kit/accordion`   | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                                                                  |

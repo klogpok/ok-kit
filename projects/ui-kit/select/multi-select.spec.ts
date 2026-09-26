@@ -276,3 +276,28 @@ describe('UiMultiSelect with Signal Forms', () => {
     expect(root.textContent).toContain('Choose a role');
   });
 });
+
+@Component({
+  imports: [UiMultiSelect, UiOption],
+  template: `
+    <ui-multi-select aria-label="Recipients" clearable [(value)]="value">
+      <ui-option value="dana">Dana</ui-option>
+      <ui-option value="yossi">Yossi</ui-option>
+    </ui-multi-select>
+  `,
+})
+class ClearableHost {
+  readonly value = signal<readonly string[]>(['dana', 'yossi']);
+}
+
+describe('UiMultiSelect clearable', () => {
+  it('clears all selected values', async () => {
+    const fixture = TestBed.createComponent(ClearableHost);
+    await settle(fixture);
+    const root = fixture.nativeElement as HTMLElement;
+    root.querySelector<HTMLButtonElement>('.ui-select__clear')!.click();
+    await settle(fixture);
+    expect(fixture.componentInstance.value()).toEqual([]);
+    expect(root.querySelector('.ui-select__clear')).toBeNull();
+  });
+});

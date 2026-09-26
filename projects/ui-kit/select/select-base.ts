@@ -27,7 +27,7 @@ import {
   UiSize,
   resolveDirection,
 } from '@vplans/ui-kit/core';
-import { uiIconChevronDown } from '@vplans/ui-kit/icon';
+import { uiIconChevronDown, uiIconX } from '@vplans/ui-kit/icon';
 import { UiOption, UiOptionParent } from './option';
 
 const POSITIONS: ConnectedPosition[] = [
@@ -51,6 +51,7 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
     '[class.ui-select--disabled]': 'isDisabled()',
     '[class.ui-select--readonly]': 'readonly()',
     '[class.ui-select--invalid]': 'showError()',
+    '[class.ui-select--clearable]': 'showClear()',
     '[attr.id]': 'id()',
     // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
@@ -77,6 +78,13 @@ export abstract class UiSelectBase<T, V>
   readonly ariaLabel = input('', { alias: 'aria-label' });
   /** Type in the trigger to filter the options. */
   readonly searchable = input(false, { transform: booleanAttribute });
+  /** Shows a button that clears the value while one is selected. */
+  readonly clearable = input(false, { transform: booleanAttribute });
+  /**
+   * Options are loading (e.g. server-side search): a spinner replaces the chevron and the list
+   * is marked busy.
+   */
+  readonly loading = input(false, { transform: booleanAttribute });
   /** Hide options whose label does not contain the search text. Turn off for server-side search. */
   readonly filterOptions = input(true, { transform: booleanAttribute });
   /**
@@ -109,6 +117,7 @@ export abstract class UiSelectBase<T, V>
   protected readonly panelWidth = signal(0);
   protected readonly positions = POSITIONS;
   protected readonly chevron = uiIconChevronDown;
+  protected readonly clearIcon = uiIconX;
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-control`);
@@ -137,8 +146,13 @@ export abstract class UiSelectBase<T, V>
       return [...kept, ...seen];
     },
   });
-  protected readonly noResults = computed(() =>
-    this.options().every((option) => option.filteredOut()),
+  protected readonly noResults = computed(
+    () => !this.loading() && this.options().every((option) => option.filteredOut()),
+  );
+  /** Whether a value is selected. */
+  protected abstract readonly hasValue: Signal<boolean>;
+  protected readonly showClear = computed(
+    () => this.clearable() && this.hasValue() && !this.isDisabled() && !this.readonly(),
   );
 
   protected readonly keyManager = new ActiveDescendantKeyManager<UiOption<T>>(
@@ -184,6 +198,8 @@ export abstract class UiSelectBase<T, V>
 
   protected abstract isSelected(value: unknown): boolean;
   protected abstract selectOption(value: unknown): void;
+  /** Sets the empty value (`null` or `[]`) and reports it to the form. */
+  protected abstract clearValue(): void;
 
   /** Whether an option value equals a selected value, through `compareWith`. */
   protected matches(option: unknown, selected: unknown): boolean {
@@ -243,6 +259,15 @@ export abstract class UiSelectBase<T, V>
     const onChevron = !!(event.target as Element).closest('.ui-select__chevron');
     if (this.isOpen() && (!this.searchable() || onChevron)) this.close();
     else this.open();
+    this.focus();
+  }
+
+  /** The clear button: empties the value and keeps focus on the control. */
+  protected onClear(event: MouseEvent): void {
+    // The trigger would toggle the list.
+    event.stopPropagation();
+    if (!this.showClear()) return;
+    this.clearValue();
     this.focus();
   }
 
