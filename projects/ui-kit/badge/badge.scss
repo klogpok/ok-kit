@@ -1,3 +1,5 @@
+@use '../styles/mixins';
+
 :host {
   display: inline-flex;
   align-items: center;
@@ -30,20 +32,64 @@
   --_font-size: var(--ui-badge-font-size-md);
 }
 
-@each $tone in neutral, primary, success, warning, danger {
+:host(.ui-badge--lg) {
+  --_pad-block: var(--ui-space-2xs);
+  --_pad-inline: var(--ui-space-md);
+  --_font-size: var(--ui-badge-font-size-lg);
+}
+
+@each $tone in neutral, primary, info, success, warning, danger {
   :host(.ui-badge--#{$tone}.ui-badge--soft) {
     --_bg: var(--ui-badge-#{$tone}-soft-bg);
     --_text: var(--ui-badge-#{$tone}-soft-text);
+    --_dot: var(--ui-badge-#{$tone}-soft-text);
   }
 
   :host(.ui-badge--#{$tone}.ui-badge--solid) {
     --_bg: var(--ui-badge-#{$tone}-solid-bg);
     --_text: var(--ui-badge-#{$tone}-solid-text);
+    --_dot: var(--ui-badge-#{$tone}-solid-bg);
   }
+}
+
+// A number keeps a round shape for one digit.
+:host(.ui-badge--count) {
+  justify-content: center;
+  min-inline-size: calc(1em * var(--ui-line-height-tight) + var(--_pad-block) * 2);
+  font-variant-numeric: tabular-nums;
+}
+
+:host(.ui-badge--dot) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.ui-badge__dot {
+  display: block;
+  inline-size: var(--ui-badge-dot-size);
+  block-size: var(--ui-badge-dot-size);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--_dot);
+}
+
+.ui-badge__label {
+  display: contents;
+}
+
+// `display: contents` would drop the clipping box.
+.ui-badge__label--hidden {
+  display: block;
+
+  @include mixins.visually-hidden;
 }
 
 @media (forced-colors: active) {
   :host {
     border-color: CanvasText;
+  }
+
+  .ui-badge__dot {
+    background-color: CanvasText;
   }
 }

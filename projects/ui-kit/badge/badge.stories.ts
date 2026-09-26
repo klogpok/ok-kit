@@ -11,10 +11,10 @@ const meta: Meta<BadgeArgs> = {
   argTypes: {
     tone: {
       control: 'inline-radio',
-      options: ['neutral', 'primary', 'success', 'warning', 'danger'],
+      options: ['neutral', 'primary', 'info', 'success', 'warning', 'danger'],
     },
     appearance: { control: 'inline-radio', options: ['soft', 'solid'] },
-    size: { control: 'inline-radio', options: ['sm', 'md'] },
+    size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
   },
 };
 
@@ -48,7 +48,7 @@ export const Tones: Story = {
       <div style="display:grid;gap:12px">
         @for (appearance of ['soft', 'solid']; track appearance) {
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            @for (tone of ['neutral', 'primary', 'success', 'warning', 'danger']; track tone) {
+            @for (tone of ['neutral', 'primary', 'info', 'success', 'warning', 'danger']; track tone) {
               <ui-badge [tone]="$any(tone)" [appearance]="$any(appearance)">{{ tone }}</ui-badge>
             }
           </div>
@@ -63,6 +63,7 @@ export const Sizes: Story = {
       <div style="display:flex;gap:8px;align-items:center">
         <ui-badge size="sm" tone="primary">Small</ui-badge>
         <ui-badge size="md" tone="primary">Medium</ui-badge>
+        <ui-badge size="lg" tone="primary">Large</ui-badge>
       </div>`,
   }),
 };
@@ -73,6 +74,34 @@ export const WithIcon: Story = {
       <div style="display:flex;gap:8px">
         <ui-badge tone="success"><ui-icon icon="check" /> Approved</ui-badge>
         <ui-badge tone="danger" appearance="soft"><ui-icon icon="alert-circle" /> Rejected</ui-badge>
+      </div>`,
+  }),
+};
+
+/** A number instead of the text; the text stays for screen readers. Above `max` it shows "99+". */
+export const Count: Story = {
+  render: () => ({
+    template: `
+      <div style="display:flex;gap:8px;align-items:center">
+        <ui-badge tone="danger" [count]="3">unread messages</ui-badge>
+        <ui-badge tone="primary" [count]="42" size="sm">plans to sign</ui-badge>
+        <ui-badge tone="neutral" appearance="soft" [count]="250">notifications</ui-badge>
+        <ui-badge tone="danger" [count]="12" max="9" size="lg">alerts</ui-badge>
+      </div>`,
+  }),
+};
+
+/** Only a dot in the tone color; the text stays for screen readers. */
+export const Dot: Story = {
+  render: () => ({
+    template: `
+      <div style="display:flex;gap:16px;align-items:center">
+        <span style="display:inline-flex;gap:8px;align-items:center">
+          <ui-badge tone="success" dot>Online</ui-badge> Dana Levi
+        </span>
+        <span style="display:inline-flex;gap:8px;align-items:center">
+          <ui-badge tone="danger" dot>New comments</ui-badge> Tower B
+        </span>
       </div>`,
   }),
 };

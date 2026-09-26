@@ -507,6 +507,8 @@
   --ui-badge-radius: var(--ui-radius-full);
   --ui-badge-font-size: var(--ui-font-size-xs);
   --ui-badge-font-size-md: var(--ui-font-size-sm);
+  --ui-badge-font-size-lg: var(--ui-font-size-md);
+  --ui-badge-dot-size: var(--ui-space-sm);
   --ui-badge-font-weight: var(--ui-font-weight-semibold);
   --ui-badge-neutral-soft-bg: var(--ui-color-surface-muted);
   --ui-badge-neutral-soft-text: var(--ui-color-text-muted);
@@ -516,6 +518,10 @@
   --ui-badge-primary-soft-text: var(--ui-color-primary-text);
   --ui-badge-primary-solid-bg: var(--ui-color-primary);
   --ui-badge-primary-solid-text: var(--ui-color-primary-contrast);
+  --ui-badge-info-soft-bg: var(--ui-color-info-subtle);
+  --ui-badge-info-soft-text: var(--ui-color-info-text);
+  --ui-badge-info-solid-bg: var(--ui-color-info);
+  --ui-badge-info-solid-text: var(--ui-color-primary-contrast);
   --ui-badge-success-soft-bg: var(--ui-color-success-subtle);
   --ui-badge-success-soft-text: var(--ui-color-success-text);
   --ui-badge-success-solid-bg: var(--ui-color-success);

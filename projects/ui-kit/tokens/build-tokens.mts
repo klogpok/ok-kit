@@ -183,6 +183,8 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.success-text', 'color.success-subtle', TEXT],
   ['color.warning-text', 'color.warning-subtle', TEXT],
   ['color.info-text', 'color.info-subtle', TEXT],
+  // Solid info badges.
+  ['color.primary-contrast', 'color.info', TEXT],
   // Alert text on the tinted tone backgrounds.
   ['color.text', 'color.info-subtle', TEXT],
   ['color.text', 'color.success-subtle', TEXT],

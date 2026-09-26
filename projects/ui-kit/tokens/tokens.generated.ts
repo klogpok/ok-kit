@@ -2162,6 +2162,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-size-sm)"
   },
   {
+    "name": "--ui-badge-font-size-lg",
+    "layer": "component",
+    "light": "var(--ui-font-size-md)",
+    "dark": "var(--ui-font-size-md)"
+  },
+  {
+    "name": "--ui-badge-dot-size",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
     "name": "--ui-badge-font-weight",
     "layer": "component",
     "light": "var(--ui-font-weight-semibold)",
@@ -2211,6 +2223,30 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   },
   {
     "name": "--ui-badge-primary-solid-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-contrast)",
+    "dark": "var(--ui-color-primary-contrast)"
+  },
+  {
+    "name": "--ui-badge-info-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-info-subtle)",
+    "dark": "var(--ui-color-info-subtle)"
+  },
+  {
+    "name": "--ui-badge-info-soft-text",
+    "layer": "component",
+    "light": "var(--ui-color-info-text)",
+    "dark": "var(--ui-color-info-text)"
+  },
+  {
+    "name": "--ui-badge-info-solid-bg",
+    "layer": "component",
+    "light": "var(--ui-color-info)",
+    "dark": "var(--ui-color-info)"
+  },
+  {
+    "name": "--ui-badge-info-solid-text",
     "layer": "component",
     "light": "var(--ui-color-primary-contrast)",
     "dark": "var(--ui-color-primary-contrast)"
