@@ -31,6 +31,9 @@ so versions mark review points rather than releases.
 - **select / multi-select:** `clearable`, `loading` (spinner and `aria-busy`), and the option
   slots `[uiOptionIcon]` and `[uiOptionDescription]`.
 - **labels:** `clear`.
+- **calendar / datepicker:** month and year views from the calendar title, and Today and Clear
+  buttons in the datepicker dialog.
+- **labels:** `chooseMonth`, `chooseYear`, `today`.
 
 ## Phase 5: second audit
 

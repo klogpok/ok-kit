@@ -48,6 +48,12 @@ export interface UiLabels {
   locale: string;
   /** Calendar button and dialog of `ui-datepicker`. */
   chooseDate: string;
+  /** Title button of `ui-calendar` that shows the months of the year. */
+  chooseMonth: string;
+  /** Title button of `ui-calendar` that shows a page of years. */
+  chooseYear: string;
+  /** Button of the `ui-datepicker` calendar that picks today. */
+  today: string;
   /** Error of `ui-datepicker` for text that is not an allowed date. */
   invalidDate: string;
   previousMonth: string;
@@ -81,6 +87,9 @@ export const UI_LABELS_HE: UiLabels = {
   moreCount: (count) => `עוד ${count}`,
   locale: 'he-IL',
   chooseDate: 'בחירת תאריך',
+  chooseMonth: 'בחירת חודש',
+  chooseYear: 'בחירת שנה',
+  today: 'היום',
   invalidDate: 'תאריך לא תקין',
   previousMonth: 'חודש קודם',
   nextMonth: 'חודש הבא',
@@ -111,6 +120,9 @@ export const UI_LABELS_EN: UiLabels = {
   moreCount: (count) => `${count} more`,
   locale: 'en-US',
   chooseDate: 'Choose date',
+  chooseMonth: 'Choose month',
+  chooseYear: 'Choose year',
+  today: 'Today',
   invalidDate: 'Enter a valid date',
   previousMonth: 'Previous month',
   nextMonth: 'Next month',

@@ -1,6 +1,7 @@
 @use '../styles/mixins' as ui;
 
 :host {
+  position: relative;
   display: inline-block;
   color: var(--ui-color-text);
   font-family: var(--ui-font-family-sans);
@@ -16,10 +17,44 @@
 
 .ui-calendar__title {
   flex: 1;
+  box-sizing: border-box;
+  min-block-size: var(--ui-control-height-sm);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--ui-space-xs);
+  border: 0;
+  border-radius: var(--ui-radius-control);
+  background: none;
+  color: inherit;
+  font: inherit;
   font-size: var(--ui-calendar-title-font-size);
   font-weight: var(--ui-calendar-title-font-weight);
   text-align: center;
   white-space: nowrap;
+  cursor: pointer;
+
+  @include ui.transition(background-color);
+  @include ui.focus-visible;
+
+  &:hover {
+    background-color: var(--ui-calendar-cell-hover-bg);
+  }
+}
+
+.ui-calendar__title--static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+
+  &:hover {
+    background: none;
+  }
+}
+
+// Names the grid and announces changes; the visible title is the button.
+.ui-calendar__live {
+  @include ui.visually-hidden;
 }
 
 .ui-calendar__grid {
@@ -44,7 +79,13 @@ td {
   text-align: center;
 }
 
-.ui-calendar__day {
+// The month and year grids fill the width of the day grid.
+.ui-calendar__periods td {
+  inline-size: calc((var(--ui-calendar-cell-size) * 7 + var(--ui-calendar-gap) * 6) / 4);
+}
+
+.ui-calendar__day,
+.ui-calendar__period {
   border: var(--ui-border-width-default) solid transparent;
   border-radius: var(--ui-calendar-cell-radius);
   font-variant-numeric: tabular-nums;

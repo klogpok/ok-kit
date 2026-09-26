@@ -20,7 +20,7 @@ import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { transformedValue } from '@angular/forms/signals';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
-import { UiIconButton } from '@vplans/ui-kit/button';
+import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
   UI_FORM_FIELD_CONTROL,
   UI_LABELS,
@@ -39,6 +39,7 @@ import {
   isDayEnabled,
   parseDay,
   sameDay,
+  startOfDay,
   validDay,
 } from './date-utils';
 
@@ -66,7 +67,7 @@ interface Draft {
  *   message is shown once the user leaves the field.
  * - The calendar button (or Alt+ArrowDown in the field) opens a dialog with `ui-calendar`. Focus
  *   moves to the selected day and is trapped in the dialog; Escape or picking a day closes it
- *   and returns focus to the button.
+ *   and returns focus to the button. The dialog also has "Today" and "Clear" buttons.
  *
  * The value is a local `Date` at midnight. Implements `FormValueControl` (Signal Forms) and
  * `ControlValueAccessor`.
@@ -78,7 +79,15 @@ interface Draft {
  */
 @Component({
   selector: 'ui-datepicker',
-  imports: [CdkConnectedOverlay, CdkOverlayOrigin, CdkTrapFocus, UiCalendar, UiIcon, UiIconButton],
+  imports: [
+    CdkConnectedOverlay,
+    CdkOverlayOrigin,
+    CdkTrapFocus,
+    UiButton,
+    UiCalendar,
+    UiIcon,
+    UiIconButton,
+  ],
   template: `
     <div class="ui-datepicker__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
       <input
@@ -142,6 +151,24 @@ interface Draft {
           [startAt]="startAt()"
           (dateSelected)="onPick($event)"
         />
+        <div class="ui-datepicker__footer">
+          @if (text()) {
+            <button ui-button variant="ghost" size="sm" (click)="onClear()">
+              {{ labels().clear }}
+            </button>
+          }
+          <button
+            ui-button
+            variant="ghost"
+            size="sm"
+            class="ui-datepicker__today"
+            disabledInteractive
+            [disabled]="!todayAllowed()"
+            (click)="onToday()"
+          >
+            {{ labels().today }}
+          </button>
+        </div>
       </div>
     </ng-template>
   `,
@@ -269,6 +296,11 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected readonly invalidState = computed(() => this.showError() || this.parseError());
 
+  /** Whether today can be picked (inside `min`/`max` and allowed by `dateFilter`). */
+  protected readonly todayAllowed = computed(() =>
+    isDayEnabled(startOfDay(new Date()), this.min(), this.max(), this.dateFilter()),
+  );
+
   /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
   private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
     const error = this.rawText.parseErrors().at(0);
@@ -353,6 +385,20 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected onPick(date: Date): void {
     this.draft.set(null);
     this.setValue(date);
+    this.close();
+  }
+
+  protected onToday(): void {
+    if (this.todayAllowed()) this.onPick(startOfDay(new Date()));
+  }
+
+  /** Empties the field, also when it holds text that is not a date. */
+  protected onClear(): void {
+    const before = this.value();
+    this.draft.set(null);
+    this.rawText.set('');
+    if (before !== null) this.notifyChange(null);
+    else this.ngControl?.control?.updateValueAndValidity();
     this.close();
   }
 

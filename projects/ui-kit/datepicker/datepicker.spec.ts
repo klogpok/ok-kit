@@ -190,6 +190,73 @@ describe('UiDatepicker', () => {
     await settle(fixture);
     expect(dialog()!.closest('[dir]')!.getAttribute('dir')).toBe('rtl');
   });
+
+  it('picks today from the calendar dialog', async () => {
+    toggle().click();
+    await settle(fixture);
+    const today = [
+      ...dialog()!.querySelectorAll<HTMLButtonElement>('.ui-datepicker__footer button'),
+    ];
+    // No value yet: only "Today".
+    expect(today.map((b) => b.textContent.trim())).toEqual(['היום']);
+    today[0].click();
+    await settle(fixture);
+    const now = new Date();
+    expect(host.value()).toEqual(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+    expect(dialog()).toBeNull();
+    expect(document.activeElement).toBe(toggle());
+  });
+
+  it('clears the value, or text that is not a date, from the calendar dialog', async () => {
+    host.value.set(new Date(2026, 8, 16));
+    await settle(fixture);
+    toggle().click();
+    await settle(fixture);
+    const clear = () =>
+      [...dialog()!.querySelectorAll<HTMLButtonElement>('.ui-datepicker__footer button')].find(
+        (b) => b.textContent.trim() === 'ניקוי',
+      )!;
+    clear().click();
+    await settle(fixture);
+    expect(host.value()).toBeNull();
+    expect(input().value).toBe('');
+
+    await type('31.02.2026');
+    await blur();
+    expect(input().getAttribute('aria-invalid')).toBe('true');
+    toggle().click();
+    await settle(fixture);
+    clear().click();
+    await settle(fixture);
+    expect(input().value).toBe('');
+    expect(input().hasAttribute('aria-invalid')).toBe(false);
+  });
+
+  it('disables Today when today is outside min and max', async () => {
+    fixture.destroy();
+    root.remove();
+    @Component({
+      imports: [UiDatepicker],
+      template: `<ui-datepicker aria-label="Date" [min]="min" />`,
+    })
+    class FutureHost {
+      readonly min = new Date(new Date().getFullYear() + 1, 0, 1);
+    }
+    const future = TestBed.createComponent(FutureHost);
+    document.body.appendChild(future.nativeElement);
+    await settle(future);
+    (future.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('.ui-datepicker__toggle')!
+      .click();
+    await settle(future);
+    const today = dialog()!.querySelector<HTMLButtonElement>('.ui-datepicker__today')!;
+    expect(today.getAttribute('aria-disabled')).toBe('true');
+    today.click();
+    await settle(future);
+    expect(dialog()).not.toBeNull();
+    future.destroy();
+    (future.nativeElement as HTMLElement).remove();
+  });
 });
 
 @Component({

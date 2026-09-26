@@ -34,6 +34,7 @@ describe('UiCalendar', () => {
   const title = () => root().querySelector('.ui-calendar__title')!.textContent.trim();
   const cell = (key: string) => root().querySelector<HTMLElement>(`td[data-date="${key}"]`)!;
   const focused = () => (document.activeElement as HTMLElement | null)?.dataset['date'];
+  const focusedPeriod = () => (document.activeElement as HTMLElement | null)?.dataset['period'];
   const button = (label: string) =>
     root().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
   const settle = async () => {
@@ -218,5 +219,92 @@ describe('UiCalendar', () => {
     previous.click();
     await settle();
     expect(title()).toBe('August 2026');
+  });
+
+  it('switches to the months and years from the title and back to the days', async () => {
+    await create();
+    const titleButton = () => root().querySelector<HTMLButtonElement>('button.ui-calendar__title');
+    expect(titleButton()?.getAttribute('aria-label')).toBe('September 2026, Choose month');
+    titleButton()!.click();
+    await settle();
+
+    // Month view: 12 months of the year in rows of 4, the selected month focused.
+    expect(title()).toBe('2026');
+    const months = [...root().querySelectorAll<HTMLElement>('td[data-period]')];
+    expect(months).toHaveLength(12);
+    expect(root().querySelectorAll('.ui-calendar__periods tr')).toHaveLength(3);
+    expect(months[8].getAttribute('aria-selected')).toBe('true');
+    expect(months[8].getAttribute('aria-label')).toBe('September 2026');
+    expect(document.activeElement).toBe(months[8]);
+    expect(button('Previous month')).toBeNull();
+
+    // Year view: a page of 24 years.
+    titleButton()!.click();
+    await settle();
+    expect(root().querySelectorAll('td[data-period]')).toHaveLength(24);
+    expect(root().querySelector('.ui-calendar__title--static')?.textContent).toContain(
+      '2016 – 2039',
+    );
+    expect(focusedPeriod()).toBe('2026');
+
+    // Picking a year shows its months, picking a month shows its days.
+    root().querySelector<HTMLElement>('td[data-period="2028"]')!.click();
+    await settle();
+    expect(title()).toBe('2028');
+    root().querySelector<HTMLElement>('td[data-period="2028-03"]')!.click();
+    await settle();
+    expect(title()).toBe('March 2028');
+    expect(focused()).toBe('2028-03-16');
+    expect(host.picked).toEqual([]);
+  });
+
+  it('moves through months and years with the keyboard', async () => {
+    await create();
+    root().querySelector<HTMLButtonElement>('button.ui-calendar__title')!.click();
+    await settle();
+    await key('ArrowRight');
+    expect(focusedPeriod()).toBe('2026-10');
+    await key('ArrowDown');
+    expect(focusedPeriod()).toBe('2027-02');
+    await key('Home');
+    expect(focusedPeriod()).toBe('2027-01');
+    await key('End');
+    expect(focusedPeriod()).toBe('2027-04');
+    await key('PageUp');
+    expect(focusedPeriod()).toBe('2026-04');
+    await key('Escape');
+    expect(title()).toBe('April 2026');
+    expect(focused()).toBe('2026-04-16');
+
+    root().querySelector<HTMLButtonElement>('button.ui-calendar__title')!.click();
+    await settle();
+    root().querySelector<HTMLButtonElement>('button.ui-calendar__title')!.click();
+    await settle();
+    await key('ArrowUp');
+    expect(focusedPeriod()).toBe('2022');
+    await key('PageDown');
+    expect(focusedPeriod()).toBe('2046');
+    await key('Enter');
+    expect(title()).toBe('2046');
+  });
+
+  it('mirrors the arrows in RTL and disables months outside min and max', async () => {
+    await create();
+    host.dir.set('rtl');
+    host.min.set(new Date(2026, 5, 10));
+    await settle();
+    root().querySelector<HTMLButtonElement>('button.ui-calendar__title')!.click();
+    await settle();
+    await key('ArrowLeft');
+    expect(focusedPeriod()).toBe('2026-10');
+    const may = root().querySelector<HTMLElement>('td[data-period="2026-05"]')!;
+    expect(may.getAttribute('aria-disabled')).toBe('true');
+    expect(root().querySelector('td[data-period="2026-06"]')?.hasAttribute('aria-disabled')).toBe(
+      false,
+    );
+    may.click();
+    await settle();
+    expect(title()).toBe('2026');
+    expect(button('Previous year').getAttribute('aria-disabled')).toBe('true');
   });
 });

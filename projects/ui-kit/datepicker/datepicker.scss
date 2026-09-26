@@ -116,6 +116,15 @@
   box-shadow: var(--ui-datepicker-panel-shadow);
 }
 
+.ui-datepicker__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ui-space-2xs);
+  margin-block-start: var(--ui-space-xs);
+  padding-block-start: var(--ui-space-xs);
+  border-block-start: var(--ui-border-width-default) solid var(--ui-datepicker-panel-border);
+}
+
 @media (forced-colors: active) {
   :host(.ui-datepicker--invalid) .ui-datepicker__field {
     border-style: dashed;

@@ -176,6 +176,9 @@ Without a forms directive, use the `invalid` input to show the error state manua
 `ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with the
 `invalidDate` label as its message; the value is `null` meanwhile.
 
+The calendar title switches to a grid of months and then of years for long jumps. The datepicker
+dialog has **Today** and **Clear** buttons (the `today` and `clear` labels).
+
 ### Prefix and suffix
 
 Mark content with `uiPrefix` / `uiSuffix` to place it inside the border of a text control:
@@ -511,7 +514,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 | `@vplans/ui-kit/dialog`      | `UiDialog`, `provideUiDialog`, `UI_DIALOG_DEFAULT_OPTIONS`, `UiDialogDefaults`, `UiDialogOptions`, `UiDrawerOptions`, `UiDrawerPosition`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`       | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                                                                                                                                                                                               |
 | `@vplans/ui-kit/select`      | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                                                                                                                                                                                                |
-| `@vplans/ui-kit/datepicker`  | `UiDatepicker`, `UiCalendar`, `UiDateFilter`                                                                                                                                                                                                                                                            |
+| `@vplans/ui-kit/datepicker`  | `UiDatepicker`, `UiCalendar`, `UiCalendarView`, `UiDateFilter`                                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/icon`        | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                         |
 | `@vplans/ui-kit/theme`       | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                                                                                                                                |
 | `@vplans/ui-kit/core`        | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`                                                                       |
