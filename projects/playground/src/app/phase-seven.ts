@@ -4,7 +4,7 @@ import { FormField, form, max, min, minLength, required, submit } from '@angular
 import { UiAutocomplete } from '@vplans/ui-kit/autocomplete';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton } from '@vplans/ui-kit/button';
-import { UiChip, UiChipInput, UiChipSet, UiFilterChip } from '@vplans/ui-kit/chip';
+import { UiChipInput, UiChipSet, UiFilterChip } from '@vplans/ui-kit/chip';
 import { UiFileUpload } from '@vplans/ui-kit/file-upload';
 import { UiFormField, UiPrefix, UiSuffix } from '@vplans/ui-kit/form-field';
 import { UiNumberInput } from '@vplans/ui-kit/number-input';
@@ -81,7 +81,6 @@ const UNITS: Unit[] = Array.from({ length: 12 }, (_, i) => ({
     UiAutocomplete,
     UiBadge,
     UiButton,
-    UiChip,
     UiChipInput,
     UiChipSet,
     UiFilterChip,
@@ -105,7 +104,7 @@ const UNITS: Unit[] = Array.from({ length: 12 }, (_, i) => ({
     UiRowDetail,
   ],
   templateUrl: './phase-seven.html',
-  styleUrl: './phase-three.scss',
+  styleUrls: ['./phase-three.scss', './phase-seven.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseSeven {

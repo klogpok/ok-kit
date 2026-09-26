@@ -1,0 +1,9 @@
+.form {
+  display: grid;
+  gap: var(--ui-space-lg);
+}
+
+.form .row > * {
+  flex: 1;
+  min-inline-size: 10rem;
+}

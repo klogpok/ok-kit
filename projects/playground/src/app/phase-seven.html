@@ -3,7 +3,7 @@
 <div class="grid">
   <section aria-labelledby="order-title">
     <h3 id="order-title" class="ui-heading-4">Work order (Signal Forms)</h3>
-    <form class="popover" novalidate (submit)="save($event)">
+    <form class="form" novalidate (submit)="save($event)">
       <ui-form-field label="City">
         <ui-autocomplete [formField]="order.city" placeholder="Type a city">
           @for (city of cities; track city) {
@@ -52,7 +52,7 @@
           [progress]="uploads()"
         />
       </ui-form-field>
-      <button ui-button type="submit">Save the work order</button>
+      <div><button ui-button type="submit">Save the work order</button></div>
     </form>
     <pre>{{ model() | json }}</pre>
   </section>
@@ -65,7 +65,9 @@
     <div class="row">
       <span>{{ selected().length }} selected</span>
       @if (selected().length) {
-        <ui-chip removable (removed)="selected.set([])">Clear the selection</ui-chip>
+        <button ui-button size="sm" variant="ghost" (click)="selected.set([])">
+          Clear the selection
+        </button>
       }
     </div>
     <ui-table-container style="max-block-size: 24rem">
