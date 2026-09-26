@@ -160,3 +160,27 @@ flag, `limits` for the range slider with Signal Forms, `null` shown at `min` / a
 off-grid values shown snapped but not rewritten, `max` off the step grid not reachable, overlapping
 range thumbs picked by the drag direction). No vertical orientation, value tooltip or minimum
 distance between thumbs for now.
+
+## Phase 8.1–8.3: date range picker, time input, stepper (approved 2026-09-26)
+
+Delivered: `ui-date-range-picker` (`datepicker`) with presets and a two-month calendar dialog;
+`ui-calendar` `range` / `[(selectedRange)]` / `months`; `ui-time-input` (`time`) with a typing mask
+and a list of times, `uiDateWithTime()` / `uiTimeOf()`; `ui-stepper` + `ui-step` (`stepper`) with
+linear mode and form validity; `UiDateRangePickerHarness`, `UiTimeInputHarness`,
+`UiStepperHarness` / `UiStepHarness`; calendar range and stepper tokens; an inspection request
+wizard in the "Phase 8" playground section; 729 baselines.
+
+Review answers: all deviations in the roadmap are accepted:
+
+- the range value is `{ start, end } | null`, and a range with one open end is valid;
+- the limits are `minDate`/`maxDate` and `minTime`/`maxTime` (NG8022);
+- presets are an input list whose ranges may be functions;
+- an end before the start reports `uiDateRangeOrder` in the field typed last;
+- the time format follows the locale's hour cycle, and hours without AM/PM are read as 24-hour;
+- the time input has no toggle button, and the typed text does not filter the list;
+- date and time are joined with helpers, not a combined component;
+- the stepper is our own component, not CDK Stepper; going back is always allowed, and
+  `reset()` does not reset the forms.
+
+The playground bundle went over 900 kB. Instead of raising the budget, the phase sections are
+loaded lazily with `@defer (on viewport)`.

@@ -20,7 +20,7 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 
 ## Status and history
 
-- Phases 1–7 are done and approved (2026-09-26). In phase 8 only 8.4 (slider) is done and approved; the rest of phase 8 is next. The plan for phases 8–9 is in [docs/ROADMAP.md](docs/ROADMAP.md).
+- Phases 1–7 are done and approved (2026-09-26). In phase 8, 8.1–8.4 (date range picker, time input, stepper, slider) are done and approved; 8.5–8.7 are next. The plan for phases 8–9 is in [docs/ROADMAP.md](docs/ROADMAP.md).
 - What each phase delivered and every review answer are in [docs/DECISIONS.md](docs/DECISIONS.md). Check it before you change an existing default or behavior: most were chosen by the user.
 
 ## Workflow per phase
