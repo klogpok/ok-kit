@@ -144,3 +144,19 @@ Review answers: all deviations in the roadmap are accepted (element `ui-number-i
 blur, array selection model with `th[ui-table-select-all]`/`td[ui-table-select-row]`, invalid files
 kept in the list, `addOnBlur` and Backspace in `ui-chip-input`, pick-only autocomplete clears unpicked
 text); the bundle warning is raised to 900 kB.
+
+## Phase 8.4: slider (approved 2026-09-26)
+
+Only 8.4 of phase 8 was built, at the user's request; 8.1–8.3 and 8.5–8.7 are not started.
+
+Delivered: `ui-slider` and `ui-range-slider` (`slider`) on transparent native range inputs, with
+track clicks and drags, arrow keys that follow the visual direction in RTL, `step`, ticks and
+labelled `marks`, `valueText`, `valueCommit`, `limits` on the range slider; `UiSliderHarness`; the
+`rangeStart` / `rangeEnd` labels; `--ui-slider-*` tokens; the "Phase 8" playground section; 660
+baselines.
+
+Review answers: all deviations in the roadmap are accepted (two components instead of a `range`
+flag, `limits` for the range slider with Signal Forms, `null` shown at `min` / as the whole scale,
+off-grid values shown snapped but not rewritten, `max` off the step grid not reachable, overlapping
+range thumbs picked by the drag direction). No vertical orientation, value tooltip or minimum
+distance between thumbs for now.
