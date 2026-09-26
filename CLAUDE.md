@@ -27,10 +27,8 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 
 1. Build components one at a time, each in its own secondary entry point (see README → "Adding a component").
 2. Commit each component separately (`feat(<name>): ...`). Include tests and stories.
-3. Before reporting a phase, run: `pnpm tokens && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm test:playground && pnpm build && pnpm build:playground && pnpm build-storybook && pnpm test-storybook && pnpm test-visual`, and type-check the stories with `pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit`.
-   New or intentionally changed stories need new baselines: `pnpm test-visual:update`, then look at the new PNGs in `visual/` before committing them.
-4. Check the stories in a real browser for light and dark themes and for RTL. `playwright-core` with `channel: 'msedge'` works without downloading browsers.
-5. End the phase with a report: what was done, what is left, which decisions the user must make. Wait for approval before starting the next phase.
+3. Before reporting a phase, run the `/phase-check` skill: the full check command, visual baselines, the browser check in light/dark/RTL and the report format.
+4. End the phase with a report: what was done, what is left, which decisions the user must make. Wait for approval before starting the next phase.
 
 ## Gotchas
 
