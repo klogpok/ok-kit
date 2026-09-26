@@ -17,6 +17,7 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - [Overlays](#overlays)
 - [Feedback](#feedback)
 - [Data display](#data-display)
+- [Navigation](#navigation)
 - [Components](#components)
 - [Tokens](#tokens)
 - [Contributing](#contributing)
@@ -443,6 +444,20 @@ The bar is named by `label`, by `aria-labelledby`, or by the `loading` label.
 
 The name is the accessible name. Set `decorative` when the name is shown next to the avatar.
 
+## Navigation
+
+```html
+<!-- Breadcrumbs: the last link is the current page; 5+ links collapse into a menu -->
+<nav ui-breadcrumbs>
+  <a ui-breadcrumb routerLink="/">Home</a>
+  <a ui-breadcrumb routerLink="/plans">Plans</a>
+  <a ui-breadcrumb>{{ plan.name }}</a>
+</nav>
+```
+
+With more links than `maxItems` (default 4), the links after the first one and before the last
+`maxItems - 2` go into a "…" menu; picking an item follows the hidden link.
+
 ## Components
 
 | Entry point                  | Exports                                                                                                                                                                                                                                                          |
@@ -464,6 +479,7 @@ The name is the accessible name. Set `decorative` when the name is shown next to
 | `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                                                                                             |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                       |
 | `@vplans/ui-kit/accordion`   | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                           |
+| `@vplans/ui-kit/breadcrumbs` | `UiBreadcrumbs`, `UiBreadcrumb`                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/tabs`        | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                                                                                                                                                     |
 | `@vplans/ui-kit/pagination`  | `UiPagination`, `UiPageEvent`, `UiPageItem`, `uiPageItems`                                                                                                                                                                                                       |
 | `@vplans/ui-kit/tooltip`     | `UiTooltip`, `UiTooltipPosition`                                                                                                                                                                                                                                 |
@@ -550,6 +566,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-em-6`                              | semantic  | `6em`                                                                        | `6em`                                                                  |
 | `--ui-em-0-8`                            | semantic  | `0.8em`                                                                      | `0.8em`                                                                |
 | `--ui-em-2-5`                            | semantic  | `2.5em`                                                                      | `2.5em`                                                                |
+| `--ui-em-0-4`                            | semantic  | `0.4em`                                                                      | `0.4em`                                                                |
 | `--ui-z-sticky`                          | semantic  | `1100`                                                                       | `1100`                                                                 |
 | `--ui-motion-duration-instant`           | semantic  | `50ms`                                                                       | `50ms`                                                                 |
 | `--ui-motion-duration-fast`              | semantic  | `120ms`                                                                      | `120ms`                                                                |
@@ -781,6 +798,15 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-avatar-color-7-text`               | component | `var(--ui-color-accent-7-text)`                                              | `var(--ui-color-accent-7-text)`                                        |
 | `--ui-avatar-color-8-bg`                 | component | `var(--ui-color-accent-8-bg)`                                                | `var(--ui-color-accent-8-bg)`                                          |
 | `--ui-avatar-color-8-text`               | component | `var(--ui-color-accent-8-text)`                                              | `var(--ui-color-accent-8-text)`                                        |
+| `--ui-breadcrumbs-gap`                   | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
+| `--ui-breadcrumbs-font-size`             | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-breadcrumbs-link`                  | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-breadcrumbs-link-hover`            | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-breadcrumbs-current`               | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-breadcrumbs-current-font-weight`   | component | `var(--ui-font-weight-medium)`                                               | `var(--ui-font-weight-medium)`                                         |
+| `--ui-breadcrumbs-separator`             | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-breadcrumbs-separator-size`        | component | `var(--ui-em-0-4)`                                                           | `var(--ui-em-0-4)`                                                     |
+| `--ui-breadcrumbs-separator-width`       | component | `var(--ui-border-width-default)`                                             | `var(--ui-border-width-default)`                                       |
 | `--ui-card-bg`                           | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
 | `--ui-card-border`                       | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-card-radius`                       | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |

@@ -26,6 +26,10 @@ export interface UiLabels {
   loading: string;
   /** Accessible name of the `ui-pagination` navigation landmark. */
   pagination: string;
+  /** Accessible name of the `nav[ui-breadcrumbs]` landmark. */
+  breadcrumbs: string;
+  /** Button that shows the collapsed items of `nav[ui-breadcrumbs]`. */
+  showMore: string;
   firstPage: string;
   previousPage: string;
   nextPage: string;
@@ -61,6 +65,8 @@ export const UI_LABELS_HE: UiLabels = {
   required: 'חובה',
   loading: 'טוען',
   pagination: 'עימוד',
+  breadcrumbs: 'נתיב ניווט',
+  showMore: 'הצגת עוד',
   firstPage: 'עמוד ראשון',
   previousPage: 'עמוד קודם',
   nextPage: 'עמוד הבא',
@@ -89,6 +95,8 @@ export const UI_LABELS_EN: UiLabels = {
   required: 'required',
   loading: 'Loading',
   pagination: 'Pagination',
+  breadcrumbs: 'Breadcrumbs',
+  showMore: 'Show more',
   firstPage: 'First page',
   previousPage: 'Previous page',
   nextPage: 'Next page',

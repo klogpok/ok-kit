@@ -710,6 +710,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "2.5em"
   },
   {
+    "name": "--ui-ref-em-0-4",
+    "layer": "primitive",
+    "light": "0.4em",
+    "dark": "0.4em"
+  },
+  {
     "name": "--ui-ref-radius-none",
     "layer": "primitive",
     "light": "0",
@@ -1326,6 +1332,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "semantic",
     "light": "2.5em",
     "dark": "2.5em"
+  },
+  {
+    "name": "--ui-em-0-4",
+    "layer": "semantic",
+    "light": "0.4em",
+    "dark": "0.4em"
   },
   {
     "name": "--ui-z-sticky",
@@ -2712,6 +2724,60 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-accent-8-text)",
     "dark": "var(--ui-color-accent-8-text)"
+  },
+  {
+    "name": "--ui-breadcrumbs-gap",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-breadcrumbs-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-breadcrumbs-link",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-breadcrumbs-link-hover",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-breadcrumbs-current",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-breadcrumbs-current-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-medium)",
+    "dark": "var(--ui-font-weight-medium)"
+  },
+  {
+    "name": "--ui-breadcrumbs-separator",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-breadcrumbs-separator-size",
+    "layer": "component",
+    "light": "var(--ui-em-0-4)",
+    "dark": "var(--ui-em-0-4)"
+  },
+  {
+    "name": "--ui-breadcrumbs-separator-width",
+    "layer": "component",
+    "light": "var(--ui-border-width-default)",
+    "dark": "var(--ui-border-width-default)"
   },
   {
     "name": "--ui-card-bg",

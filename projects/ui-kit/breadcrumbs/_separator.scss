@@ -1,0 +1,19 @@
+/// Chevron drawn with two borders before an item. No text, so screen readers skip it; it
+/// points to the inline end, so it turns around in RTL.
+@mixin separator {
+  &::before {
+    content: '';
+    display: inline-block;
+    flex-shrink: 0;
+    inline-size: var(--ui-breadcrumbs-separator-size);
+    block-size: var(--ui-breadcrumbs-separator-size);
+    margin-inline-end: var(--ui-breadcrumbs-gap);
+    border-block-start: var(--ui-breadcrumbs-separator-width) solid var(--ui-breadcrumbs-separator);
+    border-inline-end: var(--ui-breadcrumbs-separator-width) solid var(--ui-breadcrumbs-separator);
+    rotate: 45deg;
+  }
+
+  &:dir(rtl)::before {
+    rotate: -45deg;
+  }
+}

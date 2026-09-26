@@ -1,0 +1,22 @@
+@use 'separator';
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-2xs) var(--ui-breadcrumbs-gap);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-breadcrumbs-font-size);
+  line-height: var(--ui-line-height-snug);
+}
+
+.ui-breadcrumbs__more {
+  display: inline-flex;
+  align-items: center;
+
+  @include separator.separator;
+}
+
+.ui-breadcrumbs__more-button {
+  --ui-button-ghost-text: var(--ui-breadcrumbs-link);
+}

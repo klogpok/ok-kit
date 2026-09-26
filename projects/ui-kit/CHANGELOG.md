@@ -19,6 +19,9 @@ so versions mark review points rather than releases.
 - **tokens:** `--ui-color-accent-1-*` … `--ui-color-accent-8-*` (bg/text pairs) and
   `--ui-media-size-*`.
 - **labels:** `moreCount`.
+- **breadcrumbs:** `nav[ui-breadcrumbs]` and `a[ui-breadcrumb]` with CSS separators that turn in
+  RTL and a "…" menu for collapsed links (`maxItems`).
+- **labels:** `breadcrumbs`, `showMore`.
 
 ## Phase 5: second audit
 

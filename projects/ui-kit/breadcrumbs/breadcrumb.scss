@@ -1,0 +1,38 @@
+@use '../styles/mixins';
+@use 'separator';
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-breadcrumbs-link);
+  text-decoration: none;
+
+  @include mixins.transition(color);
+  @include mixins.focus-visible;
+}
+
+:host(:not(:first-child)) {
+  @include separator.separator;
+}
+
+:host([href]:hover) {
+  color: var(--ui-breadcrumbs-link-hover);
+  text-decoration: underline;
+}
+
+:host(.ui-breadcrumb--current) {
+  color: var(--ui-breadcrumbs-current);
+  font-weight: var(--ui-breadcrumbs-current-font-weight);
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  :host(.ui-breadcrumb--current) {
+    color: CanvasText;
+  }
+}
