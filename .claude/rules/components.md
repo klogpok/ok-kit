@@ -19,6 +19,7 @@ paths:
 ## Focus
 
 - Angular `@for` may move a kept DOM node when items before it are removed, which drops focus. Re-focus after render (see the toast `keepFocus`).
+- `focus()` right after a `pointerdown` that called `preventDefault()` shows the focus ring in Edge (`:focus-visible` matches). Pass `focusVisible: false` (see `ui-slider`).
 - An element that sets up a later focus move (`afterNextRender`) must outlive the change: `ui-chip-set` disappears with its last chip, so `ui-chip-input` moves focus itself.
 
 ## RTL and a11y
