@@ -11,6 +11,10 @@ so versions mark review points rather than releases.
   in light/rtl, dark/rtl and light/ltr with the baselines in `visual/` (`pixelmatch`, 0.1% of
   the pixels); `pnpm test-visual:update` writes new or changed baselines. The Storybook server
   and story list are shared with `test-storybook` (`scripts/storybook-pages.mjs`).
+- **testing:** new entry point `@vplans/ui-kit/testing` with CDK component harnesses:
+  `UiHarness` (base with focus helpers), `UiButtonHarness`, `UiInputHarness`,
+  `UiCheckboxHarness`, `UiSelectHarness` + `UiOptionHarness` and `UiDialogHarness` (dialogs and
+  drawers). New components come with a harness.
 
 ## Unreleased (phase 6: everyday blocks)
 

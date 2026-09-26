@@ -7,5 +7,5 @@
     "types": []
   },
   "include": ["**/*.ts"],
-  "exclude": ["**/*.spec.ts", "**/*.stories.ts", "tokens/**", "testing/**"]
+  "exclude": ["**/*.spec.ts", "**/*.stories.ts", "tokens/**"]
 }

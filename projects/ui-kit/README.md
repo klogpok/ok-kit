@@ -18,6 +18,7 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - [Feedback](#feedback)
 - [Data display](#data-display)
 - [Navigation](#navigation)
+- [Testing](#testing)
 - [Components](#components)
 - [Tokens](#tokens)
 - [Contributing](#contributing)
@@ -505,6 +506,47 @@ The name is the accessible name. Set `decorative` when the name is shown next to
 With more links than `maxItems` (default 4), the links after the first one and before the last
 `maxItems - 2` go into a "…" menu; picking an item follows the hidden link.
 
+## Testing
+
+`@vplans/ui-kit/testing` has [component harnesses](https://angular.dev/guide/testing/component-harnesses-overview)
+built on `@angular/cdk/testing`. Tests that use them do not depend on the internal DOM of the kit,
+so they keep working when that DOM changes.
+
+| Harness             | Finds                                                | Filters                                  |
+| ------------------- | ---------------------------------------------------- | ---------------------------------------- |
+| `UiButtonHarness`   | `ui-button`, `ui-icon-button` (`<button>` and `<a>`) | `text`, `label`, `variant`, `disabled`   |
+| `UiInputHarness`    | `input[ui-input]`, `textarea[ui-textarea]`           | `label`, `value`, `placeholder`          |
+| `UiCheckboxHarness` | `ui-checkbox`                                        | `label`, `name`, `checked`, `disabled`   |
+| `UiSelectHarness`   | `ui-select`, `ui-multi-select`                       | `label`, `value`, `disabled`, `multiple` |
+| `UiOptionHarness`   | `ui-option` (from `UiSelectHarness.getOptions()`)    | `text`, `selected`, `disabled`           |
+| `UiDialogHarness`   | dialogs and drawers opened with `UiDialog`           | `title`, `drawer`                        |
+
+`label` matches the `aria-label` or the text of the `label[for]`, so the label of `ui-form-field`
+works (without the required marker). Every harness extends `UiHarness`: `focus()`, `blur()`,
+`isFocused()` act on the element that takes focus, and `getHarness()` loads harnesses inside it
+(e.g. the buttons of a dialog).
+
+```ts
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { UiDialogHarness, UiInputHarness, UiSelectHarness } from '@vplans/ui-kit/testing';
+
+const loader = TestbedHarnessEnvironment.loader(fixture);
+await (
+  await loader.getHarness(UiInputHarness.with({ label: 'Email' }))
+).setValue('dana@vplans.com');
+await (
+  await loader.getHarness(UiSelectHarness.with({ label: 'City' }))
+).clickOptions({ text: 'Haifa' });
+
+// Dialogs, and the options of a select, live in an overlay outside the fixture.
+const dialog = await TestbedHarnessEnvironment.documentRootLoader(fixture).getHarness(
+  UiDialogHarness.with({ title: 'Rename plan' }),
+);
+await dialog.close();
+```
+
+Harnesses for the other components follow in roadmap phase 9.
+
 ## Components
 
 | Entry point                  | Exports                                                                                                                                                                                                                                                                                                 |
@@ -538,6 +580,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 | `@vplans/ui-kit/datepicker`  | `UiDatepicker`, `UiCalendar`, `UiCalendarView`, `UiDateFilter`                                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/icon`        | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                         |
 | `@vplans/ui-kit/theme`       | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                                                                                                                                |
+| `@vplans/ui-kit/testing`     | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, their `*HarnessFilters`                                                                                                                                                 |
 | `@vplans/ui-kit/core`        | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`                                                                       |
 
 ## Tokens
@@ -1061,14 +1104,15 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
    - Stylelint enforces these rules.
    - New component tokens go into `tokens.json` → `component.<name>`, and reference semantic tokens.
 6. For a form control, extend `UiFormControlBase` (from `@vplans/ui-kit/core`) and provide `UI_FORM_FIELD_CONTROL`. For a native element, use `injectControlState()`. A checkbox-like control extends `UiCheckableBase` and provides `provideUiCheckedValidator()`, so `required` means checked in Reactive and template forms.
-7. Required tests:
+7. Add a harness for the component to `projects/ui-kit/testing/` (`<name>-harness.ts` extending `UiHarness`, with a spec), export it from `public-api.ts` and list it under [Testing](#testing).
+8. Required tests:
    - rendering and inputs;
    - outputs and model updates;
    - keyboard interaction;
    - ARIA attributes;
    - for form controls, Reactive Forms and Signal Forms (value both ways, disabled, touched, error linking).
-8. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL.
-9. Visual baselines: after `pnpm build-storybook`, run `pnpm test-visual:update` for new or intentionally changed stories and look at the new PNGs in `visual/` before you commit them. `pnpm test-visual` must pass. A failure writes the new screenshot and a diff to `dist/visual-diff/`. The baselines are taken in the installed Edge at 1024×768 with reduced motion and a fixed date (2026-09-25), so a new Edge version may need an update of all baselines.
-10. Keep commits small, one per component: `feat(<name>): ...`.
+9. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL.
+10. Visual baselines: after `pnpm build-storybook`, run `pnpm test-visual:update` for new or intentionally changed stories and look at the new PNGs in `visual/` before you commit them. `pnpm test-visual` must pass. A failure writes the new screenshot and a diff to `dist/visual-diff/`. The baselines are taken in the installed Edge at 1024×768 with reduced motion and a fixed date (2026-09-25), so a new Edge version may need an update of all baselines.
+11. Keep commits small, one per component: `feat(<name>): ...`.
 
 Anything not exported from an entry point's `public-api.ts` is internal and may change without notice.
