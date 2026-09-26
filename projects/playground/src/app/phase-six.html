@@ -1,0 +1,112 @@
+<h2 class="ui-heading-3">Phase 6</h2>
+
+<section aria-labelledby="navigation-title">
+  <h3 id="navigation-title" class="ui-heading-4">Navigation and feedback</h3>
+  <nav ui-breadcrumbs>
+    <a ui-breadcrumb href="#home">ראשי</a>
+    <a ui-breadcrumb href="#projects">פרויקטים</a>
+    <a ui-breadcrumb href="#tower">מגדל ב׳</a>
+    <a ui-breadcrumb href="#plans">תוכניות</a>
+    <a ui-breadcrumb>קומה 4</a>
+  </nav>
+
+  @if (alertShown()) {
+    <ui-alert
+      tone="warning"
+      title="התוכנית ממתינה לחתימה"
+      dismissible
+      (dismissed)="alertShown.set(false)"
+    >
+      יש לשלוח את התוכנית לבעלים לפני יום חמישי.
+      <button uiAlertActions ui-button size="sm">שליחה לבעלים</button>
+    </ui-alert>
+  } @else {
+    <div>
+      <button ui-button variant="secondary" (click)="alertShown.set(true)">Show the alert</button>
+    </div>
+  }
+
+  <div class="row">
+    <span id="upload-caption">Uploading plan.pdf: {{ uploaded() }} of 8 MB</span>
+    <button ui-button size="sm" variant="secondary" (click)="upload()">Next MB</button>
+  </div>
+  <ui-progress-bar [value]="uploaded()" max="8" aria-labelledby="upload-caption" />
+  <ui-progress-bar size="sm" label="Loading plans" />
+</section>
+
+<div class="grid">
+  <section aria-labelledby="people-title">
+    <h3 id="people-title" class="ui-heading-4">People</h3>
+    <div class="row">
+      <ui-avatar-group max="3" aria-label="Coordinators">
+        @for (person of people; track person.id) {
+          <ui-avatar [name]="person.name" />
+        }
+      </ui-avatar-group>
+      <ui-badge tone="danger" [count]="120">unread messages</ui-badge>
+      <ui-badge tone="info" size="lg">Shared</ui-badge>
+      <span class="row"><ui-badge tone="success" dot>Online</ui-badge> Dana Levi</span>
+    </div>
+    <ui-form-field label="Coordinator">
+      <ui-select placeholder="Choose" clearable [(value)]="coordinator">
+        @for (person of people; track person.id) {
+          <ui-option [value]="person.id">
+            <ui-avatar uiOptionIcon size="sm" [name]="person.name" decorative />
+            {{ person.name }}
+            <span uiOptionDescription>{{ person.role }}</span>
+          </ui-option>
+        }
+      </ui-select>
+    </ui-form-field>
+  </section>
+
+  <section aria-labelledby="overlays-title">
+    <h3 id="overlays-title" class="ui-heading-4">Overlays</h3>
+    <div class="row">
+      <button ui-button variant="secondary" [uiPopoverTriggerFor]="filters">
+        <ui-icon icon="filter" /> Filters
+      </button>
+      <button ui-button variant="secondary" (click)="openDrawer()">Plan details</button>
+      <button ui-button variant="secondary" uiMenuPosition="bottom-end" [uiMenuTriggerFor]="view">
+        View <ui-icon icon="chevron-down" />
+      </button>
+    </div>
+    <p aria-live="polite">{{ drawerResult() }} · sort: {{ sort() }} · archived: {{ archived() }}</p>
+
+    <ng-template #filters let-close="close">
+      <div class="popover">
+        <ui-checkbox [(checked)]="onlyMine">Only my plans</ui-checkbox>
+        <button ui-button size="sm" (click)="close()">Apply</button>
+      </div>
+    </ng-template>
+    <ng-template #view>
+      <ui-menu>
+        <ui-menu-group label="Sort by">
+          <button ui-menu-item-radio [checked]="sort() === 'name'" (triggered)="sort.set('name')">
+            Name
+          </button>
+          <button ui-menu-item-radio [checked]="sort() === 'date'" (triggered)="sort.set('date')">
+            Last update
+          </button>
+        </ui-menu-group>
+        <ui-divider />
+        <button
+          ui-menu-item-checkbox
+          [checked]="archived()"
+          (triggered)="archived.set(!archived())"
+        >
+          Show archived
+        </button>
+        <a ui-menu-item href="#history"><ui-icon icon="clock" /> History</a>
+      </ui-menu>
+    </ng-template>
+  </section>
+
+  <section aria-labelledby="empty-title">
+    <h3 id="empty-title" class="ui-heading-4">Empty state</h3>
+    <ui-empty-state title="No comments yet" size="sm" headingLevel="4">
+      <ui-icon icon="bell" />
+      Comments from the coordinator appear here.
+    </ui-empty-state>
+  </section>
+</div>

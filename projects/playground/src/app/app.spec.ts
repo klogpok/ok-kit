@@ -13,6 +13,7 @@ describe('App', () => {
       expect.arrayContaining(['Profile (Signal Forms)', 'Plans', 'Actions']),
     );
     expect(el.querySelector('app-phase-three section')).not.toBeNull();
+    expect(el.querySelector('app-phase-six nav[ui-breadcrumbs]')).not.toBeNull();
   });
 
   it('switches the direction and the language together', async () => {

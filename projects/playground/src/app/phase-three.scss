@@ -37,3 +37,9 @@ pre {
   overflow: auto;
   font-size: var(--ui-font-size-xs);
 }
+
+.popover {
+  display: grid;
+  gap: var(--ui-space-md);
+  justify-items: start;
+}
