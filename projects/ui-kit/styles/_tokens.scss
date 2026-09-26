@@ -640,6 +640,14 @@
   --ui-tooltip-max-width: var(--ui-container-width-sm);
   --ui-tooltip-offset: var(--ui-space-xs);
   --ui-tooltip-viewport-margin: var(--ui-space-sm);
+  --ui-popover-bg: var(--ui-color-surface-raised);
+  --ui-popover-border: var(--ui-color-surface-active);
+  --ui-popover-radius: var(--ui-radius-container);
+  --ui-popover-shadow: var(--ui-shadow-md);
+  --ui-popover-padding: var(--ui-space-lg);
+  --ui-popover-max-width: var(--ui-container-width-md);
+  --ui-popover-offset: var(--ui-space-xs);
+  --ui-popover-viewport-margin: var(--ui-space-sm);
   --ui-dialog-bg: var(--ui-color-surface-raised);
   --ui-dialog-radius: var(--ui-radius-container);
   --ui-dialog-shadow: var(--ui-shadow-lg);

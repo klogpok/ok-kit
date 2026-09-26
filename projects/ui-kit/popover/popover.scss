@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  max-inline-size: min(var(--ui-popover-max-width), 100vw - var(--ui-popover-viewport-margin) * 2);
+  padding: var(--ui-popover-padding);
+  border: var(--ui-border-width-default) solid var(--ui-popover-border);
+  border-radius: var(--ui-popover-radius);
+  background-color: var(--ui-popover-bg);
+  color: var(--ui-color-text);
+  box-shadow: var(--ui-popover-shadow);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-normal);
+  outline: none;
+  animation: ui-popover-enter var(--ui-motion-duration-fast) var(--ui-motion-easing-enter);
+}
+
+// The gap to the trigger. Margins are part of the pane, so positioning accounts for them.
+:host(.ui-popover--top) {
+  margin-block-end: var(--ui-popover-offset);
+}
+
+:host(.ui-popover--bottom) {
+  margin-block-start: var(--ui-popover-offset);
+}
+
+:host(.ui-popover--start) {
+  margin-inline-end: var(--ui-popover-offset);
+}
+
+:host(.ui-popover--end) {
+  margin-inline-start: var(--ui-popover-offset);
+}
+
+@keyframes ui-popover-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :host {
+    border-color: CanvasText;
+  }
+}

@@ -2960,6 +2960,54 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-space-sm)"
   },
   {
+    "name": "--ui-popover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-raised)",
+    "dark": "var(--ui-color-surface-raised)"
+  },
+  {
+    "name": "--ui-popover-border",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
+    "name": "--ui-popover-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-popover-shadow",
+    "layer": "component",
+    "light": "var(--ui-shadow-md)",
+    "dark": "var(--ui-shadow-md)"
+  },
+  {
+    "name": "--ui-popover-padding",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
+    "name": "--ui-popover-max-width",
+    "layer": "component",
+    "light": "var(--ui-container-width-md)",
+    "dark": "var(--ui-container-width-md)"
+  },
+  {
+    "name": "--ui-popover-offset",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-popover-viewport-margin",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
     "name": "--ui-dialog-bg",
     "layer": "component",
     "light": "var(--ui-color-surface-raised)",

@@ -22,6 +22,8 @@ so versions mark review points rather than releases.
 - **breadcrumbs:** `nav[ui-breadcrumbs]` and `a[ui-breadcrumb]` with CSS separators that turn in
   RTL and a "…" menu for collapsed links (`maxItems`).
 - **labels:** `breadcrumbs`, `showMore`.
+- **popover:** `[uiPopoverTriggerFor]` opens a non-modal dialog from an `ng-template` with
+  `uiPopoverPosition`, `open()`/`close()`, `opened`/`closed` and a `close()` in the template context.
 
 ## Phase 5: second audit
 

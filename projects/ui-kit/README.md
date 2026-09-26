@@ -384,6 +384,18 @@ this.toast.show({ message: 'Plan deleted', action: 'Undo' }).onAction.subscribe(
 </ui-form-field>
 ```
 
+```html
+<!-- Popover: non-modal, named by the trigger; Escape, a click outside or close() closes it -->
+<button ui-button variant="secondary" [uiPopoverTriggerFor]="filters">Filters</button>
+<ng-template #filters let-close="close">
+  <ui-checkbox [(checked)]="onlyMine">Only my plans</ui-checkbox>
+  <button ui-button size="sm" (click)="apply(); close()">Apply</button>
+</ng-template>
+```
+
+The popover focuses `[cdkFocusInitial]` or its first focusable element and closes when focus
+leaves it. Use `uiPopoverLabel` when the trigger text does not describe the content.
+
 Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
 `minLength(path.recipients, 1)` next to `required()`.
 
@@ -483,6 +495,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 | `@vplans/ui-kit/tabs`        | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                                                                                                                                                     |
 | `@vplans/ui-kit/pagination`  | `UiPagination`, `UiPageEvent`, `UiPageItem`, `uiPageItems`                                                                                                                                                                                                       |
 | `@vplans/ui-kit/tooltip`     | `UiTooltip`, `UiTooltipPosition`                                                                                                                                                                                                                                 |
+| `@vplans/ui-kit/popover`     | `UiPopoverTrigger`, `UiPopoverContext`, `UiPopoverPosition`                                                                                                                                                                                                      |
 | `@vplans/ui-kit/menu`        | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/dialog`      | `UiDialog`, `provideUiDialog`, `UI_DIALOG_DEFAULT_OPTIONS`, `UiDialogDefaults`, `UiDialogOptions`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`       | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                                                                                                                                                        |
@@ -837,6 +850,14 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-tooltip-max-width`                 | component | `var(--ui-container-width-sm)`                                               | `var(--ui-container-width-sm)`                                         |
 | `--ui-tooltip-offset`                    | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
 | `--ui-tooltip-viewport-margin`           | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
+| `--ui-popover-bg`                        | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
+| `--ui-popover-border`                    | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-popover-radius`                    | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-popover-shadow`                    | component | `var(--ui-shadow-md)`                                                        | `var(--ui-shadow-md)`                                                  |
+| `--ui-popover-padding`                   | component | `var(--ui-space-lg)`                                                         | `var(--ui-space-lg)`                                                   |
+| `--ui-popover-max-width`                 | component | `var(--ui-container-width-md)`                                               | `var(--ui-container-width-md)`                                         |
+| `--ui-popover-offset`                    | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
+| `--ui-popover-viewport-margin`           | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
 | `--ui-dialog-bg`                         | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
 | `--ui-dialog-radius`                     | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
 | `--ui-dialog-shadow`                     | component | `var(--ui-shadow-lg)`                                                        | `var(--ui-shadow-lg)`                                                  |
