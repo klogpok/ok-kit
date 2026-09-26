@@ -22,6 +22,11 @@ so versions mark review points rather than releases.
   for several months side by side.
 - **tokens:** `--ui-calendar-month-gap`, `--ui-calendar-range-bg`.
 - **labels:** `chooseDateRange`, `startDate`, `endDate`, `dateRangePresets`, `invalidDateRange`.
+- **time:** new entry point with `ui-time-input`: an `"HH:mm"` value shown in 24-hour or 12-hour
+  format by locale, a typing mask, a list of times every `interval` minutes (editable combobox),
+  `minTime` / `maxTime`, a `uiTimeParse` error; `uiDateWithTime()` and `uiTimeOf()` to join it
+  with a date; `UiTimeInputHarness` in testing.
+- **labels:** `invalidTime`.
 
 ## Unreleased (phase 7: data)
 

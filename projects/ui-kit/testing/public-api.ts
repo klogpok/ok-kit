@@ -10,3 +10,4 @@ export * from './autocomplete-harness';
 export * from './file-upload-harness';
 export * from './slider-harness';
 export * from './date-range-picker-harness';
+export * from './time-input-harness';

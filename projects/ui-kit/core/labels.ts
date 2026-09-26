@@ -103,6 +103,8 @@ export interface UiLabels {
   invalidDate: string;
   /** Error of `ui-date-range-picker` when the end is before the start. */
   invalidDateRange: string;
+  /** Error of `ui-time-input` for text that is not an allowed time. */
+  invalidTime: string;
   /** Start thumb of `ui-range-slider`, read after the field label. */
   rangeStart: string;
   /** End thumb of `ui-range-slider`, read after the field label. */
@@ -167,6 +169,7 @@ export const UI_LABELS_HE: UiLabels = {
   invalidNumber: 'מספר לא תקין',
   invalidDate: 'תאריך לא תקין',
   invalidDateRange: 'תאריך הסיום מוקדם מתאריך ההתחלה',
+  invalidTime: 'שעה לא תקינה',
   rangeStart: 'מינימום',
   rangeEnd: 'מקסימום',
   previousMonth: 'חודש קודם',
@@ -226,6 +229,7 @@ export const UI_LABELS_EN: UiLabels = {
   invalidNumber: 'Enter a valid number',
   invalidDate: 'Enter a valid date',
   invalidDateRange: 'The end date is before the start date',
+  invalidTime: 'Enter a valid time',
   rangeStart: 'Minimum',
   rangeEnd: 'Maximum',
   previousMonth: 'Previous month',

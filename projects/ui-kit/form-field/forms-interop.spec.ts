@@ -10,6 +10,7 @@ import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
 import { UiMultiSelect, UiOption, UiSelect } from '@vplans/ui-kit/select';
 import { UiRangeSlider, UiSlider, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiSwitch } from '@vplans/ui-kit/switch';
+import { UiTimeInput } from '@vplans/ui-kit/time';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
@@ -32,6 +33,7 @@ const CONTROLS = [
   UiFileUpload,
   UiSlider,
   UiRangeSlider,
+  UiTimeInput,
 ];
 
 @Component({
@@ -54,6 +56,7 @@ const CONTROLS = [
       </ui-multi-select>
       <ui-datepicker formControlName="date" aria-label="Date" />
       <ui-date-range-picker formControlName="period" aria-label="Period" />
+      <ui-time-input formControlName="time" aria-label="Time" />
       <ui-number-input formControlName="units" aria-label="Units" />
       <ui-chip-input formControlName="labels" aria-label="Labels" />
       <ui-file-upload formControlName="plans" aria-label="Plans" multiple />
@@ -71,6 +74,7 @@ class NamedHost {
     tags: new FormControl<string[]>(['b']),
     date: new FormControl<Date | null>(new Date(2026, 8, 25)),
     period: new FormControl<UiDateRange | null>({ start: new Date(2026, 8, 1), end: null }),
+    time: new FormControl<string | null>('07:30'),
     units: new FormControl<number | null>(1200),
     labels: new FormControl<readonly string[]>(['north']),
     plans: new FormControl<readonly File[]>([new File(['x'], 'a.pdf')]),
@@ -92,6 +96,7 @@ class NamedHost {
     UiNumberInput,
     UiChipInput,
     UiFileUpload,
+    UiTimeInput,
   ],
   template: `
     <ui-checkbox name="terms" [(ngModel)]="terms">Terms</ui-checkbox>
@@ -105,6 +110,7 @@ class NamedHost {
     </ui-select>
     <ui-datepicker name="date" aria-label="Date" [(ngModel)]="date" />
     <ui-date-range-picker name="period" aria-label="Period" [(ngModel)]="period" />
+    <ui-time-input name="time" aria-label="Time" [(ngModel)]="time" />
     <ui-number-input name="units" aria-label="Units" [(ngModel)]="units" />
     <ui-chip-input name="labels" aria-label="Labels" [(ngModel)]="labels" />
     <ui-file-upload name="plans" aria-label="Plans" [(ngModel)]="plans" />
@@ -116,6 +122,7 @@ class NgModelHost {
   readonly city = signal<string | null>('haifa');
   readonly date = signal<Date | null>(null);
   readonly period = signal<UiDateRange | null>(null);
+  readonly time = signal<string | null>(null);
   readonly units = signal<number | null>(3);
   readonly labels = signal<readonly string[]>([]);
   readonly plans = signal<readonly File[]>([]);
@@ -140,6 +147,8 @@ describe('Custom form controls with formControlName', () => {
       ...root.querySelectorAll<HTMLInputElement>('.ui-date-range-picker__input'),
     ];
     expect(periodStart.value).toBe('1.9.2026');
+    const time = root.querySelector<HTMLInputElement>('.ui-time-input__input')!;
+    expect(time.value).toBe('07:30');
     const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
     expect(units.value).toBe('1,200');
     expect(root.querySelector('ui-chip')!.textContent).toContain('north');
@@ -163,6 +172,10 @@ describe('Custom form controls with formControlName', () => {
     periodEnd.dispatchEvent(new Event('input'));
     await settle(fixture);
     expect(form.value.period).toEqual({ start: new Date(2026, 8, 1), end: new Date(2026, 8, 3) });
+    time.value = '18:05';
+    time.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(form.value.time).toBe('18:05');
     root.querySelector<HTMLButtonElement>('.ui-chip__remove')!.click();
     await settle(fixture);
     expect(form.value.labels).toEqual([]);
@@ -213,6 +226,11 @@ describe('Custom form controls with ngModel', () => {
     period.dispatchEvent(new Event('input'));
     await settle(fixture);
     expect(host.period()).toEqual({ start: new Date(2026, 9, 2), end: null });
+    const time = root.querySelector<HTMLInputElement>('.ui-time-input__input')!;
+    time.value = '6:15';
+    time.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(host.time()).toBe('06:15');
     const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
     expect(units.value).toBe('3');
     units.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', cancelable: true }));
