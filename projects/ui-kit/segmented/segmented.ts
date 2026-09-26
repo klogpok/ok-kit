@@ -29,6 +29,8 @@ class UiSegmentedControl {
   keydown: (event: KeyboardEvent, segment: object) => void = () => undefined;
 }
 
+export type UiSegmentedOrientation = 'horizontal' | 'vertical';
+
 /** Keys that move between segments; the number is the step in DOM order for LTR. */
 const ARROW_STEPS: Readonly<Record<string, number>> = {
   ArrowLeft: -1,
@@ -108,7 +110,8 @@ export class UiSegment<T = unknown> {
  * A segmented control: a row of mutually exclusive options that switch a view or a mode, e.g.
  * list / board. It is a `radiogroup` of native radios, so the single tab stop, Space and the
  * accessible name of each segment come from the browser. The arrow keys move and select, and
- * ←/→ follow the visual direction (in RTL ← moves to the next segment).
+ * ←/→ follow the visual direction (in RTL ← moves to the next segment); Home and End go to the
+ * first and the last segment. `orientation="vertical"` stacks the segments.
  * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
  *
  * Mark an icon with `uiSegmentIcon`; give an icon-only segment an `aria-label`.
@@ -132,6 +135,7 @@ export class UiSegment<T = unknown> {
     class: 'ui-segmented',
     role: 'radiogroup',
     '[class]': '"ui-segmented--" + size()',
+    '[class.ui-segmented--vertical]': 'orientation() === "vertical"',
     '[class.ui-segmented--full-width]': 'fullWidth()',
     '[class.ui-segmented--disabled]': 'isDisabled()',
     '[class.ui-segmented--invalid]': 'showError()',
@@ -144,6 +148,7 @@ export class UiSegment<T = unknown> {
     '[attr.aria-required]': 'isRequired() ? "true" : null',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
     '[attr.aria-readonly]': 'readonly() ? "true" : null',
+    '[attr.aria-orientation]': 'orientation()',
     '(focusout)': 'onFocusOut($event)',
   },
 })
@@ -161,6 +166,8 @@ export class UiSegmented<T = unknown>
   /** Shared native `name`; generated when omitted. */
   readonly name = input(this.ids.getId('ui-segmented-name-'));
   readonly size = input<UiSize>('md');
+  /** `vertical` stacks the segments; they then share the width of the widest one. */
+  readonly orientation = input<UiSegmentedOrientation>('horizontal');
   /** Stretches the control to its container; the segments share the width equally. */
   readonly fullWidth = input(false, { transform: booleanAttribute });
   readonly ariaLabel = input('', { alias: 'aria-label' });
@@ -197,20 +204,25 @@ export class UiSegmented<T = unknown>
   }
 
   /**
-   * Arrow keys move to the next enabled segment (wrapping) and select it; a readonly control only
-   * moves focus. Handled here rather than by the browser, which does not mirror ←/→ in RTL
-   * everywhere.
+   * Arrow keys move to the next enabled segment (wrapping) and select it, Home and End to the
+   * first and the last one; a readonly control only moves focus. Handled here rather than by the
+   * browser, which does not mirror ←/→ in RTL everywhere.
    */
   private onKeydown(event: KeyboardEvent, segment: UiSegment<T>): void {
-    const step = ARROW_STEPS[event.key] as number | undefined;
-    if (step === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
     const segments = this.segments().filter((item) => !item.isDisabled());
     const current = segments.indexOf(segment);
-    if (current < 0) return;
+    const step = ARROW_STEPS[event.key] as number | undefined;
+    if (current < 0 || (step === undefined && event.key !== 'Home' && event.key !== 'End')) return;
     event.preventDefault();
-    const horizontal = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
-    const rtl = horizontal && resolveDirection(this.host) === 'rtl';
-    const next = segments[(current + (rtl ? -step : step) + segments.length) % segments.length];
+    let next: UiSegment<T>;
+    if (step === undefined) {
+      next = event.key === 'Home' ? segments[0] : segments[segments.length - 1];
+    } else {
+      const horizontal = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+      const rtl = horizontal && resolveDirection(this.host) === 'rtl';
+      next = segments[(current + (rtl ? -step : step) + segments.length) % segments.length];
+    }
     next.focus();
     if (!next.isChecked()) this.control.select(next.value());
   }

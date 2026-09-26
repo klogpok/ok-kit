@@ -14,7 +14,8 @@
   display: inline-flex;
   flex: 1;
   align-items: center;
-  justify-content: center;
+  // ui-segmented--vertical puts the text at the start edge, like a list.
+  justify-content: var(--_item-justify, center);
   gap: var(--_gap);
   box-sizing: border-box;
   min-inline-size: 0;

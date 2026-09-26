@@ -123,3 +123,16 @@ export const IconOnly: Story = {
       </ui-segmented>`,
   }),
 };
+
+export const Vertical: Story = {
+  render: () => ({
+    template: `
+      <ui-form-field label="סטטוס">
+        <ui-segmented orientation="vertical" value="review">
+          <ui-segment value="draft"><ui-icon uiSegmentIcon icon="edit" />טיוטה</ui-segment>
+          <ui-segment value="review"><ui-icon uiSegmentIcon icon="clock" />ממתין לאישור מתאם</ui-segment>
+          <ui-segment value="approved"><ui-icon uiSegmentIcon icon="check" />מאושר</ui-segment>
+        </ui-segmented>
+      </ui-form-field>`,
+  }),
+};

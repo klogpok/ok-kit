@@ -36,11 +36,20 @@
   --_gap: var(--ui-control-gap-lg);
 }
 
-// The segments share the width equally.
 :host(.ui-segmented--full-width) {
-  --_segment-flex: 1 1 0;
   display: flex;
   inline-size: 100%;
+}
+
+// In a row the segments share the width equally.
+:host(.ui-segmented--full-width:not(.ui-segmented--vertical)) {
+  --_segment-flex: 1 1 0;
+}
+
+// Stacked: every item is as wide as the widest one.
+:host(.ui-segmented--vertical) {
+  --_item-justify: flex-start;
+  flex-direction: column;
 }
 
 :host(.ui-segmented--invalid) {

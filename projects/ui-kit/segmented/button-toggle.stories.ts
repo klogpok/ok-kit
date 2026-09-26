@@ -110,3 +110,16 @@ export const WithIcons: Story = {
       </ui-button-toggle-group>`,
   }),
 };
+
+export const Vertical: Story = {
+  render: () => ({
+    template: `
+      <ui-form-field label="שכבות בתוכנית">
+        <ui-button-toggle-group orientation="vertical" [value]="['walls', 'electric']">
+          <button ui-button-toggle value="walls">קירות</button>
+          <button ui-button-toggle value="plumbing">אינסטלציה</button>
+          <button ui-button-toggle value="electric">חשמל</button>
+        </ui-button-toggle-group>
+      </ui-form-field>`,
+  }),
+};

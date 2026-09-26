@@ -33,6 +33,7 @@ function press(target: Element, key: string): KeyboardEvent {
           [disabled]="disabled()"
           [readonly]="readonly()"
           [fullWidth]="fullWidth()"
+          [orientation]="orientation()"
           size="sm"
         >
           <ui-segment value="list">List</ui-segment>
@@ -51,6 +52,7 @@ class StandaloneHost {
   readonly disabled = signal(false);
   readonly readonly = signal(false);
   readonly fullWidth = signal(false);
+  readonly orientation = signal<'horizontal' | 'vertical'>('horizontal');
   readonly dir = signal<'ltr' | 'rtl'>('ltr');
   readonly control = viewChild.required(UiSegmented);
 }
@@ -152,8 +154,20 @@ describe('UiSegmented', () => {
     expect(host.value()).toBe('board');
   });
 
+  it('selects the first and the last enabled segment with Home and End', async () => {
+    radios[0].focus();
+    expect(press(radios[0], 'End').defaultPrevented).toBe(true);
+    await settle(fixture);
+    expect(host.value()).toBe('calendar');
+    expect(document.activeElement).toBe(radios[3]);
+    press(radios[3], 'Home');
+    await settle(fixture);
+    expect(host.value()).toBe('list');
+    expect(document.activeElement).toBe(radios[0]);
+  });
+
   it('ignores other keys and modified arrows', () => {
-    expect(press(radios[0], 'Home').defaultPrevented).toBe(false);
+    expect(press(radios[0], 'PageDown').defaultPrevented).toBe(false);
     const event = new KeyboardEvent('keydown', {
       key: 'ArrowRight',
       altKey: true,
@@ -194,6 +208,15 @@ describe('UiSegmented', () => {
     host.fullWidth.set(true);
     await settle(fixture);
     expect(group.classList).toContain('ui-segmented--full-width');
+  });
+
+  it('reports its orientation and stacks the segments when vertical', async () => {
+    expect(group.getAttribute('aria-orientation')).toBe('horizontal');
+    expect(group.classList).not.toContain('ui-segmented--vertical');
+    host.orientation.set('vertical');
+    await settle(fixture);
+    expect(group.getAttribute('aria-orientation')).toBe('vertical');
+    expect(group.classList).toContain('ui-segmented--vertical');
   });
 
   it('focus() and a click on the field label focus the selected segment', async () => {

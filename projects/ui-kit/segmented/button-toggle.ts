@@ -19,6 +19,7 @@ import {
   UiSize,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCheck } from '@vplans/ui-kit/icon';
+import { UiSegmentedOrientation } from './segmented';
 
 /** What a toggle may do with its group, kept out of the public `UiButtonToggleGroup` API. Internal. */
 @Injectable()
@@ -100,6 +101,7 @@ export class UiButtonToggle<T = unknown> {
     class: 'ui-button-toggle-group',
     role: 'group',
     '[class]': '"ui-button-toggle-group--" + size()',
+    '[class.ui-button-toggle-group--vertical]': 'orientation() === "vertical"',
     '[class.ui-button-toggle-group--full-width]': 'fullWidth()',
     '[class.ui-button-toggle-group--disabled]': 'isDisabled()',
     '[class.ui-button-toggle-group--invalid]': 'showError()',
@@ -125,6 +127,8 @@ export class UiButtonToggleGroup<T = unknown>
   readonly value = model<readonly T[]>([]);
   readonly id = input(inject(_IdGenerator).getId('ui-button-toggle-group-'));
   readonly size = input<UiSize>('md');
+  /** `vertical` stacks the buttons; they then share the width of the widest one. */
+  readonly orientation = input<UiSegmentedOrientation>('horizontal');
   /** Stretches the group to its container; the buttons share the width equally. */
   readonly fullWidth = input(false, { transform: booleanAttribute });
   readonly ariaLabel = input('', { alias: 'aria-label' });

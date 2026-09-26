@@ -34,7 +34,7 @@ import { UiButtonToggleGroupHarness, UiSegmentedHarness } from './segmented-harn
         </ui-segmented>
       </ui-form-field>
     </div>
-    <ui-segmented aria-label="Locked" disabled readonly value="a">
+    <ui-segmented aria-label="Locked" disabled readonly value="a" orientation="vertical">
       <ui-segment value="a">A</ui-segment>
     </ui-segmented>
 
@@ -45,7 +45,7 @@ import { UiButtonToggleGroupHarness, UiSegmentedHarness } from './segmented-harn
         <button ui-button-toggle value="tue" aria-label="Tuesday"></button>
       </ui-button-toggle-group>
     </ui-form-field>
-    <ui-button-toggle-group aria-label="Off" disabled>
+    <ui-button-toggle-group aria-label="Off" disabled orientation="vertical">
       <button ui-button-toggle value="x">X</button>
     </ui-button-toggle-group>
   `,
@@ -71,6 +71,10 @@ describe('UiSegmentedHarness', () => {
     const locked = await loader.getHarness(UiSegmentedHarness.with({ disabled: true }));
     expect(await locked.getLabel()).toBe('Locked');
     expect(await locked.isReadonly()).toBe(true);
+    expect(await locked.getOrientation()).toBe('vertical');
+    expect(
+      await loader.getAllHarnesses(UiSegmentedHarness.with({ orientation: 'horizontal' })),
+    ).toHaveLength(1);
     const view = await loader.getHarness(UiSegmentedHarness.with({ label: 'View' }));
     expect(await view.isDisabled()).toBe(false);
     expect(await view.getSelectedText()).toBeNull();
@@ -126,6 +130,10 @@ describe('UiButtonToggleGroupHarness', () => {
     expect(await loader.getAllHarnesses(UiButtonToggleGroupHarness)).toHaveLength(2);
     const off = await loader.getHarness(UiButtonToggleGroupHarness.with({ disabled: true }));
     expect(await off.getLabel()).toBe('Off');
+    expect(await off.getOrientation()).toBe('vertical');
+    expect(
+      await loader.getAllHarnesses(UiButtonToggleGroupHarness.with({ orientation: 'horizontal' })),
+    ).toHaveLength(1);
     const days = await loader.getHarness(UiButtonToggleGroupHarness.with({ label: 'Days' }));
     expect(await days.isDisabled()).toBe(false);
     expect(await days.isInvalid()).toBe(false);

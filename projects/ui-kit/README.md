@@ -272,7 +272,8 @@ rules do not apply to a tuple. The thumbs of a range are named by the field labe
 `ui-segmented` switches between a few options shown side by side, e.g. the view of a list. The
 value is the value of one `ui-segment`, or `null`. It is a `radiogroup` of native radios: one
 tab stop, and the arrow keys move and select (ArrowLeft/ArrowRight follow the visual direction, so
-in RTL ArrowLeft goes to the next segment); a readonly control only moves focus. Mark an icon with
+in RTL ArrowLeft goes to the next segment), Home and End go to the first and the last segment; a
+readonly control only moves focus. Mark an icon with
 `uiSegmentIcon`, and give an icon-only segment an `aria-label`. `fullWidth` stretches the
 control and shares the width equally.
 
@@ -280,7 +281,8 @@ control and shares the width equally.
 stop with `aria-pressed`, and a pressed button also shows a check mark. The value is the list of
 pressed values in the order they were pressed. A readonly group keeps its buttons focusable with
 `aria-disabled`. With Signal Forms use `minLength(path, 1)` for a required choice, as with
-`ui-multi-select`. Both controls take `size`, `fullWidth` and `compareWith`.
+`ui-multi-select`. Both controls take `size`, `fullWidth`, `compareWith` and `orientation`:
+`vertical` stacks the items, as wide as the widest one, with the text at the start edge.
 
 ```html
 <ui-segmented [(value)]="view" aria-label="View">
@@ -902,9 +904,9 @@ so they keep working when that DOM changes.
 | `UiStepperHarness`           | `ui-stepper` (steps: `UiStepHarness`)                       | `orientation`                            |
 | `UiStepHarness`              | a step (from `UiStepperHarness.getSteps()`)                 | `label`, `selected`, `done`, `error`     |
 | `UiDateRangePickerHarness`   | `ui-date-range-picker` (fields, calendar, presets)          | `label`, `disabled`                      |
-| `UiSegmentedHarness`         | `ui-segmented` (segments: `UiSegmentHarness`)               | `label`, `disabled`                      |
+| `UiSegmentedHarness`         | `ui-segmented` (segments: `UiSegmentHarness`)               | `label`, `disabled`, `orientation`       |
 | `UiSegmentHarness`           | a segment (from `UiSegmentedHarness.getSegments()`)         | `text`, `selected`, `disabled`           |
-| `UiButtonToggleGroupHarness` | `ui-button-toggle-group` (buttons: `UiButtonToggleHarness`) | `label`, `disabled`                      |
+| `UiButtonToggleGroupHarness` | `ui-button-toggle-group` (buttons: `UiButtonToggleHarness`) | `label`, `disabled`, `orientation`       |
 | `UiButtonToggleHarness`      | a toggle (from `UiButtonToggleGroupHarness.getToggles()`)   | `text`, `pressed`, `disabled`            |
 
 `label` matches the `aria-label` or the text of the `label[for]`, so the label of `ui-form-field`
@@ -967,7 +969,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/chip`         | `UiChip`, `UiFilterChip`, `UiChipSet`, `UiChipInput`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `@vplans/ui-kit/number-input` | `UiNumberInput`, `UiNumberFormat`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `@vplans/ui-kit/slider`       | `UiSlider`, `UiRangeSlider`, `UiSliderMark`, `UiSliderRange`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `@vplans/ui-kit/segmented`    | `UiSegmented`, `UiSegment`, `UiButtonToggleGroup`, `UiButtonToggle`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `@vplans/ui-kit/segmented`    | `UiSegmented`, `UiSegment`, `UiButtonToggleGroup`, `UiButtonToggle`, `UiSegmentedOrientation`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `@vplans/ui-kit/time`         | `UiTimeInput`, `uiDateWithTime`, `uiTimeOf`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `@vplans/ui-kit/datepicker`   | `UiDatepicker`, `UiDateRangePicker`, `UiDateRangePreset`, `UiCalendar`, `UiCalendarView`, `UiDateFilter`, `UiDateRange`                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `@vplans/ui-kit/icon`         | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                                                                                                                                                                                                                                                                             |

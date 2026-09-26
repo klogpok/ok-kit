@@ -26,6 +26,7 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
         [disabled]="disabled()"
         [readonly]="readonly()"
         [fullWidth]="fullWidth()"
+        [orientation]="orientation()"
         size="lg"
       >
         <button ui-button-toggle value="sun">Sun</button>
@@ -40,6 +41,7 @@ class StandaloneHost {
   readonly disabled = signal(false);
   readonly readonly = signal(false);
   readonly fullWidth = signal(false);
+  readonly orientation = signal<'horizontal' | 'vertical'>('horizontal');
   readonly group = viewChild.required(UiButtonToggleGroup);
 }
 
@@ -121,6 +123,13 @@ describe('UiButtonToggleGroup', () => {
     host.fullWidth.set(true);
     await settle(fixture);
     expect(group.classList).toContain('ui-button-toggle-group--full-width');
+  });
+
+  it('stacks the buttons when vertical, without aria-orientation (not allowed on a group)', async () => {
+    host.orientation.set('vertical');
+    await settle(fixture);
+    expect(group.classList).toContain('ui-button-toggle-group--vertical');
+    expect(group.hasAttribute('aria-orientation')).toBe(false);
   });
 
   it('focus() and a click on the field label focus the first pressed button', async () => {

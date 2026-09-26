@@ -35,11 +35,22 @@
   --_gap: var(--ui-control-gap-lg);
 }
 
-// The buttons share the width equally.
 :host(.ui-button-toggle-group--full-width) {
-  --_toggle-flex: 1 1 0;
   display: flex;
   inline-size: 100%;
+}
+
+// In a row the buttons share the width equally.
+:host(.ui-button-toggle-group--full-width:not(.ui-button-toggle-group--vertical)) {
+  --_toggle-flex: 1 1 0;
+}
+
+// Stacked: every item is as wide as the widest one.
+:host(.ui-button-toggle-group--vertical) {
+  --_item-justify: flex-start;
+  // Unpressed buttons keep the place of the check mark, so the labels line up.
+  --_unpressed-padding-start: calc(var(--_padding) + var(--ui-icon-size-sm) + var(--_gap));
+  flex-direction: column;
 }
 
 :host(.ui-button-toggle-group--invalid) {

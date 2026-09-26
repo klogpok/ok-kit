@@ -6,7 +6,8 @@
   display: inline-flex;
   flex: var(--_toggle-flex, 0 1 auto);
   align-items: center;
-  justify-content: center;
+  // ui-button-toggle-group--vertical puts the text at the start edge, like a list.
+  justify-content: var(--_item-justify, center);
   gap: var(--_gap);
   box-sizing: border-box;
   min-inline-size: 0;
@@ -48,6 +49,10 @@
 
 :host(:hover:not(:disabled, .ui-button-toggle--pressed, .ui-button-toggle--readonly)) {
   background-color: var(--ui-segmented-hover-bg);
+}
+
+:host(:not(.ui-button-toggle--pressed)) {
+  padding-inline-start: var(--_unpressed-padding-start, var(--_padding));
 }
 
 :host(.ui-button-toggle--pressed) {

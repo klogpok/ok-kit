@@ -39,7 +39,8 @@ so versions mark review points rather than releases.
   `radiogroup` of native radios, arrow keys that move and select and follow the visual direction
   in RTL, `uiSegmentIcon`, icon-only segments) and `ui-button-toggle-group` +
   `button[ui-button-toggle]` (several choices: `aria-pressed` buttons with a check mark, a
-  `readonly T[]` value); both with `size`, `fullWidth`, `compareWith`, `readonly`;
+  `readonly T[]` value); both with `size`, `fullWidth`, `compareWith`, `readonly` and a
+  vertical `orientation`; Home/End in `ui-segmented`;
   `UiSegmentedHarness` and `UiButtonToggleGroupHarness` in testing.
 - **tokens:** `--ui-segmented-*`.
 

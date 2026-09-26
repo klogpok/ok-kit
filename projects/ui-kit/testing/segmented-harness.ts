@@ -67,6 +67,7 @@ export interface UiSegmentedHarnessFilters extends BaseHarnessFilters {
   /** The group label: the `aria-label`, or the label of `ui-form-field`. */
   label?: string | RegExp;
   disabled?: boolean;
+  orientation?: 'horizontal' | 'vertical';
 }
 
 /** Harness for `ui-segmented`. */
@@ -85,7 +86,18 @@ export class UiSegmentedHarness extends UiHarness {
         'disabled',
         options.disabled,
         async (harness, disabled) => (await harness.isDisabled()) === disabled,
+      )
+      .addOption(
+        'orientation',
+        options.orientation,
+        async (harness, orientation) => (await harness.getOrientation()) === orientation,
       );
+  }
+
+  async getOrientation(): Promise<'horizontal' | 'vertical'> {
+    return (await (await this.host()).hasClass('ui-segmented--vertical'))
+      ? 'vertical'
+      : 'horizontal';
   }
 
   /** The selected segment, or the first enabled one: where Tab lands. */
@@ -199,6 +211,7 @@ export interface UiButtonToggleGroupHarnessFilters extends BaseHarnessFilters {
   /** The group label: the `aria-label`, or the label of `ui-form-field`. */
   label?: string | RegExp;
   disabled?: boolean;
+  orientation?: 'horizontal' | 'vertical';
 }
 
 /** Harness for `ui-button-toggle-group`. */
@@ -217,7 +230,18 @@ export class UiButtonToggleGroupHarness extends UiHarness {
         'disabled',
         options.disabled,
         async (harness, disabled) => (await harness.isDisabled()) === disabled,
+      )
+      .addOption(
+        'orientation',
+        options.orientation,
+        async (harness, orientation) => (await harness.getOrientation()) === orientation,
       );
+  }
+
+  async getOrientation(): Promise<'horizontal' | 'vertical'> {
+    return (await (await this.host()).hasClass('ui-button-toggle-group--vertical'))
+      ? 'vertical'
+      : 'horizontal';
   }
 
   /** The first pressed button, or the first enabled one: where the field label sends focus. */
