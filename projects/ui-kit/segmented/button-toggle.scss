@@ -1,0 +1,81 @@
+@use '../styles/mixins';
+
+// Sizes (--_height, --_padding, --_font-size, --_gap) come from ui-button-toggle-group.
+
+:host {
+  display: inline-flex;
+  flex: var(--_toggle-flex, 0 1 auto);
+  align-items: center;
+  justify-content: center;
+  gap: var(--_gap);
+  box-sizing: border-box;
+  min-inline-size: 0;
+  block-size: calc(
+    var(--_height) - 2 * (var(--ui-segmented-padding) + var(--ui-border-width-default))
+  );
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--_padding);
+  border: 0;
+  border-radius: var(--ui-segmented-segment-radius);
+  background-color: transparent;
+  color: var(--ui-segmented-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--_font-size);
+  font-weight: var(--ui-segmented-font-weight);
+  line-height: var(--ui-line-height-tight);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  @include mixins.transition(background-color, color);
+  @include mixins.focus-visible;
+}
+
+.ui-button-toggle__content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_gap);
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-button-toggle__check {
+  flex-shrink: 0;
+  font-size: var(--ui-icon-size-sm);
+}
+
+:host(:hover:not(:disabled, .ui-button-toggle--pressed, .ui-button-toggle--readonly)) {
+  background-color: var(--ui-segmented-hover-bg);
+}
+
+:host(.ui-button-toggle--pressed) {
+  background-color: var(--ui-segmented-pressed-bg);
+  color: var(--ui-segmented-pressed-text);
+}
+
+:host(.ui-button-toggle--readonly) {
+  cursor: default;
+}
+
+:host(:disabled) {
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+:host(.ui-button-toggle--pressed:disabled) {
+  background-color: var(--ui-segmented-disabled-selected-bg);
+}
+
+@media (forced-colors: active) {
+  :host(.ui-button-toggle--pressed) {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :host(.ui-button-toggle--pressed:disabled) {
+    background-color: GrayText;
+  }
+}

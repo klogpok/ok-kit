@@ -1,0 +1,109 @@
+@use '../styles/mixins';
+
+// Sizes (--_height, --_padding, --_font-size, --_gap) come from ui-segmented.
+
+:host {
+  display: flex;
+  flex: var(--_segment-flex, 0 1 auto);
+  min-inline-size: 0;
+  font-family: var(--ui-font-family-sans);
+}
+
+.ui-segment__label {
+  position: relative;
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_gap);
+  box-sizing: border-box;
+  min-inline-size: 0;
+  // The frame has the control height; the segment fills what its padding and border leave.
+  block-size: calc(
+    var(--_height) - 2 * (var(--ui-segmented-padding) + var(--ui-border-width-default))
+  );
+  padding-inline: var(--_padding);
+  border-radius: var(--ui-segmented-segment-radius);
+  color: var(--ui-segmented-text);
+  font-size: var(--_font-size);
+  font-weight: var(--ui-segmented-font-weight);
+  line-height: var(--ui-line-height-tight);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  @include mixins.transition(background-color, color);
+
+  // The native radio lies over the segment, so touch screen readers find it where it is drawn.
+  &:has(.ui-segment__input:focus-visible) {
+    @include mixins.focus-ring;
+  }
+}
+
+.ui-segment__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.ui-segment__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  // An icon-only segment keeps its icon centered.
+  &:empty {
+    display: none;
+  }
+}
+
+.ui-segment__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--ui-icon-size-sm);
+
+  &:empty {
+    display: none;
+  }
+}
+
+:host(:not(.ui-segment--checked, .ui-segment--disabled, .ui-segment--readonly))
+  .ui-segment__label:hover {
+  background-color: var(--ui-segmented-hover-bg);
+}
+
+:host(.ui-segment--checked) .ui-segment__label {
+  background-color: var(--ui-segmented-selected-bg);
+  color: var(--ui-segmented-selected-text);
+}
+
+:host(.ui-segment--checked:not(.ui-segment--disabled, .ui-segment--readonly))
+  .ui-segment__label:hover {
+  background-color: var(--ui-segmented-selected-hover-bg);
+}
+
+:host(.ui-segment--readonly) .ui-segment__label {
+  cursor: default;
+}
+
+:host(.ui-segment--disabled) .ui-segment__label {
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+:host(.ui-segment--disabled.ui-segment--checked) .ui-segment__label {
+  background-color: var(--ui-segmented-disabled-selected-bg);
+}
+
+@media (forced-colors: active) {
+  :host(.ui-segment--checked) .ui-segment__label {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :host(.ui-segment--disabled.ui-segment--checked) .ui-segment__label {
+    background-color: GrayText;
+  }
+}

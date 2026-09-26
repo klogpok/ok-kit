@@ -2228,6 +2228,102 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-control-bg-disabled)"
   },
   {
+    "name": "--ui-segmented-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-segmented-border",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-segmented-invalid-border",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
+  },
+  {
+    "name": "--ui-segmented-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-segmented-padding",
+    "layer": "component",
+    "light": "var(--ui-space-3xs)",
+    "dark": "var(--ui-space-3xs)"
+  },
+  {
+    "name": "--ui-segmented-gap",
+    "layer": "component",
+    "light": "var(--ui-space-3xs)",
+    "dark": "var(--ui-space-3xs)"
+  },
+  {
+    "name": "--ui-segmented-segment-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-sm)",
+    "dark": "var(--ui-radius-sm)"
+  },
+  {
+    "name": "--ui-segmented-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-segmented-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-medium)",
+    "dark": "var(--ui-font-weight-medium)"
+  },
+  {
+    "name": "--ui-segmented-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-hover)",
+    "dark": "var(--ui-color-surface-hover)"
+  },
+  {
+    "name": "--ui-segmented-selected-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-segmented-selected-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-contrast)",
+    "dark": "var(--ui-color-primary-contrast)"
+  },
+  {
+    "name": "--ui-segmented-selected-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-hover)",
+    "dark": "var(--ui-color-primary-hover)"
+  },
+  {
+    "name": "--ui-segmented-pressed-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
+    "name": "--ui-segmented-pressed-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-text)",
+    "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-segmented-disabled-selected-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-active)",
+    "dark": "var(--ui-color-surface-active)"
+  },
+  {
     "name": "--ui-spinner-track-color",
     "layer": "component",
     "light": "var(--ui-color-border)",

@@ -35,6 +35,13 @@ so versions mark review points rather than releases.
   `reset()`; `UiStepperHarness` and `UiStepHarness` in testing.
 - **tokens:** `--ui-stepper-*`.
 - **labels:** `steps`, `optional`, `stepCompleted`, `stepError`.
+- **segmented:** new entry point with `ui-segmented` + `ui-segment` (one choice: a
+  `radiogroup` of native radios, arrow keys that move and select and follow the visual direction
+  in RTL, `uiSegmentIcon`, icon-only segments) and `ui-button-toggle-group` +
+  `button[ui-button-toggle]` (several choices: `aria-pressed` buttons with a check mark, a
+  `readonly T[]` value); both with `size`, `fullWidth`, `compareWith`, `readonly`;
+  `UiSegmentedHarness` and `UiButtonToggleGroupHarness` in testing.
+- **tokens:** `--ui-segmented-*`.
 
 ## Unreleased (phase 7: data)
 
