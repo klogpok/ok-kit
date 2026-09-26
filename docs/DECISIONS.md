@@ -184,3 +184,26 @@ Review answers: all deviations in the roadmap are accepted:
 
 The playground bundle went over 900 kB. Instead of raising the budget, the phase sections are
 loaded lazily with `@defer (on viewport)`.
+
+## Phase 8.5: segmented control and button toggles (approved 2026-09-26)
+
+Delivered: `ui-segmented` + `ui-segment` and `ui-button-toggle-group` +
+`button[ui-button-toggle]` (`segmented`), `--ui-segmented-*` tokens, `UiSegmentedHarness` /
+`UiSegmentHarness` and `UiButtonToggleGroupHarness` / `UiButtonToggleHarness`, deal and feature
+filters in the "Phase 8" playground section; 789 baselines.
+
+Review answers: all deviations in the roadmap are accepted:
+
+- two components in one entry point: `ui-segmented` picks one value (`T | null`),
+  `ui-button-toggle-group` picks several (`readonly T[]`); no single mode for the toggle group
+  and no standalone toggle button;
+- `ui-segmented` uses native radios, but the component handles the arrow keys, so ←/→ follow the
+  visual direction in RTL in every browser; an arrow selects at once;
+- the selected segment is solid primary; a pressed toggle is `primary-subtle` with a check mark
+  (the button grows by the mark);
+- the toggle value keeps the press order, like `ui-multi-select`;
+- a readonly toggle group sets `aria-disabled` on its focusable buttons, and a required one is a
+  validator only (`aria-readonly` and `aria-required` are not allowed on `group`).
+
+Added after the review: `orientation="vertical"` for both controls and Home/End in
+`ui-segmented`.
