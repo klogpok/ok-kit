@@ -15,6 +15,68 @@ import {
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UI_LABELS } from '@vplans/ui-kit/core';
 
+// The row cell comes first: Storybook compiles in JIT mode, where the `contentChildren` query
+// of `UiTableSelection` reads the class when it is declared.
+/**
+ * Cell with the checkbox of one row. Marks its row (`tr`) with `aria-selected` and the
+ * `ui-table-row--selected` class. Requires `[uiTableSelection]` on the table.
+ *
+ * @example <td [ui-table-select-row]="plan" [label]="'Select ' + plan.name"></td>
+ */
+@Component({
+  selector: 'td[ui-table-select-row]',
+  imports: [UiCheckbox],
+  template: `
+    <ui-checkbox
+      class="ui-table-select__checkbox"
+      [checked]="selected()"
+      [disabled]="isDisabled()"
+      [aria-label]="label() || labels().selectRow"
+      (checkedChange)="onToggle()"
+    />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'ui-table-select ui-table-select-row',
+    // Shift is read before the checkbox changes, from the pointer or the Space key.
+    '(pointerdown)': 'range = $event.shiftKey',
+    '(keydown)': 'range = $event.shiftKey',
+  },
+})
+export class UiTableSelectRow<T = unknown> {
+  private readonly selection = inject<UiTableSelection<T>>(UiTableSelection);
+  protected readonly labels = inject(UI_LABELS);
+
+  /** The row value stored in the selection. */
+  readonly row = input.required<T>({ alias: 'ui-table-select-row' });
+  readonly disabled = input(false, { transform: booleanAttribute });
+  /** Accessible name of the checkbox; defaults to the `selectRow` label. */
+  readonly label = input('');
+
+  readonly isDisabled = computed(() => this.disabled() || this.selection.disabled());
+  protected readonly selected = computed(() => this.selection.isSelected(this.row()));
+  protected range = false;
+
+  constructor() {
+    const cell = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    const renderer = inject(Renderer2);
+    // The state belongs to the row, which is the app's element.
+    effect(() => {
+      const row = cell.parentElement;
+      if (!row) return;
+      const selected = this.selected();
+      renderer.setAttribute(row, 'aria-selected', String(selected));
+      if (selected) renderer.addClass(row, 'ui-table-row--selected');
+      else renderer.removeClass(row, 'ui-table-row--selected');
+    });
+  }
+
+  protected onToggle(): void {
+    this.selection.toggle(this.row(), this.range);
+    this.range = false;
+  }
+}
+
 /**
  * Row selection of a table. Put it on the `<table>` with the selected rows, add
  * `th[ui-table-select-all]` to the header and `td[ui-table-select-row]` to every row.
@@ -151,64 +213,4 @@ export class UiTableSelectAll {
   protected readonly labels = inject(UI_LABELS);
   /** Accessible name of the checkbox; defaults to the `selectAll` label. */
   readonly label = input('');
-}
-
-/**
- * Cell with the checkbox of one row. Marks its row (`tr`) with `aria-selected` and the
- * `ui-table-row--selected` class. Requires `[uiTableSelection]` on the table.
- *
- * @example <td [ui-table-select-row]="plan" [label]="'Select ' + plan.name"></td>
- */
-@Component({
-  selector: 'td[ui-table-select-row]',
-  imports: [UiCheckbox],
-  template: `
-    <ui-checkbox
-      class="ui-table-select__checkbox"
-      [checked]="selected()"
-      [disabled]="isDisabled()"
-      [aria-label]="label() || labels().selectRow"
-      (checkedChange)="onToggle()"
-    />
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    class: 'ui-table-select ui-table-select-row',
-    // Shift is read before the checkbox changes, from the pointer or the Space key.
-    '(pointerdown)': 'range = $event.shiftKey',
-    '(keydown)': 'range = $event.shiftKey',
-  },
-})
-export class UiTableSelectRow<T = unknown> {
-  private readonly selection = inject<UiTableSelection<T>>(UiTableSelection);
-  protected readonly labels = inject(UI_LABELS);
-
-  /** The row value stored in the selection. */
-  readonly row = input.required<T>({ alias: 'ui-table-select-row' });
-  readonly disabled = input(false, { transform: booleanAttribute });
-  /** Accessible name of the checkbox; defaults to the `selectRow` label. */
-  readonly label = input('');
-
-  readonly isDisabled = computed(() => this.disabled() || this.selection.disabled());
-  protected readonly selected = computed(() => this.selection.isSelected(this.row()));
-  protected range = false;
-
-  constructor() {
-    const cell = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-    const renderer = inject(Renderer2);
-    // The state belongs to the row, which is the app's element.
-    effect(() => {
-      const row = cell.parentElement;
-      if (!row) return;
-      const selected = this.selected();
-      renderer.setAttribute(row, 'aria-selected', String(selected));
-      if (selected) renderer.addClass(row, 'ui-table-row--selected');
-      else renderer.removeClass(row, 'ui-table-row--selected');
-    });
-  }
-
-  protected onToggle(): void {
-    this.selection.toggle(this.row(), this.range);
-    this.range = false;
-  }
 }
