@@ -147,7 +147,24 @@
   </section>
 </div>
 
-<app-phase-three />
-<app-phase-six />
-<app-phase-seven />
-<app-phase-eight />
+<!-- The phase sections load when they scroll into view, so the first bundle stays small. -->
+@defer (on viewport; prefetch on idle) {
+  <app-phase-three />
+} @placeholder {
+  <div class="phase-placeholder"></div>
+}
+@defer (on viewport; prefetch on idle) {
+  <app-phase-six />
+} @placeholder {
+  <div class="phase-placeholder"></div>
+}
+@defer (on viewport; prefetch on idle) {
+  <app-phase-seven />
+} @placeholder {
+  <div class="phase-placeholder"></div>
+}
+@defer (on viewport; prefetch on idle) {
+  <app-phase-eight />
+} @placeholder {
+  <div class="phase-placeholder"></div>
+}

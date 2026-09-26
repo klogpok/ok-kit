@@ -1,11 +1,16 @@
 import { DOCUMENT } from '@angular/common';
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { App } from './app';
 
 describe('App', () => {
   it('renders every playground section', async () => {
+    // The phase sections are deferred until they scroll into view; render them all.
+    TestBed.configureTestingModule({ deferBlockBehavior: DeferBlockBehavior.Manual });
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
+    for (const block of await fixture.getDeferBlocks()) {
+      await block.render(DeferBlockState.Complete);
+    }
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('h1')?.textContent).toContain('ui-kit playground');
     const sections = [...el.querySelectorAll('section h2')].map((h) => h.textContent.trim());
