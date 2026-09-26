@@ -1,0 +1,198 @@
+@use '../styles/mixins';
+
+:host {
+  --_fill: var(--ui-slider-fill-bg);
+  --_thumb-border: var(--ui-slider-thumb-border);
+  display: block;
+  // Thumbs at the ends stay inside the host box.
+  padding-inline: calc(var(--_thumb) / 2);
+  font-family: var(--ui-font-family-sans);
+  color: var(--ui-color-text);
+}
+
+:host(.ui-slider--sm) {
+  --_track: var(--ui-slider-track-height-sm);
+  --_thumb: var(--ui-slider-thumb-size-sm);
+}
+
+:host(.ui-slider--md) {
+  --_track: var(--ui-slider-track-height-md);
+  --_thumb: var(--ui-slider-thumb-size-md);
+}
+
+:host(.ui-slider--lg) {
+  --_track: var(--ui-slider-track-height-lg);
+  --_thumb: var(--ui-slider-thumb-size-lg);
+}
+
+.ui-slider__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  block-size: var(--ui-slider-control-height);
+  cursor: pointer;
+  // Horizontal drags move the thumb; vertical ones still scroll the page on touch screens.
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.ui-slider__track {
+  position: relative;
+  flex: 1;
+  block-size: var(--_track);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-slider-track-bg);
+}
+
+.ui-slider__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--_start);
+  inline-size: var(--_size);
+  border-radius: inherit;
+  background-color: var(--_fill);
+}
+
+.ui-slider__tick {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--_pos);
+  inline-size: var(--_track);
+  block-size: var(--_track);
+  margin-inline-start: calc(var(--_track) / -2);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-slider-tick);
+}
+
+.ui-slider__tick--active {
+  background-color: var(--ui-slider-tick-active);
+}
+
+.ui-slider__thumb {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--_pos);
+  box-sizing: border-box;
+  inline-size: var(--_thumb);
+  block-size: var(--_thumb);
+  margin-block-start: calc(var(--_thumb) / -2);
+  margin-inline-start: calc(var(--_thumb) / -2);
+  border: var(--ui-slider-thumb-border-width) solid var(--_thumb-border);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-slider-thumb-bg);
+  box-shadow: var(--ui-shadow-sm);
+  @include mixins.transition(border-color);
+
+  &:has(.ui-slider__input:focus-visible) {
+    @include mixins.focus-ring;
+  }
+}
+
+// Keys, focus and screen readers; the pointer is handled by the control.
+.ui-slider__input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  appearance: none;
+  pointer-events: none;
+}
+
+.ui-slider__marks {
+  position: relative;
+  block-size: calc(var(--ui-slider-mark-font-size) * var(--ui-line-height-snug));
+  margin-block-start: var(--ui-slider-mark-gap);
+  font-size: var(--ui-slider-mark-font-size);
+  line-height: var(--ui-line-height-snug);
+  color: var(--ui-slider-mark-color);
+}
+
+.ui-slider__mark {
+  // Centered under its tick; the labels at the ends line up with the edges instead.
+  --_shift: -50%;
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--_pos);
+  white-space: nowrap;
+  translate: var(--_shift) 0;
+
+  &:dir(rtl) {
+    translate: calc(var(--_shift) * -1) 0;
+  }
+}
+
+.ui-slider__mark--start {
+  --_shift: 0%;
+  margin-inline-start: calc(var(--_thumb) / -2);
+}
+
+.ui-slider__mark--end {
+  --_shift: -100%;
+  margin-inline-start: calc(var(--_thumb) / 2);
+}
+
+.ui-slider__mark--active {
+  color: var(--ui-slider-mark-active-color);
+}
+
+:host(:not(.ui-slider--disabled, .ui-slider--readonly)) .ui-slider__control:hover {
+  --_thumb-border: var(--ui-slider-thumb-border-hover);
+}
+
+:host(.ui-slider--invalid) {
+  --_fill: var(--ui-slider-invalid);
+  --_thumb-border: var(--ui-slider-invalid);
+}
+
+:host(.ui-slider--readonly) .ui-slider__control {
+  cursor: default;
+}
+
+:host(.ui-slider--disabled) {
+  --_fill: var(--ui-slider-disabled);
+  --_thumb-border: var(--ui-slider-disabled);
+  color: var(--ui-color-text-disabled);
+
+  .ui-slider__control {
+    cursor: not-allowed;
+  }
+
+  .ui-slider__thumb {
+    background-color: var(--ui-slider-disabled-thumb-bg);
+    box-shadow: none;
+  }
+
+  .ui-slider__marks,
+  .ui-slider__mark--active {
+    color: var(--ui-color-text-disabled);
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-slider__track {
+    outline: var(--ui-border-width-default) solid CanvasText;
+  }
+
+  .ui-slider__fill {
+    background-color: Highlight;
+  }
+
+  .ui-slider__thumb {
+    border-color: CanvasText;
+    background-color: Canvas;
+  }
+
+  .ui-slider__tick {
+    background-color: CanvasText;
+  }
+
+  .ui-slider__tick--active {
+    background-color: HighlightText;
+  }
+
+  :host(.ui-slider--disabled) .ui-slider__fill {
+    background-color: GrayText;
+  }
+}

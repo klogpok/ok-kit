@@ -8,6 +8,7 @@ import { UiFileUpload } from '@vplans/ui-kit/file-upload';
 import { UiNumberInput } from '@vplans/ui-kit/number-input';
 import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
 import { UiMultiSelect, UiOption, UiSelect } from '@vplans/ui-kit/select';
+import { UiRangeSlider, UiSlider, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiSwitch } from '@vplans/ui-kit/switch';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -28,6 +29,8 @@ const CONTROLS = [
   UiNumberInput,
   UiChipInput,
   UiFileUpload,
+  UiSlider,
+  UiRangeSlider,
 ];
 
 @Component({
@@ -52,6 +55,8 @@ const CONTROLS = [
       <ui-number-input formControlName="units" aria-label="Units" />
       <ui-chip-input formControlName="labels" aria-label="Labels" />
       <ui-file-upload formControlName="plans" aria-label="Plans" multiple />
+      <ui-slider formControlName="floor" aria-label="Floor" max="20" />
+      <ui-range-slider formControlName="area" aria-label="Area" max="500" step="50" />
     </form>
   `,
 })
@@ -66,6 +71,8 @@ class NamedHost {
     units: new FormControl<number | null>(1200),
     labels: new FormControl<readonly string[]>(['north']),
     plans: new FormControl<readonly File[]>([new File(['x'], 'a.pdf')]),
+    floor: new FormControl<number | null>(4),
+    area: new FormControl<UiSliderRange | null>([100, 300]),
   });
 }
 
@@ -127,6 +134,10 @@ describe('Custom form controls with formControlName', () => {
     expect(units.value).toBe('1,200');
     expect(root.querySelector('ui-chip')!.textContent).toContain('north');
     expect(root.querySelector('.ui-file-upload__name')!.textContent).toBe('a.pdf');
+    const [floor, areaStart, areaEnd] = [
+      ...root.querySelectorAll<HTMLInputElement>('.ui-slider__input'),
+    ];
+    expect([floor.value, areaStart.value, areaEnd.value]).toEqual(['4', '100', '300']);
 
     alerts.click();
     inputs[2].click();
@@ -144,6 +155,11 @@ describe('Custom form controls with formControlName', () => {
     root.querySelector<HTMLButtonElement>('.ui-file-upload__remove')!.click();
     await settle(fixture);
     expect(form.value.plans).toEqual([]);
+    floor.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', cancelable: true }));
+    areaEnd.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', cancelable: true }));
+    await settle(fixture);
+    expect(form.value.floor).toBe(5);
+    expect(form.value.area).toEqual([100, 500]);
 
     form.disable();
     await settle(fixture);

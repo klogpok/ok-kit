@@ -93,6 +93,10 @@ export interface UiLabels {
   invalidNumber: string;
   /** Error of `ui-datepicker` for text that is not an allowed date. */
   invalidDate: string;
+  /** Start thumb of `ui-range-slider`, read after the field label. */
+  rangeStart: string;
+  /** End thumb of `ui-range-slider`, read after the field label. */
+  rangeEnd: string;
   previousMonth: string;
   nextMonth: string;
   previousYear: string;
@@ -148,6 +152,8 @@ export const UI_LABELS_HE: UiLabels = {
   decrement: 'הקטנה',
   invalidNumber: 'מספר לא תקין',
   invalidDate: 'תאריך לא תקין',
+  rangeStart: 'מינימום',
+  rangeEnd: 'מקסימום',
   previousMonth: 'חודש קודם',
   nextMonth: 'חודש הבא',
   previousYear: 'שנה קודמת',
@@ -200,6 +206,8 @@ export const UI_LABELS_EN: UiLabels = {
   decrement: 'Decrease',
   invalidNumber: 'Enter a valid number',
   invalidDate: 'Enter a valid date',
+  rangeStart: 'Minimum',
+  rangeEnd: 'Maximum',
   previousMonth: 'Previous month',
   nextMonth: 'Next month',
   previousYear: 'Previous year',

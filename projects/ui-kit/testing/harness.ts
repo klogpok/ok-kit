@@ -45,4 +45,20 @@ export abstract class UiHarness<
     )();
     return label ? label.text({ exclude: REQUIRED_MARKERS }) : null;
   }
+
+  /**
+   * Text of the elements that `aria-labelledby` of an element refers to, joined with spaces
+   * (without the required marker of `ui-form-field`).
+   */
+  protected async labelledByText(element: TestElement): Promise<string | null> {
+    const ids = (await element.getAttribute('aria-labelledby'))?.split(/\s+/).filter(Boolean) ?? [];
+    const root = this.documentRootLocatorFactory();
+    const texts = await Promise.all(
+      ids.map(async (id) => {
+        const label = await root.locatorForOptional(`[id="${id}"]`)();
+        return label ? (await label.text({ exclude: REQUIRED_MARKERS })).trim() : '';
+      }),
+    );
+    return texts.filter(Boolean).join(' ') || null;
+  }
 }

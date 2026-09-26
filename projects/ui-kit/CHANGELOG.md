@@ -3,6 +3,18 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (phase 8: complex widgets)
+
+### Added
+
+- **slider:** new entry point with `ui-slider` (a `number`) and `ui-range-slider` (a
+  `[start, end]` tuple, `limits` for Signal Forms): native range inputs for the role, labels and
+  screen reader adjusting; track clicks and drags, arrow keys that follow the visual direction in
+  RTL, PageUp/PageDown, Home/End; `step`, ticks and labelled `marks`, `valueText`, a
+  `valueCommit` output; `UiSliderHarness` in testing.
+- **tokens:** `--ui-slider-*`.
+- **labels:** `rangeStart`, `rangeEnd`.
+
 ## Unreleased (phase 7: data)
 
 ### Added

@@ -8,3 +8,4 @@ export * from './number-input-harness';
 export * from './chip-harness';
 export * from './autocomplete-harness';
 export * from './file-upload-harness';
+export * from './slider-harness';

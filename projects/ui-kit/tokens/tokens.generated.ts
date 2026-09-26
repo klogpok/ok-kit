@@ -2096,6 +2096,138 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-danger)"
   },
   {
+    "name": "--ui-slider-control-height",
+    "layer": "component",
+    "light": "var(--ui-control-height-sm)",
+    "dark": "var(--ui-control-height-sm)"
+  },
+  {
+    "name": "--ui-slider-track-height-sm",
+    "layer": "component",
+    "light": "var(--ui-space-2xs)",
+    "dark": "var(--ui-space-2xs)"
+  },
+  {
+    "name": "--ui-slider-track-height-md",
+    "layer": "component",
+    "light": "var(--ui-space-2xs)",
+    "dark": "var(--ui-space-2xs)"
+  },
+  {
+    "name": "--ui-slider-track-height-lg",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-slider-thumb-size-sm",
+    "layer": "component",
+    "light": "var(--ui-icon-size-sm)",
+    "dark": "var(--ui-icon-size-sm)"
+  },
+  {
+    "name": "--ui-slider-thumb-size-md",
+    "layer": "component",
+    "light": "var(--ui-icon-size-md)",
+    "dark": "var(--ui-icon-size-md)"
+  },
+  {
+    "name": "--ui-slider-thumb-size-lg",
+    "layer": "component",
+    "light": "var(--ui-icon-size-lg)",
+    "dark": "var(--ui-icon-size-lg)"
+  },
+  {
+    "name": "--ui-slider-track-bg",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-slider-fill-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-slider-thumb-bg",
+    "layer": "component",
+    "light": "var(--ui-color-control-bg)",
+    "dark": "var(--ui-color-control-bg)"
+  },
+  {
+    "name": "--ui-slider-thumb-border",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-slider-thumb-border-hover",
+    "layer": "component",
+    "light": "var(--ui-color-primary-hover)",
+    "dark": "var(--ui-color-primary-hover)"
+  },
+  {
+    "name": "--ui-slider-thumb-border-width",
+    "layer": "component",
+    "light": "var(--ui-border-width-strong)",
+    "dark": "var(--ui-border-width-strong)"
+  },
+  {
+    "name": "--ui-slider-tick",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-slider-tick-active",
+    "layer": "component",
+    "light": "var(--ui-color-primary-contrast)",
+    "dark": "var(--ui-color-primary-contrast)"
+  },
+  {
+    "name": "--ui-slider-mark-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-slider-mark-active-color",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-slider-mark-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
+    "name": "--ui-slider-mark-gap",
+    "layer": "component",
+    "light": "var(--ui-space-2xs)",
+    "dark": "var(--ui-space-2xs)"
+  },
+  {
+    "name": "--ui-slider-invalid",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
+  },
+  {
+    "name": "--ui-slider-disabled",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-slider-disabled-thumb-bg",
+    "layer": "component",
+    "light": "var(--ui-color-control-bg-disabled)",
+    "dark": "var(--ui-color-control-bg-disabled)"
+  },
+  {
     "name": "--ui-spinner-track-color",
     "layer": "component",
     "light": "var(--ui-color-border)",

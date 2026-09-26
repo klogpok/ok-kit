@@ -223,6 +223,9 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.focus-ring', 'color.primary-subtle', UI],
   ['color.primary', 'color.surface', UI],
   ['color.danger', 'color.surface', UI],
+  // Slider thumbs and fill on the page and on cards.
+  ['color.primary', 'color.bg', UI],
+  ['color.danger', 'color.bg', UI],
   ['color.text', 'color.surface-raised', TEXT],
   ['color.info', 'color.surface-raised', UI],
   ['color.success', 'color.surface-raised', UI],
