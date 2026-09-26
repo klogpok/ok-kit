@@ -148,6 +148,8 @@ describe('UiAvatarGroup', () => {
   it('shows the first max avatars and a +N counter', () => {
     expect(avatars().map((a) => a.hidden)).toEqual([false, false, true, true, false]);
     expect(more()?.textContent.trim()).toBe('+2');
+    // The plus sign stays before the number in RTL.
+    expect(more()?.querySelector('[dir="ltr"]')).not.toBeNull();
     expect(more()?.getAttribute('role')).toBe('img');
     expect(more()?.getAttribute('aria-label')).toBe('2 more');
   });

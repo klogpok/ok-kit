@@ -148,7 +148,7 @@ export class UiAvatar {
         [class]="'ui-avatar-group__more--' + size()"
         [attr.aria-label]="labels().moreCount(hiddenCount())"
       >
-        <span aria-hidden="true">+{{ hiddenCount() }}</span>
+        <span aria-hidden="true" dir="ltr">+{{ hiddenCount() }}</span>
       </span>
     }
   `,
