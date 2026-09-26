@@ -3,6 +3,13 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (phase 7: data)
+
+### Added
+
+- **table:** a click on `th[ui-sort-header]` announces the new order through `LiveAnnouncer`.
+- **labels:** `sortedAscending`, `sortedDescending`, `sortedNone`.
+
 ## Unreleased (phase 6.0: test infrastructure)
 
 ### Added

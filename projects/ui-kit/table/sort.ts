@@ -2,12 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   Directive,
+  ElementRef,
   booleanAttribute,
   computed,
   inject,
   input,
   model,
+  viewChild,
 } from '@angular/core';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { UI_LABELS } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconArrowDown, uiIconArrowUp } from '@vplans/ui-kit/icon';
 
 export type UiSortDirection = 'asc' | 'desc';
@@ -52,6 +56,9 @@ export class UiSort {
  * Sortable column header. The header text goes inside a button, so it works with the keyboard;
  * the cell gets `aria-sort` while its column is sorted. Requires `[uiSort]` on the table.
  *
+ * Screen readers do not read a changed `aria-sort`, so a click also announces the new order
+ * (the `sortedAscending`, `sortedDescending` and `sortedNone` labels with the header text).
+ *
  * @example <th ui-sort-header="name">Name</th>
  */
 @Component({
@@ -62,9 +69,9 @@ export class UiSort {
       type="button"
       class="ui-sort-header__button"
       [disabled]="isDisabled()"
-      (click)="sort.toggle(column())"
+      (click)="onClick()"
     >
-      <span class="ui-sort-header__label"><ng-content /></span>
+      <span #label class="ui-sort-header__label"><ng-content /></span>
       <ui-icon
         class="ui-sort-header__icon"
         size="sm"
@@ -81,6 +88,9 @@ export class UiSort {
 })
 export class UiSortHeader {
   protected readonly sort = inject(UiSort);
+  private readonly labels = inject(UI_LABELS);
+  private readonly announcer = inject(LiveAnnouncer);
+  private readonly label = viewChild.required<ElementRef<HTMLElement>>('label');
   protected readonly icons = { asc: uiIconArrowUp, desc: uiIconArrowDown };
 
   /** Column id stored in `UiSortState.active`. */
@@ -96,6 +106,20 @@ export class UiSortHeader {
     const direction = this.direction();
     return direction === 'asc' ? 'ascending' : direction === 'desc' ? 'descending' : null;
   });
+
+  protected onClick(): void {
+    this.sort.toggle(this.column());
+    const column = this.label().nativeElement.textContent.trim();
+    const direction = this.direction();
+    const labels = this.labels();
+    const message =
+      direction === 'asc'
+        ? labels.sortedAscending(column)
+        : direction === 'desc'
+          ? labels.sortedDescending(column)
+          : labels.sortedNone;
+    void this.announcer.announce(message, 'polite');
+  }
 }
 
 const isEmpty = (value: unknown): boolean =>

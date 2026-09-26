@@ -42,6 +42,12 @@ export interface UiLabels {
   pageLabel: (page: number) => string;
   /** Range summary of `ui-pagination`, e.g. "11–20 of 57". `start` is 1-based; 0 when empty. */
   pageRange: (start: number, end: number, length: number) => string;
+  /** Announced when a `th[ui-sort-header]` sorts its column in ascending order. */
+  sortedAscending: (column: string) => string;
+  /** Announced when a `th[ui-sort-header]` sorts its column in descending order. */
+  sortedDescending: (column: string) => string;
+  /** Announced when a `th[ui-sort-header]` removes the sort. */
+  sortedNone: string;
   /** Accessible name of the "+N" counter of `ui-avatar-group`, e.g. "3 more". */
   moreCount: (count: number) => string;
   /** BCP 47 locale for dates: parsing, formatting, month and weekday names, first day of week. */
@@ -84,6 +90,9 @@ export const UI_LABELS_HE: UiLabels = {
   pageLabel: (page) => `עמוד ${page}`,
   // The isolate (LRI…PDI) keeps "51–75" from being reordered to "75–51" in RTL text.
   pageRange: (start, end, length) => `\u2066${start}–${end}\u2069 מתוך ${length}`,
+  sortedAscending: (column) => `ממוין לפי ${column}, בסדר עולה`,
+  sortedDescending: (column) => `ממוין לפי ${column}, בסדר יורד`,
+  sortedNone: 'המיון בוטל',
   moreCount: (count) => `עוד ${count}`,
   locale: 'he-IL',
   chooseDate: 'בחירת תאריך',
@@ -117,6 +126,9 @@ export const UI_LABELS_EN: UiLabels = {
   itemsPerPage: 'Items per page',
   pageLabel: (page) => `Page ${page}`,
   pageRange: (start, end, length) => `${start}–${end} of ${length}`,
+  sortedAscending: (column) => `Sorted by ${column}, ascending`,
+  sortedDescending: (column) => `Sorted by ${column}, descending`,
+  sortedNone: 'Sort removed',
   moreCount: (count) => `${count} more`,
   locale: 'en-US',
   chooseDate: 'Choose date',

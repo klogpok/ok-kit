@@ -492,6 +492,40 @@ The bar is named by `label`, by `aria-labelledby`, or by the `loading` label.
 
 The name is the accessible name. Set `decorative` when the name is shown next to the avatar.
 
+### Tables
+
+`table[ui-table]` styles a native table; the kit does not render rows for you.
+
+```html
+<table ui-table uiSort [(sort)]="sort">
+  <caption class="ui-visually-hidden">
+    Plans
+  </caption>
+  <thead>
+    <tr>
+      <th scope="col" ui-sort-header="name">Name</th>
+      <th scope="col" ui-sort-header="units" class="ui-table-numeric">Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (plan of rows(); track plan.id) {
+    <tr>
+      <td>{{ plan.name }}</td>
+      <td class="ui-table-numeric">{{ plan.units }}</td>
+    </tr>
+    } @empty {
+    <tr ui-table-message>
+      No plans yet
+    </tr>
+    }
+  </tbody>
+</table>
+```
+
+Sort the rows yourself (`uiSortData(rows, sort)`) or on the server. A click on a sort header
+announces the new order with the header text (the `sortedAscending`, `sortedDescending` and
+`sortedNone` labels), because screen readers do not read a changed `aria-sort`.
+
 ## Navigation
 
 ```html

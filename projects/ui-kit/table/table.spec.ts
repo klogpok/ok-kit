@@ -1,5 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { UiSort, UiSortHeader, UiSortState, uiSortData } from './sort';
 import { UiTable, UiTableDensity, UiTableMessage, UiTableSkeleton } from './table';
 
@@ -163,6 +164,19 @@ describe('UiTable', () => {
     await settle();
     expect(host.sort()).toBeNull();
     expect(header(1).hasAttribute('aria-sort')).toBe(false);
+  });
+
+  it('announces the new order with the header text', async () => {
+    const announce = vi.spyOn(TestBed.inject(LiveAnnouncer), 'announce').mockResolvedValue();
+    sortButton(0).click();
+    await settle();
+    expect(announce).toHaveBeenLastCalledWith('ממוין לפי Name, בסדר עולה', 'polite');
+    sortButton(0).click();
+    await settle();
+    expect(announce).toHaveBeenLastCalledWith('ממוין לפי Name, בסדר יורד', 'polite');
+    sortButton(0).click();
+    await settle();
+    expect(announce).toHaveBeenLastCalledWith('המיון בוטל', 'polite');
   });
 
   it('toggles between the two directions when not clearable', async () => {
