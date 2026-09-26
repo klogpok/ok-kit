@@ -34,45 +34,8 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 
 ## Gotchas
 
-- CDK Menu only calls `preventDefault()` on Escape and closes the menu synchronously, so a host binding on `ui-menu` never runs and the overlay keyboard dispatcher also closes a surrounding dialog. `UiMenu` stops propagation from a listener registered in its constructor (before CDK Menu's).
-- `RouterLink` recomputes `href` after every navigation (`reactiveHref` is a `linkedSignal`), so setting `href = null` once does not last. Remove the attribute in `afterEveryRender` while disabled. `RouterLink.href` is deprecated; use `urlTree` + `Router.serializeUrl()`.
-- `resolveDirection()` skips `dir="auto"` and invalid values. Do not use `closest('[dir]')` directly.
-- A component cannot provide `NG_VALIDATORS` pointing at itself when it injects `NgControl` (circular DI). Provide a separate injectable (see `provideUiCheckedValidator()`).
-- `ngDoCheck` of a child runs only when its parent is checked; OnPush test hosts must change a signal to re-render.
-- Angular `@for` may move a kept DOM node when items before it are removed, which drops focus. Re-focus after render (see the toast `keepFocus`).
-- jsdom has no Popover API, `matchMedia`, `scrollIntoView` or `scrollBy`: stub them per test.
+Area-specific gotchas live in `.claude/rules/` and load when you open matching files: `components.md` (Angular, focus, RTL, Storybook JIT), `forms.md`, `overlays.md`, `testing.md`, `storybook.md`, `visual.md`, `styles.md`. Add a new gotcha to the matching rule file, not here.
 
-- A template listener that returns `false` calls `preventDefault()`. Keep handlers returning void.
-- `model()` has no transform. Under `strictTemplates` a bare boolean attribute on a model is a compile error. Coerce on read where needed.
-- Signal Forms' `[formField]` sets the inputs `disabled`, `invalid`, `required`, `touched` and `name` on **every** directive of the host.
-- If a component provides `NG_VALUE_ACCESSOR`, `[formField]` falls back to CVA interop. This is why `UiFormControlBase` assigns `ngControl.valueAccessor` manually.
+- The package is consumed through tsconfig paths, not `node_modules`.
 - pnpm 12: dependencies that need build scripts must be listed under `allowBuilds` in `pnpm-workspace.yaml`. Do not use `pnpm dlx` for such CLIs.
-- The CDK `Directionality` reads `dir` once at startup. Every overlay must resolve the direction when it opens (`resolveDirection()` + `overlayRef.setDirection()`, or `direction` for CDK Dialog), otherwise it renders LTR after a runtime switch to RTL.
-- CDK overlays use the Popover API (top layer) by default, so `z-index` does not order them. Opening order does.
-- In Vitest (jsdom): the CDK key managers read `keyCode`, so pass it in `KeyboardEvent`. `InteractivityChecker` sees every element as hidden (no layout), so dialog focus tests need a fake checker (see `dialog.spec.ts`).
-- Storybook writes args onto the `component` instance when an arg name matches a field. For directives this replaced signal inputs. Use arg names that differ from the class fields (see `tooltip.stories.ts`).
-- Angular 22 components are OnPush by default, including test hosts. Use signals for host state in specs.
-- A static attribute that an input consumes (`<button ui-menu-item disabled>`) still stays on the native element. Bind `'[attr.disabled]': 'null'` when the native state is wrong (menu items must stay focusable).
-- Signal Forms `required()` treats only `null`, `''` and `false` as empty. An empty array needs `minLength(path, 1)`. `[formField]` also binds `min`/`max` (a `Date` for `minDate()`/`maxDate()`), so date inputs must accept `Date | null | undefined`.
-- In RTL text a numeric range such as "51–75" is shown as "75–51". Wrap it in LRI/PDI (`⁦…⁩`).
 - In sed and perl replacements `\u` upper-cases the next character, and the agent's Write/Edit tools and heredocs turn a typed `\u2066` into the raw character. Build the backslash in Node (`String.fromCharCode(92) + 'u2066'`) and check the file with grep.
-- Stylelint allows only logical `text-align` values (`start`, `end`, `center`).
-- The Storybook docs snippet ("Show code") is derived statically and shows an "Incomplete snippet" warning when a story has args that its template does not bind and that are not component inputs, when the template reads `props` that are not args, or when args are not literals (`fn()`, `new Date()`). Put args only on the stories that bind them (others spread `...Default`), keep template state in literal args, and write `parameters.docs.source.code` by hand for dates, functions and service demos.
-- Storybook dev (JIT through the Analog plugin) can drop value imports from a file where a decorator references a class declared later through `forwardRef` (`providers: [forwardRef(() => Local)]`): `forwardRef` and `Injectable` vanished from `table.ts` and the story failed with `forwardRef is not defined`. `build-storybook` is not affected. Declare local injectables before the component that provides them instead.
-- Storybook uses `@storybook/angular-vite`. `@analogjs/vite-plugin-angular` must be >= 2.7.5, older versions fail with the `initializeHash` error.
-- Signal Forms `transformedValue()` reports parse errors to `[formField]` and to Reactive Forms only in its custom-control mode. Our CVA path (`UiFormControlBase` assigns `valueAccessor`) does not get them, so the datepicker also adds a validator to `ngControl.control`.
-- Vitest does not load component styles, so `getComputedStyle` tests of component CSS pass either way. Check CSS fixes in the browser.
-- A `computed()` over DOM reads (`textContent`, header cells) runs once. Track DOM changes with a `MutationObserver` into a signal.
-- The package is consumed through tsconfig paths, not `node_modules`. App SCSS uses `@use 'ui-kit/styles' as ui` with `stylePreprocessorOptions.includePaths: ["projects"]`.
-- CDK Menu closes the menu synchronously inside the item click handler, and a link that is no longer in the page does not follow its `href`. `a[ui-menu-item]` wraps `CdkMenuItem.trigger` to keep the menu open during the click and closes it in a `setTimeout`.
-- A directive cannot extend a component (NG0903). The shared base of the dialog and drawer containers is an abstract `@Component({ template: '' })`, because it extends `CdkDialogContainer`.
-- `ViewContainerRef` of a projected element inserts views right after that element. `nav[ui-breadcrumbs]` uses it to put the "…" button after the first link, so the DOM order and the focus order follow the layout.
-- Visual baselines are taken in the installed Edge (1024×768, reduced motion, `animations: 'disabled'`, `he-IL`, Asia/Jerusalem). The date is fixed to 2026-09-25 with `context.clock.setFixedTime()`, so the "today" mark of the calendar does not move. A new Edge version can change anti-aliasing: rerun `pnpm test-visual:update` and review the diff. The screenshot covers `#storybook-root` and open `.cdk-overlay-pane`s.
-- `UiButtonHarness` also finds `ui-icon-button` (both have the `.ui-button` class), e.g. the close button of `ui-dialog-header`. Filter by `text` or `label`.
-- The `ui-form-field` label contains the required marker (`*` and, for groups, the `required` label text). Harness `label` filters read `label[for]` with `text({ exclude })` to drop it.
-- Internal cross-component calls (option → select, radio → group, item → accordion, container → toast) go through a non-exported `@Injectable()` provided by the parent, so they stay out of the public class API.
-- Storybook JIT also evaluates `contentChildren(X)` / `viewChild(X)` metadata when the class is declared. Declare `X` above the class that queries it, or the query silently matches nothing (a story renders without its child components and without an error). See `table/selection.ts`.
-- `[formField]` forbids static or bound `min`/`max` (and the other state inputs) on the same element (NG8022). With Signal Forms, set limits with the `min()`/`max()` rules.
-- Parent hooks called from a child's `computed()` may run before the child's required inputs are set (the key manager effect reads new options early). Pass the child instance and read its inputs only when needed (see `UiOptionHandle`).
-- axe rejects `aria-expanded` on a `tr` outside a treegrid (`aria-conditional-attr`); `aria-selected` on a `tr` is fine. Expand state lives on the toggle button.
-- An element that sets up a later focus move (`afterNextRender`) must outlive the change: `ui-chip-set` disappears with its last chip, so `ui-chip-input` moves focus itself.
