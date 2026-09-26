@@ -133,6 +133,7 @@ All form controls work with **Signal Forms**, **Reactive Forms** and **template-
 | `ui-multi-select`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-datepicker`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-number-input`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| `ui-chip-input`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 
 Every control supports `disabled`, `readonly` (also from a Signal Forms `readonly()` rule),
 `required` and `aria-describedby`. A readonly control stays focusable and reports
@@ -193,6 +194,18 @@ them too). ArrowUp/Down step by `step`, PageUp/Down by ten steps, Home/End go to
 <ui-form-field label="Price">
   <span uiPrefix>₪</span>
   <ui-number-input formControlName="price" min="0" minFractionDigits="2" [steppers]="false" />
+</ui-form-field>
+```
+
+`ui-chip-input` turns typed text into chips; the value is a `string[]`. Enter or a separator
+(`separators`, default `[',']`) adds a chip, pasted text is split, leaving the field adds the
+typed text (`addOnBlur`), Backspace in the empty field removes the last chip, and the same text
+is not added twice unless `allowDuplicates`. With Signal Forms, add `minLength(path, 1)` for a
+required field.
+
+```html
+<ui-form-field label="Tags" hint="Press Enter after each tag">
+  <ui-chip-input [formField]="form.tags" placeholder="Add a tag" />
 </ui-form-field>
 ```
 
@@ -511,6 +524,27 @@ The bar is named by `label`, by `aria-labelledby`, or by the `loading` label.
 
 The name is the accessible name. Set `decorative` when the name is shown next to the avatar.
 
+```html
+<!-- Chips: a list with one tab stop; the arrow keys move between the remove buttons -->
+<ui-chip-set aria-label="Recipients">
+  @for (user of recipients(); track user.id) {
+  <ui-chip removable (removed)="remove(user)">
+    <ui-avatar uiChipIcon size="sm" [name]="user.name" decorative />
+    {{ user.name }}
+  </ui-chip>
+  }
+</ui-chip-set>
+
+<!-- Filter chips: toggle buttons with aria-pressed, a group with one tab stop -->
+<ui-chip-set aria-label="Status">
+  <button ui-filter-chip [(selected)]="onlyOpen">Open</button>
+  <button ui-filter-chip [(selected)]="onlySigned">Signed</button>
+</ui-chip-set>
+```
+
+A removed chip is announced (`chipRemoved`), its button is named with `removeChip`, and focus
+moves to the next chip. The app takes the chip out of its list on `(removed)`.
+
 ### Tables
 
 `table[ui-table]` styles a native table; the kit does not render rows for you.
@@ -647,6 +681,8 @@ so they keep working when that DOM changes.
 | `UiSelectHarness`      | `ui-select`, `ui-multi-select`                       | `label`, `value`, `disabled`, `multiple` |
 | `UiOptionHarness`      | `ui-option` (from `UiSelectHarness.getOptions()`)    | `text`, `selected`, `disabled`           |
 | `UiDialogHarness`      | dialogs and drawers opened with `UiDialog`           | `title`, `drawer`                        |
+| `UiChipHarness`        | `ui-chip`, `button[ui-filter-chip]`                  | `text`, `selected`, `disabled`           |
+| `UiChipInputHarness`   | `ui-chip-input`                                      | `label`, `disabled`                      |
 | `UiNumberInputHarness` | `ui-number-input`                                    | `label`, `value` (text), `disabled`      |
 
 `label` matches the `aria-label` or the text of the `label[for]`, so the label of `ui-form-field`
@@ -705,11 +741,12 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/dialog`       | `UiDialog`, `provideUiDialog`, `UI_DIALOG_DEFAULT_OPTIONS`, `UiDialogDefaults`, `UiDialogOptions`, `UiDrawerOptions`, `UiDrawerPosition`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose` |
 | `@vplans/ui-kit/toast`        | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                                                                                                                                                                                               |
 | `@vplans/ui-kit/select`       | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                                                                                                                                                                                                |
+| `@vplans/ui-kit/chip`         | `UiChip`, `UiFilterChip`, `UiChipSet`, `UiChipInput`                                                                                                                                                                                                                                                    |
 | `@vplans/ui-kit/number-input` | `UiNumberInput`, `UiNumberFormat`                                                                                                                                                                                                                                                                       |
 | `@vplans/ui-kit/datepicker`   | `UiDatepicker`, `UiCalendar`, `UiCalendarView`, `UiDateFilter`                                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/icon`         | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                         |
 | `@vplans/ui-kit/theme`        | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                                                                                                                                |
-| `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, their `*HarnessFilters`                                                                                                                         |
+| `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, `UiChipHarness`, `UiChipInputHarness`, their `*HarnessFilters`                                                                                  |
 | `@vplans/ui-kit/core`         | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`                                                                       |
 
 ## Tokens
@@ -1178,6 +1215,21 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-message-text`                | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-sort-icon`                   | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-sort-icon-active`            | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-chip-bg`                           | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
+| `--ui-chip-text`                         | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
+| `--ui-chip-icon`                         | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-chip-radius`                       | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
+| `--ui-chip-font-size`                    | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-chip-padding-inline`               | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
+| `--ui-chip-gap`                          | component | `var(--ui-space-2xs)`                                                        | `var(--ui-space-2xs)`                                                  |
+| `--ui-chip-remove-hover-bg`              | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
+| `--ui-chip-filter-bg`                    | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
+| `--ui-chip-filter-border`                | component | `var(--ui-color-border-control)`                                             | `var(--ui-color-border-control)`                                       |
+| `--ui-chip-filter-hover-bg`              | component | `var(--ui-color-surface-hover)`                                              | `var(--ui-color-surface-hover)`                                        |
+| `--ui-chip-filter-selected-bg`           | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
+| `--ui-chip-filter-selected-border`       | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-chip-filter-selected-text`         | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-chip-set-gap`                      | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
 | `--ui-calendar-cell-size`                | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
 | `--ui-calendar-cell-radius`              | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
 | `--ui-calendar-gap`                      | component | `var(--ui-space-3xs)`                                                        | `var(--ui-space-3xs)`                                                  |

@@ -5,3 +5,4 @@ export * from './checkbox-harness';
 export * from './select-harness';
 export * from './dialog-harness';
 export * from './number-input-harness';
+export * from './chip-harness';

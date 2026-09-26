@@ -1,0 +1,7 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-chip-set-gap);
+  min-inline-size: 0;
+}

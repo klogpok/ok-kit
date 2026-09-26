@@ -1,0 +1,121 @@
+@use '../styles/mixins';
+
+// Shared by ui-chip and button[ui-filter-chip].
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-chip-gap);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  margin: 0;
+  padding-block: var(--ui-space-3xs);
+  padding-inline: var(--ui-chip-padding-inline);
+  border: var(--ui-border-width-default) solid transparent;
+  border-radius: var(--ui-chip-radius);
+  background-color: var(--ui-chip-bg);
+  color: var(--ui-chip-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-chip-font-size);
+  line-height: var(--ui-line-height-snug);
+  vertical-align: middle;
+}
+
+// The remove button sits close to the end edge.
+:host(.ui-chip--removable) {
+  padding-inline-end: var(--ui-space-3xs);
+}
+
+.ui-chip__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-chip__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin-inline-start: calc(var(--ui-space-2xs) * -1);
+  color: var(--ui-chip-icon);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.ui-chip__remove {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--ui-space-3xs);
+  border: 0;
+  border-radius: var(--ui-radius-full);
+  background: none;
+  color: var(--ui-chip-icon);
+  font-size: var(--ui-icon-size-sm);
+  cursor: pointer;
+  @include mixins.transition(background-color, color);
+  @include mixins.focus-visible(0);
+
+  &:hover:not(:disabled) {
+    background-color: var(--ui-chip-remove-hover-bg);
+    color: var(--ui-chip-text);
+  }
+}
+
+:host(.ui-chip--disabled) {
+  color: var(--ui-color-text-disabled);
+
+  .ui-chip__remove {
+    color: var(--ui-color-text-disabled);
+    cursor: default;
+  }
+}
+
+// Filter chips: outlined toggle buttons.
+:host(.ui-filter-chip) {
+  padding-block: var(--ui-space-2xs);
+  border-color: var(--ui-chip-filter-border);
+  background-color: var(--ui-chip-filter-bg);
+  cursor: pointer;
+  @include mixins.transition(background-color, border-color, color);
+  @include mixins.focus-visible;
+}
+
+:host(.ui-filter-chip:hover:not(:disabled)) {
+  background-color: var(--ui-chip-filter-hover-bg);
+}
+
+:host(.ui-filter-chip--selected),
+:host(.ui-filter-chip--selected:hover:not(:disabled)) {
+  border-color: var(--ui-chip-filter-selected-border);
+  background-color: var(--ui-chip-filter-selected-bg);
+  color: var(--ui-chip-filter-selected-text);
+}
+
+:host(.ui-filter-chip:disabled) {
+  border-color: var(--ui-color-border);
+  background-color: var(--ui-color-surface-subtle);
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.ui-chip__check {
+  flex-shrink: 0;
+  margin-inline-start: calc(var(--ui-space-2xs) * -1);
+  font-size: var(--ui-icon-size-sm);
+}
+
+@media (forced-colors: active) {
+  :host {
+    border-color: CanvasText;
+  }
+
+  :host(.ui-filter-chip--selected) {
+    border-width: var(--ui-border-width-strong);
+    border-color: Highlight;
+  }
+}

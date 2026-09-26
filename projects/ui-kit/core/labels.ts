@@ -68,6 +68,10 @@ export interface UiLabels {
   chooseYear: string;
   /** Button of the `ui-datepicker` calendar that picks today. */
   today: string;
+  /** Remove button of a removable `ui-chip`, e.g. "Remove Haifa". */
+  removeChip: (label: string) => string;
+  /** Announced when a chip is removed, e.g. "Haifa removed". */
+  chipRemoved: (label: string) => string;
   /** Stepper buttons of `ui-number-input`. */
   increment: string;
   decrement: string;
@@ -116,6 +120,8 @@ export const UI_LABELS_HE: UiLabels = {
   chooseMonth: 'בחירת חודש',
   chooseYear: 'בחירת שנה',
   today: 'היום',
+  removeChip: (label) => `הסרת ${label}`,
+  chipRemoved: (label) => `${label} הוסר`,
   increment: 'הגדלה',
   decrement: 'הקטנה',
   invalidNumber: 'מספר לא תקין',
@@ -159,6 +165,8 @@ export const UI_LABELS_EN: UiLabels = {
   chooseMonth: 'Choose month',
   chooseYear: 'Choose year',
   today: 'Today',
+  removeChip: (label) => `Remove ${label}`,
+  chipRemoved: (label) => `${label} removed`,
   increment: 'Increase',
   decrement: 'Decrease',
   invalidNumber: 'Enter a valid number',

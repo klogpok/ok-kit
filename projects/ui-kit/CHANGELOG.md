@@ -27,6 +27,12 @@ so versions mark review points rather than releases.
   `min`/`max`/`step`, fraction digits, grouping, arrow/page/Home/End keys, stepper buttons that
   repeat while held, a `uiNumberParse` error, affixes; `UiNumberInputHarness` in testing.
 - **labels:** `increment`, `decrement`, `invalidNumber`.
+- **chip:** new entry point: `ui-chip` (removable, announced removal, `uiChipIcon`),
+  `button[ui-filter-chip]` (`aria-pressed`), `ui-chip-set` (list or group with roving
+  tabindex and RTL arrows) and `ui-chip-input` (`string[]` value, separators, paste, Backspace);
+  `UiChipHarness` and `UiChipInputHarness` in testing.
+- **tokens:** `--ui-chip-*`.
+- **labels:** `removeChip`, `chipRemoved`.
 
 ## Unreleased (phase 6.0: test infrastructure)
 
