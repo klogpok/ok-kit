@@ -22,3 +22,58 @@
   <pre>{{ model() | json }}</pre>
   <p>Last committed rent: {{ committedPrice() | json }}</p>
 </section>
+
+<section aria-labelledby="inspection-title">
+  <h3 id="inspection-title" class="ui-heading-4">
+    Inspection request (stepper, date range, date and time)
+  </h3>
+  <ui-stepper linear aria-label="Inspection request" [(selectedIndex)]="step">
+    <ui-step label="Permit" [control]="wizard.permit">
+      <div class="step">
+        <ui-form-field label="Permit period" hint="Type the dates or pick them">
+          <ui-date-range-picker
+            [formField]="wizard.permit.period"
+            [minDate]="today"
+            [presets]="presets"
+          />
+        </ui-form-field>
+        <div class="actions">
+          <button ui-button uiStepperNext>Next</button>
+        </div>
+      </div>
+    </ui-step>
+    <ui-step label="Visit" [control]="wizard.visit">
+      <div class="step">
+        <div class="date-time">
+          <ui-form-field label="Date">
+            <ui-datepicker [formField]="wizard.visit.date" />
+          </ui-form-field>
+          <ui-form-field label="Time" hint="&#x2066;08:00–18:00&#x2069;">
+            <ui-time-input
+              [formField]="wizard.visit.time"
+              minTime="08:00"
+              maxTime="18:00"
+              interval="15"
+            />
+          </ui-form-field>
+        </div>
+        <div class="actions">
+          <button ui-button variant="secondary" uiStepperPrevious>Back</button>
+          <button ui-button uiStepperNext>Next</button>
+        </div>
+      </div>
+    </ui-step>
+    <ui-step label="Summary">
+      <div class="step">
+        <p>
+          Permit: {{ request().permit.period?.start?.toLocaleDateString('he-IL') }} –
+          {{ request().permit.period?.end?.toLocaleDateString('he-IL') }}
+        </p>
+        <p>Visit: {{ visit()?.toLocaleString('he-IL') }}</p>
+        <div class="actions">
+          <button ui-button variant="secondary" uiStepperPrevious>Back</button>
+        </div>
+      </div>
+    </ui-step>
+  </ui-stepper>
+</section>

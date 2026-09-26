@@ -17,6 +17,7 @@ describe('App', () => {
     expect(el.querySelector('app-phase-seven ui-table-container table[ui-table]')).not.toBeNull();
     expect(el.querySelector('app-phase-seven ui-file-upload')).not.toBeNull();
     expect(el.querySelector('app-phase-eight ui-range-slider')).not.toBeNull();
+    expect(el.querySelector('app-phase-eight ui-stepper ui-date-range-picker')).not.toBeNull();
   });
 
   it('switches the direction and the language together', async () => {
