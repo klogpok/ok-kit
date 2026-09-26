@@ -24,6 +24,8 @@ so versions mark review points rather than releases.
 - **labels:** `breadcrumbs`, `showMore`.
 - **popover:** `[uiPopoverTriggerFor]` opens a non-modal dialog from an `ng-template` with
   `uiPopoverPosition`, `open()`/`close()`, `opened`/`closed` and a `close()` in the template context.
+- **dialog:** `UiDialog.openDrawer()` opens a drawer at the `start` or `end` side (`UiDrawerOptions`)
+  with the dialog parts, focus handling and `provideUiDialog()` defaults.
 
 ## Phase 5: second audit
 

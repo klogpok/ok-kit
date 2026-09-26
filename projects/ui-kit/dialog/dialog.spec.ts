@@ -361,3 +361,98 @@ describe('provideUiDialog', () => {
     dialog.closeAll();
   });
 });
+
+describe('UiDialog.openDrawer', () => {
+  let dialog: UiDialog;
+  let trigger: HTMLButtonElement;
+  const drawer = () => document.querySelector<HTMLElement>('ui-drawer-container');
+  const settle = async () => {
+    TestBed.tick();
+    await new Promise((resolve) => setTimeout(resolve));
+    TestBed.tick();
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [{ provide: InteractivityChecker, useValue: layoutFreeChecker }],
+    });
+    dialog = TestBed.inject(UiDialog);
+    trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+  });
+
+  afterEach(() => {
+    dialog.closeAll();
+    trigger.remove();
+    document.documentElement.removeAttribute('dir');
+  });
+
+  it('opens a modal drawer at the end side with the dialog parts', async () => {
+    dialog.openDrawer(RenameDialog, { data: { name: 'Plan A' } });
+    await settle();
+    const el = drawer()!;
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-modal')).toBe('true');
+    expect([...el.classList]).toEqual(
+      expect.arrayContaining(['ui-drawer-container--md', 'ui-drawer-container--end']),
+    );
+    expect(el.getAttribute('aria-labelledby')).toBe(el.querySelector('h2')!.id);
+    expect(document.activeElement).toBe(el.querySelector('input'));
+    const pane = el.closest<HTMLElement>('.cdk-overlay-pane')!;
+    expect(pane.classList).toContain('ui-drawer-pane--end');
+    expect(pane.style.height).toBe('100%');
+    // The global strategy puts an end pane on the right in LTR.
+    expect(pane.parentElement!.style.justifyContent).toBe('flex-end');
+    expect(document.querySelector('ui-dialog-container')).toBeNull();
+  });
+
+  it('puts an end drawer on the left in RTL and a start drawer on the right', async () => {
+    document.documentElement.dir = 'rtl';
+    dialog.openDrawer(NoticeDialog);
+    await settle();
+    let pane = drawer()!.closest<HTMLElement>('.cdk-overlay-pane')!;
+    expect(pane.closest('[dir]')!.getAttribute('dir')).toBe('rtl');
+    expect(pane.parentElement!.style.justifyContent).toBe('flex-end');
+    dialog.closeAll();
+    await settle();
+
+    dialog.openDrawer(NoticeDialog, { position: 'start', size: 'lg' });
+    await settle();
+    pane = drawer()!.closest<HTMLElement>('.cdk-overlay-pane')!;
+    expect(pane.parentElement!.style.justifyContent).toBe('flex-start');
+    expect(drawer()!.classList).toContain('ui-drawer-container--start');
+    expect(drawer()!.classList).toContain('ui-drawer-container--lg');
+  });
+
+  it('closes on Escape and restores focus', async () => {
+    const ref = dialog.openDrawer<string>(RenameDialog, { data: { name: 'A' } });
+    const closed = vi.fn();
+    ref.closed.subscribe(closed);
+    await settle();
+    drawer()!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }),
+    );
+    await settle();
+    expect(closed).toHaveBeenCalledWith(undefined);
+    expect(drawer()).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('takes the provideUiDialog() defaults', async () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: InteractivityChecker, useValue: layoutFreeChecker },
+        provideUiDialog({ size: 'sm', disableClose: true }),
+      ],
+    });
+    const drawers = TestBed.inject(UiDialog);
+    const ref = drawers.openDrawer(NoticeDialog);
+    await settle();
+    expect(drawer()!.classList).toContain('ui-drawer-container--sm');
+    expect(ref.disableClose).toBe(true);
+    drawers.closeAll();
+    await settle();
+  });
+});

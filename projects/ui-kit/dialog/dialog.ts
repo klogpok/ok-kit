@@ -20,7 +20,14 @@ import { AutoFocusTarget, DIALOG_DATA, Dialog, DialogRef } from '@angular/cdk/di
 import { UiButton } from '@vplans/ui-kit/button';
 import { UI_LABELS, resolveDirection } from '@vplans/ui-kit/core';
 import { firstValueFrom } from 'rxjs';
-import { UiDialogConfig, UiDialogContainer, UiDialogSize } from './dialog-container';
+import { createGlobalPositionStrategy } from '@angular/cdk/overlay';
+import {
+  UiDialogConfig,
+  UiDialogContainer,
+  UiDialogSize,
+  UiDrawerContainer,
+  UiDrawerPosition,
+} from './dialog-container';
 import { UiDialogActions, UiDialogContent, UiDialogHeader, UiDialogTitle } from './dialog-parts';
 
 /** Options of `UiDialog.open()`. */
@@ -49,7 +56,16 @@ export interface UiDialogOptions<D = unknown> {
   viewContainerRef?: ViewContainerRef;
 }
 
-/** Options that `provideUiDialog()` can set for every dialog. */
+/** Options of `UiDialog.openDrawer()`. */
+export interface UiDrawerOptions<D = unknown> extends Omit<UiDialogOptions<D>, 'role'> {
+  /**
+   * Side the drawer slides in from. `end` (default) is the right side in LTR and the left side
+   * in RTL.
+   */
+  position?: UiDrawerPosition;
+}
+
+/** Options that `provideUiDialog()` can set for every dialog and drawer. */
 export type UiDialogDefaults = Pick<
   UiDialogOptions,
   'size' | 'disableClose' | 'autoFocus' | 'restoreFocus'
@@ -157,10 +173,49 @@ export class UiDialog {
   private readonly document = inject(DOCUMENT);
   private readonly ids = inject(_IdGenerator);
   private readonly defaults = inject(UI_DIALOG_DEFAULT_OPTIONS);
+  private readonly injector = inject(Injector);
 
   open<R = unknown, D = unknown, C = unknown>(
     content: ComponentType<C> | TemplateRef<C>,
-    openOptions: UiDialogOptions<D> = {},
+    options: UiDialogOptions<D> = {},
+  ): DialogRef<R, C> {
+    return this.show<R, D, C>(content, options, {
+      container: UiDialogContainer,
+      panelClass: 'ui-dialog-pane',
+    });
+  }
+
+  /**
+   * Opens a drawer: a modal panel of full height at the end (or start) side of the screen,
+   * for details, filters or forms that keep the page in view. It behaves like a dialog (focus
+   * trap, Escape and backdrop close, focus restore) and uses the same parts
+   * (`ui-dialog-header`, `ui-dialog-content`, `ui-dialog-actions`). On narrow screens it
+   * takes the full width.
+   *
+   * @example this.dialog.openDrawer(PlanDetails, { data: plan, size: 'lg' });
+   */
+  openDrawer<R = unknown, D = unknown, C = unknown>(
+    content: ComponentType<C> | TemplateRef<C>,
+    options: UiDrawerOptions<D> = {},
+  ): DialogRef<R, C> {
+    const position = options.position ?? 'end';
+    return this.show<R, D, C>(content, options, {
+      container: UiDrawerContainer,
+      panelClass: ['ui-drawer-pane', `ui-drawer-pane--${position}`],
+      position,
+      height: '100%',
+      // The strategy mirrors `start`/`end` by the dialog direction.
+      positionStrategy:
+        position === 'start'
+          ? createGlobalPositionStrategy(this.injector).start()
+          : createGlobalPositionStrategy(this.injector).end(),
+    });
+  }
+
+  private show<R, D, C>(
+    content: ComponentType<C> | TemplateRef<C>,
+    openOptions: UiDialogOptions<D>,
+    surface: Partial<UiDialogConfig<D, DialogRef<R, C>>>,
   ): DialogRef<R, C> {
     const options: UiDialogOptions<D> = { ...this.defaults, ...openOptions };
     const autoFocus = options.autoFocus ?? 'first-field';
@@ -182,10 +237,9 @@ export class UiDialog {
       // CDK provides `direction` to the content only when `injector` / `viewContainerRef` has
       // no Directionality, and the root one always exists.
       providers: [{ provide: Directionality, useValue: fixedDirectionality(direction) }],
-      container: UiDialogContainer,
       ariaModal: true,
-      panelClass: 'ui-dialog-pane',
       backdropClass: 'ui-dialog-backdrop',
+      ...surface,
     };
     return this.dialog.open<R, D, C>(content, config);
   }

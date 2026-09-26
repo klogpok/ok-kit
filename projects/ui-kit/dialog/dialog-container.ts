@@ -13,9 +13,14 @@ import { CdkPortalOutlet, ComponentPortal } from '@angular/cdk/portal';
 
 export type UiDialogSize = 'sm' | 'md' | 'lg';
 
+/** Side of the screen a drawer slides in from. `end` is the right side in LTR, the left in RTL. */
+export type UiDrawerPosition = 'start' | 'end';
+
 /** CDK dialog config with the kit's own options. Internal. */
 export interface UiDialogConfig<D = unknown, R = unknown> extends DialogConfig<D, R> {
   size?: UiDialogSize;
+  /** Drawers only. */
+  position?: UiDrawerPosition;
   /** Focus `[cdkFocusInitial]`, else the first form field, else the first tabbable element. */
   focusFirstField?: boolean;
   /**
@@ -36,23 +41,12 @@ const FIELDS = [
 const TABBABLE = 'button, [href], input, select, textarea, [tabindex]';
 
 /**
- * Dialog surface. Internal: `UiDialog.open()` uses it as the CDK dialog container, which keeps
- * the CDK focus trap, focus restoration and ARIA wiring.
+ * Focus handling shared by the dialog and drawer surfaces: the first field gets focus on open,
+ * and focus returns to the opener on close. Internal. A component, since it extends the CDK
+ * container component.
  */
-@Component({
-  selector: 'ui-dialog-container',
-  imports: [CdkPortalOutlet],
-  template: '<ng-template cdkPortalOutlet />',
-  styleUrl: './dialog-container.scss',
-  // Also styles the backdrop and the content component host, which live outside this view.
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    class: 'ui-dialog-container',
-    '[class]': '"ui-dialog-container--" + size',
-  },
-})
-export class UiDialogContainer extends CdkDialogContainer<UiDialogConfig> {
+@Component({ template: '' })
+export abstract class UiDialogContainerBase extends CdkDialogContainer<UiDialogConfig> {
   private readonly checker = inject(InteractivityChecker);
   private readonly injector = inject(Injector);
   private readonly focusMonitor = inject(FocusMonitor);
@@ -113,4 +107,43 @@ export class UiDialogContainer extends CdkDialogContainer<UiDialogConfig> {
       candidates.find((el) => this.checker.isTabbable(el));
     target?.focus();
   }
+}
+
+/**
+ * Dialog surface. Internal: `UiDialog.open()` uses it as the CDK dialog container, which keeps
+ * the CDK focus trap, focus restoration and ARIA wiring.
+ */
+@Component({
+  selector: 'ui-dialog-container',
+  imports: [CdkPortalOutlet],
+  template: '<ng-template cdkPortalOutlet />',
+  styleUrl: './dialog-container.scss',
+  // Also styles the backdrop and the content component host, which live outside this view.
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'ui-dialog-container',
+    '[class]': '"ui-dialog-container--" + size',
+  },
+})
+export class UiDialogContainer extends UiDialogContainerBase {}
+
+/**
+ * Drawer surface: a full-height panel at the start or end side. Internal: used by
+ * `UiDialog.openDrawer()`.
+ */
+@Component({
+  selector: 'ui-drawer-container',
+  imports: [CdkPortalOutlet],
+  template: '<ng-template cdkPortalOutlet />',
+  styleUrls: ['./dialog-container.scss', './drawer-container.scss'],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'ui-drawer-container',
+    '[class]': '["ui-drawer-container--" + size, "ui-drawer-container--" + position]',
+  },
+})
+export class UiDrawerContainer extends UiDialogContainerBase {
+  protected readonly position: UiDrawerPosition = this._config.position ?? 'end';
 }

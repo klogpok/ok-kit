@@ -659,6 +659,11 @@
   --ui-dialog-width-lg: var(--ui-container-width-3xl);
   --ui-dialog-title-font-size: var(--ui-font-size-xl);
   --ui-dialog-title-font-weight: var(--ui-font-weight-semibold);
+  --ui-drawer-bg: var(--ui-color-surface-raised);
+  --ui-drawer-shadow: var(--ui-shadow-lg);
+  --ui-drawer-width-sm: var(--ui-container-width-md);
+  --ui-drawer-width-md: var(--ui-container-width-lg);
+  --ui-drawer-width-lg: var(--ui-container-width-2xl);
   --ui-toast-bg: var(--ui-color-surface-raised);
   --ui-toast-text: var(--ui-color-text);
   --ui-toast-border: var(--ui-color-border);

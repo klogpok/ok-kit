@@ -1,0 +1,61 @@
+// Global styles (ViewEncapsulation.None): every selector is scoped to a ui-drawer class.
+
+.ui-drawer-container {
+  --_slide-from: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-dialog-gap);
+  box-sizing: border-box;
+  // Full width on phones.
+  inline-size: min(var(--_width), 100vw);
+  block-size: 100%;
+  padding-block: var(--ui-dialog-padding);
+  background-color: var(--ui-drawer-bg);
+  color: var(--ui-color-text);
+  box-shadow: var(--ui-drawer-shadow);
+  font-family: var(--ui-font-family-sans);
+  outline: none;
+  overflow: hidden;
+  animation: ui-drawer-enter var(--ui-motion-duration-normal) var(--ui-motion-easing-enter);
+}
+
+// `translate` is physical: an end drawer comes from the right in LTR and from the left in RTL.
+.ui-drawer-container--start,
+.ui-drawer-container--end:dir(rtl) {
+  --_slide-from: -100%;
+}
+
+.ui-drawer-container--start:dir(rtl) {
+  --_slide-from: 100%;
+}
+
+.ui-drawer-container--sm {
+  --_width: var(--ui-drawer-width-sm);
+}
+
+.ui-drawer-container--md {
+  --_width: var(--ui-drawer-width-md);
+}
+
+.ui-drawer-container--lg {
+  --_width: var(--ui-drawer-width-lg);
+}
+
+@keyframes ui-drawer-enter {
+  from {
+    translate: var(--_slide-from);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-drawer-container {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-drawer-container {
+    border-inline: var(--ui-border-width-default) solid CanvasText;
+  }
+}
