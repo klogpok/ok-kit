@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.file-card {
+  gap: var(--ui-space-md);
+}
+
+.file-card__main {
+  display: flex;
+  gap: var(--ui-space-sm);
+  align-items: center;
+}
+
+.file-card__type {
+  flex: none;
+  color: var(--ui-color-danger);
+  font-size: 2rem;
+}
+
+.file-card__text {
+  display: grid;
+  flex: 1;
+  gap: var(--ui-space-3xs);
+  min-inline-size: 0;
+}
+
+.file-card__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-card__meta {
+  display: flex;
+  gap: var(--ui-space-xs);
+  align-items: center;
+}
+
+.file-card__actions {
+  display: flex;
+  flex: none;
+  gap: var(--ui-space-xs);
+}
+
+// Delete stays neutral at rest and turns red on hover, so a destructive click is expected.
+.file-card__delete:is(:hover, :active):not(.ui-button--disabled) {
+  border-color: var(--ui-color-danger);
+  background-color: var(--ui-color-danger-subtle);
+  color: var(--ui-color-danger-text);
+}
+
+// Beats the `flex-wrap: wrap` of ui-card-footer so the clock stays next to the text.
+ui-card-footer.file-card__footer {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--ui-space-xs);
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.file-card__footer > ui-icon {
+  flex: none;
+  margin-block-start: 0.2em;
+}

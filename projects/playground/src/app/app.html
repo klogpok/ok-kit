@@ -105,6 +105,21 @@
     </ui-tab-group>
   </section>
 
+  <section aria-labelledby="files-title">
+    <h2 id="files-title" class="ui-heading-4">Files</h2>
+    @for (file of files(); track $index) {
+      <app-file-card
+        [file]="file"
+        [deleteDisabled]="$index === 0"
+        (rename)="renameFile(file, $event)"
+        (replace)="replaceFile(file, $event)"
+        (remove)="removeFile(file)"
+      />
+    } @empty {
+      <p class="ui-text-muted">No files</p>
+    }
+  </section>
+
   <section aria-labelledby="actions-title">
     <h2 id="actions-title" class="ui-heading-4">Actions</h2>
     <div class="row">

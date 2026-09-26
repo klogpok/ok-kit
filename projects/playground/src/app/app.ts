@@ -24,6 +24,7 @@ import { UiTab, UiTabGroup, UiTabLabel } from '@vplans/ui-kit/tabs';
 import { ThemeService } from '@vplans/ui-kit/theme';
 import { UiToast } from '@vplans/ui-kit/toast';
 import { UiTooltip } from '@vplans/ui-kit/tooltip';
+import { FileCard, StoredFile } from './file-card';
 import { PhaseSeven } from './phase-seven';
 import { PhaseSix } from './phase-six';
 import { PhaseThree } from './phase-three';
@@ -64,6 +65,7 @@ interface Plan {
     UiTab,
     UiTabLabel,
     UiTooltip,
+    FileCard,
     PhaseThree,
     PhaseSix,
     PhaseSeven,
@@ -110,6 +112,23 @@ export class App {
     },
   ];
 
+  protected readonly files = signal<StoredFile[]>([
+    {
+      name: 'Google.pdf',
+      size: 71_373,
+      version: 1,
+      uploadedAt: new Date(2026, 7, 27, 16, 7, 50),
+      uploadedBy: 'תמיכה VPlans',
+    },
+    {
+      name: 'תוכנית קומה 4 - גרסה סופית למתאם.pdf',
+      size: 2_480_000,
+      version: 3,
+      uploadedAt: new Date(2026, 8, 20, 9, 12, 4),
+      uploadedBy: 'דנה לוי',
+    },
+  ]);
+
   // The VPlans apps are Hebrew: index.html starts in RTL.
   protected readonly rtl = signal(this.document.documentElement.dir === 'rtl');
   protected readonly saving = signal(false);
@@ -154,6 +173,35 @@ export class App {
       tone: 'danger',
     });
     if (confirmed) this.profile().reset();
+  }
+
+  protected renameFile(file: StoredFile, name: string): void {
+    this.updateFile(file, { name });
+    this.toast.success(`The file was renamed to ${name}`);
+  }
+
+  protected replaceFile(file: StoredFile, upload: File): void {
+    this.updateFile(file, {
+      size: upload.size,
+      version: file.version + 1,
+      uploadedAt: new Date(),
+      uploadedBy: 'אני',
+    });
+    this.toast.success(`Version ${file.version + 1} of ${file.name} was uploaded`);
+  }
+
+  protected async removeFile(file: StoredFile): Promise<void> {
+    const confirmed = await this.dialog.confirm({
+      title: `Delete ${file.name}?`,
+      message: 'All versions of the file will be deleted.',
+      confirmLabel: 'Delete',
+      tone: 'danger',
+    });
+    if (confirmed) this.files.update((files) => files.filter((f) => f !== file));
+  }
+
+  private updateFile(file: StoredFile, changes: Partial<StoredFile>): void {
+    this.files.update((files) => files.map((f) => (f === file ? { ...f, ...changes } : f)));
   }
 
   protected remind(plan: string): void {

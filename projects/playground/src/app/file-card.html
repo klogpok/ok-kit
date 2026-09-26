@@ -1,0 +1,86 @@
+@let f = file();
+<ui-card class="file-card">
+  <div class="file-card__main">
+    <ui-icon class="file-card__type" [icon]="pdfIcon" label="PDF" />
+    <div class="file-card__text">
+      @if (editing()) {
+        <input
+          #nameInput
+          ui-input
+          size="sm"
+          aria-label="שם הקובץ"
+          [value]="f.name"
+          (keydown.enter)="commit(true)"
+          (keydown.escape)="cancel()"
+          (blur)="commit()"
+        />
+      } @else {
+        <!-- bdi isolates a Latin name without turning the line LTR, so it stays at the start. -->
+        <h3 ui-card-title class="file-card__name">
+          <bdi>{{ f.name }}</bdi>
+        </h3>
+        <p ui-card-subtitle class="file-card__meta">
+          <span>{{ size() }}</span>
+          <span aria-hidden="true">•</span>
+          <ui-badge tone="primary" appearance="soft" size="sm">
+            <span class="ui-visually-hidden">גרסה </span>V{{ f.version }}
+          </ui-badge>
+        </p>
+      }
+    </div>
+    <div class="file-card__actions" role="group" [attr.aria-label]="'פעולות על ' + f.name">
+      <button
+        #editButton
+        ui-icon-button
+        variant="secondary"
+        size="sm"
+        label="עריכת שם"
+        (mousedown)="keepFocus($event)"
+        (click)="toggleEditing()"
+      >
+        <ui-icon icon="edit" />
+      </button>
+      <button
+        ui-icon-button
+        variant="secondary"
+        size="sm"
+        label="העלאת גרסה חדשה"
+        (click)="picker.click()"
+      >
+        <ui-icon icon="file-upload" />
+      </button>
+      <button
+        ui-icon-button
+        class="file-card__delete"
+        variant="secondary"
+        size="sm"
+        label="מחיקת הקובץ"
+        [disabled]="deleteDisabled()"
+        disabledInteractive
+        [uiTooltip]="deleteDisabled() ? 'רק מי שהעלה את הקובץ יכול למחוק אותו' : ''"
+        (click)="remove.emit()"
+      >
+        <ui-icon icon="x" />
+      </button>
+      <input
+        #picker
+        type="file"
+        accept=".pdf"
+        hidden
+        tabindex="-1"
+        aria-hidden="true"
+        (change)="pick(picker)"
+      />
+    </div>
+  </div>
+  <ui-divider decorative />
+  <ui-card-footer align="start" class="file-card__footer">
+    <ui-icon icon="clock" size="sm" />
+    <span>
+      הועלה ב-<time [attr.datetime]="f.uploadedAt.toISOString()">{{
+        f.uploadedAt | date: 'dd/MM/yy HH:mm:ss'
+      }}</time>
+      על ידי <bdi>{{ f.uploadedBy }}</bdi>
+    </span>
+  </ui-card-footer>
+</ui-card>
