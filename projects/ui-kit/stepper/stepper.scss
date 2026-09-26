@@ -1,0 +1,188 @@
+@use '../styles/mixins' as ui;
+
+:host {
+  display: block;
+  color: var(--ui-stepper-label-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-font-size-sm);
+}
+
+.ui-stepper__steps {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-stepper__step {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: var(--ui-stepper-gap);
+  min-inline-size: 0;
+
+  &:last-child {
+    flex: 0 0 auto;
+  }
+}
+
+.ui-stepper__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--ui-stepper-gap);
+  max-inline-size: 100%;
+  margin: 0;
+  padding: var(--ui-stepper-header-padding);
+  border: 0;
+  border-radius: var(--ui-stepper-header-radius);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  @include ui.transition(background-color);
+  @include ui.focus-visible;
+
+  &:hover:not(:disabled) {
+    background-color: var(--ui-stepper-header-hover-bg);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.ui-stepper__marker {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-stepper-marker-size);
+  block-size: var(--ui-stepper-marker-size);
+  border: var(--ui-border-width-default) solid var(--ui-stepper-marker-border);
+  border-radius: var(--ui-radius-full);
+  color: var(--ui-stepper-marker-text);
+  font-size: var(--ui-stepper-marker-font-size);
+  font-weight: var(--ui-stepper-marker-font-weight);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ui-stepper__step--current .ui-stepper__marker,
+.ui-stepper__step--done .ui-stepper__marker {
+  border-color: var(--ui-stepper-marker-active-bg);
+  background-color: var(--ui-stepper-marker-active-bg);
+  color: var(--ui-stepper-marker-active-text);
+}
+
+.ui-stepper__step--error .ui-stepper__marker {
+  border-color: var(--ui-stepper-marker-error-bg);
+  background-color: var(--ui-stepper-marker-error-bg);
+  color: var(--ui-stepper-marker-error-text);
+}
+
+// Block lines, so the label and the note are read as separate words.
+.ui-stepper__text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.ui-stepper__label {
+  color: var(--ui-stepper-label-muted);
+  line-height: var(--ui-line-height-tight);
+
+  .ui-stepper__step--done &,
+  .ui-stepper__step--error &,
+  .ui-stepper__step--current & {
+    color: var(--ui-stepper-label-text);
+  }
+
+  .ui-stepper__step--current & {
+    font-weight: var(--ui-stepper-label-current-weight);
+  }
+}
+
+.ui-stepper__note {
+  color: var(--ui-stepper-label-muted);
+  font-size: var(--ui-stepper-note-font-size);
+}
+
+.ui-stepper__note--error {
+  color: var(--ui-stepper-error-text);
+}
+
+.ui-stepper__connector {
+  flex: 1 1 0;
+  min-inline-size: var(--ui-space-lg);
+  block-size: var(--ui-stepper-connector-width);
+  border-radius: var(--ui-radius-full);
+  background-color: var(--ui-stepper-connector);
+
+  .ui-stepper__step--done & {
+    background-color: var(--ui-stepper-connector-done);
+  }
+}
+
+.ui-stepper__content {
+  margin-block-start: var(--ui-stepper-content-gap);
+}
+
+// Vertical: the content of the current step sits under its button, next to the line that joins
+// the markers. It starts where the label starts.
+:host(.ui-stepper--vertical) {
+  .ui-stepper__steps {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ui-stepper__step {
+    display: block;
+    flex: none;
+  }
+
+  .ui-stepper__content {
+    margin-block-start: 0;
+    padding-block: var(--ui-space-xs) var(--ui-stepper-content-gap);
+  }
+}
+
+.ui-stepper__body {
+  --_half: calc(var(--ui-stepper-marker-size) / 2 - var(--ui-stepper-connector-width) / 2);
+
+  min-block-size: var(--ui-space-lg);
+  margin-inline-start: calc(var(--ui-stepper-header-padding) + var(--_half));
+  padding-inline-start: calc(var(--_half) + var(--ui-stepper-gap));
+  border-inline-start: var(--ui-stepper-connector-width) solid var(--ui-stepper-connector);
+
+  .ui-stepper__step--done & {
+    border-inline-start-color: var(--ui-stepper-connector-done);
+  }
+}
+
+.ui-stepper__body--last {
+  border-inline-start-color: transparent;
+
+  .ui-stepper__step--done & {
+    border-inline-start-color: transparent;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-stepper__step--current .ui-stepper__marker {
+    border-color: Highlight;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .ui-stepper__step--error .ui-stepper__marker {
+    border-style: dashed;
+  }
+
+  .ui-stepper__connector {
+    background-color: CanvasText;
+  }
+}

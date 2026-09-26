@@ -180,6 +180,8 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   // Option descriptions on the active option.
   ['color.text-muted', 'color.primary-subtle', TEXT],
   ['color.danger-text', 'color.surface', TEXT],
+  // Step errors of ui-stepper on the page.
+  ['color.danger-text', 'color.bg', TEXT],
   ['color.danger-text', 'color.surface-raised', TEXT],
   // Danger menu items on hover.
   ['color.danger-text', 'color.surface-active', TEXT],

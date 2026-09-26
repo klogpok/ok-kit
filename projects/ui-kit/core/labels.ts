@@ -105,6 +105,14 @@ export interface UiLabels {
   invalidDateRange: string;
   /** Error of `ui-time-input` for text that is not an allowed time. */
   invalidTime: string;
+  /** Name of the list of steps of `ui-stepper`. */
+  steps: string;
+  /** Shown under the label of an optional `ui-step`. */
+  optional: string;
+  /** Read after the label of a done step of `ui-stepper`. */
+  stepCompleted: string;
+  /** Read after the label of a `ui-stepper` step with errors. */
+  stepError: string;
   /** Start thumb of `ui-range-slider`, read after the field label. */
   rangeStart: string;
   /** End thumb of `ui-range-slider`, read after the field label. */
@@ -170,6 +178,10 @@ export const UI_LABELS_HE: UiLabels = {
   invalidDate: 'תאריך לא תקין',
   invalidDateRange: 'תאריך הסיום מוקדם מתאריך ההתחלה',
   invalidTime: 'שעה לא תקינה',
+  steps: 'שלבים',
+  optional: 'אופציונלי',
+  stepCompleted: 'הושלם',
+  stepError: 'יש שגיאות',
   rangeStart: 'מינימום',
   rangeEnd: 'מקסימום',
   previousMonth: 'חודש קודם',
@@ -230,6 +242,10 @@ export const UI_LABELS_EN: UiLabels = {
   invalidDate: 'Enter a valid date',
   invalidDateRange: 'The end date is before the start date',
   invalidTime: 'Enter a valid time',
+  steps: 'Steps',
+  optional: 'Optional',
+  stepCompleted: 'completed',
+  stepError: 'has errors',
   rangeStart: 'Minimum',
   rangeEnd: 'Maximum',
   previousMonth: 'Previous month',

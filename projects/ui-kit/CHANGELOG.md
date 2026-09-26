@@ -27,6 +27,14 @@ so versions mark review points rather than releases.
   `minTime` / `maxTime`, a `uiTimeParse` error; `uiDateWithTime()` and `uiTimeOf()` to join it
   with a date; `UiTimeInputHarness` in testing.
 - **labels:** `invalidTime`.
+- **stepper:** new entry point with `ui-stepper` and `ui-step`: a list of step buttons with
+  `aria-current="step"`, done/error/current states read after the label, `control` (Reactive
+  Forms control or Signal Forms field) for the step validity, `completed`, `error`, `optional`,
+  `linear` mode that marks a blocking form touched, horizontal and vertical orientation,
+  `button[uiStepperNext]` / `button[uiStepperPrevious]`, `next()` / `previous()` / `select()` /
+  `reset()`; `UiStepperHarness` and `UiStepHarness` in testing.
+- **tokens:** `--ui-stepper-*`.
+- **labels:** `steps`, `optional`, `stepCompleted`, `stepError`.
 
 ## Unreleased (phase 7: data)
 

@@ -4052,6 +4052,138 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-primary-subtle)"
   },
   {
+    "name": "--ui-stepper-gap",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-stepper-header-padding",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-stepper-header-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-stepper-header-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-hover)",
+    "dark": "var(--ui-color-surface-hover)"
+  },
+  {
+    "name": "--ui-stepper-marker-size",
+    "layer": "component",
+    "light": "var(--ui-control-height-sm)",
+    "dark": "var(--ui-control-height-sm)"
+  },
+  {
+    "name": "--ui-stepper-marker-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-sm)",
+    "dark": "var(--ui-font-size-sm)"
+  },
+  {
+    "name": "--ui-stepper-marker-font-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-stepper-marker-border",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-stepper-marker-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-stepper-marker-active-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-stepper-marker-active-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-contrast)",
+    "dark": "var(--ui-color-primary-contrast)"
+  },
+  {
+    "name": "--ui-stepper-marker-error-bg",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
+  },
+  {
+    "name": "--ui-stepper-marker-error-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-contrast)",
+    "dark": "var(--ui-color-danger-contrast)"
+  },
+  {
+    "name": "--ui-stepper-connector",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-stepper-connector-done",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-stepper-connector-width",
+    "layer": "component",
+    "light": "var(--ui-border-width-strong)",
+    "dark": "var(--ui-border-width-strong)"
+  },
+  {
+    "name": "--ui-stepper-label-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-stepper-label-muted",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-stepper-label-current-weight",
+    "layer": "component",
+    "light": "var(--ui-font-weight-semibold)",
+    "dark": "var(--ui-font-weight-semibold)"
+  },
+  {
+    "name": "--ui-stepper-note-font-size",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
+    "name": "--ui-stepper-error-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-text)",
+    "dark": "var(--ui-color-danger-text)"
+  },
+  {
+    "name": "--ui-stepper-content-gap",
+    "layer": "component",
+    "light": "var(--ui-space-lg)",
+    "dark": "var(--ui-space-lg)"
+  },
+  {
     "name": "--ui-datepicker-panel-bg",
     "layer": "component",
     "light": "var(--ui-color-surface-raised)",
