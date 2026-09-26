@@ -750,6 +750,7 @@
   --ui-table-header-text: var(--ui-color-text-muted);
   --ui-table-header-font-weight: var(--ui-font-weight-semibold);
   --ui-table-row-hover-bg: var(--ui-color-surface-hover);
+  --ui-table-row-selected-bg: var(--ui-color-primary-subtle);
   --ui-table-cell-padding-inline: var(--ui-space-md);
   --ui-table-cell-padding-block: var(--ui-space-md);
   --ui-table-cell-padding-block-compact: var(--ui-space-xs);

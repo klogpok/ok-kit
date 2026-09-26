@@ -9,6 +9,11 @@ so versions mark review points rather than releases.
 
 - **table:** a click on `th[ui-sort-header]` announces the new order through `LiveAnnouncer`.
 - **labels:** `sortedAscending`, `sortedDescending`, `sortedNone`.
+- **table:** row selection: `[(uiTableSelection)]` on the table, `th[ui-table-select-all]`
+  (tri-state) and `td[ui-table-select-row]`, Shift+click ranges, `selectionCompareWith`,
+  `selectionDisabled`; selected rows get `aria-selected` and `ui-table-row--selected`.
+- **tokens:** `--ui-table-row-selected-bg`.
+- **labels:** `selectAll`, `selectRow`.
 
 ## Unreleased (phase 6.0: test infrastructure)
 

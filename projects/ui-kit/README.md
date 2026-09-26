@@ -526,6 +526,32 @@ Sort the rows yourself (`uiSortData(rows, sort)`) or on the server. A click on a
 announces the new order with the header text (the `sortedAscending`, `sortedDescending` and
 `sortedNone` labels), because screen readers do not read a changed `aria-sort`.
 
+```html
+<!-- Row selection: the value is an array of rows; Shift+click selects a range -->
+<table ui-table [(uiTableSelection)]="selected" [selectionCompareWith]="byId">
+  <thead>
+    <tr>
+      <th ui-table-select-all></th>
+      <th scope="col">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (plan of rows(); track plan.id) {
+    <tr>
+      <td [ui-table-select-row]="plan" [label]="'Select ' + plan.name"></td>
+      <td>{{ plan.name }}</td>
+    </tr>
+    }
+  </tbody>
+</table>
+```
+
+The header checkbox selects or deselects the rows on screen and is mixed while some of them are
+selected; selected rows on other pages stay selected. A selected row gets `aria-selected` and
+the `ui-table-row--selected` class. The checkboxes use the `selectAll` and `selectRow` labels
+unless you pass `label`. `UiTableSelection` (`exportAs: 'uiTableSelection'`) also has
+`select()`, `deselect()`, `toggle()` and `clear()`.
+
 ## Navigation
 
 ```html
@@ -599,7 +625,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/progress`    | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                                                       |
 | `@vplans/ui-kit/avatar`      | `UiAvatar`, `UiAvatarGroup`, `UiAvatarSize`, `uiInitials`, `uiAvatarColor`                                                                                                                                                                                                                              |
 | `@vplans/ui-kit/badge`       | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                                                                |
-| `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                                                                                                                                    |
+| `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`                                                                                                                        |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                                                              |
 | `@vplans/ui-kit/accordion`   | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/breadcrumbs` | `UiBreadcrumbs`, `UiBreadcrumb`                                                                                                                                                                                                                                                                         |
@@ -1072,6 +1098,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-header-text`                 | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-header-font-weight`          | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 | `--ui-table-row-hover-bg`                | component | `var(--ui-color-surface-hover)`                                              | `var(--ui-color-surface-hover)`                                        |
+| `--ui-table-row-selected-bg`             | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
 | `--ui-table-cell-padding-inline`         | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block`          | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block-compact`  | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |

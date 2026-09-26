@@ -3620,6 +3620,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-surface-hover)"
   },
   {
+    "name": "--ui-table-row-selected-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
     "name": "--ui-table-cell-padding-inline",
     "layer": "component",
     "light": "var(--ui-space-md)",

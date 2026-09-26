@@ -1,9 +1,10 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
-import { UiIconButton } from '@vplans/ui-kit/button';
+import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiPagination } from '@vplans/ui-kit/pagination';
+import { UiTableSelectAll, UiTableSelectRow, UiTableSelection } from './selection';
 import { UiSort, UiSortHeader, UiSortState, uiSortData } from './sort';
 import { UiTable, UiTableDensity, UiTableMessage, UiTableSkeleton } from './table';
 
@@ -113,6 +114,53 @@ class PlansTable {
   });
 }
 
+/** Row selection with a bulk action bar. */
+@Component({
+  selector: 'ui-story-selection-table',
+  imports: [UiTable, UiTableSelection, UiTableSelectAll, UiTableSelectRow, UiBadge, UiButton],
+  template: `
+    <div style="display:grid;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px;min-block-size:32px">
+        <span>נבחרו {{ selected().length }} תוכניות</span>
+        @if (selected().length) {
+          <button ui-button size="sm" variant="secondary" (click)="selected.set([])">
+            ניקוי הבחירה
+          </button>
+        }
+      </div>
+      <table ui-table [(uiTableSelection)]="selected">
+        <caption class="ui-visually-hidden">
+          תוכניות
+        </caption>
+        <thead>
+          <tr>
+            <th ui-table-select-all></th>
+            <th scope="col">שם</th>
+            <th scope="col">בעלים</th>
+            <th scope="col">סטטוס</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (plan of rows; track plan.id) {
+            <tr>
+              <td [ui-table-select-row]="plan" [label]="'בחירת ' + plan.name"></td>
+              <td>{{ plan.name }}</td>
+              <td>{{ plan.owner }}</td>
+              <td>
+                <ui-badge [tone]="plan.status.tone">{{ plan.status.text }}</ui-badge>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  `,
+})
+class SelectionTable {
+  readonly rows = PLANS.slice(0, 6);
+  readonly selected = signal<readonly Plan[]>([PLANS[1], PLANS[2]]);
+}
+
 interface TableArgs {
   isLoading: boolean;
   rowDensity: UiTableDensity;
@@ -123,7 +171,15 @@ const meta: Meta<TableArgs> = {
   component: UiTable,
   decorators: [
     moduleMetadata({
-      imports: [PlansTable, UiTable, UiSort, UiSortHeader, UiTableMessage, UiTableSkeleton],
+      imports: [
+        PlansTable,
+        SelectionTable,
+        UiTable,
+        UiSort,
+        UiSortHeader,
+        UiTableMessage,
+        UiTableSkeleton,
+      ],
     }),
   ],
   argTypes: { rowDensity: { control: 'inline-radio', options: ['default', 'compact'] } },
@@ -175,4 +231,12 @@ export const StickyHeader: Story = {
         </table>
       </div>`,
   }),
+};
+
+/**
+ * Row selection: the header checkbox is mixed while some rows are selected. Shift+click selects
+ * a range.
+ */
+export const Selection: Story = {
+  render: () => ({ template: `<ui-story-selection-table dir="rtl" lang="he" />` }),
 };
