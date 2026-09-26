@@ -3,57 +3,15 @@
 // playwright-core, so no browser download is needed.
 //
 // Usage: pnpm build-storybook && pnpm test-storybook [--filter <story id part>]
-import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { extname, join, normalize, resolve } from 'node:path';
 import { chromium } from 'playwright-core';
+import { MODES, loadStories, openStory, option, startServer } from './storybook-pages.mjs';
 
 const require = createRequire(import.meta.url);
-const root = resolve('dist/storybook/ui-kit');
 const axeSource = await readFile(require.resolve('axe-core/axe.min.js'), 'utf8');
-const filterIndex = process.argv.indexOf('--filter');
-const filter = filterIndex > 0 ? process.argv[filterIndex + 1] : '';
-
-const MODES = [
-  { theme: 'light', dir: 'rtl' },
-  { theme: 'dark', dir: 'rtl' },
-  { theme: 'light', dir: 'ltr' },
-];
-
-const TYPES = {
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.mjs': 'text/javascript',
-  '.css': 'text/css',
-  '.json': 'application/json',
-  '.svg': 'image/svg+xml',
-  '.woff2': 'font/woff2',
-  '.png': 'image/png',
-};
-
-const server = createServer(async (request, response) => {
-  const path = normalize(decodeURIComponent(new URL(request.url, 'http://x').pathname));
-  const file = join(root, path.endsWith('/') ? `${path}index.html` : path);
-  if (!file.startsWith(root)) {
-    response.writeHead(403).end();
-    return;
-  }
-  try {
-    const body = await readFile(file);
-    response.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
-    response.end(body);
-  } catch {
-    response.writeHead(404).end();
-  }
-});
-await new Promise((done) => server.listen(0, '127.0.0.1', done));
-const base = `http://127.0.0.1:${server.address().port}`;
-
-const index = JSON.parse(await readFile(join(root, 'index.json'), 'utf8'));
-const stories = Object.values(index.entries).filter(
-  (entry) => entry.type === 'story' && entry.id.includes(filter),
-);
+const stories = await loadStories(option('--filter'));
+const server = await startServer();
 
 const browser = await chromium.launch({ channel: 'msedge' });
 const page = await browser.newPage();
@@ -75,11 +33,9 @@ page.on('response', (response) => {
 
 const failures = [];
 for (const story of stories) {
-  for (const { theme, dir } of MODES) {
+  for (const mode of MODES) {
     errors.length = 0;
-    const url = `${base}/iframe.html?id=${story.id}&viewMode=story&globals=theme:${theme};dir:${dir}`;
-    await page.goto(url);
-    await page.waitForSelector('#storybook-root > *', { timeout: 10000 }).catch(() => undefined);
+    await openStory(page, server.base, story.id, mode);
     // Let entry animations finish, so colours are measured at rest.
     await page.waitForTimeout(400);
     await page.addScriptTag({ content: axeSource });
@@ -93,11 +49,11 @@ for (const story of stories) {
         nodes: v.nodes.map((n) => n.target.join(' ')).slice(0, 3),
       }));
     });
-    const mode = `${theme}/${dir}`;
+    const name = `${mode.theme}/${mode.dir}`;
     for (const v of violations) {
-      failures.push(`${story.id} [${mode}] ${v.id}: ${v.help}\n      ${v.nodes.join('\n      ')}`);
+      failures.push(`${story.id} [${name}] ${v.id}: ${v.help}\n      ${v.nodes.join('\n      ')}`);
     }
-    for (const error of errors) failures.push(`${story.id} [${mode}] console: ${error}`);
+    for (const error of errors) failures.push(`${story.id} [${name}] console: ${error}`);
   }
 }
 

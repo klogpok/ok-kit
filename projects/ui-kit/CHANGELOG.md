@@ -3,6 +3,15 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (phase 6.0: test infrastructure)
+
+### Added
+
+- **tooling:** visual regression. `pnpm test-visual` compares a screenshot of every built story
+  in light/rtl, dark/rtl and light/ltr with the baselines in `visual/` (`pixelmatch`, 0.1% of
+  the pixels); `pnpm test-visual:update` writes new or changed baselines. The Storybook server
+  and story list are shared with `test-storybook` (`scripts/storybook-pages.mjs`).
+
 ## Unreleased (phase 6: everyday blocks)
 
 ### Added

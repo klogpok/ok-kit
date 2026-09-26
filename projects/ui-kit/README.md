@@ -1025,22 +1025,24 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 
 ### Scripts
 
-| Command                 | What it does                                                           |
-| ----------------------- | ---------------------------------------------------------------------- |
-| `pnpm start`            | Playground dev server                                                  |
-| `pnpm tokens`           | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast         |
-| `pnpm test`             | Unit tests (Vitest)                                                    |
-| `pnpm test:watch`       | Unit tests in watch mode                                               |
-| `pnpm test:coverage`    | Unit tests with coverage; fails below the thresholds in `angular.json` |
-| `pnpm test:playground`  | Playground smoke tests                                                 |
-| `pnpm lint`             | ESLint (strictTypeChecked, templates, a11y) and Stylelint              |
-| `pnpm format`           | Prettier (write)                                                       |
-| `pnpm format:check`     | Prettier (check only)                                                  |
-| `pnpm build`            | Tokens and the library build into `dist/ui-kit`                        |
-| `pnpm build:playground` | Playground build (checks the bundle budgets)                           |
-| `pnpm storybook`        | Storybook dev server                                                   |
-| `pnpm build-storybook`  | Static Storybook in `dist/storybook/ui-kit`                            |
-| `pnpm test-storybook`   | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes    |
+| Command                   | What it does                                                           |
+| ------------------------- | ---------------------------------------------------------------------- |
+| `pnpm start`              | Playground dev server                                                  |
+| `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast         |
+| `pnpm test`               | Unit tests (Vitest)                                                    |
+| `pnpm test:watch`         | Unit tests in watch mode                                               |
+| `pnpm test:coverage`      | Unit tests with coverage; fails below the thresholds in `angular.json` |
+| `pnpm test:playground`    | Playground smoke tests                                                 |
+| `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint              |
+| `pnpm format`             | Prettier (write)                                                       |
+| `pnpm format:check`       | Prettier (check only)                                                  |
+| `pnpm build`              | Tokens and the library build into `dist/ui-kit`                        |
+| `pnpm build:playground`   | Playground build (checks the bundle budgets)                           |
+| `pnpm storybook`          | Storybook dev server                                                   |
+| `pnpm build-storybook`    | Static Storybook in `dist/storybook/ui-kit`                            |
+| `pnpm test-storybook`     | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes    |
+| `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`     |
+| `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                         |
 
 ### Adding a component
 
@@ -1066,6 +1068,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
    - ARIA attributes;
    - for form controls, Reactive Forms and Signal Forms (value both ways, disabled, touched, error linking).
 8. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL.
-9. Keep commits small, one per component: `feat(<name>): ...`.
+9. Visual baselines: after `pnpm build-storybook`, run `pnpm test-visual:update` for new or intentionally changed stories and look at the new PNGs in `visual/` before you commit them. `pnpm test-visual` must pass. A failure writes the new screenshot and a diff to `dist/visual-diff/`. The baselines are taken in the installed Edge at 1024×768 with reduced motion and a fixed date (2026-09-25), so a new Edge version may need an update of all baselines.
+10. Keep commits small, one per component: `feat(<name>): ...`.
 
 Anything not exported from an entry point's `public-api.ts` is internal and may change without notice.
