@@ -776,6 +776,17 @@
   --ui-chip-filter-selected-border: var(--ui-color-primary);
   --ui-chip-filter-selected-text: var(--ui-color-primary-text);
   --ui-chip-set-gap: var(--ui-space-xs);
+  --ui-file-upload-zone-bg: var(--ui-color-surface);
+  --ui-file-upload-zone-border: var(--ui-color-border-control);
+  --ui-file-upload-zone-text: var(--ui-color-text-muted);
+  --ui-file-upload-zone-hover-bg: var(--ui-color-surface-hover);
+  --ui-file-upload-zone-active-bg: var(--ui-color-primary-subtle);
+  --ui-file-upload-zone-active-border: var(--ui-color-primary);
+  --ui-file-upload-zone-radius: var(--ui-radius-container);
+  --ui-file-upload-zone-padding: var(--ui-space-xl);
+  --ui-file-upload-file-border: var(--ui-color-border);
+  --ui-file-upload-file-radius: var(--ui-radius-control);
+  --ui-file-upload-gap: var(--ui-space-sm);
   --ui-calendar-cell-size: var(--ui-control-height-md);
   --ui-calendar-cell-radius: var(--ui-radius-full);
   --ui-calendar-gap: var(--ui-space-3xs);

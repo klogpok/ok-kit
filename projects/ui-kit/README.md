@@ -135,6 +135,7 @@ All form controls work with **Signal Forms**, **Reactive Forms** and **template-
 | `ui-number-input`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-chip-input`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 | `ui-autocomplete`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| `ui-file-upload`           | `FormValueControl` (`value`)      | `ControlValueAccessor` |
 
 Every control supports `disabled`, `readonly` (also from a Signal Forms `readonly()` rule),
 `required` and `aria-describedby`. A readonly control stays focusable and reports
@@ -209,6 +210,26 @@ required field.
   <ui-chip-input [formField]="form.tags" placeholder="Add a tag" />
 </ui-form-field>
 ```
+
+`ui-file-upload` picks files with a drop area (a button) and lists them with a remove button.
+The value is a `File[]`. `accept`, `maxSize` (bytes) and `maxFiles` do not drop files: a file
+that breaks them stays in the list, marked, and the control reports `uiFileType`,
+`uiFileSize` or `uiFileCount` with a message, so the form stays invalid until the user removes
+it. The kit does not upload: pass the progress per file (0–100) in `progress`.
+
+```html
+<ui-form-field label="Plans" hint="PDF, up to 10 MB">
+  <ui-file-upload
+    [formField]="form.plans"
+    accept=".pdf"
+    multiple
+    [maxSize]="10 * 1024 * 1024"
+    [progress]="uploads()"
+  />
+</ui-form-field>
+```
+
+`variant="button"` shows a compact button instead of the drop area.
 
 The calendar title switches to a grid of months and then of years for long jumps. The datepicker
 dialog has **Today** and **Clear** buttons (the `today` and `clear` labels).
@@ -778,7 +799,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/datepicker`   | `UiDatepicker`, `UiCalendar`, `UiCalendarView`, `UiDateFilter`                                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/icon`         | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                         |
 | `@vplans/ui-kit/theme`        | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                                                                                                                                |
-| `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, `UiChipHarness`, `UiChipInputHarness`, `UiAutocompleteHarness`, their `*HarnessFilters`                                                         |
+| `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, `UiChipHarness`, `UiChipInputHarness`, `UiAutocompleteHarness`, `UiFileUploadHarness` (+ `UiFileUploadItem`), their `*HarnessFilters`           |
 | `@vplans/ui-kit/core`         | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`                                                                       |
 
 ## Tokens
@@ -1262,6 +1283,17 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-chip-filter-selected-border`       | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
 | `--ui-chip-filter-selected-text`         | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
 | `--ui-chip-set-gap`                      | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
+| `--ui-file-upload-zone-bg`               | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
+| `--ui-file-upload-zone-border`           | component | `var(--ui-color-border-control)`                                             | `var(--ui-color-border-control)`                                       |
+| `--ui-file-upload-zone-text`             | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
+| `--ui-file-upload-zone-hover-bg`         | component | `var(--ui-color-surface-hover)`                                              | `var(--ui-color-surface-hover)`                                        |
+| `--ui-file-upload-zone-active-bg`        | component | `var(--ui-color-primary-subtle)`                                             | `var(--ui-color-primary-subtle)`                                       |
+| `--ui-file-upload-zone-active-border`    | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-file-upload-zone-radius`           | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
+| `--ui-file-upload-zone-padding`          | component | `var(--ui-space-xl)`                                                         | `var(--ui-space-xl)`                                                   |
+| `--ui-file-upload-file-border`           | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
+| `--ui-file-upload-file-radius`           | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-file-upload-gap`                   | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
 | `--ui-calendar-cell-size`                | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
 | `--ui-calendar-cell-radius`              | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
 | `--ui-calendar-gap`                      | component | `var(--ui-space-3xs)`                                                        | `var(--ui-space-3xs)`                                                  |

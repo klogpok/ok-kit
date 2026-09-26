@@ -72,6 +72,20 @@ export interface UiLabels {
   removeChip: (label: string) => string;
   /** Announced when a chip is removed, e.g. "Haifa removed". */
   chipRemoved: (label: string) => string;
+  /** Text of the `ui-file-upload` drop area. */
+  dropFiles: string;
+  /** Text of the `ui-file-upload` button (`variant="button"`). */
+  chooseFiles: string;
+  /** Remove button of a file in `ui-file-upload`, e.g. "Remove plan.pdf". */
+  removeFile: (name: string) => string;
+  /** Announced when a file is removed from `ui-file-upload`. */
+  fileRemoved: (name: string) => string;
+  /** Error of a file larger than `maxSize` (a formatted size, e.g. "10 MB"). */
+  fileTooLarge: (name: string, maxSize: string) => string;
+  /** Error of a file that `accept` does not allow. */
+  fileTypeNotAllowed: (name: string) => string;
+  /** Error when there are more files than `maxFiles`. */
+  tooManyFiles: (max: number) => string;
   /** Stepper buttons of `ui-number-input`. */
   increment: string;
   decrement: string;
@@ -122,6 +136,14 @@ export const UI_LABELS_HE: UiLabels = {
   today: 'היום',
   removeChip: (label) => `הסרת ${label}`,
   chipRemoved: (label) => `${label} הוסר`,
+  dropFiles: 'גררו קבצים לכאן או לחצו לבחירה',
+  chooseFiles: 'בחירת קבצים',
+  removeFile: (name) => `הסרת ${name}`,
+  fileRemoved: (name) => `${name} הוסר`,
+  // The isolates (FSI…PDI) keep a Latin file name or size from reordering the Hebrew text.
+  fileTooLarge: (name, maxSize) => `\u2068${name}\u2069 גדול מ-\u2068${maxSize}\u2069`,
+  fileTypeNotAllowed: (name) => `סוג הקובץ \u2068${name}\u2069 אינו נתמך`,
+  tooManyFiles: (max) => `אפשר לצרף עד ${max} קבצים`,
   increment: 'הגדלה',
   decrement: 'הקטנה',
   invalidNumber: 'מספר לא תקין',
@@ -167,6 +189,13 @@ export const UI_LABELS_EN: UiLabels = {
   today: 'Today',
   removeChip: (label) => `Remove ${label}`,
   chipRemoved: (label) => `${label} removed`,
+  dropFiles: 'Drop files here or click to browse',
+  chooseFiles: 'Choose files',
+  removeFile: (name) => `Remove ${name}`,
+  fileRemoved: (name) => `${name} removed`,
+  fileTooLarge: (name, maxSize) => `${name} is larger than ${maxSize}`,
+  fileTypeNotAllowed: (name) => `${name} is not an allowed file type`,
+  tooManyFiles: (max) => `Attach up to ${max} files`,
   increment: 'Increase',
   decrement: 'Decrease',
   invalidNumber: 'Enter a valid number',

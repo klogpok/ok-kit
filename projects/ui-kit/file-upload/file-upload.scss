@@ -1,0 +1,176 @@
+@use '../styles/mixins';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-file-upload-gap);
+  min-inline-size: 0;
+  font-family: var(--ui-font-family-sans);
+}
+
+.ui-file-upload__zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-xs);
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--ui-file-upload-zone-padding);
+  border: var(--ui-border-width-default) dashed var(--ui-file-upload-zone-border);
+  border-radius: var(--ui-file-upload-zone-radius);
+  background-color: var(--ui-file-upload-zone-bg);
+  color: var(--ui-file-upload-zone-text);
+  font: inherit;
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-snug);
+  text-align: center;
+  cursor: pointer;
+  @include mixins.transition(background-color, border-color, color);
+  @include mixins.focus-visible;
+
+  &:hover:not(:disabled, [aria-disabled='true']) {
+    border-color: var(--ui-input-border-hover);
+    background-color: var(--ui-file-upload-zone-hover-bg);
+    color: var(--ui-color-text);
+  }
+}
+
+.ui-file-upload__icon {
+  font-size: var(--ui-icon-size-lg);
+}
+
+// A file is dragged over the area.
+.ui-file-upload__zone--over,
+.ui-file-upload__zone--over:hover:not(:disabled) {
+  border-style: solid;
+  border-color: var(--ui-file-upload-zone-active-border);
+  background-color: var(--ui-file-upload-zone-active-bg);
+  color: var(--ui-color-primary-text);
+}
+
+// The compact look: a secondary button.
+:host(.ui-file-upload--button) .ui-file-upload__zone {
+  flex-direction: row;
+  align-self: flex-start;
+  inline-size: auto;
+  min-block-size: var(--ui-control-height-md);
+  padding-block: 0;
+  padding-inline: var(--ui-control-padding-inline-md);
+  border-style: solid;
+  border-radius: var(--ui-radius-control);
+  color: var(--ui-color-text);
+
+  .ui-file-upload__icon {
+    font-size: var(--ui-icon-size-sm);
+  }
+}
+
+:host(.ui-file-upload--invalid) .ui-file-upload__zone {
+  border-color: var(--ui-input-border-invalid);
+}
+
+:host(.ui-file-upload--readonly) .ui-file-upload__zone {
+  background-color: var(--ui-color-surface-subtle);
+  cursor: default;
+}
+
+.ui-file-upload__zone:disabled {
+  border-color: var(--ui-color-border);
+  background-color: var(--ui-input-bg-disabled);
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.ui-file-upload__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-file-upload__file {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-sm);
+  padding-block: var(--ui-space-xs);
+  padding-inline: var(--ui-space-sm) var(--ui-space-2xs);
+  border: var(--ui-border-width-default) solid var(--ui-file-upload-file-border);
+  border-radius: var(--ui-file-upload-file-radius);
+  color: var(--ui-color-text);
+  font-size: var(--ui-font-size-sm);
+}
+
+.ui-file-upload__file-icon {
+  flex-shrink: 0;
+  color: var(--ui-color-text-muted);
+}
+
+.ui-file-upload__file-text {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ui-space-3xs) var(--ui-space-sm);
+  min-inline-size: 0;
+}
+
+.ui-file-upload__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-file-upload__size {
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-xs);
+  white-space: nowrap;
+}
+
+.ui-file-upload__progress {
+  flex-basis: 100%;
+}
+
+.ui-file-upload__file--invalid {
+  border-color: var(--ui-color-danger);
+
+  .ui-file-upload__file-icon,
+  .ui-file-upload__name {
+    color: var(--ui-color-danger-text);
+  }
+}
+
+.ui-file-upload__remove {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--ui-space-2xs);
+  border: 0;
+  border-radius: var(--ui-radius-full);
+  background: none;
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-icon-size-sm);
+  cursor: pointer;
+  @include mixins.transition(background-color, color);
+  @include mixins.focus-visible(0);
+
+  &:hover {
+    background-color: var(--ui-color-surface-hover);
+    color: var(--ui-color-text);
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-file-upload__zone--over {
+    border-color: Highlight;
+  }
+
+  .ui-file-upload__file--invalid {
+    border-style: dashed;
+  }
+}

@@ -38,6 +38,13 @@ so versions mark review points rather than releases.
 - **autocomplete:** new entry point with `ui-autocomplete`: free text with suggestions, or a
   pick-one mode with `displayWith` for objects; `(searchChange)`, `filterOptions`, `loading`,
   `compareWith`; `UiAutocompleteHarness` in testing.
+- **file-upload:** new entry point with `ui-file-upload`: a drop area that is a button (or
+  `variant="button"`), a file list with sizes, remove buttons and progress bars, `accept` /
+  `maxSize` / `maxFiles` reported as `uiFileType` / `uiFileSize` / `uiFileCount` form errors;
+  `UiFileUploadHarness` in testing.
+- **tokens:** `--ui-file-upload-*`.
+- **labels:** `dropFiles`, `chooseFiles`, `removeFile`, `fileRemoved`, `fileTooLarge`,
+  `fileTypeNotAllowed`, `tooManyFiles`.
 
 ## Unreleased (phase 6.0: test infrastructure)
 

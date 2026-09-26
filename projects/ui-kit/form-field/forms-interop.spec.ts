@@ -4,6 +4,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UiChipInput } from '@vplans/ui-kit/chip';
 import { UiDatepicker } from '@vplans/ui-kit/datepicker';
+import { UiFileUpload } from '@vplans/ui-kit/file-upload';
 import { UiNumberInput } from '@vplans/ui-kit/number-input';
 import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
 import { UiMultiSelect, UiOption, UiSelect } from '@vplans/ui-kit/select';
@@ -26,6 +27,7 @@ const CONTROLS = [
   UiDatepicker,
   UiNumberInput,
   UiChipInput,
+  UiFileUpload,
 ];
 
 @Component({
@@ -49,6 +51,7 @@ const CONTROLS = [
       <ui-datepicker formControlName="date" aria-label="Date" />
       <ui-number-input formControlName="units" aria-label="Units" />
       <ui-chip-input formControlName="labels" aria-label="Labels" />
+      <ui-file-upload formControlName="plans" aria-label="Plans" multiple />
     </form>
   `,
 })
@@ -62,6 +65,7 @@ class NamedHost {
     date: new FormControl<Date | null>(new Date(2026, 8, 25)),
     units: new FormControl<number | null>(1200),
     labels: new FormControl<readonly string[]>(['north']),
+    plans: new FormControl<readonly File[]>([new File(['x'], 'a.pdf')]),
   });
 }
 
@@ -76,6 +80,7 @@ class NamedHost {
     UiDatepicker,
     UiNumberInput,
     UiChipInput,
+    UiFileUpload,
   ],
   template: `
     <ui-checkbox name="terms" [(ngModel)]="terms">Terms</ui-checkbox>
@@ -90,6 +95,7 @@ class NamedHost {
     <ui-datepicker name="date" aria-label="Date" [(ngModel)]="date" />
     <ui-number-input name="units" aria-label="Units" [(ngModel)]="units" />
     <ui-chip-input name="labels" aria-label="Labels" [(ngModel)]="labels" />
+    <ui-file-upload name="plans" aria-label="Plans" [(ngModel)]="plans" />
   `,
 })
 class NgModelHost {
@@ -99,6 +105,7 @@ class NgModelHost {
   readonly date = signal<Date | null>(null);
   readonly units = signal<number | null>(3);
   readonly labels = signal<readonly string[]>([]);
+  readonly plans = signal<readonly File[]>([]);
 }
 
 describe('Custom form controls with formControlName', () => {
@@ -119,6 +126,7 @@ describe('Custom form controls with formControlName', () => {
     const units = root.querySelector<HTMLInputElement>('.ui-number-input__input')!;
     expect(units.value).toBe('1,200');
     expect(root.querySelector('ui-chip')!.textContent).toContain('north');
+    expect(root.querySelector('.ui-file-upload__name')!.textContent).toBe('a.pdf');
 
     alerts.click();
     inputs[2].click();
@@ -133,6 +141,9 @@ describe('Custom form controls with formControlName', () => {
     root.querySelector<HTMLButtonElement>('.ui-chip__remove')!.click();
     await settle(fixture);
     expect(form.value.labels).toEqual([]);
+    root.querySelector<HTMLButtonElement>('.ui-file-upload__remove')!.click();
+    await settle(fixture);
+    expect(form.value.plans).toEqual([]);
 
     form.disable();
     await settle(fixture);
@@ -178,6 +189,12 @@ describe('Custom form controls with ngModel', () => {
     labels.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
     await settle(fixture);
     expect(host.labels()).toEqual(['east']);
+    const picker = root.querySelector<HTMLInputElement>('input[type=file]')!;
+    const plan = new File(['x'], 'b.pdf');
+    Object.defineProperty(picker, 'files', { value: [plan] });
+    picker.dispatchEvent(new Event('change'));
+    await settle(fixture);
+    expect(host.plans()).toEqual([plan]);
 
     host.city.set('eilat');
     await settle(fixture);

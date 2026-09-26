@@ -3776,6 +3776,72 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-space-xs)"
   },
   {
+    "name": "--ui-file-upload-zone-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-file-upload-zone-border",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-file-upload-zone-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-file-upload-zone-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-hover)",
+    "dark": "var(--ui-color-surface-hover)"
+  },
+  {
+    "name": "--ui-file-upload-zone-active-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
+    "name": "--ui-file-upload-zone-active-border",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-file-upload-zone-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-container)",
+    "dark": "var(--ui-radius-container)"
+  },
+  {
+    "name": "--ui-file-upload-zone-padding",
+    "layer": "component",
+    "light": "var(--ui-space-xl)",
+    "dark": "var(--ui-space-xl)"
+  },
+  {
+    "name": "--ui-file-upload-file-border",
+    "layer": "component",
+    "light": "var(--ui-color-border)",
+    "dark": "var(--ui-color-border)"
+  },
+  {
+    "name": "--ui-file-upload-file-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-file-upload-gap",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
     "name": "--ui-calendar-cell-size",
     "layer": "component",
     "light": "var(--ui-control-height-md)",
