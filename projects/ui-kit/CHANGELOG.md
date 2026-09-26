@@ -13,6 +13,7 @@ so versions mark review points rather than releases.
 - **labels:** `dismiss`.
 - **empty-state:** `ui-empty-state` with icon or illustration slots, a heading title, description
   and actions; `size="sm"` for cards and `tr[ui-table-message]`.
+- **progress:** `ui-progress-bar`, determinate or indeterminate, with sizes and tones.
 
 ## Phase 5: second audit
 

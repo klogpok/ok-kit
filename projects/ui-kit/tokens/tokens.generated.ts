@@ -2258,6 +2258,54 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-size-sm)"
   },
   {
+    "name": "--ui-progress-track",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-progress-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-full)",
+    "dark": "var(--ui-radius-full)"
+  },
+  {
+    "name": "--ui-progress-height-sm",
+    "layer": "component",
+    "light": "var(--ui-space-2xs)",
+    "dark": "var(--ui-space-2xs)"
+  },
+  {
+    "name": "--ui-progress-height-md",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-progress-primary",
+    "layer": "component",
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
+  },
+  {
+    "name": "--ui-progress-success",
+    "layer": "component",
+    "light": "var(--ui-color-success)",
+    "dark": "var(--ui-color-success)"
+  },
+  {
+    "name": "--ui-progress-warning",
+    "layer": "component",
+    "light": "var(--ui-color-warning)",
+    "dark": "var(--ui-color-warning)"
+  },
+  {
+    "name": "--ui-progress-danger",
+    "layer": "component",
+    "light": "var(--ui-color-danger)",
+    "dark": "var(--ui-color-danger)"
+  },
+  {
     "name": "--ui-card-bg",
     "layer": "component",
     "light": "var(--ui-color-surface)",

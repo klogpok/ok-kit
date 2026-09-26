@@ -491,6 +491,14 @@
   --ui-empty-state-title-font-weight: var(--ui-font-weight-semibold);
   --ui-empty-state-description-color: var(--ui-color-text-muted);
   --ui-empty-state-description-font-size: var(--ui-font-size-sm);
+  --ui-progress-track: var(--ui-color-surface-muted);
+  --ui-progress-radius: var(--ui-radius-full);
+  --ui-progress-height-sm: var(--ui-space-2xs);
+  --ui-progress-height-md: var(--ui-space-sm);
+  --ui-progress-primary: var(--ui-color-primary);
+  --ui-progress-success: var(--ui-color-success);
+  --ui-progress-warning: var(--ui-color-warning);
+  --ui-progress-danger: var(--ui-color-danger);
   --ui-card-bg: var(--ui-color-surface);
   --ui-card-border: var(--ui-color-border);
   --ui-card-radius: var(--ui-radius-container);

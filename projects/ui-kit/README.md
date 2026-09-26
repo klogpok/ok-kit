@@ -419,6 +419,14 @@ Screen readers announce a region when it is added, so render a live alert with `
 
 Mark an image or SVG with `uiEmptyStateMedia` to show it without the circle.
 
+```html
+<!-- Progress bar: indeterminate without a value -->
+<ui-progress-bar [value]="uploaded()" [max]="size()" label="Uploading plan.pdf" />
+<ui-progress-bar size="sm" />
+```
+
+The bar is named by `label`, by `aria-labelledby`, or by the `loading` label.
+
 ## Components
 
 | Entry point                  | Exports                                                                                                                                                                                                                                                          |
@@ -434,6 +442,7 @@ Mark an image or SVG with `uiEmptyStateMedia` to show it without the circle.
 | `@vplans/ui-kit/divider`     | `UiDivider`                                                                                                                                                                                                                                                      |
 | `@vplans/ui-kit/alert`       | `UiAlert`, `UiAlertTone`, `UiAlertLive`                                                                                                                                                                                                                          |
 | `@vplans/ui-kit/empty-state` | `UiEmptyState`                                                                                                                                                                                                                                                   |
+| `@vplans/ui-kit/progress`    | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                |
 | `@vplans/ui-kit/badge`       | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                         |
 | `@vplans/ui-kit/table`       | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types                                                                                                                                             |
 | `@vplans/ui-kit/card`        | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                       |
@@ -696,6 +705,14 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-empty-state-title-font-weight`     | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 | `--ui-empty-state-description-color`     | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-empty-state-description-font-size` | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
+| `--ui-progress-track`                    | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
+| `--ui-progress-radius`                   | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
+| `--ui-progress-height-sm`                | component | `var(--ui-space-2xs)`                                                        | `var(--ui-space-2xs)`                                                  |
+| `--ui-progress-height-md`                | component | `var(--ui-space-sm)`                                                         | `var(--ui-space-sm)`                                                   |
+| `--ui-progress-primary`                  | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
+| `--ui-progress-success`                  | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
+| `--ui-progress-warning`                  | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
+| `--ui-progress-danger`                   | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
 | `--ui-card-bg`                           | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
 | `--ui-card-border`                       | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-card-radius`                       | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |

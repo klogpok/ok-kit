@@ -193,6 +193,11 @@ const contrastPairs: [fg: string, bg: string, min: number][] = [
   ['color.success', 'color.success-subtle', UI],
   ['color.warning', 'color.warning-subtle', UI],
   ['color.danger', 'color.danger-subtle', UI],
+  // Progress bar indicators on their track.
+  ['color.primary', 'color.surface-muted', UI],
+  ['color.success', 'color.surface-muted', UI],
+  ['color.warning', 'color.surface-muted', UI],
+  ['color.danger', 'color.surface-muted', UI],
   ['color.border-control', 'color.bg', UI],
   ['color.border-control', 'color.surface', UI],
   ['color.border-control', 'color.control-bg', UI],

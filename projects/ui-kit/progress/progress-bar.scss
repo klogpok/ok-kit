@@ -1,0 +1,85 @@
+@use '../styles/mixins';
+
+:host {
+  display: block;
+  inline-size: 100%;
+}
+
+:host(.ui-progress-bar--sm) {
+  --_height: var(--ui-progress-height-sm);
+}
+
+:host(.ui-progress-bar--md) {
+  --_height: var(--ui-progress-height-md);
+}
+
+@each $tone in primary, success, warning, danger {
+  :host(.ui-progress-bar--#{$tone}) {
+    --_indicator: var(--ui-progress-#{$tone});
+  }
+}
+
+.ui-progress-bar__track {
+  position: relative;
+  block-size: var(--_height);
+  overflow: hidden;
+  border-radius: var(--ui-progress-radius);
+  background-color: var(--ui-progress-track);
+}
+
+.ui-progress-bar__indicator {
+  block-size: 100%;
+  border-radius: inherit;
+  background-color: var(--_indicator);
+  @include mixins.transition(inline-size);
+}
+
+// A bar of 40% slides from the start to the end of the track.
+:host(.ui-progress-bar--indeterminate) .ui-progress-bar__indicator {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 40%;
+  animation: ui-progress-slide calc(var(--ui-motion-duration-slow) * 5)
+    var(--ui-motion-easing-standard) infinite;
+}
+
+:host(.ui-progress-bar--indeterminate:dir(rtl)) .ui-progress-bar__indicator {
+  animation-name: ui-progress-slide-rtl;
+}
+
+@keyframes ui-progress-slide {
+  from {
+    translate: -100%;
+  }
+
+  to {
+    translate: 250%;
+  }
+}
+
+@keyframes ui-progress-slide-rtl {
+  from {
+    translate: 100%;
+  }
+
+  to {
+    translate: -250%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.ui-progress-bar--indeterminate) .ui-progress-bar__indicator {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-progress-bar__track {
+    border: var(--ui-border-width-default) solid CanvasText;
+  }
+
+  .ui-progress-bar__indicator {
+    background-color: Highlight;
+  }
+}
