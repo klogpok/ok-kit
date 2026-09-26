@@ -1,0 +1,24 @@
+<h2 class="ui-heading-3">Phase 8</h2>
+
+<section aria-labelledby="filters-title">
+  <h3 id="filters-title" class="ui-heading-4">Unit filters (sliders, Signal Forms)</h3>
+  <div class="filters">
+    <ui-form-field label="Rooms" hint="From the min() and max() rules">
+      <ui-slider [formField]="filters.rooms" marks />
+    </ui-form-field>
+    <ui-form-field label="Rent per month">
+      <ui-range-slider
+        [formField]="filters.price"
+        [limits]="[0, 15000]"
+        step="500"
+        [valueText]="priceText"
+        (valueCommit)="committedPrice.set($event)"
+      />
+    </ui-form-field>
+    <ui-form-field label="Floors">
+      <ui-range-slider [formField]="filters.floors" [limits]="[1, 12]" [marks]="floorMarks" />
+    </ui-form-field>
+  </div>
+  <pre>{{ model() | json }}</pre>
+  <p>Last committed rent: {{ committedPrice() | json }}</p>
+</section>

@@ -25,6 +25,7 @@ import { ThemeService } from '@vplans/ui-kit/theme';
 import { UiToast } from '@vplans/ui-kit/toast';
 import { UiTooltip } from '@vplans/ui-kit/tooltip';
 import { FileCard, StoredFile } from './file-card';
+import { PhaseEight } from './phase-eight';
 import { PhaseSeven } from './phase-seven';
 import { PhaseSix } from './phase-six';
 import { PhaseThree } from './phase-three';
@@ -69,6 +70,7 @@ interface Plan {
     PhaseThree,
     PhaseSix,
     PhaseSeven,
+    PhaseEight,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
