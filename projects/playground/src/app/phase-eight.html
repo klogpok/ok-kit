@@ -1,8 +1,24 @@
 <h2 class="ui-heading-3">Phase 8</h2>
 
 <section aria-labelledby="filters-title">
-  <h3 id="filters-title" class="ui-heading-4">Unit filters (sliders, Signal Forms)</h3>
+  <h3 id="filters-title" class="ui-heading-4">
+    Unit filters (segmented, button toggles, sliders, Signal Forms)
+  </h3>
   <div class="filters">
+    <ui-form-field label="Deal">
+      <ui-segmented [formField]="filters.deal" fullWidth>
+        <ui-segment value="rent">Rent</ui-segment>
+        <ui-segment value="sale">Sale</ui-segment>
+      </ui-segmented>
+    </ui-form-field>
+    <ui-form-field label="Features" hint="At least one">
+      <ui-button-toggle-group [formField]="filters.features">
+        <button ui-button-toggle value="parking">Parking</button>
+        <button ui-button-toggle value="elevator">Elevator</button>
+        <button ui-button-toggle value="balcony">Balcony</button>
+        <button ui-button-toggle value="storage">Storage</button>
+      </ui-button-toggle-group>
+    </ui-form-field>
     <ui-form-field label="Rooms" hint="From the min() and max() rules">
       <ui-slider [formField]="filters.rooms" marks />
     </ui-form-field>

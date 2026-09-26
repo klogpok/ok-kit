@@ -1,6 +1,15 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { FormField, form, max, min, minDate, required, validate } from '@angular/forms/signals';
+import {
+  FormField,
+  form,
+  max,
+  min,
+  minDate,
+  minLength,
+  required,
+  validate,
+} from '@angular/forms/signals';
 import { UiButton } from '@vplans/ui-kit/button';
 import {
   UiDateRange,
@@ -9,11 +18,19 @@ import {
   UiDatepicker,
 } from '@vplans/ui-kit/datepicker';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import {
+  UiButtonToggle,
+  UiButtonToggleGroup,
+  UiSegment,
+  UiSegmented,
+} from '@vplans/ui-kit/segmented';
 import { UiRangeSlider, UiSlider, UiSliderMark, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiStep, UiStepper, UiStepperNext, UiStepperPrevious } from '@vplans/ui-kit/stepper';
 import { UiTimeInput, uiDateWithTime } from '@vplans/ui-kit/time';
 
 interface UnitFilters {
+  deal: 'rent' | 'sale';
+  features: readonly string[];
   rooms: number;
   price: UiSliderRange;
   floors: UiSliderRange;
@@ -35,10 +52,14 @@ const addDays = (date: Date, days: number) =>
     JsonPipe,
     FormField,
     UiButton,
+    UiButtonToggle,
+    UiButtonToggleGroup,
     UiDatepicker,
     UiDateRangePicker,
     UiFormField,
     UiRangeSlider,
+    UiSegment,
+    UiSegmented,
     UiSlider,
     UiStep,
     UiStepper,
@@ -52,11 +73,14 @@ const addDays = (date: Date, days: number) =>
 })
 export class PhaseEight {
   protected readonly model = signal<UnitFilters>({
+    deal: 'rent',
+    features: ['parking'],
     rooms: 3,
     price: [4000, 9000],
     floors: [2, 8],
   });
   protected readonly filters = form(this.model, (p) => {
+    minLength(p.features, 1, { message: 'Choose at least one feature' });
     min(p.rooms, 1);
     max(p.rooms, 6);
   });
