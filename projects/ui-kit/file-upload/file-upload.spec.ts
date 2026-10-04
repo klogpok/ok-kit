@@ -1,9 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, minLength } from '@angular/forms/signals';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiFileUploadHarness } from '@vplans/ui-kit/testing';
 import { UiFileUpload } from './file-upload';
 import { acceptsFile, fileProblem, formatFileSize, sameFile } from './file-utils';
 
@@ -219,82 +221,159 @@ describe('UiFileUpload', () => {
   });
 });
 
+/** Reactive forms show the message of an error value that is a string. */
+const attachAPlan: ValidatorFn = (control) =>
+  (control.value as readonly File[] | null)?.length ? null : { plans: 'Attach a plan' };
+
 @Component({
   imports: [UiFileUpload, UiFormField, ReactiveFormsModule],
   template: `
-    <ui-form-field label="Plans">
-      <ui-file-upload [formControl]="files" accept=".pdf" multiple variant="button" />
-    </ui-form-field>
+    <form [formGroup]="form">
+      <ui-form-field label="Plans">
+        <ui-file-upload formControlName="plans" accept=".pdf" multiple variant="button" />
+      </ui-form-field>
+      <ui-form-field label="Scans">
+        <ui-file-upload
+          formControlName="scans"
+          accept=".pdf"
+          multiple
+          [maxSize]="2000"
+          [maxFiles]="1"
+        />
+      </ui-form-field>
+    </form>
   `,
 })
 class ReactiveHost {
-  readonly files = new FormControl<readonly File[]>([], Validators.required);
+  readonly form = new FormGroup({
+    plans: new FormControl<readonly File[]>([], attachAPlan),
+    scans: new FormControl<readonly File[]>([]),
+  });
 }
 
-describe('UiFileUpload with forms', () => {
-  it('works with Reactive Forms and reports file errors', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
-    const root = fixture.nativeElement as HTMLElement;
-    await settle(fixture);
-    const { files } = fixture.componentInstance;
-    expect(root.querySelector('.ui-file-upload__zone')!.textContent).toContain('בחירת קבצים');
-    expect(files.invalid).toBe(true);
-    pick(root, [file('a.pdf')]);
-    await settle(fixture);
-    expect(files.value!.map((f) => f.name)).toEqual(['a.pdf']);
-    expect(files.valid).toBe(true);
+describe('UiFileUpload with Reactive Forms', () => {
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
+  let controls: ReactiveHost['form']['controls'];
+  let loader: HarnessLoader;
+  const upload = (label: string) => loader.getHarness(UiFileUploadHarness.with({ label }));
+  /** The message `ui-form-field` shows under the field with this label. */
+  const errorOf = (label: string): string => {
+    const fields = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ui-form-field')];
+    const owner = fields.find((it) => it.querySelector('label')?.textContent.includes(label));
+    return owner?.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  };
 
-    pick(root, [file('b.exe')]);
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
+    controls = host.form.controls;
+    loader = TestbedHarnessEnvironment.loader(fixture);
     await settle(fixture);
-    expect(files.hasError('uiFileType')).toBe(true);
-
-    files.setValue([]);
-    await settle(fixture);
-    expect(root.querySelector('.ui-file-upload__list')).toBeNull();
-    root
-      .querySelector<HTMLButtonElement>('.ui-file-upload__zone')!
-      .dispatchEvent(new FocusEvent('blur'));
-    expect(files.touched).toBe(true);
-    fixture.destroy();
-    expect(files.hasError('uiFileType')).toBe(false);
   });
 
-  it('works with Signal Forms and reports file errors', async () => {
-    @Component({
-      imports: [UiFileUpload, UiFormField, FormField],
-      template: `
-        <ui-form-field label="Plans">
-          <ui-file-upload [formField]="plan.files" [maxSize]="10" multiple />
-        </ui-form-field>
-      `,
-    })
-    class SignalHost {
-      readonly model = signal<{ files: readonly File[] }>({ files: [] });
-      readonly plan = form(this.model, (p) => {
-        minLength(p.files, 1, { message: 'Attach a plan' });
-      });
-    }
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    pick(root, [file('a.pdf', 100)]);
-    await settle(fixture);
-    expect(host.model().files).toHaveLength(1);
+  afterEach(() => fixture.destroy());
+
+  it('binds the value both ways and shows the compact button', async () => {
+    const plans = await upload('Plans');
     expect(
-      host.plan
-        .files()
-        .errors()
-        .map((e) => e.kind),
-    ).toContain('uiFileSize');
-    root.querySelector<HTMLButtonElement>('.ui-file-upload__remove')!.click();
+      (fixture.nativeElement as HTMLElement).querySelector('.ui-file-upload__zone')!.textContent,
+    ).toContain('בחירת קבצים');
+
+    await plans.dropFiles([file('a.pdf')]);
     await settle(fixture);
-    expect(
-      host.plan
-        .files()
-        .errors()
-        .map((e) => e.kind),
-    ).toEqual(['minLength']);
-    fixture.destroy();
+    expect(controls.plans.value!.map((f) => f.name)).toEqual(['a.pdf']);
+    expect((await plans.getFiles()).map((f) => f.name)).toEqual(['a.pdf']);
+
+    controls.plans.setValue([file('b.pdf')]);
+    await settle(fixture);
+    expect((await plans.getFiles()).map((f) => f.name)).toEqual(['b.pdf']);
+  });
+
+  it('disables the drop area from the control', async () => {
+    const plans = await upload('Plans');
+    controls.plans.disable();
+    await settle(fixture);
+    expect(await plans.isDisabled()).toBe(true);
+    await plans.dropFiles([file('a.pdf')]);
+    await settle(fixture);
+    expect(await plans.getFiles()).toEqual([]);
+  });
+
+  it('marks the control touched when the user leaves the drop area', async () => {
+    const plans = await upload('Plans');
+    expect(controls.plans.touched).toBe(false);
+    await plans.focus();
+    await plans.blur();
+    expect(controls.plans.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    const plans = await upload('Plans');
+    expect(controls.plans.invalid).toBe(true);
+    expect(await plans.isInvalid()).toBe(false);
+    expect(errorOf('Plans')).toBe('');
+
+    await plans.blur();
+    await settle(fixture);
+    expect(await plans.isInvalid()).toBe(true);
+    expect(errorOf('Plans')).toContain('Attach a plan');
+
+    await plans.dropFiles([file('a.pdf')]);
+    await settle(fixture);
+    expect(controls.plans.valid).toBe(true);
+    expect(errorOf('Plans')).toBe('');
+  });
+
+  it('says why a file is rejected without failing the control', async () => {
+    const scans = await upload('Scans');
+    await scans.dropFiles([file('big.pdf', 5000), file('virus.exe')]);
+    await settle(fixture);
+    expect(controls.scans.value!.map((f) => f.name)).toEqual(['big.pdf', 'virus.exe']);
+    expect((await scans.getFiles()).map((f) => f.invalid)).toEqual([true, true]);
+    expect(await scans.isInvalid()).toBe(true);
+    expect(errorOf('Scans')).toMatch(/big.pdf.* גדול מ-/);
+    expect(errorOf('Scans')).toMatch(/סוג הקובץ .virus.exe. אינו נתמך/);
+    expect(errorOf('Scans')).toContain('אפשר לצרף עד 1 קבצים');
+
+    expect(controls.scans.errors).toBeNull();
+    expect(controls.scans.valid).toBe(true);
+  });
+
+  it('drops the message when the rejected file is removed', async () => {
+    const scans = await upload('Scans');
+    await scans.dropFiles([file('a.pdf', 100), file('virus.exe')]);
+    await settle(fixture);
+    expect(errorOf('Scans')).not.toBe('');
+
+    await scans.removeFile('virus.exe');
+    await settle(fixture);
+    expect(await scans.isInvalid()).toBe(false);
+    expect(errorOf('Scans')).toBe('');
+  });
+
+  it('leaves the errors of a bound control to its own validators', async () => {
+    const plans = await upload('Plans');
+    await plans.dropFiles([file('virus.exe')]);
+    await settle(fixture);
+    expect(controls.plans.errors).toBeNull();
+    expect(host.form.valid).toBe(true);
+    expect(errorOf('Plans')).toMatch(/סוג הקובץ .virus.exe. אינו נתמך/);
+
+    await plans.removeFile('virus.exe');
+    await settle(fixture);
+    expect(controls.plans.errors).toEqual({ plans: 'Attach a plan' });
+  });
+
+  it('drops the message when the control writes files that pass', async () => {
+    const scans = await upload('Scans');
+    await scans.dropFiles([file('virus.exe')]);
+    await settle(fixture);
+    expect(errorOf('Scans')).not.toBe('');
+
+    controls.scans.setValue([file('a.pdf', 100)]);
+    await settle(fixture);
+    expect(await scans.isInvalid()).toBe(false);
+    expect(errorOf('Scans')).toBe('');
   });
 });

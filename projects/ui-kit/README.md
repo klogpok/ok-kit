@@ -221,14 +221,14 @@ required field.
 
 `ui-file-upload` picks files with a drop area (a button) and lists them with a remove button.
 The value is a `File[]`. `accept`, `maxSize` (bytes) and `maxFiles` do not drop files: a file
-that breaks them stays in the list, marked, and the control reports `uiFileType`,
-`uiFileSize` or `uiFileCount` with a message, so the form stays invalid until the user removes
-it. The kit does not upload: pass the progress per file (0–100) in `progress`.
+that breaks them stays in the list, marked, and the field says why. That message is the control's
+own: it never becomes an error of the bound form control, so the form stays as valid as your
+validators say. The kit does not upload: pass the progress per file (0–100) in `progress`.
 
 ```html
 <ui-form-field label="Plans" hint="PDF, up to 10 MB">
   <ui-file-upload
-    [formField]="form.plans"
+    formControlName="plans"
     accept=".pdf"
     multiple
     [maxSize]="10 * 1024 * 1024"
