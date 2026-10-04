@@ -57,6 +57,18 @@ class Host {
   ];
 }
 
+// The calendar opens on today's month when nothing is selected, and these specs click days in
+// September 2026 by key. Freeze the clock on the day the visual baselines use, so these specs do
+// not depend on the day the suite runs and the calendar has one "today" across both layers.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date(2026, 8, 25, 12));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe('UiDateRangePicker', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
