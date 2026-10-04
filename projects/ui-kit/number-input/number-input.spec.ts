@@ -1,8 +1,16 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { FormField, form, max, min, required } from '@angular/forms/signals';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiNumberInputHarness } from '@vplans/ui-kit/testing';
 import { UiNumberInput } from './number-input';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -238,115 +246,149 @@ describe('UiNumberInput', () => {
   });
 });
 
+/** Stands in for an application validator with a message of its own. */
+const atMostForty: ValidatorFn = (control) =>
+  typeof control.value === 'number' && control.value > 40
+    ? { uiTooMany: { message: 'Up to 40 floors' } }
+    : null;
+
 @Component({
   imports: [UiNumberInput, UiFormField, ReactiveFormsModule],
   template: `
-    <ui-form-field label="Units">
-      <ui-number-input [formControl]="control" />
-    </ui-form-field>
+    <form [formGroup]="form">
+      <ui-form-field label="Floors">
+        <ui-number-input min="1" max="40" formControlName="floors" />
+      </ui-form-field>
+      <ui-form-field label="Area">
+        <ui-number-input formControlName="area" />
+      </ui-form-field>
+    </form>
   `,
 })
 class ReactiveHost {
-  readonly control = new FormControl<number | null>(12);
+  readonly form = new FormGroup({
+    floors: new FormControl<number | null>(2, [Validators.required, atMostForty]),
+    area: new FormControl<number | null>(null),
+  });
 }
 
 describe('UiNumberInput with Reactive Forms', () => {
-  it('binds the value both ways and reports parse errors as control errors', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
-    const root = fixture.nativeElement as HTMLElement;
-    await settle(fixture);
-    const { control } = fixture.componentInstance;
-    const input = root.querySelector('input')!;
-    expect(input.value).toBe('12');
+  let fixture: ComponentFixture<ReactiveHost>;
+  let controls: ReactiveHost['form']['controls'];
+  let loader: HarnessLoader;
+  const field = (label: string) => loader.getHarness(UiNumberInputHarness.with({ label }));
+  /** The `ui-form-field` that carries this label, for what the harness does not expose. */
+  const fieldOf = (label: string): Element =>
+    [...(fixture.nativeElement as HTMLElement).querySelectorAll('ui-form-field')].find((it) =>
+      it.querySelector('label')?.textContent.includes(label),
+    )!;
+  /** The message `ui-form-field` shows under the field with this label. */
+  const errorOf = (label: string): string =>
+    fieldOf(label).querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
 
-    input.value = '30';
-    input.dispatchEvent(new Event('input'));
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    controls = fixture.componentInstance.form.controls;
+    loader = TestbedHarnessEnvironment.loader(fixture);
     await settle(fixture);
-    expect(control.value).toBe(30);
-
-    input.value = 'abc';
-    input.dispatchEvent(new Event('input'));
-    input.dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(control.value).toBeNull();
-    expect(control.touched).toBe(true);
-    expect(control.hasError('uiNumberParse')).toBe(true);
-    expect(root.querySelector('.ui-form-field__error')!.textContent).toContain('מספר לא תקין');
-
-    control.setValue(7);
-    await settle(fixture);
-    expect(input.value).toBe('7');
-    expect(control.valid).toBe(true);
-
-    control.disable();
-    await settle(fixture);
-    expect(input.disabled).toBe(true);
   });
 
-  it('removes its parse validator when destroyed', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
+  it('binds the value both ways and takes its limits from the inputs', async () => {
+    const floors = await field('Floors');
+    expect(await floors.getText()).toBe('2');
+    expect(await floors.getMin()).toBe(1);
+    expect(await floors.getMax()).toBe(40);
+    expect(await floors.isRequired()).toBe(true);
+    expect(fieldOf('Floors').querySelector('.ui-form-field__required')).not.toBeNull();
+
+    await floors.increment();
+    expect(controls.floors.value).toBe(3);
+
+    controls.floors.setValue(7);
     await settle(fixture);
-    const { control } = fixture.componentInstance;
-    const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
-    input.value = 'x';
-    input.dispatchEvent(new Event('input'));
-    await settle(fixture);
-    expect(control.invalid).toBe(true);
-    fixture.destroy();
-    expect(control.valid).toBe(true);
+    expect(await floors.getText()).toBe('7');
   });
-});
 
-@Component({
-  imports: [UiNumberInput, UiFormField, FormField],
-  template: `
-    <ui-form-field label="Floors">
-      <ui-number-input [formField]="plan.floors" />
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal<{ floors: number | null }>({ floors: 2 });
-  readonly plan = form(this.model, (p) => {
-    required(p.floors, { message: 'Enter the floors' });
-    min(p.floors, 1);
-    max(p.floors, 40);
+  it('disables the field from the control', async () => {
+    const floors = await field('Floors');
+    controls.floors.disable();
+    await settle(fixture);
+    expect(await floors.isDisabled()).toBe(true);
   });
-}
 
-describe('UiNumberInput with Signal Forms', () => {
-  it('binds the value, takes min and max from the rules and reports parse errors', async () => {
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    const input = root.querySelector('input')!;
-    expect(input.value).toBe('2');
-    expect(input.getAttribute('aria-valuemin')).toBe('1');
-    expect(input.getAttribute('aria-valuemax')).toBe('40');
-    expect(input.getAttribute('aria-required')).toBe('true');
+  it('marks the control touched when the user leaves the field', async () => {
+    const floors = await field('Floors');
+    expect(controls.floors.touched).toBe(false);
+    await floors.focus();
+    await floors.blur();
+    expect(controls.floors.touched).toBe(true);
+  });
 
-    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', cancelable: true }));
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    const floors = await field('Floors');
+    controls.floors.setValue(41);
     await settle(fixture);
-    expect(host.model().floors).toBe(3);
+    expect(controls.floors.invalid).toBe(true);
+    expect(await floors.isInvalid()).toBe(false);
+    expect(errorOf('Floors')).toBe('');
 
-    input.value = '3a';
-    input.dispatchEvent(new Event('input'));
-    input.dispatchEvent(new FocusEvent('blur'));
+    await floors.focus();
+    await floors.blur();
     await settle(fixture);
-    expect(host.model().floors).toBeNull();
-    expect(host.plan.floors().touched()).toBe(true);
-    expect(
-      host.plan
-        .floors()
-        .errors()
-        .map((e) => e.kind),
-    ).toContain('uiNumberParse');
-    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(await floors.isInvalid()).toBe(true);
+    expect(errorOf('Floors')).toContain('Up to 40 floors');
+  });
 
-    host.plan().reset({ floors: 5 });
+  it('shows text that is not a number without failing the form', async () => {
+    const area = await field('Area');
+    await area.setText('abc');
+    await area.blur();
     await settle(fixture);
-    expect(input.value).toBe('5');
-    expect(host.plan.floors().errors()).toEqual([]);
+    expect(controls.area.value).toBeNull();
+    expect(controls.area.errors).toBeNull();
+    expect(fixture.componentInstance.form.valid).toBe(true);
+    expect(await area.isInvalid()).toBe(true);
+    expect(errorOf('Area')).toContain('מספר לא תקין');
+
+    await area.setText('5');
+    await area.blur();
+    await settle(fixture);
+    expect(controls.area.value).toBe(5);
+    expect(await area.isInvalid()).toBe(false);
+    expect(errorOf('Area')).toBe('');
+  });
+
+  it('leaves validity to the validators of a control that has them', async () => {
+    const floors = await field('Floors');
+    await floors.setText('12x');
+    await floors.blur();
+    await settle(fixture);
+    expect(controls.floors.value).toBeNull();
+    // Invalid because the value is empty, not because the text does not parse.
+    expect(Object.keys(controls.floors.errors ?? {})).toEqual(['required']);
+    expect(errorOf('Floors')).toContain('מספר לא תקין');
+  });
+
+  it('drops the message when the value is written from the control', async () => {
+    const area = await field('Area');
+    await area.setText('abc');
+    await area.blur();
+    await settle(fixture);
+    expect(await area.isInvalid()).toBe(true);
+
+    controls.area.setValue(5);
+    await settle(fixture);
+    expect(await area.getText()).toBe('5');
+    expect(await area.isInvalid()).toBe(false);
+
+    await area.setText('abc');
+    await area.blur();
+    await settle(fixture);
+    expect(await area.isInvalid()).toBe(true);
+    // A reset writes `null` over a value that is already `null`: the text still has to go.
+    controls.area.reset();
+    await settle(fixture);
+    expect(await area.getText()).toBe('');
+    expect(await area.isInvalid()).toBe(false);
   });
 });
