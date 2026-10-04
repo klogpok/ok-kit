@@ -1,9 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, readonly, required } from '@angular/forms/signals';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiTimeInputHarness } from '@vplans/ui-kit/testing';
 import { UiTimeInput } from './time-input';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -49,6 +57,7 @@ const active = (input: HTMLInputElement) =>
         [minTime]="min()"
         [maxTime]="max()"
         [interval]="interval()"
+        [disabled]="disabled()"
         (opened)="events.push('opened')"
         (closed)="events.push('closed')"
       />
@@ -60,6 +69,7 @@ class Host {
   readonly min = signal<string | null>('08:00');
   readonly max = signal<string | null>('12:00');
   readonly interval = signal(60);
+  readonly disabled = signal(false);
   readonly events: string[] = [];
 }
 
@@ -241,6 +251,15 @@ describe('UiTimeInput', () => {
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
+  it('does not take focus or open the list when disabled', async () => {
+    host.disabled.set(true);
+    await settle(fixture);
+    root.querySelector<HTMLElement>('.ui-time-input__field')!.click();
+    await settle(fixture);
+    expect(listbox()).toBeNull();
+    expect(document.activeElement).not.toBe(input());
+  });
+
   it('closes on Tab, blur and a click outside', async () => {
     input().click();
     await settle(fixture);
@@ -314,174 +333,148 @@ describe('UiTimeInput in a 12-hour locale', () => {
   });
 });
 
+/** Reactive forms show the message of an error value that is a string. */
+const chooseATime: ValidatorFn = (control) =>
+  control.value ? null : { chooseTime: 'Choose a time' };
+
 @Component({
   imports: [UiTimeInput, UiFormField, ReactiveFormsModule],
   template: `
-    <ui-form-field label="Start">
-      <ui-time-input maxTime="18:00" [formControl]="control" />
-    </ui-form-field>
+    <form [formGroup]="form">
+      <ui-form-field label="Start">
+        <ui-time-input maxTime="18:00" [readonly]="locked()" formControlName="start" />
+      </ui-form-field>
+      <ui-form-field label="End">
+        <ui-time-input maxTime="18:00" formControlName="end" />
+      </ui-form-field>
+    </form>
   `,
 })
 class ReactiveHost {
-  readonly control = new FormControl<string | null>('08:30', Validators.required);
+  readonly locked = signal(false);
+  readonly form = new FormGroup({
+    start: new FormControl<string | null>('08:30', [Validators.required, chooseATime]),
+    end: new FormControl<string | null>(null),
+  });
 }
 
 describe('UiTimeInput with Reactive Forms', () => {
   let fixture: ComponentFixture<ReactiveHost>;
-  let root: HTMLElement;
-  let control: FormControl<string | null>;
-  const input = () => root.querySelector<HTMLInputElement>('input')!;
+  let host: ReactiveHost;
+  let controls: ReactiveHost['form']['controls'];
+  let loader: HarnessLoader;
+  const field = (label: string) => loader.getHarness(UiTimeInputHarness.with({ label }));
+  /** The message `ui-form-field` shows under the field with this label. */
+  const errorOf = (label: string): string => {
+    const fields = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ui-form-field')];
+    const owner = fields.find((it) => it.querySelector('label')?.textContent.includes(label));
+    return owner?.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  };
 
   beforeEach(async () => {
+    Element.prototype.scrollIntoView = () => undefined;
     fixture = TestBed.createComponent(ReactiveHost);
-    root = fixture.nativeElement as HTMLElement;
-    control = fixture.componentInstance.control;
-    document.body.appendChild(root);
+    host = fixture.componentInstance;
+    controls = host.form.controls;
+    loader = TestbedHarnessEnvironment.loader(fixture);
     await settle(fixture);
   });
 
-  afterEach(() => {
-    fixture.destroy();
-    root.remove();
+  it('binds the value both ways and marks the required field', async () => {
+    const start = await field('Start');
+    expect(await start.getText()).toBe('08:30');
+    expect(await start.isRequired()).toBe(true);
+    expect(await start.isReadonly()).toBe(false);
+
+    await start.setText('1745');
+    expect(controls.start.value).toBe('17:45');
+
+    controls.start.setValue('06:00');
+    await settle(fixture);
+    expect(await start.getText()).toBe('06:00');
   });
 
-  it('binds the value both ways', async () => {
-    expect(input().value).toBe('08:30');
-    expect(input().getAttribute('aria-required')).toBe('true');
-    type(input(), '1745');
+  it('disables the field from the control', async () => {
+    const start = await field('Start');
+    controls.start.disable();
     await settle(fixture);
-    expect(control.value).toBe('17:45');
-    control.setValue('06:00');
-    await settle(fixture);
-    expect(input().value).toBe('06:00');
+    expect(await start.isDisabled()).toBe(true);
+    await start.open();
+    expect(await start.isOpen()).toBe(false);
   });
 
-  it('reports parse errors to the control and clears them on reset', async () => {
-    type(input(), '19:00');
-    await settle(fixture);
-    expect(control.value).toBeNull();
-    expect(control.getError('uiTimeParse')).toEqual({ message: 'שעה לא תקינה' });
-    control.reset('10:00');
-    await settle(fixture);
-    expect(control.valid).toBe(true);
-    expect(input().value).toBe('10:00');
-  });
-
-  it('is touched on blur and disabled with the control', async () => {
-    input().dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(control.touched).toBe(true);
-    control.disable();
-    await settle(fixture);
-    expect(input().disabled).toBe(true);
-    root.querySelector<HTMLElement>('.ui-time-input__field')!.click();
-    await settle(fixture);
-    expect(listbox()).toBeNull();
-  });
-
-  it('removes its validator when destroyed', async () => {
-    type(input(), '99');
-    await settle(fixture);
-    expect(control.hasError('uiTimeParse')).toBe(true);
-    fixture.destroy();
-    expect(control.hasError('uiTimeParse')).toBe(false);
-    expect(control.hasError('required')).toBe(true);
-  });
-});
-
-@Component({
-  imports: [UiTimeInput, UiFormField, FormField],
-  template: `
-    <ui-form-field label="Start">
-      <ui-time-input [formField]="f.start" minTime="09:00" />
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal<{ start: string | null }>({ start: null });
-  readonly f = form(this.model, (p) => {
-    required(p.start, { message: 'Choose a time' });
-  });
-}
-
-describe('UiTimeInput with Signal Forms', () => {
-  let fixture: ComponentFixture<SignalHost>;
-  let root: HTMLElement;
-  const input = () => root.querySelector<HTMLInputElement>('input')!;
-
-  beforeEach(async () => {
-    fixture = TestBed.createComponent(SignalHost);
-    root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
-    await settle(fixture);
-  });
-
-  afterEach(() => {
-    fixture.destroy();
-    root.remove();
-  });
-
-  it('binds the value both ways', async () => {
-    type(input(), '1000');
-    await settle(fixture);
-    expect(fixture.componentInstance.model().start).toBe('10:00');
-    fixture.componentInstance.model.set({ start: '16:45' });
-    await settle(fixture);
-    expect(input().value).toBe('16:45');
-  });
-
-  it('shows the required error once touched', async () => {
-    expect(input().getAttribute('aria-required')).toBe('true');
-    input().dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(input().getAttribute('aria-invalid')).toBe('true');
-    expect(root.textContent).toContain('Choose a time');
-  });
-
-  it('reports parse errors to the field and drops them on reset', async () => {
-    const field = fixture.componentInstance.f.start;
-    type(input(), '0830');
-    await settle(fixture);
-    expect(
-      field()
-        .errors()
-        .map((e) => e.kind),
-    ).toContain('uiTimeParse');
-    fixture.componentInstance.f().reset();
-    await settle(fixture);
-    expect(input().value).toBe('');
-    expect(
-      field()
-        .errors()
-        .map((e) => e.kind),
-    ).not.toContain('uiTimeParse');
-  });
-});
-
-@Component({
-  imports: [UiTimeInput, FormField],
-  template: `<ui-time-input aria-label="Start" [formField]="f.start" />`,
-})
-class ReadonlyHost {
-  readonly model = signal<{ start: string | null }>({ start: '09:00' });
-  readonly f = form(this.model, (p) => {
-    readonly(p.start);
-  });
-}
-
-describe('UiTimeInput readonly', () => {
   it('keeps the text readonly and does not open the list', async () => {
-    const fixture = TestBed.createComponent(ReadonlyHost);
-    const root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
+    const start = await field('Start');
+    host.locked.set(true);
     await settle(fixture);
-    const input = root.querySelector('input')!;
-    expect(input.readOnly).toBe(true);
-    keydown(input, 'ArrowDown');
-    input.click();
+    expect(await start.isReadonly()).toBe(true);
+    await start.open();
+    expect(await start.isOpen()).toBe(false);
+  });
+
+  it('marks the control touched when the user leaves the field', async () => {
+    const start = await field('Start');
+    expect(controls.start.touched).toBe(false);
+    await start.focus();
+    await start.blur();
+    expect(controls.start.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    const start = await field('Start');
+    await start.setText('');
     await settle(fixture);
-    expect(listbox()).toBeNull();
-    fixture.destroy();
-    root.remove();
+    expect(controls.start.value).toBeNull();
+    expect(controls.start.invalid).toBe(true);
+    expect(await start.isInvalid()).toBe(false);
+    expect(errorOf('Start')).toBe('');
+
+    await start.blur();
+    await settle(fixture);
+    expect(await start.isInvalid()).toBe(true);
+    expect(errorOf('Start')).toContain('Choose a time');
+  });
+
+  it('shows text that is not a time without failing the form', async () => {
+    const end = await field('End');
+    await end.setText('19:00');
+    await end.blur();
+    await settle(fixture);
+    expect(controls.end.value).toBeNull();
+    expect(controls.end.errors).toBeNull();
+    expect(controls.end.valid).toBe(true);
+    expect(host.form.valid).toBe(true);
+    expect(await end.getText()).toBe('19:00');
+    expect(await end.isInvalid()).toBe(true);
+    expect(errorOf('End')).toContain('שעה לא תקינה');
+
+    await end.setText('16:00');
+    await end.blur();
+    await settle(fixture);
+    expect(controls.end.value).toBe('16:00');
+    expect(await end.isInvalid()).toBe(false);
+    expect(errorOf('End')).toBe('');
+  });
+
+  it('drops the message when the control writes a value', async () => {
+    const end = await field('End');
+    await end.setText('19:00');
+    await end.blur();
+    await settle(fixture);
+    expect(await end.isInvalid()).toBe(true);
+
+    // `null` written over `null`: only `writeValue` itself can drop the text here.
+    controls.end.reset();
+    await settle(fixture);
+    expect(await end.getText()).toBe('');
+    expect(await end.isInvalid()).toBe(false);
+    expect(errorOf('End')).toBe('');
+
+    await end.setText('19:00');
+    await end.blur();
+    controls.end.setValue('10:00');
+    await settle(fixture);
+    expect(await end.getText()).toBe('10:00');
+    expect(await end.isInvalid()).toBe(false);
   });
 });

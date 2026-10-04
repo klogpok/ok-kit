@@ -342,24 +342,24 @@ several months side by side.
 minutes (default 30). The value is a 24-hour `"HH:mm"` string or `null`; it is shown in the
 format of the `locale` label: "14:30" in `he-IL`, "2:30 PM" in `en-US`. Typing keeps only the
 characters of a time and adds the ":" ("1430" → "14:30"); "930", "9" and "2:30 pm" are read too.
-Text that is not a time, or a time outside `minTime`/`maxTime`, sets `null` and reports
-`uiTimeParse` (`invalidTime` label). A click or ArrowDown opens the list at the selected time
-or the next one; Enter picks, Escape closes. With Signal Forms set the limits with
-`minTime`/`maxTime`: `[formField]` does not allow `min`/`max`, and the `min()`/`max()` rules take
-only numbers.
+Text that is not a time, or a time outside `minTime`/`maxTime`, sets `null` and, once the user
+leaves the field, shows the `invalidTime` label. That message is the field's own: it never becomes
+an error of the bound form control, so the control stays as valid as your validators say. A click
+or ArrowDown opens the list at the selected time or the next one; Enter picks, Escape closes.
 
 To pick a date and a time, put `ui-datepicker` and `ui-time-input` side by side and join their
 values with `uiDateWithTime(date, time)`; `uiTimeOf(date)` gives the `"HH:mm"` of a `Date`.
 
 ```html
-<ui-form-field label="Date"><ui-datepicker [formField]="form.date" /></ui-form-field>
+<ui-form-field label="Date"><ui-datepicker formControlName="date" /></ui-form-field>
 <ui-form-field label="Time">
-  <ui-time-input [formField]="form.time" minTime="08:00" maxTime="18:00" interval="15" />
+  <ui-time-input formControlName="time" minTime="08:00" maxTime="18:00" interval="15" />
 </ui-form-field>
 ```
 
 ```ts
-readonly meeting = computed(() => uiDateWithTime(this.model().date, this.model().time));
+const { date, time } = this.form.getRawValue();
+const meeting = uiDateWithTime(date, time);
 ```
 
 ### Prefix and suffix
