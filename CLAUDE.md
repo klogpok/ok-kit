@@ -37,3 +37,19 @@ Area-specific gotchas live in `.claude/rules/` and load when you open matching f
 - The package is consumed through tsconfig paths, not `node_modules`.
 - pnpm 12: dependencies that need build scripts must be listed under `allowBuilds` in `pnpm-workspace.yaml`. Do not use `pnpm dlx` for such CLIs.
 - In sed and perl replacements `\u` upper-cases the next character, and the agent's Write/Edit tools and heredocs turn a typed `\u2066` into the raw character. Build the backslash in Node (`String.fromCharCode(92) + 'u2066'`) and check the file with grep.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs are local markdown under `.scratch/<feature>/`; there is no remote tracker.
+See [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md).
+
+### Triage labels
+
+The five canonical roles, unchanged: `needs-triage`, `needs-info`, `ready-for-agent`,
+`ready-for-human`, `wontfix`. See [docs/agents/triage-labels.md](docs/agents/triage-labels.md).
+
+### Domain docs
+
+Single-context: `CONTEXT.md` at the root and `docs/adr/`. See [docs/agents/domain.md](docs/agents/domain.md).
