@@ -184,8 +184,9 @@ Without a forms directive, use the `invalid` input to show the error state manua
 `(option: City, selected: City) => option.id === selected.id`. It is called as
 `compareWith(option, selected)` and never with `null`; a `null` value matches only `null`.
 
-`ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with the
-`invalidDate` label as its message; the value is `null` meanwhile.
+`ui-datepicker` sets `null` for typed text that is not an allowed date and, once the user leaves
+the field, shows the `invalidDate` label. That message is the field's own: it never becomes an
+error of the bound form control, so the control stays as valid as your validators say.
 
 `ui-number-input` reads and shows numbers in the format of the `locale` label ("1,234.5" in
 he-IL). The value is a `number` or `null`. Text that is not a number sets `null` and, once the

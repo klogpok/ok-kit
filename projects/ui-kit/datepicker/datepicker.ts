@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
-  DestroyRef,
   ElementRef,
   Injector,
   afterNextRender,
@@ -17,8 +16,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { transformedValue } from '@angular/forms/signals';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -61,20 +58,19 @@ interface Draft {
  * Date field: type a date in the locale format or pick it from a calendar.
  *
  * - The text is parsed with the `locale` label (default `he-IL`, "25.9.2026"). Text that is not a
- *   date, or a date outside `min`/`max`/`dateFilter`, sets the value to `null` and reports a
- *   `uiDateParse` error (message `labels().invalidDate`) to Signal Forms or Reactive Forms, so
- *   the form is invalid and `ui-form-field` shows the message. Without a forms directive the
- *   message is shown once the user leaves the field.
+ *   date, or a date outside `min`/`max`/`dateFilter`, sets the value to `null` and, once the user
+ *   leaves the field, shows `labels().invalidDate`. The message is the field's own: it never
+ *   becomes an error of a bound form control.
  * - The calendar button (or Alt+ArrowDown in the field) opens a dialog with `ui-calendar`. Focus
  *   moves to the selected day and is trapped in the dialog; Escape or picking a day closes it
  *   and returns focus to the button. The dialog also has "Today" and "Clear" buttons.
  *
- * The value is a local `Date` at midnight. Implements `FormValueControl` (Signal Forms) and
- * `ControlValueAccessor`.
+ * The value is a local `Date` at midnight. Implements `ControlValueAccessor`, so it binds with
+ * `[formControl]`, `formControlName` and `[(ngModel)]`.
  *
  * @example
  * <ui-form-field label="Signing date" hint="DD.MM.YYYY">
- *   <ui-datepicker [formField]="form.signingDate" [min]="today" />
+ *   <ui-datepicker formControlName="signingDate" [min]="today" />
  * </ui-form-field>
  */
 @Component({
@@ -105,7 +101,7 @@ interface Draft {
         [attr.name]="name() || null"
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-required]="isRequired() ? 'true' : null"
-        [attr.aria-invalid]="invalidState() ? 'true' : null"
+        [attr.aria-invalid]="showError() ? 'true' : null"
         [attr.aria-describedby]="describedBy()"
         (input)="onInput($event)"
         (keydown)="onInputKeydown($event)"
@@ -180,7 +176,7 @@ interface Draft {
     '[class]': '"ui-datepicker--" + size()',
     '[class.ui-datepicker--disabled]': 'isDisabled()',
     '[class.ui-datepicker--readonly]': 'readonly()',
-    '[class.ui-datepicker--invalid]': 'invalidState()',
+    '[class.ui-datepicker--invalid]': 'showError()',
     '[attr.id]': 'id()',
     // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
@@ -225,41 +221,15 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly positions = POSITIONS;
   protected readonly calendarIcon = uiIconCalendar;
 
-  /**
-   * Parses typed text into the value. Through `transformedValue` Signal Forms receives the parse
-   * errors; they clear when the value changes elsewhere or the form is reset.
-   */
-  private readonly rawText = transformedValue(this.value, {
-    parse: (text: string) => {
-      const parsed = text.trim() ? parseDay(text, this.locale()) : null;
-      const allowed =
-        parsed && isDayEnabled(parsed, this.min(), this.max(), this.dateFilter()) ? parsed : null;
-      const current = this.value();
-      const changed = !sameDay(allowed, current) && !(allowed === null && current === null);
-      return {
-        value: changed ? allowed : undefined,
-        error:
-          text.trim() && !allowed
-            ? { kind: 'uiDateParse', message: this.labels().invalidDate }
-            : undefined,
-      };
-    },
-    format: (value: Date | null) => {
-      const day = validDay(value);
-      return day ? formatDay(day, this.locale()) : '';
-    },
-  });
-
-  /**
-   * Dropped when the value or the parsed text changes elsewhere (e.g. a reset, which sets the
-   * text to the formatted value), so old text does not come back.
-   */
-  private readonly draft = linkedSignal<{ value: Date | null; text: string }, Draft | null>({
-    source: () => ({ value: this.value(), text: this.rawText() }),
-    computation: ({ value, text }, previous) => {
+  /** Dropped when the value changes elsewhere, so old text does not come back. */
+  private readonly draft = linkedSignal<Date | null, Draft | null>({
+    source: () => this.value(),
+    computation: (value, previous) => {
       const draft = previous?.value;
-      const sameValue = draft && (draft.value === value || sameDay(draft.value, value));
-      return draft && sameValue && draft.text === text ? draft : null;
+      // A written Invalid Date or string also drops the text: it is a value, and it shows empty.
+      return draft && (draft.value === value || sameDay(draft.value, validDay(value)))
+        ? draft
+        : null;
     },
   });
 
@@ -285,59 +255,25 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   /** Typed text that is not an allowed date. */
   protected readonly parseError = computed(() => {
     const draft = this.draft();
-    return (
-      !!draft &&
-      draft.committed &&
-      draft.text.trim() !== '' &&
-      draft.value === null &&
-      this.value() === null
-    );
+    return !!draft && draft.committed && draft.text.trim() !== '' && draft.value === null;
   });
-
-  protected readonly invalidState = computed(() => this.showError() || this.parseError());
 
   /** Whether today can be picked (inside `min`/`max` and allowed by `dateFilter`). */
   protected readonly todayAllowed = computed(() =>
     isDayEnabled(startOfDay(new Date()), this.min(), this.max(), this.dateFilter()),
   );
 
-  /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
-  private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
-    const error = this.rawText.parseErrors().at(0);
-    return error ? { [error.kind]: { message: error.message } } : null;
-  };
-
-  /** The control that holds `parseValidator`; it must not keep it after this field is gone. */
-  private validatedControl: AbstractControl | null = null;
-
-  constructor() {
-    super();
-    inject(DestroyRef).onDestroy(() => this.releaseParseValidator());
-  }
-
-  /** Without a forms directive, the field itself shows the parse error. */
+  /**
+   * The field shows the parse message itself, bound or not: a text the user still has to fix is
+   * not a validation failure of the consumer's control, which only ever sees `null`.
+   */
   protected override ownErrors(): readonly string[] {
-    return !this.controlState.bound && this.parseError() ? [this.labels().invalidDate] : [];
+    return this.parseError() ? [this.labels().invalidDate] : [];
   }
 
   writeValue(value: Date | null | undefined): void {
-    const day = validDay(value);
     this.draft.set(null);
-    this.value.set(day);
-    // A new date clears the parse errors by itself; `null` over `null` (reset) does not.
-    if (day === null) this.rawText.set('');
-  }
-
-  override registerOnChange(fn: (value: Date | null) => void): void {
-    const control = this.ngControl?.control ?? null;
-    if (control !== this.validatedControl) {
-      this.releaseParseValidator();
-      if (control && !control.hasValidator(this.parseValidator)) {
-        control.addValidators(this.parseValidator);
-      }
-      this.validatedControl = control;
-    }
-    super.registerOnChange(fn);
+    this.value.set(validDay(value));
   }
 
   focus(options?: FocusOptions): void {
@@ -394,25 +330,18 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   /** Empties the field, also when it holds text that is not a date. */
   protected onClear(): void {
-    const before = this.value();
     this.draft.set(null);
-    this.rawText.set('');
-    if (before !== null) this.notifyChange(null);
-    else this.ngControl?.control?.updateValueAndValidity();
+    this.setValue(null);
     this.close();
   }
 
   protected onInput(event: Event): void {
     const text = (event.target as HTMLInputElement).value;
-    const before = this.value();
-    const hadError = this.rawText.parseErrors().length > 0;
-    this.rawText.set(text);
-    const value = this.value();
+    const parsed = text.trim() ? parseDay(text, this.locale()) : null;
+    const value =
+      parsed && isDayEnabled(parsed, this.min(), this.max(), this.dateFilter()) ? parsed : null;
+    this.setValue(value);
     this.draft.set({ text, value, committed: false });
-    if (value !== before) this.notifyChange(value);
-    else if (hadError !== this.rawText.parseErrors().length > 0) {
-      this.ngControl?.control?.updateValueAndValidity();
-    }
   }
 
   protected onInputKeydown(event: KeyboardEvent): void {
@@ -440,14 +369,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
     const draft = this.draft();
     if (!draft) return;
     this.draft.set(draft.value ? null : { ...draft, committed: true });
-  }
-
-  private releaseParseValidator(): void {
-    const control = this.validatedControl;
-    this.validatedControl = null;
-    if (!control?.hasValidator(this.parseValidator)) return;
-    control.removeValidators(this.parseValidator);
-    control.updateValueAndValidity();
   }
 
   private setValue(value: Date | null): void {
