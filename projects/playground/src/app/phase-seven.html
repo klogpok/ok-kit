@@ -28,9 +28,6 @@
         <ui-form-field label="Units">
           <ui-number-input formControlName="units" min="1" max="200" maxFractionDigits="0" />
           <span uiSuffix>units</span>
-          @if (order.controls.units.hasError('required')) {
-            <ui-error>Enter the units</ui-error>
-          }
         </ui-form-field>
         <ui-form-field label="Price">
           <span uiPrefix>₪</span>

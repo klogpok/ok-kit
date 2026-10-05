@@ -27,7 +27,7 @@ import {
 import { UiRangeSlider, UiSlider, UiSliderMark, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiStep, UiStepper, UiStepperNext, UiStepperPrevious } from '@vplans/ui-kit/stepper';
 import { UiTimeInput, uiDateWithTime } from '@vplans/ui-kit/time';
-import { uiAtLeastOne } from './validators';
+import { uiAtLeastOne, uiRequired } from './validators';
 
 interface UnitFilters {
   deal: 'rent' | 'sale';
@@ -44,7 +44,7 @@ const addDays = (date: Date, days: number) =>
 /** A range that has a start needs an end too. */
 const endOfRange = (control: AbstractControl): ValidationErrors | null => {
   const range = control.value as UiDateRange | null;
-  return range && !range.end ? { end: true } : null;
+  return range && !range.end ? { end: 'Choose the end date' } : null;
 };
 
 /** Phase 8 components: complex widgets. */
@@ -112,12 +112,15 @@ export class PhaseEight {
   protected readonly step = signal(0);
   protected readonly wizard = new FormGroup({
     permit: new FormGroup({
-      period: new FormControl<UiDateRange | null>(null, [Validators.required, endOfRange]),
+      period: new FormControl<UiDateRange | null>(null, [
+        ...uiRequired('Choose the permit period'),
+        endOfRange,
+      ]),
     }),
     visit: new FormGroup({
       // `[min]="today"` already keeps earlier days out of the control, so `required` is enough.
-      date: new FormControl<Date | null>(null, Validators.required),
-      time: new FormControl<string | null>(null, Validators.required),
+      date: new FormControl<Date | null>(null, uiRequired('Choose a date')),
+      time: new FormControl<string | null>(null, uiRequired('Choose a time')),
     }),
   });
   /** The wizard's value as a signal, for the summary step. */

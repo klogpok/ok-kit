@@ -120,4 +120,22 @@ describe('App', () => {
 
     expect(errorsIn(el, 'app-phase-three')).toEqual(['Choose a meeting date']);
   });
+
+  it("keeps the range picker's own message beside the required one", async () => {
+    const fixture = await renderPlayground();
+    const el = fixture.nativeElement as HTMLElement;
+    const start = el.querySelector<HTMLInputElement>('app-phase-eight ui-date-range-picker input')!;
+    start.value = 'not a date';
+    start.dispatchEvent(new Event('input'));
+    start.dispatchEvent(new FocusEvent('blur'));
+    start.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    await fixture.whenStable();
+
+    // A projected <ui-error> would drop the picker's own message; a string-valued error does not.
+    expect(errorsIn(el, 'app-phase-eight ui-stepper')).toEqual([
+      // The playground runs with the default Hebrew labels.
+      'תאריך לא תקין',
+      'Choose the permit period',
+    ]);
+  });
 });

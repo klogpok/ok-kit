@@ -97,9 +97,6 @@
     </ui-form-field>
     <ui-form-field label="Meeting date" hint="Sunday to Thursday">
       <ui-datepicker formControlName="meeting" [min]="today" [dateFilter]="workdays" />
-      @if (schedule.controls.meeting.hasError('required')) {
-        <ui-error>Choose a meeting date</ui-error>
-      }
     </ui-form-field>
     <pre dir="ltr">{{ model() | json }}</pre>
   </section>

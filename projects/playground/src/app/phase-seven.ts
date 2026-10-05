@@ -27,7 +27,7 @@ import {
   uiSortData,
 } from '@vplans/ui-kit/table';
 import { UiToast } from '@vplans/ui-kit/toast';
-import { uiAtLeastOne } from './validators';
+import { uiAtLeastOne, uiRequired } from './validators';
 
 interface Person {
   id: number;
@@ -113,7 +113,7 @@ export class PhaseSeven {
     owner: new FormControl<Person | string | null>(null, Validators.required),
     // The limits are on the controls themselves; the validators keep the form honest.
     units: new FormControl<number | null>(12, [
-      Validators.required,
+      ...uiRequired('Enter the units'),
       Validators.min(1),
       Validators.max(200),
     ]),

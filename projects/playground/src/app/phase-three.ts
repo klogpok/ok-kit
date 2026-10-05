@@ -1,7 +1,7 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { map } from 'rxjs';
 import { UiAccordion, UiAccordionContent, UiAccordionItem } from '@vplans/ui-kit/accordion';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
@@ -25,7 +25,7 @@ import {
   uiSortData,
 } from '@vplans/ui-kit/table';
 import { UiToast } from '@vplans/ui-kit/toast';
-import { uiAtLeastOne } from './validators';
+import { uiAtLeastOne, uiRequired } from './validators';
 
 interface Plan {
   id: number;
@@ -113,7 +113,7 @@ export class PhaseThree {
   protected readonly schedule = new FormGroup({
     recipients: new FormControl<string[]>([], { nonNullable: true, validators: uiAtLeastOne }),
     // `[min]="today"` already keeps earlier days out of the control, so `required` is enough.
-    meeting: new FormControl<Date | null>(null, Validators.required),
+    meeting: new FormControl<Date | null>(null, uiRequired('Choose a meeting date')),
   });
   /** The form's value as a signal, for the panel below it. */
   protected readonly model = toSignal(
