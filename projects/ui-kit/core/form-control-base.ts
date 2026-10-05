@@ -9,18 +9,17 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { FORM_FIELD } from '@angular/forms/signals';
 import { injectControlState } from './control-state';
 import { UI_FORM_FIELD } from './form-field-control';
 
 /**
  * Base class for custom (non-native) form controls such as checkbox, switch and radio group.
  *
- * - **Signal Forms**: subclasses expose a `value` or `checked` model, so `[formField]` binds them
- *   natively as `FormValueControl` / `FormCheckboxControl` (inputs `disabled`, `readonly`,
- *   `required`, `invalid` are set by the directive; `touch` marks the field touched).
- * - **Reactive / template forms**: registers itself as the `ControlValueAccessor` of the host's
- *   `NgControl` (instead of `NG_VALUE_ACCESSOR`, which would force `[formField]` into CVA interop).
+ * Reactive and template forms are the forms contract: the control registers itself as the
+ * `ControlValueAccessor` of the host's `NgControl`. It assigns `valueAccessor` directly rather than
+ * providing `NG_VALUE_ACCESSOR`, which a control that injects `NgControl` cannot do without a
+ * circular dependency. Subclasses keep their `value` or `checked` model, so a control also works
+ * standalone with `[(value)]` / `[(checked)]`.
  *
  * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`. `writeValue` sets the
  * model, so its output (`valueChange` / `checkedChange`) also fires for values written by the
@@ -31,16 +30,11 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   protected readonly controlState = injectControlState();
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
   /** Reactive / template forms directive on the host, when bound through CVA. */
-  protected readonly ngControl = inject(FORM_FIELD, { self: true, optional: true })
-    ? null
-    : inject(NgControl, { self: true, optional: true });
+  protected readonly ngControl = inject(NgControl, { self: true, optional: true });
 
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly required = input(false, { transform: booleanAttribute });
-  /**
-   * The value is shown and focusable but the user cannot change it. Signal Forms binds it from a
-   * `readonly()` rule.
-   */
+  /** The value is shown and focusable but the user cannot change it. */
   readonly readonly = input(false, { transform: booleanAttribute });
   /**
    * Shows the error state when no forms directive is bound. With forms bound, the error state is
@@ -49,7 +43,7 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   readonly invalid = input(false, { transform: booleanAttribute });
   /** Ids of the app's own descriptions, kept before the hint / error of `ui-form-field`. */
   readonly ariaDescribedBy = input<string | null>(null, { alias: 'aria-describedby' });
-  /** Emits when the user leaves the control. Signal Forms uses it to mark the field touched. */
+  /** Emits when the user leaves the control, next to the `touched` the value accessor reports. */
   readonly touch = output();
 
   private readonly cvaDisabled = signal(false);

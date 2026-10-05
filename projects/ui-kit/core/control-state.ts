@@ -1,11 +1,10 @@
 import { DestroyRef, Signal, computed, inject, signal } from '@angular/core';
 import { AbstractControl, NgControl, ValidationErrors, Validators } from '@angular/forms';
-import { FORM_FIELD } from '@angular/forms/signals';
 import { Subscription } from 'rxjs';
 
-/** Forms-layer state of a control, independent of Signal Forms vs. Reactive/Template forms. */
+/** Forms-layer state of a control, as the Reactive / template forms directives report it. */
 export interface UiControlState {
-  /** Whether a forms directive (`[formField]`, `formControl`, `ngModel`, ...) is bound to the host. */
+  /** Whether a forms directive (`formControl`, `formControlName`, `ngModel`, ...) is bound to the host. */
   readonly bound: boolean;
   readonly disabled: Signal<boolean>;
   readonly invalid: Signal<boolean>;
@@ -68,27 +67,11 @@ function messagesFromErrors(errors: ValidationErrors | null): string[] {
 }
 
 /**
- * Reads the forms state of the host element: the Signal Forms `[formField]` directive when
- * present, otherwise `NgControl` (`formControl`, `formControlName`, `ngModel`).
+ * Reads the forms state of the host element from its `NgControl` (`formControl`,
+ * `formControlName`, `ngModel`).
  * Must be called in an injection context of a directive/component on the control element.
  */
 export function injectControlState(): UiControlState {
-  const formField = inject(FORM_FIELD, { self: true, optional: true });
-  if (formField) {
-    const state = formField.state;
-    return {
-      bound: true,
-      disabled: computed(() => state().disabled()),
-      invalid: computed(() => state().invalid()),
-      touched: computed(() => state().touched()),
-      required: computed(() => state().required()),
-      errorMessages: computed(() =>
-        formField.errors().flatMap((error) => (error.message ? [error.message] : [])),
-      ),
-      sync: () => undefined,
-    };
-  }
-
   const ngControl = inject(NgControl, { self: true, optional: true });
   const current = signal(EMPTY, { equal: sameSnapshot });
   let tracked: AbstractControl | null = null;
