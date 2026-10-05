@@ -1,7 +1,14 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
-import { FormField, form, readonly } from '@angular/forms/signals';
+import {
+  FormControl,
+  FormsModule,
+  NgModel,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiSwitch } from './switch';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -10,19 +17,22 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
 }
 
+/** Stands in for an application validator with a message of its own. */
+const mustEnable: ValidatorFn = (control) =>
+  control.value === true ? null : { uiBluetooth: { message: 'Turn Bluetooth on' } };
+
 @Component({
-  imports: [UiSwitch, ReactiveFormsModule, FormField],
+  imports: [UiSwitch, ReactiveFormsModule, UiFormField],
   template: `
     <ui-switch id="plain" [(checked)]="checked" labelPosition="start" size="lg">Wi-Fi</ui-switch>
-    <ui-switch id="reactive" [formControl]="control">Bluetooth</ui-switch>
-    <ui-switch id="signal" [formField]="f.airplane">Airplane mode</ui-switch>
+    <ui-form-field label="Bluetooth">
+      <ui-switch id="reactive" [formControl]="control">Bluetooth</ui-switch>
+    </ui-form-field>
   `,
 })
 class Host {
   readonly checked = signal(false);
-  readonly control = new FormControl(true);
-  readonly model = signal({ airplane: false });
-  readonly f = form(this.model);
+  readonly control = new FormControl(true, [Validators.requiredTrue, mustEnable]);
 }
 
 describe('UiSwitch', () => {
@@ -57,27 +67,53 @@ describe('UiSwitch', () => {
     expect(input('plain').checked).toBe(true);
   });
 
-  it('works with Reactive Forms', async () => {
+  it('binds checked both ways and marks the field required', async () => {
+    const root = fixture.nativeElement as HTMLElement;
     expect(input('reactive').checked).toBe(true);
+    expect(input('reactive').required).toBe(true);
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
+
     input('reactive').click();
+    await settle(fixture);
     expect(fixture.componentInstance.control.value).toBe(false);
 
+    fixture.componentInstance.control.setValue(true);
+    await settle(fixture);
+    expect(input('reactive').checked).toBe(true);
+  });
+
+  it('marks the control touched when the user leaves it', () => {
+    expect(fixture.componentInstance.control.touched).toBe(false);
     input('reactive').dispatchEvent(new Event('blur'));
     expect(fixture.componentInstance.control.touched).toBe(true);
+  });
 
+  it('disables the switch from the control', async () => {
     fixture.componentInstance.control.disable();
     await settle(fixture);
     expect(input('reactive').disabled).toBe(true);
   });
 
-  it('works with Signal Forms', async () => {
-    input('signal').click();
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    const error = () =>
+      (fixture.nativeElement as HTMLElement).querySelector('.ui-form-field__error')!;
+    fixture.componentInstance.control.setValue(false);
     await settle(fixture);
-    expect(fixture.componentInstance.model().airplane).toBe(true);
+    expect(fixture.componentInstance.control.invalid).toBe(true);
+    expect(input('reactive').hasAttribute('aria-invalid')).toBe(false);
+    expect(error().textContent.trim()).toBe('');
 
-    fixture.componentInstance.model.set({ airplane: false });
+    input('reactive').dispatchEvent(new Event('blur'));
     await settle(fixture);
-    expect(input('signal').checked).toBe(false);
+    expect(input('reactive').getAttribute('aria-invalid')).toBe('true');
+    expect(error().textContent).toContain('Turn Bluetooth on');
+    expect(input('reactive').getAttribute('aria-describedby')).toBe(error().id);
+
+    input('reactive').click();
+    await settle(fixture);
+    expect(fixture.componentInstance.control.valid).toBe(true);
+    expect(input('reactive').hasAttribute('aria-invalid')).toBe(false);
+    expect(error().textContent.trim()).toBe('');
   });
 });
 
@@ -98,26 +134,25 @@ describe('UiSwitch static attributes', () => {
 });
 
 @Component({
-  imports: [FormField, UiSwitch],
-  template: `<ui-switch aria-label="Alerts" [formField]="f.alerts" />`,
+  imports: [ReactiveFormsModule, UiSwitch],
+  template: `<ui-switch aria-label="Alerts" [readonly]="true" [formControl]="alerts" />`,
 })
 class ReadonlySwitchHost {
-  readonly model = signal({ alerts: true });
-  readonly f = form(this.model, (p) => {
-    readonly(p.alerts);
-  });
+  readonly alerts = new FormControl(true);
 }
 
 describe('UiSwitch readonly', () => {
-  it('keeps its state on click under a Signal Forms readonly rule', async () => {
+  it('keeps the state of a bound control on click', async () => {
     const fixture = TestBed.createComponent(ReadonlySwitchHost);
     await settle(fixture);
     const input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
     input.click();
     await settle(fixture);
-    expect(fixture.componentInstance.model().alerts).toBe(true);
+    expect(fixture.componentInstance.alerts.value).toBe(true);
     expect(input.checked).toBe(true);
     expect(input.getAttribute('aria-readonly')).toBe('true');
+    // Readonly is not disabled: the switch stays focusable.
+    expect(input.disabled).toBe(false);
   });
 
   it('moves aria-label from the host to the native input', async () => {
