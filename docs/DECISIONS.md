@@ -207,3 +207,16 @@ Review answers: all deviations in the roadmap are accepted:
 
 Added after the review: `orientation="vertical"` for both controls and Home/End in
 `ui-segmented`.
+
+## Angular 20 migration: parse messages and `ui-form-field` (decided 2026-10-05)
+
+Tickets 02–06 move the "cannot read the typed text" messages of `ui-number-input`,
+`ui-time-input`, `ui-datepicker`, `ui-date-range-picker` and `ui-file-upload` off Signal Forms:
+the field writes `null` to the bound control and returns the message from `ownErrors()`, which
+the base class merges into `errorMessages()`. The control itself therefore never fails.
+
+Review answer: **keep the current `ui-form-field` behaviour.** `ui-form-field` drops the
+control's own `errorMessages()` as soon as a `<ui-error>` is projected, so a consumer who
+projects one does not see `invalidDate`, `invalidDateRange` or the other parse messages. The user
+was asked whether the two should be merged and chose to leave it as is. Do not add a merge of own
+and projected messages without asking again.

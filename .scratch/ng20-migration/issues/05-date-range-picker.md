@@ -51,8 +51,9 @@ Signal Forms.
   (`invalidDateRange`) - now come out of `ownErrors()`, which the base class merges into
   `errorMessages()` and `showError()`. A bound control therefore only ever receives the days the
   picker could read, and gets no error of the picker's own. `invalidState(edge)` stayed, because
-  it marks the single field whose text is wrong; its fallback is now the base's `showError()`
-  instead of `parseMessage()`, and the host's `--invalid` class is plain `showError()`.
+  it marks the single field whose text is wrong. Its own body did not change - its fallback was
+  already the base's `showError()`. What did change is the host's `--invalid` class, which went
+  from `showError() || !!parseMessage()` to plain `showError()`.
 - Real guards (each fails if the fix is reverted):
   - "shows text that is not a date without failing the control" and "shows an end before the
     start without failing the control" assert `control.errors === null` and `control.valid` while
@@ -70,9 +71,11 @@ Signal Forms.
   `errorMessages()` as soon as a `<ui-error>` is projected: "Period" carries `Validators.required`
   and the projected message, "Window" is plain and carries the parse and order cases. The readonly
   host now uses plain `readonly` + `[value]` inputs.
-- Green: `pnpm lint`, `pnpm test` (68 files, 694 tests), `pnpm test:playground` (2), `pnpm build`,
+- Green: `pnpm lint`, `pnpm test` (68 files, 695 tests), `pnpm test:playground` (2), `pnpm build`,
   `pnpm build:playground`, and `tsc -p projects/ui-kit/tsconfig.spec.json --noEmit`. The
-  date-range-picker spec itself is 24 tests. Coverage was not re-measured for this ticket.
+  date-range-picker spec itself is 25 tests. Coverage was not re-measured for this ticket. These
+  are the numbers after the `draft` fix recorded below; an earlier pass noted 694 and 24 while the
+  model-write case was still red.
 - `README.md` lost the `uiDateParse` / `uiDateRangeOrder` paragraph; `.claude/rules/forms.md` lost
   the note about the picker adding a validator and now lists the picker among the fields that keep
   the message to themselves.
@@ -92,10 +95,33 @@ Signal Forms.
 - **Interpretation.** "through the existing harness" was read as the spec's own existing helpers
   (`fieldOf` / `inputs(label)` / `type` / `blur`), the way ticket 04 did it;
   `UiDateRangePickerHarness` was not introduced into this spec, which never used it.
-- **Re-checked after that fix.** `pnpm lint`, `pnpm test` (68 files, 695 tests),
-  `pnpm test:playground` (2), `pnpm build`, `pnpm build:playground` and
-  `tsc -p projects/ui-kit/tsconfig.spec.json --noEmit` are green again; the picker spec is now
-  25 tests.
+- **Re-checked after that fix.** All six checks above are green again, at the numbers listed
+  above.
+
+Second review pass (2026-10-05), after the fix above:
+
+- **Decided by the user: leave as is.** `ui-form-field` drops the control's own
+  `errorMessages()` entirely as soon as a `<ui-error>` is projected
+  (`hasProjectedErrors() ? [] : ...`, form-field.ts:124, and the behaviour its own doc comment
+  describes). Since the parse and order messages now live only in `errorMessages()`, a consumer
+  who follows the README pattern and projects a `<ui-error>` never sees `invalidDate` or
+  `invalidDateRange`. This is not specific to the range picker: it is the shape of tickets 02-06
+  together. The user was asked and chose to keep the current `ui-form-field` behaviour, so no
+  merge of own and projected messages is to be added.
+- **Lost coverage, left for ticket 14 (value accessor provider).** The deleted test "removes its
+  validator when destroyed" also asserted that a consumer's `Validators.required` survives the
+  picker's destruction. The new `ConditionalHost` only asserts `validator === null` on controls
+  that carry no validator of their own, so that guard is gone. 14 touches the accessor wiring for
+  every control and is the right place to assert it once.
+- **Dead input in the spec, not fixed.** The "Window" field in `ReactiveHost` still takes
+  `[minDate]="min"`, but no reactive-host case exercises it; the out-of-range case
+  (`1.1.2027` past `maxDate`) lives only in the `[(value)]` host. The coverage exists, so the
+  input was left rather than duplicating the case.
+- **Judgement calls, not acted on.** The draft-keeping condition is spelled differently in
+  `datepicker.ts` (`sameDay`) and here (`sameRange`), which invites a shared helper in
+  `date-utils.ts`; `this.draft.set(null)` repeats before three `setValue(...)` calls; and
+  `hasErrors()`, `fieldErrors()` and `parseMessage()` each parse the same
+  `draft.parsed` shape. All three mirror `ui-datepicker`, so consistency won over extraction.
 
 ## Комментарии
 
@@ -115,8 +141,9 @@ Signal Forms.
   начала (`invalidDateRange`), - теперь выдаёт `ownErrors()`, а базовый класс вливает их в
   `errorMessages()` и `showError()`. Связанный контрол получает только те дни, которые контрол смог
   прочитать, и ни одной собственной ошибки контрола. `invalidState(edge)` остался, потому что
-  помечает ровно то поле, текст которого неверен; его запасной вариант теперь `showError()`
-  базового класса вместо `parseMessage()`, а класс `--invalid` на хосте стал просто `showError()`.
+  помечает ровно то поле, текст которого неверен. Его тело не менялось - запасным вариантом и
+  раньше был `showError()` базового класса. Изменился класс `--invalid` на хосте: из
+  `showError() || !!parseMessage()` он стал просто `showError()`.
 - Настоящие сторожа (каждый падает, если откатить правку):
   - «shows text that is not a date without failing the control» и «shows an end before the start
     without failing the control» проверяют `control.errors === null` и `control.valid` в тот
@@ -135,9 +162,11 @@ Signal Forms.
   `errorMessages()`, как только в него спроецирован `<ui-error>`, поэтому «Period» несёт
   `Validators.required` и спроецированное сообщение, а «Window» - обычное поле с кейсами разбора и
   порядка. Readonly-хост теперь использует обычные входы `readonly` и `[value]`.
-- Зелёные: `pnpm lint`, `pnpm test` (68 файлов, 694 теста), `pnpm test:playground` (2),
+- Зелёные: `pnpm lint`, `pnpm test` (68 файлов, 695 тестов), `pnpm test:playground` (2),
   `pnpm build`, `pnpm build:playground` и `tsc -p projects/ui-kit/tsconfig.spec.json --noEmit`. Сам
-  спек пикера - 24 теста. Покрытие для этого тикета заново не измерялось.
+  спек пикера - 25 тестов. Покрытие для этого тикета заново не измерялось. Это числа уже после
+  правки `draft`, записанной ниже; более ранний проход отметил 694 и 24, когда кейс записи через
+  модель был ещё красным.
 - Из `README.md` ушёл абзац про `uiDateParse` / `uiDateRangeOrder`; из `.claude/rules/forms.md` -
   заметка о том, что пикер добавляет валидатор, и пикер добавлен в список контролов, которые
   оставляют сообщение себе.
@@ -158,6 +187,31 @@ Signal Forms.
 - **Трактовка.** «через существующий харнесс» прочитано как существующие хелперы самого спека
   (`fieldOf` / `inputs(label)` / `type` / `blur`), так же как в тикете 04;
   `UiDateRangePickerHarness` в этот спек не вводился - его там никогда не было.
-- **Перепроверено после этой правки.** `pnpm lint`, `pnpm test` (68 файлов, 695 тестов),
-  `pnpm test:playground` (2), `pnpm build`, `pnpm build:playground` и
-  `tsc -p projects/ui-kit/tsconfig.spec.json --noEmit` снова зелёные; спек пикера теперь 25 тестов.
+- **Перепроверено после этой правки.** Все шесть проверок выше снова зелёные, с числами,
+  указанными выше.
+
+Второй проход ревью (2026-10-05), уже после правки выше:
+
+- **Решение пользователя: оставить как есть.** `ui-form-field` полностью отбрасывает собственные
+  `errorMessages()` контрола, как только спроецирован `<ui-error>`
+  (`hasProjectedErrors() ? [] : ...`, form-field.ts:124 - ровно то поведение, которое описано в
+  его же doc-комментарии). Поскольку сообщения разбора и порядка теперь живут только в
+  `errorMessages()`, потребитель, который следует примеру из README и проецирует `<ui-error>`,
+  не увидит ни `invalidDate`, ни `invalidDateRange`. Это не особенность пикера диапазона: так
+  устроены тикеты 02-06 вместе. Пользователю задали вопрос, и он выбрал сохранить нынешнее
+  поведение `ui-form-field` - слияние собственных и проецируемых сообщений не добавляем.
+- **Потерянное покрытие, передано в тикет 14 (value accessor provider).** Удалённый тест
+  «removes its validator when destroyed» проверял заодно, что `Validators.required` потребителя
+  переживает уничтожение пикера. Новый `ConditionalHost` проверяет только `validator === null`
+  на контролах без собственных валидаторов, так что этот сторож пропал. Тикет 14 трогает обвязку
+  аксессора у всех контролов и подходит, чтобы проверить это один раз.
+- **Мёртвый вход в спеке, не исправлено.** Поле «Window» в `ReactiveHost` по-прежнему принимает
+  `[minDate]="min"`, но ни один кейс реактивного хоста его не задействует; кейс выхода за границу
+  (`1.1.2027` за `maxDate`) живёт только в хосте с `[(value)]`. Покрытие есть, поэтому вход
+  оставили, а кейс не дублировали.
+- **Суждения, по которым ничего не делали.** Условие удержания черновика записано по-разному в
+  `datepicker.ts` (`sameDay`) и здесь (`sameRange`) - просится общий хелпер в
+  `date-utils.ts`; `this.draft.set(null)` повторяется перед тремя вызовами `setValue(...)`;
+  `hasErrors()`, `fieldErrors()` и `parseMessage()` разбирают одну и ту же форму
+  `draft.parsed`. Все три зеркалят `ui-datepicker`, поэтому консистентность перевесила
+  вынесение.
