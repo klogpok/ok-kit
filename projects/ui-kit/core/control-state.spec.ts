@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angu
 import { UiControlState, injectControlState } from './control-state';
 
 /** Stands in for a directive on a native input, e.g. `[ui-input]`. */
-@Directive({ selector: 'input[probe]', exportAs: 'probe' })
+@Directive({ selector: 'input[uiProbe]', exportAs: 'uiProbe' })
 class Probe implements DoCheck {
   readonly state: UiControlState = injectControlState();
 
@@ -20,8 +20,8 @@ const mustBeOleg: ValidatorFn = (control) =>
 @Component({
   imports: [ReactiveFormsModule, Probe],
   template: `
-    <input probe #bound="probe" [formControl]="control" />
-    <input probe #free="probe" />
+    <input uiProbe #bound="uiProbe" [formControl]="control" />
+    <input uiProbe #free="uiProbe" />
     <span>{{ tick() }}</span>
   `,
 })
@@ -49,7 +49,7 @@ describe('injectControlState', () => {
     host = fixture.componentInstance;
     fixture.detectChanges();
     const probes = fixture.debugElement
-      .queryAllNodes((node) => node.providerTokens?.includes(Probe) ?? false)
+      .queryAllNodes((node) => node.providerTokens.includes(Probe))
       .map((node) => node.injector.get(Probe));
     [bound, free] = [probes[0].state, probes[1].state];
     settle();
