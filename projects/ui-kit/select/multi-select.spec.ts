@@ -1,8 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { FormField, form, minLength, required } from '@angular/forms/signals';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiSelectHarness } from '@vplans/ui-kit/testing';
 import { UiMultiSelect } from './multi-select';
 import { UiOption } from './option';
 
@@ -157,123 +159,146 @@ describe('UiMultiSelect', () => {
   });
 });
 
-@Component({
-  imports: [UiMultiSelect, UiOption, ReactiveFormsModule],
-  template: `
-    <ui-multi-select [formControl]="control" aria-label="Cities" [compareWith]="byId">
-      @for (city of cities; track city.id) {
-        <ui-option [value]="city">{{ city.name }}</ui-option>
-      }
-    </ui-multi-select>
-  `,
-})
-class ReactiveHost {
-  readonly cities = [
-    { id: 1, name: 'Haifa' },
-    { id: 2, name: 'Tel Aviv' },
-  ];
-  readonly control = new FormControl<{ id: number; name: string }[]>([{ id: 2, name: 'Tel Aviv' }]);
-  readonly byId = (option: { id: number }, selected: { id: number }) => option.id === selected.id;
+interface City {
+  id: number;
+  name: string;
 }
 
-describe('UiMultiSelect with Reactive Forms', () => {
-  let fixture: ComponentFixture<ReactiveHost>;
-  let root: HTMLElement;
-  const control = () => root.querySelector<HTMLElement>('.ui-select__control')!;
-
-  beforeEach(async () => {
-    fixture = TestBed.createComponent(ReactiveHost);
-    root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
-    await settle(fixture);
-  });
-
-  afterEach(() => root.remove());
-
-  it('shows the initial value using compareWith and writes a new array', async () => {
-    expect(control().textContent.trim()).toBe('Tel Aviv');
-    const before = fixture.componentInstance.control.value;
-    control().click();
-    await settle(fixture);
-    options()[0].click();
-    await settle(fixture);
-    expect(fixture.componentInstance.control.value).toEqual([
-      { id: 2, name: 'Tel Aviv' },
-      { id: 1, name: 'Haifa' },
-    ]);
-    expect(fixture.componentInstance.control.value).not.toBe(before);
-  });
-
-  it('marks touched on blur and disables the trigger', async () => {
-    control().dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(fixture.componentInstance.control.touched).toBe(true);
-
-    fixture.componentInstance.control.disable();
-    await settle(fixture);
-    expect((control() as HTMLButtonElement).disabled).toBe(true);
-  });
-
-  it('treats a null value as empty', async () => {
-    fixture.componentInstance.control.setValue(null);
-    await settle(fixture);
-    expect(control().textContent.trim()).toBe('');
-  });
-});
+/**
+ * The value is a collection, so the minimum is what `required` cannot express on its own.
+ * Reactive forms show the message of an error value that is a string.
+ */
+const atLeastTwo: ValidatorFn = (control) => {
+  const cities = control.value as readonly City[] | null;
+  return (cities?.length ?? 0) >= 2 ? null : { minCities: 'Choose at least two cities' };
+};
 
 @Component({
-  imports: [UiMultiSelect, UiOption, UiFormField, FormField],
+  imports: [UiMultiSelect, UiOption, UiFormField, ReactiveFormsModule],
   template: `
-    <ui-form-field label="Roles">
-      <ui-multi-select [formField]="f.roles">
-        <ui-option value="owner">Owner</ui-option>
-        <ui-option value="coordinator">Coordinator</ui-option>
+    <ui-form-field label="Cities">
+      <ui-multi-select [formControl]="control" [compareWith]="byId" [readonly]="locked()">
+        @for (city of cities; track city.id) {
+          <ui-option [value]="city">{{ city.name }}</ui-option>
+        }
       </ui-multi-select>
     </ui-form-field>
   `,
 })
-class SignalHost {
-  readonly model = signal<{ roles: string[] }>({ roles: [] });
-  readonly f = form(this.model, (p) => {
-    // `required()` treats only null, '' and false as empty; an empty array needs `minLength`.
-    required(p.roles);
-    minLength(p.roles, 1, { message: 'Choose a role' });
-  });
+class ReactiveHost {
+  readonly locked = signal(false);
+  readonly cities: City[] = [
+    { id: 1, name: 'Haifa' },
+    { id: 2, name: 'Tel Aviv' },
+  ];
+  readonly control = new FormControl<City[] | null>([{ id: 2, name: 'Tel Aviv' }], [
+    Validators.required,
+    atLeastTwo,
+  ]);
+  readonly byId = (option: City, selected: City) => option.id === selected.id;
 }
 
-describe('UiMultiSelect with Signal Forms', () => {
-  let fixture: ComponentFixture<SignalHost>;
+describe('UiMultiSelect with Reactive Forms', () => {
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
   let root: HTMLElement;
-  const control = () => root.querySelector<HTMLElement>('.ui-select__control')!;
+  let loader: HarnessLoader;
+  const cities = () => loader.getHarness(UiSelectHarness.with({ label: 'Cities' }));
+  const trigger = () => root.querySelector<HTMLButtonElement>('.ui-select__control')!;
+  /** The message `ui-form-field` shows under the select. */
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
 
   beforeEach(async () => {
-    fixture = TestBed.createComponent(SignalHost);
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
     root = fixture.nativeElement as HTMLElement;
+    loader = TestbedHarnessEnvironment.loader(fixture);
     document.body.appendChild(root);
     await settle(fixture);
   });
 
   afterEach(() => root.remove());
 
-  it('binds the value both ways', async () => {
-    control().click();
-    await settle(fixture);
-    options()[1].click();
-    options()[0].click();
-    await settle(fixture);
-    expect(fixture.componentInstance.model().roles).toEqual(['coordinator', 'owner']);
+  it('binds the value both ways using compareWith and writes a new array', async () => {
+    const select = await cities();
+    expect(await select.getValueText()).toBe('Tel Aviv');
 
-    fixture.componentInstance.model.set({ roles: ['owner'] });
+    const before = host.control.value;
+    await select.clickOptions({ text: 'Haifa' });
+    expect(host.control.value).toEqual([
+      { id: 2, name: 'Tel Aviv' },
+      { id: 1, name: 'Haifa' },
+    ]);
+    expect(host.control.value).not.toBe(before);
+
+    host.control.setValue([{ id: 1, name: 'Haifa' }]);
     await settle(fixture);
-    expect(control().textContent.trim()).toBe('Owner');
+    expect(await select.getValueText()).toBe('Haifa');
   });
 
-  it('shows the required state and the error once touched', async () => {
-    expect(control().getAttribute('aria-required')).toBe('true');
-    control().dispatchEvent(new FocusEvent('blur'));
+  it('treats a null value as empty', async () => {
+    const select = await cities();
+    host.control.setValue(null);
     await settle(fixture);
-    expect(control().getAttribute('aria-invalid')).toBe('true');
-    expect(root.textContent).toContain('Choose a role');
+    expect(await select.getValueText()).toBe('');
+  });
+
+  it('marks the field required from the validators of the control', async () => {
+    expect(await (await cities()).isRequired()).toBe(true);
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
+  });
+
+  it('disables the trigger from the control', async () => {
+    const select = await cities();
+    host.control.disable();
+    await settle(fixture);
+    expect(await select.isDisabled()).toBe(true);
+    expect(trigger().disabled).toBe(true);
+    await select.open();
+    expect(await select.isOpen()).toBe(false);
+  });
+
+  it('stays focusable but does not open while readonly', async () => {
+    const select = await cities();
+    host.locked.set(true);
+    await settle(fixture);
+    expect(await select.isReadonly()).toBe(true);
+    expect(trigger().disabled).toBe(false);
+    await select.open();
+    expect(await select.isOpen()).toBe(false);
+  });
+
+  it('closes the list and marks the control touched when focus leaves', async () => {
+    const select = await cities();
+    await select.open();
+    expect(await select.isOpen()).toBe(true);
+    expect(host.control.touched).toBe(false);
+
+    await select.blur();
+    await settle(fixture);
+    expect(await select.isOpen()).toBe(false);
+    expect(host.control.touched).toBe(true);
+  });
+
+  it('shows the minimum-length message only once the control is invalid and touched', async () => {
+    const select = await cities();
+    // One city: too few, but nothing is shown before the user has been there.
+    expect(host.control.invalid).toBe(true);
+    expect(await select.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
+
+    await select.blur();
+    await settle(fixture);
+    expect(await select.isInvalid()).toBe(true);
+    expect(errorText()).toContain('Choose at least two cities');
+    const error = document.getElementById(trigger().getAttribute('aria-describedby')!);
+    expect(error!.textContent).toContain('Choose at least two cities');
+
+    await select.clickOptions({ text: 'Haifa' });
+    await settle(fixture);
+    expect(host.control.valid).toBe(true);
+    expect(await select.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
   });
 });
 
