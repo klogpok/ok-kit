@@ -2,31 +2,41 @@
 
 <div class="grid">
   <section aria-labelledby="order-title">
-    <h3 id="order-title" class="ui-heading-4">Work order (Signal Forms)</h3>
-    <form class="form" novalidate (submit)="save($event)">
+    <h3 id="order-title" class="ui-heading-4">Work order (Reactive Forms)</h3>
+    <form class="form" novalidate [formGroup]="order" (submit)="save($event)">
       <ui-form-field label="City">
-        <ui-autocomplete [formField]="order.city" placeholder="Type a city">
+        <ui-autocomplete formControlName="city" placeholder="Type a city">
           @for (city of cities; track city) {
             <ui-option [value]="city">{{ city }}</ui-option>
           }
         </ui-autocomplete>
+        @if (order.controls.city.hasError('required')) {
+          <ui-error>Enter a city</ui-error>
+        }
       </ui-form-field>
       <ui-form-field label="Owner">
-        <ui-autocomplete [formField]="order.owner" [displayWith]="nameOf" [compareWith]="byId">
+        <ui-autocomplete formControlName="owner" [displayWith]="nameOf" [compareWith]="byId">
           @for (person of people; track person.id) {
             <ui-option [value]="person">{{ person.name }}</ui-option>
           }
         </ui-autocomplete>
+        @if (order.controls.owner.hasError('required')) {
+          <ui-error>Pick an owner</ui-error>
+        }
       </ui-form-field>
       <div class="row">
         <ui-form-field label="Units">
-          <ui-number-input [formField]="order.units" maxFractionDigits="0" />
+          <ui-number-input formControlName="units" min="1" max="200" maxFractionDigits="0" />
           <span uiSuffix>units</span>
+          @if (order.controls.units.hasError('required')) {
+            <ui-error>Enter the units</ui-error>
+          }
         </ui-form-field>
         <ui-form-field label="Price">
           <span uiPrefix>₪</span>
           <ui-number-input
-            [formField]="order.price"
+            formControlName="price"
+            min="0"
             minFractionDigits="2"
             maxFractionDigits="2"
             [steppers]="false"
@@ -34,23 +44,29 @@
         </ui-form-field>
       </div>
       <ui-form-field label="Tags" hint="Enter or a comma after each tag">
-        <ui-chip-input [formField]="order.tags" placeholder="Add a tag" />
+        <ui-chip-input formControlName="tags" placeholder="Add a tag" />
       </ui-form-field>
       <ui-form-field label="Trades">
-        <ui-multi-select [formField]="order.trades" chips selectAll placeholder="Choose">
+        <ui-multi-select formControlName="trades" chips selectAll placeholder="Choose">
           @for (trade of trades; track trade) {
             <ui-option [value]="trade">{{ trade }}</ui-option>
           }
         </ui-multi-select>
+        @if (order.controls.trades.hasError('minLength')) {
+          <ui-error>Choose a trade</ui-error>
+        }
       </ui-form-field>
       <ui-form-field label="Plans" hint="PDF, up to 10 MB">
         <ui-file-upload
-          [formField]="order.files"
+          formControlName="files"
           accept=".pdf"
           multiple
           [maxSize]="10 * 1024 * 1024"
           [progress]="uploads()"
         />
+        @if (order.controls.files.hasError('minLength')) {
+          <ui-error>Attach a plan</ui-error>
+        }
       </ui-form-field>
       <div><button ui-button type="submit">Save the work order</button></div>
     </form>

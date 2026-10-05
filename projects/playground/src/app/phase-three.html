@@ -83,17 +83,23 @@
 </section>
 
 <div class="grid">
-  <section aria-labelledby="schedule-title">
-    <h3 id="schedule-title" class="ui-heading-4">Schedule a meeting (Signal Forms)</h3>
+  <section aria-labelledby="schedule-title" [formGroup]="schedule">
+    <h3 id="schedule-title" class="ui-heading-4">Schedule a meeting (Reactive Forms)</h3>
     <ui-form-field label="Recipients">
-      <ui-multi-select placeholder="Choose recipients" searchable [formField]="schedule.recipients">
+      <ui-multi-select placeholder="Choose recipients" searchable formControlName="recipients">
         @for (owner of owners; track owner) {
           <ui-option [value]="owner">{{ owner }}</ui-option>
         }
       </ui-multi-select>
+      @if (schedule.controls.recipients.hasError('minLength')) {
+        <ui-error>Choose at least one recipient</ui-error>
+      }
     </ui-form-field>
     <ui-form-field label="Meeting date" hint="Sunday to Thursday">
-      <ui-datepicker [formField]="schedule.meeting" [dateFilter]="workdays" />
+      <ui-datepicker formControlName="meeting" [min]="today" [dateFilter]="workdays" />
+      @if (schedule.controls.meeting.hasError('required')) {
+        <ui-error>Choose a meeting date</ui-error>
+      }
     </ui-form-field>
     <pre dir="ltr">{{ model() | json }}</pre>
   </section>

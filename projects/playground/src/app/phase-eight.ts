@@ -10,7 +10,6 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { FormField, form, max, min, minLength } from '@angular/forms/signals';
 import { UiButton } from '@vplans/ui-kit/button';
 import {
   UiDateRange,
@@ -28,6 +27,7 @@ import {
 import { UiRangeSlider, UiSlider, UiSliderMark, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiStep, UiStepper, UiStepperNext, UiStepperPrevious } from '@vplans/ui-kit/stepper';
 import { UiTimeInput, uiDateWithTime } from '@vplans/ui-kit/time';
+import { uiAtLeastOne } from './validators';
 
 interface UnitFilters {
   deal: 'rent' | 'sale';
@@ -52,7 +52,6 @@ const endOfRange = (control: AbstractControl): ValidationErrors | null => {
   selector: 'app-phase-eight',
   imports: [
     JsonPipe,
-    FormField,
     ReactiveFormsModule,
     UiButton,
     UiButtonToggle,
@@ -76,18 +75,25 @@ const endOfRange = (control: AbstractControl): ValidationErrors | null => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseEight {
-  protected readonly model = signal<UnitFilters>({
-    deal: 'rent',
-    features: ['parking'],
-    rooms: 3,
-    price: [4000, 9000],
-    floors: [2, 8],
+  protected readonly filters = new FormGroup({
+    deal: new FormControl<UnitFilters['deal']>('rent', { nonNullable: true }),
+    features: new FormControl<readonly string[]>(['parking'], {
+      nonNullable: true,
+      validators: uiAtLeastOne,
+    }),
+    // The slider carries its own limits now, so the control only has to match them.
+    rooms: new FormControl(3, {
+      nonNullable: true,
+      validators: [Validators.min(1), Validators.max(6)],
+    }),
+    price: new FormControl<UiSliderRange>([4000, 9000], { nonNullable: true }),
+    floors: new FormControl<UiSliderRange>([2, 8], { nonNullable: true }),
   });
-  protected readonly filters = form(this.model, (p) => {
-    minLength(p.features, 1, { message: 'Choose at least one feature' });
-    min(p.rooms, 1);
-    max(p.rooms, 6);
-  });
+  /** The filters as a signal, for the panel below them. */
+  protected readonly model = toSignal(
+    this.filters.valueChanges.pipe(map(() => this.filters.getRawValue())),
+    { initialValue: this.filters.getRawValue() },
+  );
 
   /** The last price range the user let go of, e.g. for a server request. */
   protected readonly committedPrice = signal<UiSliderRange | null>(null);

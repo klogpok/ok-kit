@@ -1,12 +1,14 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { FormField, form, minDate, minLength, required } from '@angular/forms/signals';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { map } from 'rxjs';
 import { UiAccordion, UiAccordionContent, UiAccordionItem } from '@vplans/ui-kit/accordion';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiDatepicker } from '@vplans/ui-kit/datepicker';
 import { UiDivider } from '@vplans/ui-kit/divider';
-import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiMenu, UiMenuItem, UiMenuTrigger } from '@vplans/ui-kit/menu';
 import { UiPagination } from '@vplans/ui-kit/pagination';
@@ -23,6 +25,7 @@ import {
   uiSortData,
 } from '@vplans/ui-kit/table';
 import { UiToast } from '@vplans/ui-kit/toast';
+import { uiAtLeastOne } from './validators';
 
 interface Plan {
   id: number;
@@ -58,7 +61,7 @@ const startOfToday = () => {
   selector: 'app-phase-three',
   imports: [
     JsonPipe,
-    FormField,
+    ReactiveFormsModule,
     UiAccordion,
     UiAccordionItem,
     UiAccordionContent,
@@ -67,6 +70,7 @@ const startOfToday = () => {
     UiIconButton,
     UiDatepicker,
     UiDivider,
+    UiError,
     UiFormField,
     UiIcon,
     UiMenu,
@@ -106,16 +110,16 @@ export class PhaseThree {
   });
 
   protected readonly today = startOfToday();
-  protected readonly model = signal<{ recipients: string[]; meeting: Date | null }>({
-    recipients: [],
-    meeting: null,
+  protected readonly schedule = new FormGroup({
+    recipients: new FormControl<string[]>([], { nonNullable: true, validators: uiAtLeastOne }),
+    // `[min]="today"` already keeps earlier days out of the control, so `required` is enough.
+    meeting: new FormControl<Date | null>(null, Validators.required),
   });
-  protected readonly schedule = form(this.model, (p) => {
-    required(p.recipients);
-    minLength(p.recipients, 1, { message: 'Choose at least one recipient' });
-    required(p.meeting, { message: 'Choose a meeting date' });
-    minDate(p.meeting, startOfToday(), { message: 'The meeting cannot be in the past' });
-  });
+  /** The form's value as a signal, for the panel below it. */
+  protected readonly model = toSignal(
+    this.schedule.valueChanges.pipe(map(() => this.schedule.getRawValue())),
+    { initialValue: this.schedule.getRawValue() },
+  );
 
   protected readonly workdays = (date: Date) => date.getDay() !== 5 && date.getDay() !== 6;
 
