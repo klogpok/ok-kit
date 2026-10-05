@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
-  DestroyRef,
   ElementRef,
   Injector,
   afterNextRender,
@@ -20,8 +19,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { ValidationError, transformedValue } from '@angular/forms/signals';
 import { map } from 'rxjs';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -92,15 +89,15 @@ interface Draft {
 
 const hasErrors = (parsed: ParsedRange): boolean =>
   parsed.invalid.start || parsed.invalid.end || parsed.order !== null;
-
 /**
  * Date range field: a start and an end field that parse typed dates, and a calendar dialog that
  * picks both.
  *
  * - Each field is parsed like `ui-datepicker` (the `locale` label, default `he-IL`). Text that is
- *   not a date, or a day outside `minDate`/`maxDate`/`dateFilter`, sets that end to `null` and
- *   reports `uiDateParse` (`invalidDate` label). An end before the start sets the field typed
- *   last to `null` and reports `uiDateRangeOrder` (`invalidDateRange` label).
+ *   not a date, or a day outside `minDate`/`maxDate`/`dateFilter`, sets that end to `null` and,
+ *   once the user leaves the field, shows `labels().invalidDate`. An end before the start sets
+ *   the field typed last to `null` and shows `labels().invalidDateRange`. Both messages are the
+ *   field's own: they never become errors of a bound form control.
  * - The calendar button (or Alt+ArrowDown in a field) opens a dialog with two months side by
  *   side (one on narrow screens). The first pick sets the start, the second the end and closes
  *   the dialog; until then the day under the pointer or the focused day previews the range.
@@ -108,13 +105,12 @@ const hasErrors = (parsed: ParsedRange): boolean =>
  *
  * The value is `{ start, end }` with local dates at midnight, or `null` when both are empty. A
  * range with one open end is kept (e.g. "from September 1"); add a validator when both are
- * needed. With Signal Forms set the limits with `minDate`/`maxDate`: `[formField]` does not allow
- * `min`/`max`, and the date rules do not apply to a range. Implements `FormValueControl`
- * (Signal Forms) and `ControlValueAccessor`.
+ * needed. Implements `ControlValueAccessor`, so it binds with `[formControl]`, `formControlName`
+ * and `[(ngModel)]`.
  *
  * @example
  * <ui-form-field label="Report period">
- *   <ui-date-range-picker [formField]="form.period" [maxDate]="today" [presets]="presets" />
+ *   <ui-date-range-picker formControlName="period" [maxDate]="today" [presets]="presets" />
  * </ui-form-field>
  */
 @Component({
@@ -241,7 +237,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
     '[class]': '"ui-date-range-picker--" + size()',
     '[class.ui-date-range-picker--disabled]': 'isDisabled()',
     '[class.ui-date-range-picker--readonly]': 'readonly()',
-    '[class.ui-date-range-picker--invalid]': 'showError() || !!parseMessage()',
+    '[class.ui-date-range-picker--invalid]': 'showError()',
     '[attr.id]': 'id()',
     '[attr.aria-labelledby]': 'groupLabelledBy()',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
@@ -312,38 +308,18 @@ export class UiDateRangePicker
   /** The value when it holds valid dates; anything else is shown empty. */
   protected readonly range = computed(() => validRange(this.value()));
 
-  /**
-   * Parses the two texts into the value. Through `transformedValue` Signal Forms receives the
-   * parse errors; they clear when the value changes elsewhere or the form is reset.
-   */
-  private readonly rawText = transformedValue(this.value, {
-    parse: (raw: RangeText) => {
-      const parsed = this.parse(raw);
-      return {
-        value: sameRange(parsed.value, this.range()) ? undefined : parsed.value,
-        error: this.errorsOf(parsed),
-      };
-    },
-    format: (value: UiDateRange | null): RangeText => this.format(validRange(value)),
-  });
-
-  /**
-   * Dropped when the value or the texts change elsewhere (e.g. a reset, which sets the texts to
-   * the formatted value), so old text does not come back.
-   */
-  private readonly draft = linkedSignal<
-    { value: UiDateRange | null; raw: RangeText },
-    Draft | null
-  >({
-    source: () => ({ value: this.range(), raw: this.rawText() }),
-    computation: ({ value, raw }, previous) => {
+  /** Dropped when the value changes elsewhere, so old text does not come back. */
+  private readonly draft = linkedSignal<UiDateRange | null, Draft | null>({
+    source: () => this.value(),
+    computation: (value, previous) => {
       const draft = previous?.value;
-      const current =
-        !!draft &&
-        sameRange(draft.parsed.value, value) &&
-        draft.start === raw.start &&
-        draft.end === raw.end;
-      return current ? draft : null;
+      // A written range the picker cannot read also drops the text: it is a value, and it shows
+      // empty. Only the very object the draft produced, or the same days, keeps the text.
+      const parsed = draft?.parsed.value ?? null;
+      const written = validRange(value);
+      return draft && (parsed === value || (!!parsed && !!written && sameRange(parsed, written)))
+        ? draft
+        : null;
     },
   });
 
@@ -365,7 +341,7 @@ export class UiDateRangePicker
   });
 
   /** Message for committed text that is not a valid range. */
-  protected readonly parseMessage = computed(() => {
+  private readonly parseMessage = computed(() => {
     const draft = this.draft();
     if (!draft?.committed) return null;
     const { invalid, order } = draft.parsed;
@@ -384,45 +360,19 @@ export class UiDateRangePicker
     { id: `${this.id()}-end-name`, text: this.labels().endDate },
   ]);
 
-  /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
-  private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
-    const errors = this.rawText.parseErrors();
-    if (!errors.length) return null;
-    return Object.fromEntries(errors.map((error) => [error.kind, { message: error.message }]));
-  };
-
-  /** The control that holds `parseValidator`; it must not keep it after this field is gone. */
-  private validatedControl: AbstractControl | null = null;
-
-  constructor() {
-    super();
-    inject(DestroyRef).onDestroy(() => this.releaseParseValidator());
-  }
-
-  /** Without a forms directive, the field itself shows the parse error. */
+  /**
+   * The field shows the parse and order messages itself, bound or not: text the user still has to
+   * fix is not a validation failure of the consumer's control, which only ever sees the days it
+   * could read.
+   */
   protected override ownErrors(): readonly string[] {
     const message = this.parseMessage();
-    return !this.controlState.bound && message ? [message] : [];
+    return message ? [message] : [];
   }
 
   writeValue(value: UiDateRange | null | undefined): void {
-    const range = validRange(value);
     this.draft.set(null);
-    this.value.set(range);
-    // A new range clears the parse errors by itself; `null` over `null` (reset) does not.
-    if (range === null) this.rawText.set({ start: '', end: '' });
-  }
-
-  override registerOnChange(fn: (value: UiDateRange | null) => void): void {
-    const control = this.ngControl?.control ?? null;
-    if (control !== this.validatedControl) {
-      this.releaseParseValidator();
-      if (control && !control.hasValidator(this.parseValidator)) {
-        control.addValidators(this.parseValidator);
-      }
-      this.validatedControl = control;
-    }
-    super.registerOnChange(fn);
+    this.value.set(validRange(value));
   }
 
   /** Focuses the start field. */
@@ -480,35 +430,31 @@ export class UiDateRangePicker
 
   /** The first pick sets the start; the second sets the end and closes the dialog. */
   protected onRangePick(range: UiDateRange): void {
+    this.draft.set(null);
     this.setValue(validRange(range));
-    this.syncText();
     if (range.end) this.close();
   }
 
   protected onPreset(preset: UiDateRangePreset): void {
     const range = typeof preset.range === 'function' ? preset.range() : preset.range;
+    this.draft.set(null);
     this.setValue(validRange(range));
-    this.syncText();
     this.close();
   }
 
   /** Empties both fields, also when they hold text that is not a date. */
   protected onClear(): void {
+    this.draft.set(null);
     this.setValue(null);
-    this.syncText();
     this.close();
   }
 
   protected onInput(edge: Edge, event: Event): void {
     const text = (event.target as HTMLInputElement).value;
-    const before = this.value();
-    const errorsBefore = this.errorKinds();
     const raw: RangeText = { ...this.texts(), [edge]: text, edited: edge };
-    this.rawText.set(raw);
-    this.draft.set({ start: raw.start, end: raw.end, parsed: this.parse(raw), committed: false });
-    const value = this.value();
-    if (value !== before) this.notifyChange(value);
-    else if (errorsBefore !== this.errorKinds()) this.ngControl?.control?.updateValueAndValidity();
+    const parsed = this.parse(raw);
+    this.setValue(parsed.value);
+    this.draft.set({ start: raw.start, end: raw.end, parsed, committed: false });
   }
 
   protected onInputKeydown(event: KeyboardEvent): void {
@@ -556,43 +502,9 @@ export class UiDateRangePicker
     };
   }
 
-  private errorsOf(parsed: ParsedRange): ValidationError.WithoutFieldTree[] | undefined {
-    const errors: ValidationError.WithoutFieldTree[] = [];
-    if (parsed.invalid.start || parsed.invalid.end) {
-      errors.push({ kind: 'uiDateParse', message: this.labels().invalidDate });
-    }
-    if (parsed.order) {
-      errors.push({ kind: 'uiDateRangeOrder', message: this.labels().invalidDateRange });
-    }
-    return errors.length ? errors : undefined;
-  }
-
   private format(range: UiDateRange | null): RangeText {
     const text = (date: Date | null | undefined) => (date ? formatDay(date, this.locale()) : '');
     return { start: text(range?.start), end: text(range?.end) };
-  }
-
-  private errorKinds(): string {
-    return this.rawText
-      .parseErrors()
-      .map((error) => error.kind)
-      .join();
-  }
-
-  /** Drops the typed texts and their errors, and shows the value. */
-  private syncText(): void {
-    const errorsBefore = this.errorKinds();
-    this.draft.set(null);
-    this.rawText.set(this.format(this.range()));
-    if (errorsBefore) this.ngControl?.control?.updateValueAndValidity();
-  }
-
-  private releaseParseValidator(): void {
-    const control = this.validatedControl;
-    this.validatedControl = null;
-    if (!control?.hasValidator(this.parseValidator)) return;
-    control.removeValidators(this.parseValidator);
-    control.updateValueAndValidity();
   }
 
   private setValue(value: UiDateRange | null): void {

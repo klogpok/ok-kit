@@ -1,10 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, readonly, required } from '@angular/forms/signals';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { of } from 'rxjs';
-import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiDateRangePicker, UiDateRangePreset } from './date-range-picker';
 import { UiDateRange } from './date-utils';
 
@@ -153,6 +152,19 @@ describe('UiDateRangePicker', () => {
     await settle(fixture);
     expect(start().value).toBe('');
     expect(end().value).toBe('');
+  });
+
+  it('drops typed text and its message when the model writes a value it cannot read', async () => {
+    await type(end(), '31.2.2026');
+    await blur(end());
+    expect(end().value).toBe('31.2.2026');
+    expect(root.textContent).toContain('תאריך לא תקין');
+
+    host.value.set({ start: new Date(Number.NaN), end: null });
+    await settle(fixture);
+    expect(end().value).toBe('');
+    expect(end().getAttribute('aria-invalid')).toBeNull();
+    expect(root.textContent).not.toContain('תאריך לא תקין');
   });
 
   it('marks the field with text that is not an allowed date once the user leaves it', async () => {
@@ -323,35 +335,56 @@ describe('UiDateRangePicker on wide screens', () => {
 });
 
 @Component({
-  imports: [UiDateRangePicker, UiFormField, ReactiveFormsModule],
+  imports: [UiDateRangePicker, UiFormField, UiError, ReactiveFormsModule],
   template: `
-    <ui-form-field label="Period">
-      <ui-date-range-picker [formControl]="control" />
-    </ui-form-field>
+    <form [formGroup]="form">
+      <ui-form-field label="Period">
+        <ui-date-range-picker formControlName="period" />
+        <ui-error>Choose the dates</ui-error>
+      </ui-form-field>
+      <ui-form-field label="Window">
+        <ui-date-range-picker formControlName="window" [minDate]="min" />
+      </ui-form-field>
+    </form>
   `,
 })
 class ReactiveHost {
-  readonly control = new FormControl<UiDateRange | null>(
-    range(new Date(2026, 8, 1), new Date(2026, 8, 5)),
-    Validators.required,
-  );
+  readonly min = new Date(2026, 0, 1);
+  readonly form = new FormGroup({
+    period: new FormControl<UiDateRange | null>(
+      range(new Date(2026, 8, 1), new Date(2026, 8, 5)),
+      Validators.required,
+    ),
+    window: new FormControl<UiDateRange | null>(range(new Date(2026, 8, 1), new Date(2026, 8, 5))),
+  });
 }
 
 describe('UiDateRangePicker with Reactive Forms', () => {
   let fixture: ComponentFixture<ReactiveHost>;
   let root: HTMLElement;
-  let control: FormControl<UiDateRange | null>;
-  const inputs = () => [...root.querySelectorAll<HTMLInputElement>('input')];
+  let controls: ReactiveHost['form']['controls'];
+  const fieldOf = (label: string): HTMLElement =>
+    [...root.querySelectorAll<HTMLElement>('ui-form-field')].find((it) =>
+      it.querySelector('label')!.textContent.includes(label),
+    )!;
+  const inputs = (label: string) => [...fieldOf(label).querySelectorAll<HTMLInputElement>('input')];
+  /** The message `ui-form-field` shows under the fields with this label. */
+  const errorOf = (label: string): string =>
+    fieldOf(label).querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
   const type = async (input: HTMLInputElement, text: string) => {
     input.value = text;
     input.dispatchEvent(new Event('input'));
+    await settle(fixture);
+  };
+  const blur = async (input: HTMLInputElement) => {
+    leave(input);
     await settle(fixture);
   };
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);
     root = fixture.nativeElement as HTMLElement;
-    control = fixture.componentInstance.control;
+    controls = fixture.componentInstance.form.controls;
     document.body.appendChild(root);
     await settle(fixture);
   });
@@ -362,160 +395,180 @@ describe('UiDateRangePicker with Reactive Forms', () => {
   });
 
   it('binds the value both ways and shows the required state', async () => {
-    expect(inputs().map((i) => i.value)).toEqual(['1.9.2026', '5.9.2026']);
-    expect(inputs()[0].getAttribute('aria-required')).toBe('true');
-    await type(inputs()[1], '9.9.2026');
-    expect(control.value).toEqual(range(new Date(2026, 8, 1), new Date(2026, 8, 9)));
-    control.setValue(range(new Date(2026, 3, 1), new Date(2026, 3, 2)));
+    expect(inputs('Period').map((i) => i.value)).toEqual(['1.9.2026', '5.9.2026']);
+    expect(inputs('Period')[0].getAttribute('aria-required')).toBe('true');
+    await type(inputs('Period')[1], '9.9.2026');
+    expect(controls.period.value).toEqual(range(new Date(2026, 8, 1), new Date(2026, 8, 9)));
+    controls.period.setValue(range(new Date(2026, 3, 1), new Date(2026, 3, 2)));
     await settle(fixture);
-    expect(inputs().map((i) => i.value)).toEqual(['1.4.2026', '2.4.2026']);
+    expect(inputs('Period').map((i) => i.value)).toEqual(['1.4.2026', '2.4.2026']);
   });
 
-  it('reports parse and order errors to the control', async () => {
-    await type(inputs()[0], 'abc');
-    expect(control.hasError('uiDateParse')).toBe(true);
-    expect(control.getError('uiDateParse')).toEqual({ message: 'תאריך לא תקין' });
-    await type(inputs()[0], '10.9.2026');
-    expect(control.hasError('uiDateParse')).toBe(false);
-    expect(control.hasError('uiDateRangeOrder')).toBe(true);
-    await type(inputs()[0], '');
-    await type(inputs()[1], '');
-    expect(control.value).toBeNull();
-    expect(control.hasError('required')).toBe(true);
-    expect(control.hasError('uiDateRangeOrder')).toBe(false);
+  it('shows text that is not a date without failing the control', async () => {
+    await type(inputs('Window')[0], 'abc');
+    expect(controls.window.value).toEqual(range(null, new Date(2026, 8, 5)));
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBeNull();
+
+    await blur(inputs('Window')[0]);
+    expect(controls.window.errors).toBeNull();
+    expect(controls.window.valid).toBe(true);
+    expect(fixture.componentInstance.form.valid).toBe(true);
+    expect(inputs('Window')[0].value).toBe('abc');
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBe('true');
+    expect(inputs('Window')[1].getAttribute('aria-invalid')).toBeNull();
+    expect(errorOf('Window')).toContain('תאריך לא תקין');
+
+    await type(inputs('Window')[0], '2.9.2026');
+    await blur(inputs('Window')[0]);
+    expect(controls.window.value).toEqual(range(new Date(2026, 8, 2), new Date(2026, 8, 5)));
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBeNull();
+    expect(errorOf('Window')).toBe('');
   });
 
-  it('clears the parse error when the form is reset', async () => {
-    await type(inputs()[1], 'abc');
-    control.reset(range(new Date(2026, 3, 1), null));
+  it('shows an end before the start without failing the control', async () => {
+    await type(inputs('Window')[0], '10.9.2026');
+    await blur(inputs('Window')[0]);
+    expect(controls.window.value).toEqual(range(null, new Date(2026, 8, 5)));
+    expect(controls.window.errors).toBeNull();
+    expect(controls.window.valid).toBe(true);
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBe('true');
+    expect(errorOf('Window')).toContain('תאריך הסיום מוקדם מתאריך ההתחלה');
+  });
+
+  it("shows the consumer's required message once both fields are empty", async () => {
+    await type(inputs('Period')[0], '');
+    await type(inputs('Period')[1], '');
+    expect(controls.period.value).toBeNull();
+    expect(controls.period.hasError('required')).toBe(true);
+    await blur(inputs('Period')[1]);
+    expect(controls.period.touched).toBe(true);
+    expect(inputs('Period').every((i) => i.getAttribute('aria-invalid') === 'true')).toBe(true);
+    expect(errorOf('Period')).toContain('Choose the dates');
+  });
+
+  it('drops typed text and its message when the control writes a value', async () => {
+    await type(inputs('Window')[1], 'abc');
+    await blur(inputs('Window')[1]);
+    expect(inputs('Window')[1].getAttribute('aria-invalid')).toBe('true');
+
+    controls.window.reset(range(new Date(2026, 3, 1), null));
     await settle(fixture);
-    expect(control.valid).toBe(true);
-    expect(inputs().map((i) => i.value)).toEqual(['1.4.2026', '']);
-    await type(inputs()[1], 'abc');
-    control.reset();
+    expect(controls.window.valid).toBe(true);
+    expect(inputs('Window').map((i) => i.value)).toEqual(['1.4.2026', '']);
+    expect(inputs('Window')[1].getAttribute('aria-invalid')).toBeNull();
+    expect(errorOf('Window')).toBe('');
+
+    // `null` written over `null`: only `writeValue` itself can drop the text here.
+    await type(inputs('Window')[0], '');
+    await type(inputs('Window')[0], 'abc');
+    await blur(inputs('Window')[0]);
+    expect(errorOf('Window')).toContain('תאריך לא תקין');
+    controls.window.reset();
     await settle(fixture);
-    expect(control.hasError('uiDateParse')).toBe(false);
+    expect(inputs('Window')[0].value).toBe('');
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBeNull();
+    expect(errorOf('Window')).toBe('');
+  });
+
+  it('drops typed text and its message when a day is picked', async () => {
+    await type(inputs('Window')[0], 'abc');
+    await blur(inputs('Window')[0]);
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBe('true');
+    fieldOf('Window').querySelector<HTMLButtonElement>('.ui-date-range-picker__toggle')!.click();
+    await settle(fixture);
+    day('2026-09-15').click();
+    await settle(fixture);
+    expect(controls.window.value).toEqual(range(new Date(2026, 8, 15), null));
+    expect(inputs('Window')[0].value).toBe('15.9.2026');
+    expect(inputs('Window')[0].getAttribute('aria-invalid')).toBeNull();
+    expect(errorOf('Window')).toBe('');
   });
 
   it('is not touched while focus moves between its fields', async () => {
-    leave(inputs()[0], inputs()[1]);
+    leave(inputs('Period')[0], inputs('Period')[1]);
     await settle(fixture);
-    expect(control.touched).toBe(false);
-    leave(inputs()[1]);
+    expect(controls.period.touched).toBe(false);
+    leave(inputs('Period')[1]);
     await settle(fixture);
-    expect(control.touched).toBe(true);
-    expect(inputs()[0].getAttribute('aria-invalid')).toBeNull();
+    expect(controls.period.touched).toBe(true);
+    expect(inputs('Period')[0].getAttribute('aria-invalid')).toBeNull();
   });
 
   it('disables both fields and the calendar button', async () => {
-    control.disable();
+    controls.period.disable();
     await settle(fixture);
-    expect(inputs().every((i) => i.disabled)).toBe(true);
-    expect(root.querySelector('ui-date-range-picker')!.getAttribute('aria-disabled')).toBe('true');
-    expect(root.querySelector<HTMLButtonElement>('.ui-date-range-picker__toggle')!.disabled).toBe(
-      true,
-    );
-  });
-
-  it('removes its validator when destroyed', async () => {
-    await type(inputs()[0], 'abc');
-    fixture.destroy();
-    expect(control.valid).toBe(true);
-    expect(control.hasValidator(Validators.required)).toBe(true);
+    expect(inputs('Period').every((i) => i.disabled)).toBe(true);
+    expect(
+      fieldOf('Period').querySelector('ui-date-range-picker')!.getAttribute('aria-disabled'),
+    ).toBe('true');
+    expect(
+      fieldOf('Period').querySelector<HTMLButtonElement>('.ui-date-range-picker__toggle')!.disabled,
+    ).toBe(true);
   });
 });
 
 @Component({
-  imports: [UiDateRangePicker, UiFormField, FormField],
+  imports: [UiDateRangePicker, ReactiveFormsModule],
   template: `
-    <ui-form-field label="Period">
-      <ui-date-range-picker [formField]="f.period" [minDate]="min" />
-    </ui-form-field>
+    @if (shown()) {
+      <ui-date-range-picker aria-label="Period" [formControl]="control()" />
+    }
   `,
 })
-class SignalHost {
-  readonly min = new Date(2026, 0, 1);
-  readonly model = signal<{ period: UiDateRange | null }>({ period: null });
-  readonly f = form(this.model, (p) => {
-    required(p.period, { message: 'Choose the dates' });
-  });
+class ConditionalHost {
+  readonly shown = signal(true);
+  readonly first = new FormControl<UiDateRange | null>(null);
+  readonly second = new FormControl<UiDateRange | null>(null);
+  readonly control = signal(this.first);
 }
 
-describe('UiDateRangePicker with Signal Forms', () => {
-  let fixture: ComponentFixture<SignalHost>;
+describe('UiDateRangePicker bound to a changing control', () => {
+  let fixture: ComponentFixture<ConditionalHost>;
   let root: HTMLElement;
-  const inputs = () => [...root.querySelectorAll<HTMLInputElement>('input')];
-  const type = async (input: HTMLInputElement, text: string) => {
+  const type = async (text: string) => {
+    const input = root.querySelector<HTMLInputElement>('input')!;
     input.value = text;
     input.dispatchEvent(new Event('input'));
     await settle(fixture);
   };
 
   beforeEach(async () => {
-    fixture = TestBed.createComponent(SignalHost);
+    fixture = TestBed.createComponent(ConditionalHost);
     root = fixture.nativeElement as HTMLElement;
     document.body.appendChild(root);
     await settle(fixture);
   });
 
-  afterEach(() => {
-    fixture.destroy();
-    root.remove();
-  });
+  afterEach(() => root.remove());
 
-  it('binds the value both ways', async () => {
-    await type(inputs()[0], '3.3.2026');
-    expect(fixture.componentInstance.model().period).toEqual(range(new Date(2026, 2, 3), null));
-    fixture.componentInstance.model.set({
-      period: range(new Date(2026, 6, 14), new Date(2026, 6, 20)),
-    });
-    await settle(fixture);
-    expect(inputs().map((i) => i.value)).toEqual(['14.7.2026', '20.7.2026']);
-  });
+  // The field used to add a parse validator to the bound control and take it off again; now it
+  // adds nothing, so no control it is bound to - or was bound to - may end up with a validator.
+  it('adds no validator of its own, and leaves none behind', async () => {
+    const { first, second } = fixture.componentInstance;
+    await type('abc');
+    expect(first.value).toBeNull();
+    expect(first.valid).toBe(true);
+    expect(first.validator).toBeNull();
 
-  it('shows the required error once touched', async () => {
-    expect(inputs()[1].getAttribute('aria-required')).toBe('true');
-    leave(inputs()[0]);
+    fixture.componentInstance.control.set(second);
     await settle(fixture);
-    expect(fixture.componentInstance.f.period().touched()).toBe(true);
-    expect(inputs().every((i) => i.getAttribute('aria-invalid') === 'true')).toBe(true);
-    expect(root.textContent).toContain('Choose the dates');
-  });
+    await type('xyz');
+    expect(second.valid).toBe(true);
+    expect(second.validator).toBeNull();
 
-  it('reports parse errors to the field and drops them on reset', async () => {
-    const field = fixture.componentInstance.f.period;
-    await type(inputs()[0], '31.12.2025');
-    expect(
-      field()
-        .errors()
-        .map((e) => e.kind),
-    ).toContain('uiDateParse');
-    leave(inputs()[0]);
+    fixture.componentInstance.shown.set(false);
     await settle(fixture);
-    expect(root.textContent).toContain('תאריך לא תקין');
-
-    fixture.componentInstance.f().reset();
-    await settle(fixture);
-    expect(inputs()[0].value).toBe('');
-    expect(
-      field()
-        .errors()
-        .map((e) => e.kind),
-    ).not.toContain('uiDateParse');
+    expect(first.valid).toBe(true);
+    expect(second.valid).toBe(true);
   });
 });
 
 @Component({
-  imports: [UiDateRangePicker, FormField],
-  template: `<ui-date-range-picker aria-label="Period" [formField]="f.period" />`,
+  imports: [UiDateRangePicker],
+  template: `<ui-date-range-picker aria-label="Period" readonly [value]="value" />`,
 })
 class ReadonlyHost {
-  readonly model = signal<{ period: UiDateRange | null }>({
-    period: range(new Date(2026, 3, 1), new Date(2026, 3, 3)),
-  });
-  readonly f = form(this.model, (p) => {
-    readonly(p.period);
-  });
+  readonly value = range(new Date(2026, 3, 1), new Date(2026, 3, 3));
 }
 
 describe('UiDateRangePicker readonly', () => {
@@ -525,6 +578,7 @@ describe('UiDateRangePicker readonly', () => {
     document.body.appendChild(root);
     await settle(fixture);
     const inputs = [...root.querySelectorAll('input')];
+    expect(inputs.map((i) => i.value)).toEqual(['1.4.2026', '3.4.2026']);
     expect(inputs.every((i) => i.readOnly && !i.disabled)).toBe(true);
     expect(root.querySelector<HTMLButtonElement>('.ui-date-range-picker__toggle')!.disabled).toBe(
       true,

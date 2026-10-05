@@ -310,8 +310,10 @@ the dialog; until then the day under the pointer or the focused day previews the
 before the start starts a new range. `presets` add quick picks; a preset `range` may be a
 function, for ranges relative to today.
 
-Text that is not an allowed date reports `uiDateParse`; an end before the start reports
-`uiDateRangeOrder` (`invalidDateRange` label) and leaves the field typed last empty. A range with
+Text that is not an allowed date sets that field to `null`; an end before the start empties the
+field typed last. Once the user leaves the field, the picker shows the `invalidDate` or the
+`invalidDateRange` label. Those messages are the picker's own: they never become errors of the
+bound form control, so the control stays as valid as your validators say. A range with
 one open end is a valid value (e.g. "from September 1"); add a validator when both ends are
 needed. With Signal Forms set the limits with `minDate` / `maxDate`: `[formField]` does not
 allow `min`/`max`, and the date rules do not apply to a range. The group is named by the field
