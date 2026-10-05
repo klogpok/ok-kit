@@ -874,7 +874,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 
 `ui-stepper` shows the content of the current step in a region named by its button; the content
 of the other steps is kept, not destroyed, so their forms keep their state. A step with a
-`control` (a Reactive Forms control or a Signal Forms field) is done once the user leaves it
+`control` (a Reactive Forms control, e.g. a `FormGroup`) is done once the user leaves it
 valid and shows an error once the user leaves it, or tries to, invalid. `completed` and `error`
 (a string is shown under the label) set the state yourself. In a `linear` stepper a step can be
 reached only when the steps before it are valid or `optional`; a blocked Next marks the form of

@@ -44,33 +44,44 @@
     Inspection request (stepper, date range, date and time)
   </h3>
   <ui-stepper linear aria-label="Inspection request" [(selectedIndex)]="step">
-    <ui-step label="Permit" [control]="wizard.permit">
+    <ui-step label="Permit" [control]="wizard.controls.permit">
       <div class="step">
         <ui-form-field label="Permit period" hint="Type the dates or pick them">
           <ui-date-range-picker
-            [formField]="wizard.permit.period"
+            [formControl]="wizard.controls.permit.controls.period"
             [minDate]="today"
             [presets]="presets"
           />
+          @if (wizard.controls.permit.controls.period.hasError('required')) {
+            <ui-error>Choose the permit period</ui-error>
+          } @else if (wizard.controls.permit.controls.period.hasError('end')) {
+            <ui-error>Choose the end date</ui-error>
+          }
         </ui-form-field>
         <div class="actions">
           <button ui-button uiStepperNext>Next</button>
         </div>
       </div>
     </ui-step>
-    <ui-step label="Visit" [control]="wizard.visit">
+    <ui-step label="Visit" [control]="wizard.controls.visit">
       <div class="step">
         <div class="date-time">
           <ui-form-field label="Date">
-            <ui-datepicker [formField]="wizard.visit.date" />
+            <ui-datepicker [formControl]="wizard.controls.visit.controls.date" [min]="today" />
+            @if (wizard.controls.visit.controls.date.hasError('required')) {
+              <ui-error>Choose a date</ui-error>
+            }
           </ui-form-field>
           <ui-form-field label="Time" hint="&#x2066;08:00–18:00&#x2069;">
             <ui-time-input
-              [formField]="wizard.visit.time"
+              [formControl]="wizard.controls.visit.controls.time"
               minTime="08:00"
               maxTime="18:00"
               interval="15"
             />
+            @if (wizard.controls.visit.controls.time.hasError('required')) {
+              <ui-error>Choose a time</ui-error>
+            }
           </ui-form-field>
         </div>
         <div class="actions">

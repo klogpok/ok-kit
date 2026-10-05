@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, required } from '@angular/forms/signals';
 import {
   UiStep,
   UiStepper,
@@ -233,27 +232,26 @@ describe('UiStepper', () => {
 });
 
 @Component({
-  imports: [FormField, UiStepper, UiStep, UiStepperNext],
+  imports: [ReactiveFormsModule, UiStepper, UiStep, UiStepperNext],
   template: `
     <ui-stepper linear aria-label="Order">
-      <ui-step label="Contact" [control]="f.email">
-        <input aria-label="Email" [formField]="f.email" />
+      <ui-step label="Contact" [control]="control()">
+        <input aria-label="Email" [formControl]="control()" />
         <button type="button" uiStepperNext>Next</button>
       </ui-step>
       <ui-step label="Done"><p>Thanks</p></ui-step>
     </ui-stepper>
   `,
 })
-class SignalHost {
-  readonly model = signal({ email: '' });
-  readonly f = form(this.model, (p) => {
-    required(p.email);
-  });
+class ControlHost {
+  readonly email = new FormControl('', { nonNullable: true, validators: Validators.required });
+  readonly phone = new FormControl('', { nonNullable: true, validators: Validators.required });
+  readonly control = signal(this.email);
 }
 
-describe('UiStepper with Signal Forms', () => {
-  it('uses the validity of a field and marks it touched when blocked', async () => {
-    const fixture = TestBed.createComponent(SignalHost);
+describe('UiStepper with a single control on a step', () => {
+  it('uses the validity of the control and marks it touched when blocked', async () => {
+    const fixture = TestBed.createComponent(ControlHost);
     const root = fixture.nativeElement as HTMLElement;
     document.body.appendChild(root);
     await settle(fixture);
@@ -264,15 +262,47 @@ describe('UiStepper with Signal Forms', () => {
 
     root.querySelector<HTMLButtonElement>('.ui-stepper__content button')!.click();
     await settle(fixture);
-    expect(fixture.componentInstance.f.email().touched()).toBe(true);
+    expect(fixture.componentInstance.email.touched).toBe(true);
     expect(headers()[0].getAttribute('aria-current')).toBe('step');
 
-    fixture.componentInstance.model.set({ email: 'dana@vplans.com' });
+    fixture.componentInstance.email.setValue('dana@vplans.com');
     await settle(fixture);
+    expect(headers()[1].disabled).toBe(false);
     root.querySelector<HTMLButtonElement>('.ui-stepper__content button')!.click();
     await settle(fixture);
     expect(headers()[1].getAttribute('aria-current')).toBe('step');
     expect(root.querySelector('.ui-stepper__content')!.textContent).toContain('Thanks');
+    fixture.destroy();
+    root.remove();
+  });
+
+  it('follows a control that is disabled or swapped for another', async () => {
+    const fixture = TestBed.createComponent(ControlHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    const headers = () => [...root.querySelectorAll<HTMLButtonElement>('.ui-stepper__header')];
+    expect(headers()[1].disabled).toBe(true);
+
+    // A disabled control counts as valid: the step cannot be filled in, so it cannot block.
+    fixture.componentInstance.email.disable();
+    await settle(fixture);
+    expect(headers()[1].disabled).toBe(false);
+
+    fixture.componentInstance.email.enable();
+    await settle(fixture);
+    expect(headers()[1].disabled).toBe(true);
+
+    // The step follows the new control, and no longer the one it was moved away from.
+    fixture.componentInstance.control.set(fixture.componentInstance.phone);
+    await settle(fixture);
+    fixture.componentInstance.email.setValue('dana@vplans.com');
+    await settle(fixture);
+    expect(headers()[1].disabled).toBe(true);
+
+    fixture.componentInstance.phone.setValue('03-1234567');
+    await settle(fixture);
+    expect(headers()[1].disabled).toBe(false);
     fixture.destroy();
     root.remove();
   });
