@@ -1,30 +1,33 @@
 <h2 class="ui-heading-3">Phase 8</h2>
 
-<section aria-labelledby="filters-title">
+<section aria-labelledby="filters-title" [formGroup]="filters">
   <h3 id="filters-title" class="ui-heading-4">
-    Unit filters (segmented, button toggles, sliders, Signal Forms)
+    Unit filters (segmented, button toggles, sliders, Reactive Forms)
   </h3>
   <div class="filters">
     <ui-form-field label="Deal">
-      <ui-segmented [formField]="filters.deal" fullWidth>
+      <ui-segmented formControlName="deal" fullWidth>
         <ui-segment value="rent">Rent</ui-segment>
         <ui-segment value="sale">Sale</ui-segment>
       </ui-segmented>
     </ui-form-field>
     <ui-form-field label="Features" hint="At least one">
-      <ui-button-toggle-group [formField]="filters.features">
+      <ui-button-toggle-group formControlName="features">
         <button ui-button-toggle value="parking">Parking</button>
         <button ui-button-toggle value="elevator">Elevator</button>
         <button ui-button-toggle value="balcony">Balcony</button>
         <button ui-button-toggle value="storage">Storage</button>
       </ui-button-toggle-group>
+      @if (filters.controls.features.hasError('minLength')) {
+        <ui-error>Choose at least one feature</ui-error>
+      }
     </ui-form-field>
-    <ui-form-field label="Rooms" hint="From the min() and max() rules">
-      <ui-slider [formField]="filters.rooms" marks />
+    <ui-form-field label="Rooms" hint="From the min and max inputs">
+      <ui-slider formControlName="rooms" min="1" max="6" marks />
     </ui-form-field>
     <ui-form-field label="Rent per month">
       <ui-range-slider
-        [formField]="filters.price"
+        formControlName="price"
         [limits]="[0, 15000]"
         step="500"
         [valueText]="priceText"
@@ -32,7 +35,7 @@
       />
     </ui-form-field>
     <ui-form-field label="Floors">
-      <ui-range-slider [formField]="filters.floors" [limits]="[1, 12]" [marks]="floorMarks" />
+      <ui-range-slider formControlName="floors" [limits]="[1, 12]" [marks]="floorMarks" />
     </ui-form-field>
   </div>
   <pre>{{ model() | json }}</pre>
@@ -52,11 +55,6 @@
             [minDate]="today"
             [presets]="presets"
           />
-          @if (wizard.controls.permit.controls.period.hasError('required')) {
-            <ui-error>Choose the permit period</ui-error>
-          } @else if (wizard.controls.permit.controls.period.hasError('end')) {
-            <ui-error>Choose the end date</ui-error>
-          }
         </ui-form-field>
         <div class="actions">
           <button ui-button uiStepperNext>Next</button>
@@ -68,9 +66,6 @@
         <div class="date-time">
           <ui-form-field label="Date">
             <ui-datepicker [formControl]="wizard.controls.visit.controls.date" [min]="today" />
-            @if (wizard.controls.visit.controls.date.hasError('required')) {
-              <ui-error>Choose a date</ui-error>
-            }
           </ui-form-field>
           <ui-form-field label="Time" hint="&#x2066;08:00–18:00&#x2069;">
             <ui-time-input
@@ -79,9 +74,6 @@
               maxTime="18:00"
               interval="15"
             />
-            @if (wizard.controls.visit.controls.time.hasError('required')) {
-              <ui-error>Choose a time</ui-error>
-            }
           </ui-form-field>
         </div>
         <div class="actions">

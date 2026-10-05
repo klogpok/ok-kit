@@ -1,12 +1,14 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { FormField, form, max, min, minLength, required, submit } from '@angular/forms/signals';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { map } from 'rxjs';
 import { UiAutocomplete } from '@vplans/ui-kit/autocomplete';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton } from '@vplans/ui-kit/button';
 import { UiChipInput, UiChipSet, UiFilterChip } from '@vplans/ui-kit/chip';
 import { UiFileUpload } from '@vplans/ui-kit/file-upload';
-import { UiFormField, UiPrefix, UiSuffix } from '@vplans/ui-kit/form-field';
+import { UiError, UiFormField, UiPrefix, UiSuffix } from '@vplans/ui-kit/form-field';
 import { UiNumberInput } from '@vplans/ui-kit/number-input';
 import { UiMultiSelect, UiOption } from '@vplans/ui-kit/select';
 import {
@@ -25,20 +27,11 @@ import {
   uiSortData,
 } from '@vplans/ui-kit/table';
 import { UiToast } from '@vplans/ui-kit/toast';
+import { uiAtLeastOne, uiRequired } from './validators';
 
 interface Person {
   id: number;
   name: string;
-}
-
-interface WorkOrder {
-  city: string;
-  owner: Person | string | null;
-  units: number | null;
-  price: number | null;
-  tags: readonly string[];
-  trades: readonly string[];
-  files: readonly File[];
 }
 
 interface Unit {
@@ -77,7 +70,7 @@ const UNITS: Unit[] = Array.from({ length: 12 }, (_, i) => ({
   selector: 'app-phase-seven',
   imports: [
     JsonPipe,
-    FormField,
+    ReactiveFormsModule,
     UiAutocomplete,
     UiBadge,
     UiButton,
@@ -85,6 +78,7 @@ const UNITS: Unit[] = Array.from({ length: 12 }, (_, i) => ({
     UiChipSet,
     UiFilterChip,
     UiFileUpload,
+    UiError,
     UiFormField,
     UiPrefix,
     UiSuffix,
@@ -114,25 +108,29 @@ export class PhaseSeven {
   protected readonly cities = ['Haifa', 'Hadera', 'Holon', 'Eilat', 'Acre', 'Ashdod'];
   protected readonly trades = ['Electric', 'Plumbing', 'Paint', 'Tiles', 'Drywall', 'HVAC'];
 
-  protected readonly model = signal<WorkOrder>({
-    city: '',
-    owner: null,
-    units: 12,
-    price: null,
-    tags: ['north'],
-    trades: [],
-    files: [],
+  protected readonly order = new FormGroup({
+    city: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    owner: new FormControl<Person | string | null>(null, Validators.required),
+    // The limits are on the controls themselves; the validators keep the form honest.
+    units: new FormControl<number | null>(12, [
+      ...uiRequired('Enter the units'),
+      Validators.min(1),
+      Validators.max(200),
+    ]),
+    price: new FormControl<number | null>(null, Validators.min(0)),
+    tags: new FormControl<readonly string[]>(['north'], { nonNullable: true }),
+    trades: new FormControl<readonly string[]>([], {
+      nonNullable: true,
+      validators: uiAtLeastOne,
+    }),
+    files: new FormControl<readonly File[]>([], { nonNullable: true, validators: uiAtLeastOne }),
   });
-  protected readonly order = form(this.model, (p) => {
-    required(p.city, { message: 'Enter a city' });
-    required(p.owner, { message: 'Pick an owner' });
-    required(p.units, { message: 'Enter the units' });
-    min(p.units, 1);
-    max(p.units, 200);
-    min(p.price, 0);
-    minLength(p.trades, 1, { message: 'Choose a trade' });
-    minLength(p.files, 1, { message: 'Attach a plan' });
-  });
+  /** The form's value as a signal, for the panel below it. */
+  protected readonly model = toSignal(
+    this.order.valueChanges.pipe(map(() => this.order.getRawValue())),
+    { initialValue: this.order.getRawValue() },
+  );
+
   protected readonly uploads = signal<ReadonlyMap<File, number>>(new Map());
   protected readonly nameOf = (person: Person) => person.name;
   protected readonly byId = (a: Person, b: Person) => a.id === b.id;
@@ -147,10 +145,13 @@ export class PhaseSeven {
 
   protected async save(event: Event): Promise<void> {
     event.preventDefault();
-    await submit(this.order, async () => {
-      await this.upload(this.model().files);
-      this.toast.success('The work order was saved');
-    });
+    // The messages show only on a touched field, so an empty submit has to touch them all.
+    if (this.order.invalid) {
+      this.order.markAllAsTouched();
+      return;
+    }
+    await this.upload(this.order.getRawValue().files);
+    this.toast.success('The work order was saved');
   }
 
   /** Simulates an upload so the progress bars move. */
