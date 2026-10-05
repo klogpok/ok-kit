@@ -1,14 +1,16 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { FormField, form, readonly, required } from '@angular/forms/signals';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiSegmentedHarness } from '@vplans/ui-kit/testing';
 import { UiSegment, UiSegmented } from './segmented';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -234,56 +236,118 @@ describe('UiSegmented', () => {
   });
 });
 
+/** Stands in for an application validator with a message of its own. */
+const scopeChosen: ValidatorFn = (control) =>
+  control.value ? null : { uiScope: { message: 'Choose a scope' } };
+
 @Component({
-  imports: [UiSegmented, UiSegment, ReactiveFormsModule],
+  imports: [UiSegmented, UiSegment, UiFormField, ReactiveFormsModule],
   template: `
     <form [formGroup]="form">
-      <ui-segmented formControlName="unit" aria-label="Unit">
-        <ui-segment value="m2">m²</ui-segment>
-        <ui-segment value="ft2">ft²</ui-segment>
-      </ui-segmented>
+      <ui-form-field label="Scope">
+        <ui-segmented formControlName="scope" [readonly]="locked()">
+          <ui-segment value="mine">Mine</ui-segment>
+          <ui-segment value="all">All</ui-segment>
+        </ui-segmented>
+      </ui-form-field>
     </form>
-    <button type="button">Outside</button>
+    <button type="button" class="outside">Outside</button>
   `,
 })
 class ReactiveHost {
+  readonly locked = signal(false);
   readonly form = new FormGroup({
-    unit: new FormControl<string | null>('ft2', Validators.required),
+    scope: new FormControl<string | null>('all', [Validators.required, scopeChosen]),
   });
 }
 
 describe('UiSegmented with Reactive Forms', () => {
-  it('writes and reads values, marks touched when focus leaves and follows disable()', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
-    const root = fixture.nativeElement as HTMLElement;
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
+  let control: ReactiveHost['form']['controls']['scope'];
+  let root: HTMLElement;
+  let segmented: UiSegmentedHarness;
+
+  /** The message `ui-form-field` shows under the group. */
+  const error = (): string => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
+    root = fixture.nativeElement as HTMLElement;
     document.body.appendChild(root);
+    control = host.form.controls.scope;
     await settle(fixture);
-    const control = fixture.componentInstance.form.controls.unit;
-    const radios = root.querySelectorAll<HTMLInputElement>('input');
-    const group = root.querySelector('ui-segmented')!;
-    expect(radios[1].checked).toBe(true);
-    expect(group.getAttribute('aria-required')).toBe('true');
+    segmented = await TestbedHarnessEnvironment.loader(fixture).getHarness(
+      UiSegmentedHarness.with({ label: 'Scope' }),
+    );
+  });
 
-    radios[0].click();
+  afterEach(() => root.remove());
+
+  it('binds the value both ways and marks the group required', async () => {
+    expect(await segmented.getSelectedText()).toBe('All');
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
+    expect(root.querySelector('ui-segmented')!.getAttribute('aria-required')).toBe('true');
+
+    await segmented.select({ text: 'Mine' });
     await settle(fixture);
-    expect(control.value).toBe('m2');
+    expect(control.value).toBe('mine');
 
-    radios[0].focus();
-    press(radios[0], 'ArrowRight');
+    await segmented.focus();
+    await segmented.pressArrow('ArrowRight');
     await settle(fixture);
-    expect(control.value).toBe('ft2');
-    expect(control.touched).toBe(false);
-    root.querySelector('button')!.focus();
-    expect(control.touched).toBe(true);
+    expect(control.value).toBe('all');
 
-    control.setValue(null);
+    control.setValue('mine');
     await settle(fixture);
-    expect(group.getAttribute('aria-invalid')).toBe('true');
+    expect(await segmented.getSelectedText()).toBe('Mine');
+  });
 
+  it('disables the segments from the control', async () => {
     control.disable();
     await settle(fixture);
-    expect([...radios].every((radio) => radio.disabled)).toBe(true);
-    root.remove();
+    expect(await segmented.isDisabled()).toBe(true);
+    for (const segment of await segmented.getSegments()) {
+      expect(await segment.isDisabled()).toBe(true);
+    }
+  });
+
+  it('keeps the selection when the control is readonly', async () => {
+    host.locked.set(true);
+    await settle(fixture);
+    expect(await segmented.isReadonly()).toBe(true);
+    await segmented.select({ text: 'Mine' });
+    await settle(fixture);
+    expect(control.value).toBe('all');
+    expect(await segmented.getSelectedText()).toBe('All');
+  });
+
+  it('marks the control touched when focus leaves', async () => {
+    expect(control.touched).toBe(false);
+    await segmented.focus();
+    await segmented.blur();
+    await settle(fixture);
+    expect(control.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    control.setValue(null);
+    await settle(fixture);
+    expect(control.invalid).toBe(true);
+    expect(await segmented.isInvalid()).toBe(false);
+    expect(error()).toBe('');
+
+    await segmented.focus();
+    await segmented.blur();
+    await settle(fixture);
+    expect(await segmented.isInvalid()).toBe(true);
+    expect(error()).toContain('Choose a scope');
+
+    await segmented.select({ text: 'All' });
+    await settle(fixture);
+    expect(await segmented.isInvalid()).toBe(false);
+    expect(error()).toBe('');
   });
 });
 
@@ -315,64 +379,6 @@ describe('UiSegmented with ngModel', () => {
     fixture.componentInstance.period.set('week');
     await settle(fixture);
     expect(radios[0].checked).toBe(true);
-  });
-});
-
-@Component({
-  imports: [UiSegmented, UiSegment, FormField, UiFormField],
-  template: `
-    <ui-form-field label="Scope">
-      <ui-segmented [formField]="f.scope">
-        <ui-segment value="mine">Mine</ui-segment>
-        <ui-segment value="all">All</ui-segment>
-      </ui-segmented>
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly locked = signal(false);
-  readonly model = signal<{ scope: string | null }>({ scope: null });
-  readonly f = form(this.model, (p) => {
-    required(p.scope, { message: 'Choose a scope' });
-    readonly(p.scope, () => this.locked());
-  });
-}
-
-describe('UiSegmented with Signal Forms', () => {
-  it('binds the value, shows the error after touch and follows a readonly rule', async () => {
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    const group = root.querySelector('ui-segmented')!;
-    const radios = root.querySelectorAll<HTMLInputElement>('input');
-    expect(group.getAttribute('aria-required')).toBe('true');
-    expect(group.getAttribute('aria-invalid')).toBeNull();
-
-    radios[0].focus();
-    radios[0].blur();
-    await settle(fixture);
-    expect(host.f.scope().touched()).toBe(true);
-    expect(group.getAttribute('aria-invalid')).toBe('true');
-    expect(root.querySelector('.ui-form-field__error')!.textContent).toContain('Choose a scope');
-
-    radios[1].click();
-    await settle(fixture);
-    expect(host.model().scope).toBe('all');
-    expect(group.getAttribute('aria-invalid')).toBeNull();
-
-    host.model.set({ scope: 'mine' });
-    await settle(fixture);
-    expect(radios[0].checked).toBe(true);
-
-    host.locked.set(true);
-    await settle(fixture);
-    expect(group.getAttribute('aria-readonly')).toBe('true');
-    radios[1].click();
-    await settle(fixture);
-    expect(host.model().scope).toBe('mine');
-    root.remove();
   });
 });
 
