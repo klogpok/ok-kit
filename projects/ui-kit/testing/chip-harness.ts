@@ -152,6 +152,10 @@ export class UiChipInputHarness extends UiHarness {
     return (await this.input()).getProperty<boolean>('readOnly');
   }
 
+  async isRequired(): Promise<boolean> {
+    return (await (await this.input()).getAttribute('aria-required')) === 'true';
+  }
+
   async isInvalid(): Promise<boolean> {
     return (await (await this.input()).getAttribute('aria-invalid')) === 'true';
   }
