@@ -1,7 +1,6 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, readonly, required } from '@angular/forms/signals';
+import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiRadio, UiRadioGroup } from './radio';
 
@@ -29,35 +28,23 @@ class StandaloneHost {
   readonly group = viewChild.required(UiRadioGroup);
 }
 
-@Component({
-  imports: [UiRadioGroup, UiRadio, ReactiveFormsModule],
-  template: `
-    <ui-radio-group [formControl]="control" aria-label="Size">
-      <ui-radio [value]="1">S</ui-radio>
-      <ui-radio [value]="2">M</ui-radio>
-    </ui-radio-group>
-  `,
-})
-class ReactiveHost {
-  readonly control = new FormControl<number | null>(2, Validators.required);
-}
+/** Stands in for an application validator with a message of its own. */
+const inStock: ValidatorFn = (control) =>
+  control.value === 2 ? { uiStock: { message: 'M is out of stock' } } : null;
 
 @Component({
-  imports: [UiRadioGroup, UiRadio, FormField, UiFormField],
+  imports: [UiRadioGroup, UiRadio, ReactiveFormsModule, UiFormField],
   template: `
-    <ui-form-field label="Plan">
-      <ui-radio-group [formField]="f.plan">
-        <ui-radio value="free">Free</ui-radio>
-        <ui-radio value="pro">Pro</ui-radio>
+    <ui-form-field label="Size">
+      <ui-radio-group [formControl]="control">
+        <ui-radio [value]="1">S</ui-radio>
+        <ui-radio [value]="2">M</ui-radio>
       </ui-radio-group>
     </ui-form-field>
   `,
 })
-class SignalHost {
-  readonly model = signal({ plan: '' });
-  readonly f = form(this.model, (p) => {
-    required(p.plan, { message: 'Pick a plan' });
-  });
+class ReactiveHost {
+  readonly control = new FormControl<number | null>(2, [Validators.required, inStock]);
 }
 
 describe('UiRadioGroup', () => {
@@ -132,51 +119,78 @@ describe('UiRadioGroup', () => {
   });
 
   describe('with Reactive Forms', () => {
-    it('writes/reads values, marks touched and follows disable()', async () => {
-      const fixture = TestBed.createComponent(ReactiveHost);
-      await settle(fixture);
-      const el = fixture.nativeElement as HTMLElement;
-      const radios = el.querySelectorAll<HTMLInputElement>('input');
-      const control = fixture.componentInstance.control;
+    let fixture: ComponentFixture<ReactiveHost>;
+    let control: ReactiveHost['control'];
+    let radios: HTMLInputElement[];
+    const group = (): HTMLElement =>
+      (fixture.nativeElement as HTMLElement).querySelector('ui-radio-group')!;
+    /** The message `ui-form-field` shows under the group. */
+    const error = (): HTMLElement =>
+      (fixture.nativeElement as HTMLElement).querySelector('.ui-form-field__error')!;
+    /** Leaves the group, the way a tab out of its last radio does. */
+    const leaveGroup = (from: HTMLInputElement): void => {
+      from.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+    };
 
+    beforeEach(async () => {
+      fixture = TestBed.createComponent(ReactiveHost);
+      control = fixture.componentInstance.control;
+      await settle(fixture);
+      radios = Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLInputElement>('input'),
+      );
+    });
+
+    it('binds the value both ways and marks the group required', async () => {
       expect(radios[1].checked).toBe(true);
-      expect(el.querySelector('ui-radio-group')!.getAttribute('aria-required')).toBe('true');
-      expect(el.querySelector('ui-radio-group')!.getAttribute('aria-label')).toBe('Size');
+      expect(group().getAttribute('aria-required')).toBe('true');
+      expect(
+        (fixture.nativeElement as HTMLElement).querySelector('.ui-form-field__required'),
+      ).not.toBeNull();
 
       radios[0].click();
+      await settle(fixture);
       expect(control.value).toBe(1);
 
+      control.setValue(2);
+      await settle(fixture);
+      expect(radios[1].checked).toBe(true);
+    });
+
+    it('marks the control touched only once focus leaves the whole group', () => {
       // Moving between radios keeps focus in the group.
       radios[0].dispatchEvent(
         new FocusEvent('focusout', { bubbles: true, relatedTarget: radios[1] }),
       );
       expect(control.touched).toBe(false);
-      radios[1].dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
-      expect(control.touched).toBe(true);
 
+      leaveGroup(radios[1]);
+      expect(control.touched).toBe(true);
+    });
+
+    it('disables every radio from the control', async () => {
       control.disable();
       await settle(fixture);
-      expect(radios[0].disabled).toBe(true);
+      expect(radios.every((radio) => radio.disabled)).toBe(true);
+      expect(group().getAttribute('aria-disabled')).toBe('true');
     });
-  });
 
-  describe('with Signal Forms', () => {
-    it('binds the value and shows validation after touch', async () => {
-      const fixture = TestBed.createComponent(SignalHost);
-      await settle(fixture);
-      const el = fixture.nativeElement as HTMLElement;
-      const radios = el.querySelectorAll<HTMLInputElement>('input');
-      const group = el.querySelector('ui-radio-group')!;
+    it('shows the validator message only once the control is invalid and touched', async () => {
+      expect(control.invalid).toBe(true);
+      expect(group().hasAttribute('aria-invalid')).toBe(false);
+      expect(error().textContent.trim()).toBe('');
 
-      radios[0].dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+      leaveGroup(radios[1]);
       await settle(fixture);
-      expect(group.getAttribute('aria-invalid')).toBe('true');
-      expect(el.textContent).toContain('Pick a plan');
+      expect(group().getAttribute('aria-invalid')).toBe('true');
+      expect(error().textContent).toContain('M is out of stock');
+      expect(group().getAttribute('aria-describedby')).toBe(error().id);
 
-      radios[1].click();
+      radios[0].click();
       await settle(fixture);
-      expect(fixture.componentInstance.model().plan).toBe('pro');
-      expect(group.hasAttribute('aria-invalid')).toBe(false);
+      expect(control.valid).toBe(true);
+      expect(group().hasAttribute('aria-invalid')).toBe(false);
+      expect(error().textContent.trim()).toBe('');
     });
   });
 });
@@ -237,30 +251,32 @@ describe('UiRadioGroup with compareWith', () => {
 });
 
 @Component({
-  imports: [FormField, UiRadioGroup, UiRadio],
+  imports: [ReactiveFormsModule, UiRadioGroup, UiRadio],
   template: `
-    <ui-radio-group aria-label="Delivery" aria-describedby="delivery-note" [formField]="f.delivery">
+    <ui-radio-group
+      aria-label="Delivery"
+      aria-describedby="delivery-note"
+      [readonly]="true"
+      [formControl]="delivery"
+    >
       <ui-radio value="pickup">Pickup</ui-radio>
       <ui-radio value="courier" aria-label="Courier delivery">Courier</ui-radio>
     </ui-radio-group>
   `,
 })
 class ReadonlyRadioHost {
-  readonly model = signal({ delivery: 'pickup' });
-  readonly f = form(this.model, (p) => {
-    readonly(p.delivery);
-  });
+  readonly delivery = new FormControl('pickup');
 }
 
 describe('UiRadioGroup readonly', () => {
-  it('keeps the selection under a Signal Forms readonly rule', async () => {
+  it('keeps the selection of a bound control under the readonly input', async () => {
     const fixture = TestBed.createComponent(ReadonlyRadioHost);
     await settle(fixture);
     const root = fixture.nativeElement as HTMLElement;
     const [pickup, courier] = Array.from(root.querySelectorAll('input'));
     courier.click();
     await settle(fixture);
-    expect(fixture.componentInstance.model().delivery).toBe('pickup');
+    expect(fixture.componentInstance.delivery.value).toBe('pickup');
     expect(pickup.checked).toBe(true);
     expect(courier.checked).toBe(false);
     expect(root.querySelector('ui-radio-group')!.getAttribute('aria-readonly')).toBe('true');
@@ -273,7 +289,7 @@ describe('UiRadioGroup readonly', () => {
     TestBed.overrideTemplate(
       ReadonlyRadioHost,
       `<ui-form-field label="Delivery method">
-        <ui-radio-group aria-label="Delivery" [formField]="f.delivery">
+        <ui-radio-group aria-label="Delivery" [formControl]="delivery">
           <ui-radio value="pickup">Pickup</ui-radio>
         </ui-radio-group>
       </ui-form-field>`,
