@@ -1,9 +1,11 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, readonly, required } from '@angular/forms/signals';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
-import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
+import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiSelectHarness } from '@vplans/ui-kit/testing';
 import { UiOption, UiOptionGroup } from './option';
 import { UiSelect } from './select';
 
@@ -400,135 +402,137 @@ describe('UiSelect', () => {
   });
 });
 
+interface City {
+  id: number;
+  name: string;
+}
+
+/** Reactive forms show the message of an error value that is a string. */
+const chooseACity: ValidatorFn = (control) =>
+  control.value ? null : { chooseCity: 'Choose a city' };
+
 @Component({
-  imports: [UiSelect, UiOption, UiFormField, UiError, ReactiveFormsModule],
+  imports: [UiSelect, UiOption, UiFormField, ReactiveFormsModule],
   template: `
     <ui-form-field label="City">
-      <ui-select [formControl]="control" [compareWith]="byId">
+      <ui-select [formControl]="control" [compareWith]="byId" [readonly]="locked()">
         @for (city of cities; track city.id) {
           <ui-option [value]="city">{{ city.name }}</ui-option>
         }
       </ui-select>
-      <ui-error>Choose a city</ui-error>
     </ui-form-field>
   `,
 })
 class ReactiveHost {
-  readonly cities = [
+  readonly locked = signal(false);
+  readonly cities: City[] = [
     { id: 1, name: 'Haifa' },
     { id: 2, name: 'Tel Aviv' },
   ];
-  readonly control = new FormControl<{ id: number; name: string } | null>(
-    { id: 2, name: 'Tel Aviv' },
+  readonly control = new FormControl<City | null>({ id: 2, name: 'Tel Aviv' }, [
     Validators.required,
-  );
-  readonly byId = (option: { id: number }, selected: { id: number }) => option.id === selected.id;
+    chooseACity,
+  ]);
+  readonly byId = (option: City, selected: City) => option.id === selected.id;
 }
 
 describe('UiSelect with Reactive Forms', () => {
   let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
   let root: HTMLElement;
-  const control = () => root.querySelector<HTMLElement>('.ui-select__control')!;
+  let loader: HarnessLoader;
+  const select = () => loader.getHarness(UiSelectHarness.with({ label: 'City' }));
+  const trigger = () => root.querySelector<HTMLButtonElement>('.ui-select__control')!;
+  /** The message `ui-form-field` shows under the select. */
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
     root = fixture.nativeElement as HTMLElement;
+    loader = TestbedHarnessEnvironment.loader(fixture);
     document.body.appendChild(root);
     await settle(fixture);
   });
 
   afterEach(() => root.remove());
 
-  it('shows the initial value using compareWith', () => {
-    expect(control().textContent.trim()).toBe('Tel Aviv');
+  it('binds the value both ways using compareWith', async () => {
+    const city = await select();
+    expect(await city.getValueText()).toBe('Tel Aviv');
+
+    await city.clickOptions({ text: 'Haifa' });
+    expect(host.control.value).toEqual({ id: 1, name: 'Haifa' });
+
+    host.control.setValue({ id: 2, name: 'Tel Aviv' });
+    await settle(fixture);
+    expect(await city.getValueText()).toBe('Tel Aviv');
   });
 
-  it('writes the selected object to the control', async () => {
-    control().click();
-    await settle(fixture);
-    options()[0].click();
-    await settle(fixture);
-    expect(fixture.componentInstance.control.value).toEqual({ id: 1, name: 'Haifa' });
+  it('marks the field required from the validators of the control', async () => {
+    expect(await (await select()).isRequired()).toBe(true);
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
   });
 
-  it('marks touched on blur and links the error', async () => {
-    fixture.componentInstance.control.setValue(null);
-    control().dispatchEvent(new FocusEvent('blur'));
+  it('disables the trigger from the control', async () => {
+    const city = await select();
+    host.control.disable();
     await settle(fixture);
-    expect(fixture.componentInstance.control.touched).toBe(true);
-    expect(control().getAttribute('aria-invalid')).toBe('true');
-    const error = document.getElementById(control().getAttribute('aria-describedby')!);
+    expect(await city.isDisabled()).toBe(true);
+    expect(trigger().disabled).toBe(true);
+    await city.open();
+    expect(await city.isOpen()).toBe(false);
+  });
+
+  it('stays focusable but does not open while readonly', async () => {
+    const city = await select();
+    host.locked.set(true);
+    await settle(fixture);
+    expect(await city.isReadonly()).toBe(true);
+    expect(trigger().disabled).toBe(false);
+    await city.open();
+    expect(await city.isOpen()).toBe(false);
+  });
+
+  it('closes the list and marks the control touched when focus leaves', async () => {
+    const city = await select();
+    await city.open();
+    expect(await city.isOpen()).toBe(true);
+    expect(host.control.touched).toBe(false);
+
+    await city.blur();
+    await settle(fixture);
+    expect(await city.isOpen()).toBe(false);
+    expect(host.control.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    const city = await select();
+    host.control.setValue(null);
+    await settle(fixture);
+    expect(host.control.invalid).toBe(true);
+    expect(await city.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
+
+    await city.blur();
+    await settle(fixture);
+    expect(await city.isInvalid()).toBe(true);
+    expect(errorText()).toContain('Choose a city');
+    // The message is linked to the trigger, not only rendered next to it.
+    const error = document.getElementById(trigger().getAttribute('aria-describedby')!);
     expect(error!.textContent).toContain('Choose a city');
   });
-
-  it('disables the trigger', async () => {
-    fixture.componentInstance.control.disable();
-    await settle(fixture);
-    expect((control() as HTMLButtonElement).disabled).toBe(true);
-    control().click();
-    await settle(fixture);
-    expect(listbox()).toBeNull();
-  });
 });
 
 @Component({
-  imports: [UiSelect, UiOption, UiFormField, FormField],
+  imports: [UiSelect, UiOption],
   template: `
-    <ui-form-field label="Role">
-      <ui-select [formField]="f.role">
-        <ui-option value="owner">Owner</ui-option>
-        <ui-option value="coordinator">Coordinator</ui-option>
-      </ui-select>
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal<{ role: string | null }>({ role: null });
-  readonly f = form(this.model, (p) => {
-    required(p.role, { message: 'Choose a role' });
-  });
-}
-
-describe('UiSelect with Signal Forms', () => {
-  let fixture: ComponentFixture<SignalHost>;
-  let root: HTMLElement;
-  const control = () => root.querySelector<HTMLElement>('.ui-select__control')!;
-
-  beforeEach(async () => {
-    fixture = TestBed.createComponent(SignalHost);
-    root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
-    await settle(fixture);
-  });
-
-  afterEach(() => root.remove());
-
-  it('binds the value both ways', async () => {
-    control().click();
-    await settle(fixture);
-    options()[1].click();
-    await settle(fixture);
-    expect(fixture.componentInstance.model().role).toBe('coordinator');
-
-    fixture.componentInstance.model.set({ role: 'owner' });
-    await settle(fixture);
-    expect(control().textContent.trim()).toBe('Owner');
-  });
-
-  it('shows the required state and the error message once touched', async () => {
-    expect(control().getAttribute('aria-required')).toBe('true');
-    control().dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(fixture.componentInstance.f.role().touched()).toBe(true);
-    expect(control().getAttribute('aria-invalid')).toBe('true');
-    expect(root.textContent).toContain('Choose a role');
-  });
-});
-
-@Component({
-  imports: [FormField, UiSelect, UiOption],
-  template: `
-    <ui-select aria-label="Coordinator" [formField]="f.coordinator" [searchable]="searchable()">
+    <ui-select
+      aria-label="Coordinator"
+      [(value)]="value"
+      [readonly]="locked()"
+      [searchable]="searchable()"
+    >
       <ui-option value="dana">Dana</ui-option>
       <ui-option value="yael">Yael</ui-option>
     </ui-select>
@@ -537,10 +541,7 @@ describe('UiSelect with Signal Forms', () => {
 class ReadonlySelectHost {
   readonly searchable = signal(false);
   readonly locked = signal(true);
-  readonly model = signal({ coordinator: 'dana' });
-  readonly f = form(this.model, (p) => {
-    readonly(p.coordinator, { when: () => this.locked() });
-  });
+  readonly value = signal<string | null>('dana');
 }
 
 describe('UiSelect readonly', () => {
@@ -556,7 +557,7 @@ describe('UiSelect readonly', () => {
 
   afterEach(() => (fixture.nativeElement as HTMLElement).remove());
 
-  it('does not open under a Signal Forms readonly rule and stays focusable', async () => {
+  it('does not open while readonly and stays focusable', async () => {
     expect(control().getAttribute('aria-readonly')).toBe('true');
     expect((control() as HTMLButtonElement).disabled).toBe(false);
     expect(control().getAttribute('aria-label')).toBe('Coordinator');
@@ -565,7 +566,7 @@ describe('UiSelect readonly', () => {
     keydown(control(), 'ArrowDown');
     await settle(fixture);
     expect(listbox()).toBeNull();
-    expect(fixture.componentInstance.model().coordinator).toBe('dana');
+    expect(fixture.componentInstance.value()).toBe('dana');
   });
 
   it('makes the search field readonly', async () => {
