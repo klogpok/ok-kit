@@ -11,8 +11,8 @@ Forms directive is simply no longer a thing the kit supports.
 - [x] The control-state helper loses its Signal Forms branch and keeps the reactive one, with the shape of its public interface unchanged
 - [x] The shared base class for custom controls no longer injects or checks the Signal Forms field token
 - [x] No file anywhere in the repository imports from the Signal Forms package
-- [ ] The full check passes: unit tests, lint, build, stories and visual baselines
-- [ ] Error display, disabled state, required marker and touched behaviour are observably unchanged for every control
+- [x] The full check passes: unit tests, lint, build, stories and visual baselines
+- [x] Error display, disabled state, required marker and touched behaviour are observably unchanged for every control
 
 ## Comments
 
@@ -49,6 +49,22 @@ Storybook source snippet in `autocomplete.stories.ts`). They are stale documenta
 ticket 20 owns the forms story. `UI_FORM_FIELD` and `UI_FORM_FIELD_CONTROL` are the kit's own
 tokens and are unrelated to Signal Forms; they stay.
 
+### 2026-10-05 (merge into ng20-migration)
+
+The environment is repaired and the full check was run on the merge of this branch into
+`ng20-migration`, with no baseline updated: ui-kit unit tests 726 passed in 69 files, playground
+unit tests 7 passed in 1 file, `ng lint` clean for both projects, stylelint clean over
+`projects/**/*.scss`, both builds green, 263 stories checked in 3 modes with no accessibility
+violations and no console errors, and 263 stories compared in 3 modes with no visual changes. No
+`.png` differs from the pre-merge tip, so error display, disabled state, the required marker and
+touched behaviour are observably unchanged for every control. Searching the repository's TypeScript
+outside `node_modules` for the Signal Forms entry point returns nothing.
+
+The new `control-state.spec.ts` passed all seven cases on its first real run; only lint had to be
+fixed, in a separate commit: the probe directive took the `ui` selector prefix the workspace rule
+requires, and the `providerTokens` filter lost an optional chain and a fallback that TypeScript
+knows are never needed. No case was weakened, removed or skipped.
+
 ## Русский перевод
 
 # 13: Библиотека перестаёт говорить на Signal Forms
@@ -64,8 +80,8 @@ tokens and are unrelated to Signal Forms; they stay.
 - [x] Помощник состояния контрола теряет ветку Signal Forms и сохраняет реактивную, форма публичного интерфейса не меняется
 - [x] Общий базовый класс кастомных контролов больше не инжектит и не проверяет токен сигнального поля
 - [x] Ни один файл в репозитории не импортирует из пакета Signal Forms
-- [ ] Полная проверка проходит: юнит-тесты, линт, сборка, стори и визуальные бейслайны
-- [ ] Отображение ошибок, disabled, маркер обязательности и поведение touched наблюдаемо не изменились ни у одного контрола
+- [x] Полная проверка проходит: юнит-тесты, линт, сборка, стори и визуальные бейслайны
+- [x] Отображение ошибок, disabled, маркер обязательности и поведение touched наблюдаемо не изменились ни у одного контрола
 
 ## Комментарии
 
@@ -103,3 +119,20 @@ Signal Forms (`Implements FormValueControl (Signal Forms)`, примеры
 `<ui-checkbox [formField]="...">`, сниппет исходника Storybook в `autocomplete.stories.ts`). Это
 устаревшая документация, а не код, и историей форм владеет тикет 20. `UI_FORM_FIELD` и
 `UI_FORM_FIELD_CONTROL` — собственные токены кита, к Signal Forms отношения не имеют и остаются.
+
+### 2026-10-05 (слияние в ng20-migration)
+
+Окружение починено, полная проверка прогнана на слиянии этой ветки в `ng20-migration`, ни один
+бейзлайн не обновлялся: юнит-тесты ui-kit — 726 прошли в 69 файлах, юнит-тесты playground — 7
+прошли в 1 файле, `ng lint` чист по обоим проектам, stylelint чист по `projects/**/*.scss`, обе
+сборки зелёные, проверка стори — 263 стори в 3 режимах без нарушений доступности и без ошибок
+консоли, визуальная проверка — 263 стори в 3 режимах без визуальных изменений. Ни один `.png` не
+отличается от состояния до слияния, поэтому отображение ошибок, disabled, маркер обязательности и
+поведение touched наблюдаемо не изменились ни у одного контрола. Поиск точки входа Signal Forms по
+TypeScript репозитория вне `node_modules` не даёт совпадений.
+
+Новый `control-state.spec.ts` прошёл все семь кейсов с первого настоящего запуска; чинить пришлось
+только линт, отдельным коммитом: директива-проба получила префикс селектора `ui`, которого
+требует правило воркспейса, а фильтр по `providerTokens` потерял опциональную цепочку и
+подстановку, которые TypeScript считает ненужными. Ни один кейс не ослаблен, не удалён и не помечен
+skip.
