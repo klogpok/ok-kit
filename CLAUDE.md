@@ -52,4 +52,4 @@ The five canonical roles, unchanged: `needs-triage`, `needs-info`, `ready-for-ag
 
 ### Domain docs
 
-Single-context: `CONTEXT.md` at the root and `docs/adr/`. See [docs/agents/domain.md](docs/agents/domain.md).
+Single-context: `GLOSSARY.md` at the root and `docs/adr/`. See [docs/agents/domain.md](docs/agents/domain.md).
