@@ -22,7 +22,7 @@ Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/
 
 ## Status and history
 
-- Phases 1–7 are done and approved (2026-09-26). In phase 8, 8.1–8.5 (date range picker, time input, stepper, slider, segmented) are done and approved. The Angular 20 migration ran as its own phase after 8.5; it is approved and merged into `master` (2026-10-07), with two open questions left in [docs/DECISIONS.md](docs/DECISIONS.md). 8.6–8.7 were deferred until after it and are next. The plan for phases 8–9 and the migration phase are in [docs/ROADMAP.md](docs/ROADMAP.md).
+- Phases 1–7 are done and approved (2026-09-26). In phase 8, 8.1–8.5 (date range picker, time input, stepper, slider, segmented) are done and approved. The Angular 20 migration ran as its own phase after 8.5; it is approved and merged into `master` (2026-10-07), and every review question is answered in [docs/DECISIONS.md](docs/DECISIONS.md). 8.6–8.7 were deferred until after it and are next. The plan for phases 8–9 and the migration phase are in [docs/ROADMAP.md](docs/ROADMAP.md).
 - What each phase delivered and every review answer are in [docs/DECISIONS.md](docs/DECISIONS.md). Check it before you change an existing default or behavior: most were chosen by the user.
 
 ## Workflow per phase
