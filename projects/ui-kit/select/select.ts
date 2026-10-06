@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
@@ -35,6 +36,7 @@ import { UiSelectBase } from './select-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSelect) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSelect), multi: true },
     UiOptionParent,
   ],
   host: { class: 'ui-select' },

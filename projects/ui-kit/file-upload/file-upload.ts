@@ -14,6 +14,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LiveAnnouncer, _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -133,7 +134,10 @@ const optionalNumber = (value: unknown): number | null =>
   `,
   styleUrl: './file-upload.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiFileUpload) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiFileUpload) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiFileUpload), multi: true },
+  ],
   host: {
     class: 'ui-file-upload',
     '[class]': '"ui-file-upload--" + variant()',

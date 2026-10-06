@@ -15,6 +15,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -230,7 +231,10 @@ const hasErrors = (parsed: ParsedRange): boolean =>
   `,
   styleUrl: './date-range-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDateRangePicker) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDateRangePicker) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiDateRangePicker), multi: true },
+  ],
   host: {
     class: 'ui-date-range-picker',
     role: 'group',

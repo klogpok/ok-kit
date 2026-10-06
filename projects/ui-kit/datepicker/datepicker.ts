@@ -15,6 +15,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
@@ -170,7 +171,10 @@ interface Draft {
   `,
   styleUrl: './datepicker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDatepicker) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDatepicker) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiDatepicker), multi: true },
+  ],
   host: {
     class: 'ui-datepicker',
     '[class]': '"ui-datepicker--" + size()',

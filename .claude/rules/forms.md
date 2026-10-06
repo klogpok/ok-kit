@@ -7,7 +7,10 @@ paths:
 # Form controls: Signal Forms and CVA
 
 - Signal Forms' `[formField]` sets the inputs `disabled`, `invalid`, `required`, `touched` and `name` on **every** directive of the host.
-- If a component provides `NG_VALUE_ACCESSOR`, `[formField]` falls back to CVA interop. This is why `UiFormControlBase` assigns `ngControl.valueAccessor` manually.
+- If a component provides `NG_VALUE_ACCESSOR`, `[formField]` falls back to CVA interop.
+- Every concrete custom control declares `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }` itself: Angular does not inherit `providers` metadata into a subclass with its own decorator. `UiFormControlBase` stays the only implementation of the accessor methods.
+- A component that provides `NG_VALUE_ACCESSOR` must not inject `NgControl` while it is constructed (NG0200). `injectControlState()` therefore resolves `NgControl` from an `Injector` on the first `sync()`, and `UiControlState.bound` is a signal, not a plain boolean.
+- Injecting a directive in a constructor also instantiates it, and Angular registers the pre-order hooks in instantiation order. Dropping the eager `inject(NgControl)` moved `UiTextControlBase.ngDoCheck` ahead of `FormControlName.ngOnChanges`, so the first `sync()` saw no control yet. A native input has no accessor to be called back through, so it syncs again in `ngAfterViewInit`; a custom control is covered by `registerOnChange` / `registerOnTouched`, which `setUpControl` calls.
 - A component cannot provide `NG_VALIDATORS` pointing at itself when it injects `NgControl` (circular DI). Provide a separate injectable (see `provideUiCheckedValidator()`).
 - Signal Forms `required()` treats only `null`, `''` and `false` as empty. An empty array needs `minLength(path, 1)`. `[formField]` also binds `min`/`max` (a `Date` for `minDate()`/`maxDate()`), so date inputs must accept `Date | null | undefined`.
 - `[formField]` forbids static or bound `min`/`max` (and the other state inputs) on the same element (NG8022). With Signal Forms, set limits with the `min()`/`max()` rules. These rules take only number, string or date fields, so a tuple control needs another input for its limits (`ui-range-slider` has `limits`).

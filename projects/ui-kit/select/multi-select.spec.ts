@@ -191,10 +191,10 @@ class ReactiveHost {
     { id: 1, name: 'Haifa' },
     { id: 2, name: 'Tel Aviv' },
   ];
-  readonly control = new FormControl<City[] | null>([{ id: 2, name: 'Tel Aviv' }], [
-    Validators.required,
-    atLeastTwo,
-  ]);
+  readonly control = new FormControl<City[] | null>(
+    [{ id: 2, name: 'Tel Aviv' }],
+    [Validators.required, atLeastTwo],
+  );
   readonly byId = (option: City, selected: City) => option.id === selected.id;
 }
 
