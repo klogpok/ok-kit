@@ -6,7 +6,7 @@ no release that supports Angular 20, so the workbench moves to the webpack-based
 
 **Blocked by:** 15
 
-**Status:** done, waiting for the user’s review
+**Status:** done
 
 - [x] Storybook stays on its current major and switches to the webpack-based Angular framework package, with the Angular 20 webpack build package added
 - [x] The Vite-based framework package and the Analog Vite plugin are removed
@@ -26,7 +26,7 @@ no release that supports Angular 20, so the workbench moves to the webpack-based
 
 **Блокируется:** 15
 
-**Статус:** сделано, ждёт ревью пользователя
+**Статус:** сделано
 
 - [x] Storybook остаётся на текущем мажоре и переходит на webpack-овый пакет Angular-фреймворка, добавляется webpack-пакет сборки Angular 20
 - [x] Vite-пакет фреймворка и Vite-плагин Analog удалены

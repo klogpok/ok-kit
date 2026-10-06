@@ -6,7 +6,7 @@ removal of Signal Forms from the library.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The Signal Forms host is removed from the checkbox, switch and radio specs
 - [x] For each, the reactive forms host asserts: checked or selected value in both directions, disabled from the control, readonly, required marker, touched on blur, error shown only when invalid and touched, and the validator's message
@@ -24,7 +24,7 @@ removal of Signal Forms from the library.
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Сигнальный хост удалён из спеков чекбокса, переключателя и радио
 - [x] Для каждого реактивный хост проверяет: значение или отмеченность в обе стороны, disabled от контрола, readonly, маркер обязательности, touched по уходу фокуса, показ ошибки только при «невалиден и тронут» и сообщение валидатора

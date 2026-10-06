@@ -7,7 +7,7 @@ write it.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The Signal Forms host is removed from the form field spec
 - [x] The reactive forms host asserts: the label association, the required marker, the hint, the error appearing only when the control is invalid and touched, the error text coming from the validator, and the accessible description linking the control to its hint and error
@@ -25,7 +25,7 @@ write it.
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Сигнальный хост удалён из спека поля формы
 - [x] Реактивный хост проверяет: связь метки с контролом, маркер обязательности, подсказку, появление ошибки только когда контрол невалиден и тронут, текст ошибки из валидатора и доступное описание, связывающее контрол с подсказкой и ошибкой

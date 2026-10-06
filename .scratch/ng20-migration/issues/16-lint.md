@@ -5,7 +5,7 @@ that supports Angular 20.
 
 **Blocked by:** 15
 
-**Status:** done, waiting for the user's review
+**Status:** done
 
 - [x] The linter and its Angular plugin are on the majors that support Angular 20
 - [x] The lint command passes across the library, the playground and the stories
@@ -22,7 +22,7 @@ that supports Angular 20.
 
 **Блокируется:** 15
 
-**Статус:** done, waiting for the user's review
+**Статус:** сделано
 
 - [x] Линтер и его Angular-плагин на мажорах с поддержкой Angular 20
 - [x] Команда линта проходит по библиотеке, playground и сторис

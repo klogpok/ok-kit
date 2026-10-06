@@ -1,6 +1,6 @@
 # Spec: migrate @vplans/ui-kit to Angular 20
 
-Status: ready-for-agent
+Status: done
 
 ## Problem Statement
 
@@ -212,7 +212,7 @@ The consumer gets a library whose sources compile under Angular 20, whose forms 
 
 # Спека: миграция @vplans/ui-kit на Angular 20
 
-Статус: ready-for-agent
+Статус: сделано
 
 ## Постановка проблемы
 

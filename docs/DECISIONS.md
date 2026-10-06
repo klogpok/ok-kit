@@ -273,7 +273,7 @@ Do not re-add Signal Forms, in any shape, without reading this entry first.
   `strictTypeChecked` rule set is unchanged. Three rules ESLint 10 had in its recommended set are
   now enabled by hand in `eslint.config.js`.
 
-Three consequences of the migration are **open and need the user's decision**; they are recorded
+Four consequences of the migration are **open and need the user's decision**; they are recorded
 here as facts, not as settled policy:
 
 - **Coverage thresholds are gone.** The Angular 20 `@angular/build:unit-test` builder has no

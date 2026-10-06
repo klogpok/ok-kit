@@ -7,7 +7,7 @@ invalid on its own.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The control no longer imports anything from the Signal Forms package
 - [x] Raw typed text is held in a signal derived from the value, and formatting on blur behaves as before
@@ -26,7 +26,7 @@ invalid on its own.
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Контрол больше ничего не импортирует из пакета Signal Forms
 - [x] Сырой введённый текст держится в сигнале, производном от значения, форматирование по уходу фокуса ведёт себя как раньше

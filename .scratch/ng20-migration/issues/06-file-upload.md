@@ -5,7 +5,7 @@ and the message is the control's own rather than one carried by Signal Forms.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The control no longer imports anything from the Signal Forms package
 - [x] A rejected file produces a message through the control's own error collection
@@ -22,7 +22,7 @@ and the message is the control's own rather than one carried by Signal Forms.
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Контрол больше ничего не импортирует из пакета Signal Forms
 - [x] Отвергнутый файл даёт сообщение через собственную коллекцию ошибок контрола

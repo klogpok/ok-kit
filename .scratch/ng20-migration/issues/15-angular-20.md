@@ -9,10 +9,10 @@ earlier major of the test runner.
 
 **Blocked by:** 14
 
-**Status:** done, waiting for the user's review
+**Status:** done
 
 - [x] Angular and the CDK are on 20.3, TypeScript on 5.8, the build and packaging tooling on their Angular 20 majors, and the test runner and bundler on the versions those require
-- [ ] No unmet peer dependency warnings remain on a clean install
+- [x] No unmet peer dependency warnings remain on a clean install
 - [x] The library builds and the whole unit test suite passes, with signature differences from the version change fixed rather than silenced
 - [x] The accessibility and overlay APIs of the CDK, which the library uses most heavily, are checked against their Angular 20 signatures
 - [x] The playground builds and runs
@@ -31,10 +31,10 @@ Angular, CDK, TypeScript, пакет сборки и тест-раннер дв�
 
 **Блокируется:** 14
 
-**Статус:** done, waiting for the user's review
+**Статус:** сделано
 
 - [x] Angular и CDK на 20.3, TypeScript на 5.8, инструменты сборки и упаковки на своих мажорах под Angular 20, тест-раннер и бандлер на версиях, которые они требуют
-- [ ] На чистой установке не остаётся предупреждений о неудовлетворённых peer-зависимостях
+- [x] На чистой установке не остаётся предупреждений о неудовлетворённых peer-зависимостях
 - [x] Библиотека собирается, весь набор юнит-тестов проходит, расхождения сигнатур от смены версии исправлены, а не заглушены
 - [x] API доступности и оверлеев CDK, которые библиотека использует плотнее всего, сверены со своими сигнатурами в Angular 20
 - [x] Playground собирается и запускается
@@ -183,3 +183,18 @@ playground, который отрисовывается и реагирует н
 `@storybook/angular-vite@10.6.0`, которому нужны Angular 21 или новее, TypeScript 5.9 и Vite 8, —
 тикет 17. При этом `build-storybook` на Angular 20 всё равно собирается. `angular-eslint` 22 линтит
 чисто, но печатает уведомление о несовпадении мажора — тикет 16.
+
+### 2026-10-07 — the peer criterion is closed by ticket 17
+
+The one open criterion above, "no unmet peer dependency warnings remain on a clean install", was
+left for later because every warning still standing belonged to `@storybook/angular-vite`. Ticket 17
+replaced it with `@storybook/angular`, and `pnpm install` has printed no unmet peer since (see
+`17-storybook.md`). The criterion is ticked now that the migration is merged.
+
+### 2026-10-07 — критерий о peer-зависимостях закрыт тикетом 17
+
+Единственный открытый критерий выше — «на чистой установке не остаётся предупреждений о
+неудовлетворённых peer-зависимостях» — был отложен, потому что все оставшиеся предупреждения
+принадлежали `@storybook/angular-vite`. Тикет 17 заменил его на `@storybook/angular`, и с тех пор
+`pnpm install` не печатает ни одной неудовлетворённой peer-зависимости (см. `17-storybook.md`).
+Критерий отмечен после слияния миграции.

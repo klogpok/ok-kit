@@ -6,7 +6,7 @@ no longer accepts a Signal Forms field as a step's control.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The stepper no longer imports anything from the Signal Forms package
 - [x] The public type of a step's control is a reactive control, with the union and the field branch removed
@@ -24,7 +24,7 @@ no longer accepts a Signal Forms field as a step's control.
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Степпер больше ничего не импортирует из пакета Signal Forms
 - [x] Публичный тип контрола шага — реактивный контрол, объединение типов и ветка поля удалены

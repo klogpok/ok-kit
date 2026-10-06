@@ -6,7 +6,7 @@ Anyone who later needs the pre-migration library can get it by name instead of b
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The current state of the default branch is tagged `ng22-final`
 - [x] A clone exists at a sibling directory named `ui-kit-20`, carrying the full git history, the decision log, the roadmap, the area rules, the token build and the visual baselines
@@ -44,7 +44,7 @@ Anyone who later needs the pre-migration library can get it by name instead of b
 
 **Блокируется:** ничем (можно начинать сразу)
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Текущее состояние ветки по умолчанию помечено тегом `ng22-final`
 - [x] Клон существует в соседнем каталоге с именем `ui-kit-20` и несёт полную историю git, журнал решений, роадмап, правила по областям, сборку токенов и визуальные бейслайны

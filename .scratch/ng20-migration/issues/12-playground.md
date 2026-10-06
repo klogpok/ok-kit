@@ -5,7 +5,7 @@ forms the way the consuming application does. Nothing in it reaches for Signal F
 
 **Blocked by:** 01
 
-**Status:** done, waiting for the user's review
+**Status:** done
 
 - [x] No page of the playground imports from the Signal Forms package
 - [x] Each form on the demonstration pages is a reactive form, with the same fields, validators and submit behaviour as before
@@ -66,7 +66,7 @@ forms the way the consuming application does. Nothing in it reaches for Signal F
 
 **Блокируется:** 01
 
-**Статус:** сделано, ждёт ревью пользователя
+**Статус:** сделано
 
 - [x] Ни одна страница playground не импортирует из пакета Signal Forms
 - [x] Каждая форма на демонстрационных страницах — реактивная, с теми же полями, валидаторами и поведением отправки, что и раньше

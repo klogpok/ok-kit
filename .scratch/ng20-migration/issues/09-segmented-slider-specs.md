@@ -5,7 +5,7 @@ is asserted against reactive forms so that it still holds once Signal Forms is g
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The Signal Forms host is removed from the segmented, button toggle and slider specs
 - [x] For each, the reactive forms host asserts: value in both directions, disabled from the control, readonly, required marker, touched on blur, error shown only when invalid and touched, and the validator's message
@@ -55,7 +55,7 @@ is asserted against reactive forms so that it still holds once Signal Forms is g
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Сигнальный хост удалён из спеков segmented, button toggle и слайдера
 - [x] Для каждого реактивный хост проверяет: значение в обе стороны, disabled от контрола, readonly, маркер обязательности, touched по уходу фокуса, показ ошибки только при «невалиден и тронут» и сообщение валидатора

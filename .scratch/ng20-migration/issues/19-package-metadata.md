@@ -5,7 +5,7 @@ and that its forms API is not the one from the previous version.
 
 **Blocked by:** 15
 
-**Status:** done, waiting for the user's review
+**Status:** done
 
 - [x] The package version is 0.2.0
 - [x] The peer range names Angular 20 for every Angular package the library depends on, with the router staying optional
@@ -22,7 +22,7 @@ Angular 20 и что его API форм — не тот, что в прошло
 
 **Блокируется:** 15
 
-**Статус:** done, waiting for the user's review
+**Статус:** сделано
 
 - [x] Версия пакета 0.2.0
 - [x] peer-диапазон называет Angular 20 для каждого Angular-пакета, от которого зависит библиотека, роутер остаётся опциональным

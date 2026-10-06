@@ -6,7 +6,7 @@ changed.
 
 **Blocked by:** 17
 
-**Status:** done, waiting for the user’s review
+**Status:** done
 
 - [x] The visual comparison command is run and every difference is accounted for
 - [x] Baselines are re-taken only where the rendering genuinely moved; an unexplained difference is investigated as a regression before any image is accepted
@@ -24,7 +24,7 @@ changed.
 
 **Блокируется:** 17
 
-**Статус:** сделано, ждёт ревью пользователя
+**Статус:** сделано
 
 - [x] Команда визуального сравнения запущена, каждое расхождение объяснено
 - [x] Бейслайны пересняты только там, где отрисовка действительно сдвинулась; необъяснённое расхождение расследуется как регрессия до принятия любой картинки

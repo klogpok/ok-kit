@@ -6,7 +6,7 @@ accessor are the forms story, and learns why Signal Forms is not.
 
 **Blocked by:** 14, 17
 
-**Status:** done, waiting for the user's review
+**Status:** done
 
 - [x] The decision log gains an entry recording that the Signal Forms decision is reversed, with the reason - the consuming application is on Angular 20 and Signal Forms does not exist there - without editing the original decision away
 - [x] The roadmap carries the migration as a phase of its own, with what it delivered
@@ -25,7 +25,7 @@ accessor, и узнаю́т, почему это не Signal Forms.
 
 **Блокируется:** 14, 17
 
-**Статус:** done, waiting for the user's review
+**Статус:** сделано
 
 - [x] В журнале решений появляется запись об отмене решения по Signal Forms с причиной — потребляющее приложение на Angular 20, где Signal Forms не существует, — без вытирания исходного решения
 - [x] Роадмап содержит миграцию как отдельную фазу с описанием того, что она дала

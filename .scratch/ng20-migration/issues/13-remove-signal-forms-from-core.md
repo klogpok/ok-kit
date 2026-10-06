@@ -6,7 +6,7 @@ Forms directive is simply no longer a thing the kit supports.
 
 **Blocked by:** 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The control-state helper loses its Signal Forms branch and keeps the reactive one, with the shape of its public interface unchanged
 - [x] The shared base class for custom controls no longer injects or checks the Signal Forms field token
@@ -75,7 +75,7 @@ knows are never needed. No case was weakened, removed or skipped.
 
 **Блокируется:** 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Помощник состояния контрола теряет ветку Signal Forms и сохраняет реактивную, форма публичного интерфейса не меняется
 - [x] Общий базовый класс кастомных контролов больше не инжектит и не проверяет токен сигнального поля

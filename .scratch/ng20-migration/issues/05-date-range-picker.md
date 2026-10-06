@@ -6,7 +6,7 @@ through Signal Forms.
 
 **Blocked by:** 04 (same entry point; sequencing them avoids conflicting edits)
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The control no longer imports anything from the Signal Forms package, including the validation error type
 - [x] Raw typed text for both ends is held in signals derived from the value
@@ -25,7 +25,7 @@ Signal Forms.
 
 **Блокируется:** 04 (та же точка входа; последовательность избавляет от конфликтующих правок)
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Контрол больше ничего не импортирует из пакета Signal Forms, включая тип ошибки валидации
 - [x] Сырой текст обоих концов держится в сигналах, производных от значения

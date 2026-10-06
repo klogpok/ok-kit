@@ -5,7 +5,7 @@ the ones whose value is a collection.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The Signal Forms host is removed from the select, multi-select, autocomplete and chip input specs
 - [x] For each, the reactive forms host asserts: value in both directions, disabled from the control, readonly, required marker, touched when the overlay closes or focus leaves, error shown only when invalid and touched, and the validator's message
@@ -23,7 +23,7 @@ the ones whose value is a collection.
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Сигнальный хост удалён из спеков select, multi-select, автокомплита и поля чипов
 - [x] Для каждого реактивный хост проверяет: значение в обе стороны, disabled от контрола, readonly, маркер обязательности, touched при закрытии оверлея или уходе фокуса, показ ошибки только при «невалиден и тронут» и сообщение валидатора

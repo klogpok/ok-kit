@@ -29,7 +29,7 @@ ngOnInit(): void {
 
 **Blocked by:** 13
 
-**Status:** done, waiting for the user's review
+**Status:** done
 
 - [x] Each of the fifteen concrete custom controls provides the value accessor token pointing at itself; the shared base class remains the only implementation of the accessor methods
 - [x] The base class no longer injects the forms directive during construction and no longer assigns itself to it
@@ -70,7 +70,7 @@ ngOnInit(): void {
 
 **Блокируется:** 13
 
-**Статус:** done, waiting for the user's review
+**Статус:** сделано
 
 - [x] Каждый из пятнадцати конкретных кастомных контролов отдаёт токен value accessor, указывающий на себя; общий базовый класс остаётся единственной реализацией методов accessor
 - [x] Базовый класс больше не инжектит директиву формы при конструировании и не присваивает себя в неё

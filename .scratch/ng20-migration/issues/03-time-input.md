@@ -6,7 +6,7 @@ does not make a bound form control invalid by itself.
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] The control no longer imports anything from the Signal Forms package
 - [x] Raw typed text is held in a signal derived from the value, and formatting on blur behaves as before
@@ -25,7 +25,7 @@ Forms, и само по себе не делает связанный контр
 
 **Блокируется:** 01
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 - [x] Контрол больше ничего не импортирует из пакета Signal Forms
 - [x] Сырой текст держится в сигнале, производном от значения, форматирование по уходу фокуса как раньше
