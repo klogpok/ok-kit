@@ -182,7 +182,8 @@ describe('UiButtonToggleGroup with Reactive Forms', () => {
   let group: UiButtonToggleGroupHarness;
 
   /** The message `ui-form-field` shows under the group. */
-  const error = (): string => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const error = (): string =>
+    root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);

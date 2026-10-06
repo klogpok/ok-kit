@@ -60,7 +60,7 @@ describe('UiButton', () => {
     expect(btn.classList).toContain('ui-button--primary');
     expect(btn.classList).toContain('ui-button--md');
     expect(btn.getAttribute('type')).toBe('button');
-    expect(btn.textContent.trim()).toBe('Save');
+    expect(btn.textContent?.trim()).toBe('Save');
   });
 
   it('respects an explicit type', () => {

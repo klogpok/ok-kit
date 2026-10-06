@@ -37,7 +37,7 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
 const listbox = () => document.querySelector<HTMLElement>('[role="listbox"]');
 const shown = () =>
   [...document.querySelectorAll<HTMLElement>('ui-option:not([hidden])')].map((o) =>
-    o.textContent.trim(),
+    o.textContent?.trim(),
   );
 
 const CITIES = ['Haifa', 'Hadera', 'Eilat', 'Acre'];
@@ -117,7 +117,7 @@ describe('UiAutocomplete (free text)', () => {
     await press('ArrowDown');
     await press('ArrowDown');
     const active = input().getAttribute('aria-activedescendant')!;
-    expect(document.getElementById(active)!.textContent.trim()).toBe('Hadera');
+    expect(document.getElementById(active)!.textContent?.trim()).toBe('Hadera');
     expect((await press('Enter')).defaultPrevented).toBe(true);
     expect(host.city()).toBe('Hadera');
     expect(input().value).toBe('Hadera');
@@ -145,7 +145,7 @@ describe('UiAutocomplete (free text)', () => {
     await press('Escape');
     await press('ArrowUp');
     const active = input().getAttribute('aria-activedescendant')!;
-    expect(document.getElementById(active)!.textContent.trim()).toBe('Acre');
+    expect(document.getElementById(active)!.textContent?.trim()).toBe('Acre');
   });
 
   it('hides the list without matches', async () => {
@@ -294,7 +294,7 @@ describe('UiAutocomplete with Reactive Forms', () => {
   let loader: HarnessLoader;
   const field = () => loader.getHarness(UiAutocompleteHarness.with({ label: 'City' }));
   /** The message `ui-form-field` shows under the field. */
-  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);

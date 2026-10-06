@@ -93,7 +93,7 @@ describe('UiDateRangePicker', () => {
     input
       .getAttribute('aria-labelledby')!
       .split(' ')
-      .map((id) => document.getElementById(id)!.textContent.trim());
+      .map((id) => document.getElementById(id)!.textContent?.trim());
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(Host);
@@ -259,7 +259,7 @@ describe('UiDateRangePicker', () => {
     expect(presets.getAttribute('role')).toBe('group');
     expect(presets.getAttribute('aria-label')).toBe('טווחים מוכנים');
     const buttons = [...presets.querySelectorAll('button')];
-    expect(buttons.map((b) => b.textContent.trim())).toEqual(['September', 'First week']);
+    expect(buttons.map((b) => b.textContent?.trim())).toEqual(['September', 'First week']);
     buttons[1].click();
     await settle(fixture);
     expect(host.value()).toEqual(range(new Date(2026, 8, 1), new Date(2026, 8, 7)));
@@ -365,12 +365,12 @@ describe('UiDateRangePicker with Reactive Forms', () => {
   let controls: ReactiveHost['form']['controls'];
   const fieldOf = (label: string): HTMLElement =>
     [...root.querySelectorAll<HTMLElement>('ui-form-field')].find((it) =>
-      it.querySelector('label')!.textContent.includes(label),
+      it.querySelector('label')!.textContent?.includes(label),
     )!;
   const inputs = (label: string) => [...fieldOf(label).querySelectorAll<HTMLInputElement>('input')];
   /** The message `ui-form-field` shows under the fields with this label. */
   const errorOf = (label: string): string =>
-    fieldOf(label).querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+    fieldOf(label).querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
   const type = async (input: HTMLInputElement, text: string) => {
     input.value = text;
     input.dispatchEvent(new Event('input'));

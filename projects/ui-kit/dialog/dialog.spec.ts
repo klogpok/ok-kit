@@ -288,7 +288,7 @@ describe('UiDialog', () => {
       void dialog.confirm({ title: 'Leave?', injector });
       await settle();
       const [cancel] = container()!.querySelectorAll<HTMLButtonElement>('ui-dialog-actions button');
-      expect(cancel.textContent.trim()).toBe('Not now');
+      expect(cancel.textContent?.trim()).toBe('Not now');
     });
 
     it('resolves true on confirm', async () => {
@@ -303,10 +303,10 @@ describe('UiDialog', () => {
       expect(el.textContent).toContain('The owner gets an email.');
       expect(el.querySelector('.ui-dialog-header__close')).toBeNull();
       const description = document.getElementById(el.getAttribute('aria-describedby')!);
-      expect(description!.textContent.trim()).toBe('The owner gets an email.');
+      expect(description!.textContent?.trim()).toBe('The owner gets an email.');
 
       const [cancel, confirm] = el.querySelectorAll<HTMLButtonElement>('ui-dialog-actions button');
-      expect(cancel.textContent.trim()).toBe('ביטול');
+      expect(cancel.textContent?.trim()).toBe('ביטול');
       expect(document.activeElement).toBe(confirm);
       confirm.click();
       await expect(result).resolves.toBe(true);
@@ -319,7 +319,7 @@ describe('UiDialog', () => {
       const [cancel, confirm] = container()!.querySelectorAll<HTMLButtonElement>(
         'ui-dialog-actions button',
       );
-      expect(confirm.textContent.trim()).toBe('Delete');
+      expect(confirm.textContent?.trim()).toBe('Delete');
       expect(confirm.classList).toContain('ui-button--danger');
       expect(document.activeElement).toBe(cancel);
       cancel.click();

@@ -83,13 +83,14 @@ class UiChipSetParent {
 /** Text of a chip label, tracked when it changes. */
 function injectLabelText(label: Signal<ElementRef<HTMLElement>>): Signal<string> {
   const text = signal<string | null>(null);
+  const read = () => (label().nativeElement.textContent ?? '').trim();
   const element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   if (typeof MutationObserver !== 'undefined') {
-    const observer = new MutationObserver(() => text.set(label().nativeElement.textContent.trim()));
+    const observer = new MutationObserver(() => text.set(read()));
     observer.observe(element, { childList: true, characterData: true, subtree: true });
     inject(DestroyRef).onDestroy(() => observer.disconnect());
   }
-  return computed(() => text() ?? label().nativeElement.textContent.trim());
+  return computed(() => text() ?? read());
 }
 
 /**

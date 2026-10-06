@@ -44,9 +44,9 @@ function type(input: HTMLInputElement, text: string): void {
 
 const listbox = () => document.querySelector<HTMLElement>('[role="listbox"]');
 const options = () => [...document.querySelectorAll<HTMLElement>('ui-option')];
-const optionTexts = () => options().map((option) => option.textContent.trim());
+const optionTexts = () => options().map((option) => option.textContent?.trim());
 const active = (input: HTMLInputElement) =>
-  document.getElementById(input.getAttribute('aria-activedescendant') ?? '')?.textContent.trim();
+  document.getElementById(input.getAttribute('aria-activedescendant') ?? '')?.textContent?.trim();
 
 @Component({
   imports: [UiTimeInput, UiFormField],
@@ -367,8 +367,8 @@ describe('UiTimeInput with Reactive Forms', () => {
   /** The message `ui-form-field` shows under the field with this label. */
   const errorOf = (label: string): string => {
     const fields = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ui-form-field')];
-    const owner = fields.find((it) => it.querySelector('label')?.textContent.includes(label));
-    return owner?.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+    const owner = fields.find((it) => it.querySelector('label')?.textContent?.includes(label));
+    return owner?.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
   };
 
   beforeEach(async () => {

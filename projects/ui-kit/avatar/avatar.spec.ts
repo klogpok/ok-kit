@@ -147,7 +147,7 @@ describe('UiAvatarGroup', () => {
 
   it('shows the first max avatars and a +N counter', () => {
     expect(avatars().map((a) => a.hidden)).toEqual([false, false, true, true, false]);
-    expect(more()?.textContent.trim()).toBe('+2');
+    expect(more()?.textContent?.trim()).toBe('+2');
     // The plus sign stays before the number in RTL.
     expect(more()?.querySelector('[dir="ltr"]')).not.toBeNull();
     expect(more()?.getAttribute('role')).toBe('img');
@@ -177,6 +177,6 @@ describe('UiAvatarGroup', () => {
     fixture.componentInstance.max.set(1);
     fixture.componentInstance.names.update((names) => [...names, 'Tal Mor']);
     await render();
-    expect(more()?.textContent.trim()).toBe('+4');
+    expect(more()?.textContent?.trim()).toBe('+4');
   });
 });

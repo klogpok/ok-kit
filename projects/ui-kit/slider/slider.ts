@@ -27,6 +27,14 @@ import {
 } from '@vplans/ui-kit/core';
 import { UiSliderScale, percentOf, scaleTop, snapToScale } from './slider-utils';
 
+/** `FocusOptions` plus `focusVisible`, which the DOM supports but the TypeScript lib omits. */
+interface UiFocusOptions extends FocusOptions {
+  focusVisible?: boolean;
+}
+
+/** Moving a thumb with the pointer must not paint the focus ring. */
+const THUMB_FOCUS_OPTIONS: UiFocusOptions = { preventScroll: true, focusVisible: false };
+
 /** A point of the scale shown under the track, e.g. `{ value: 50, label: '50%' }`. */
 export interface UiSliderMark {
   value: number;
@@ -335,7 +343,7 @@ export abstract class UiSliderBase<T>
   }
 
   private focusThumb(index: number): void {
-    this.inputs()[index]?.nativeElement.focus({ preventScroll: true, focusVisible: false });
+    this.inputs()[index]?.nativeElement.focus(THUMB_FOCUS_OPTIONS);
   }
 
   /** Moves a thumb within its limits. Returns whether the value changed. */

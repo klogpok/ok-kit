@@ -178,7 +178,7 @@ describe('UiRadioGroup', () => {
     it('shows the validator message only once the control is invalid and touched', async () => {
       expect(control.invalid).toBe(true);
       expect(group().hasAttribute('aria-invalid')).toBe(false);
-      expect(error().textContent.trim()).toBe('');
+      expect(error().textContent?.trim()).toBe('');
 
       leaveGroup(radios[1]);
       await settle(fixture);
@@ -190,7 +190,7 @@ describe('UiRadioGroup', () => {
       await settle(fixture);
       expect(control.valid).toBe(true);
       expect(group().hasAttribute('aria-invalid')).toBe(false);
-      expect(error().textContent.trim()).toBe('');
+      expect(error().textContent?.trim()).toBe('');
     });
   });
 });

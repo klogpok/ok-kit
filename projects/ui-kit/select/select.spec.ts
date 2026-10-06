@@ -141,7 +141,7 @@ describe('UiSelect with server-side search', () => {
     await settle(fixture);
 
     const active = document.getElementById(control.getAttribute('aria-activedescendant')!);
-    expect(active!.textContent.trim()).toBe('Dana');
+    expect(active!.textContent?.trim()).toBe('Dana');
     keydown(control, 'Enter');
     await settle(fixture);
     expect(fixture.componentInstance.value()).toBe('Dana');
@@ -205,7 +205,7 @@ describe('UiSelect', () => {
     expect(root.querySelector('label')!.getAttribute('for')).toBe(button.id);
     const hint = document.getElementById(button.getAttribute('aria-describedby')!);
     expect(hint!.textContent).toContain('Approves the plan');
-    expect(button.textContent.trim()).toBe('Choose');
+    expect(button.textContent?.trim()).toBe('Choose');
   });
 
   it('opens a labelled listbox with options and groups', async () => {
@@ -229,7 +229,7 @@ describe('UiSelect', () => {
     await settle(fixture);
     expect(fixture.componentInstance.value()).toBe('yael');
     expect(listbox()).toBeNull();
-    expect(control().textContent.trim()).toBe('Yael');
+    expect(control().textContent?.trim()).toBe('Yael');
     expect(document.activeElement).toBe(control());
   });
 
@@ -444,7 +444,7 @@ describe('UiSelect with Reactive Forms', () => {
   const select = () => loader.getHarness(UiSelectHarness.with({ label: 'City' }));
   const trigger = () => root.querySelector<HTMLButtonElement>('.ui-select__control')!;
   /** The message `ui-form-field` shows under the select. */
-  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);
@@ -632,7 +632,7 @@ describe('UiSelect clearable, loading and option slots', () => {
   afterEach(() => (fixture.nativeElement as HTMLElement).remove());
 
   it('shows the label slot only in the trigger', () => {
-    expect(control().textContent.trim()).toBe('Dana Levi');
+    expect(control().textContent?.trim()).toBe('Dana Levi');
   });
 
   it('clears the value with the clear button without opening the list', async () => {
@@ -660,7 +660,7 @@ describe('UiSelect clearable, loading and option slots', () => {
     control().click();
     await settle(fixture);
     expect(listbox()?.getAttribute('aria-busy')).toBe('true');
-    expect(listbox()?.querySelector('.ui-select__loading')?.textContent.trim()).toBe('Loading');
+    expect(listbox()?.querySelector('.ui-select__loading')?.textContent?.trim()).toBe('Loading');
   });
 
   it('renders the icon and the description of an option', async () => {
@@ -669,6 +669,6 @@ describe('UiSelect clearable, loading and option slots', () => {
     const [dana] = options();
     expect(dana.querySelector('.ui-option__icon .icon')?.textContent).toBe('D');
     expect(dana.querySelector('.ui-option__description')?.textContent).toBe('Coordinator');
-    expect(dana.querySelector('.ui-option__label')?.textContent.trim()).toBe('Dana Levi');
+    expect(dana.querySelector('.ui-option__label')?.textContent?.trim()).toBe('Dana Levi');
   });
 });

@@ -163,7 +163,7 @@ describe('UiCheckbox', () => {
     it('shows the validator message only once the control is invalid and touched', async () => {
       expect(control.invalid).toBe(true);
       expect(await checkbox.isInvalid()).toBe(false);
-      expect(error().textContent.trim()).toBe('');
+      expect(error().textContent?.trim()).toBe('');
 
       await checkbox.focus();
       await checkbox.blur();
@@ -180,7 +180,7 @@ describe('UiCheckbox', () => {
       await settle(fixture);
       expect(control.valid).toBe(true);
       expect(await checkbox.isInvalid()).toBe(false);
-      expect(error().textContent.trim()).toBe('');
+      expect(error().textContent?.trim()).toBe('');
     });
   });
 });

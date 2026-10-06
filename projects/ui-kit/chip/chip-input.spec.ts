@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import type { MockInstance } from 'vitest';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -64,9 +65,9 @@ describe('UiChipInput', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
   let root: HTMLElement;
-  let announce: ReturnType<typeof vi.spyOn>;
+  let announce: MockInstance<LiveAnnouncer['announce']>;
   const input = () => root.querySelector<HTMLInputElement>('.ui-chip-input__input')!;
-  const chips = () => [...root.querySelectorAll('ui-chip')].map((c) => c.textContent.trim());
+  const chips = () => [...root.querySelectorAll('ui-chip')].map((c) => c.textContent?.trim());
   const removeButtons = () => [...root.querySelectorAll<HTMLButtonElement>('.ui-chip__remove')];
   const type = async (text: string) => {
     input().value = text;
@@ -242,7 +243,7 @@ describe('UiChipInput with Reactive Forms', () => {
   let loader: HarnessLoader;
   const field = () => loader.getHarness(UiChipInputHarness.with({ label: 'Emails' }));
   /** The message `ui-form-field` shows under the field. */
-  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);

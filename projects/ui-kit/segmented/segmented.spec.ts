@@ -94,7 +94,7 @@ describe('UiSegmented', () => {
     const names = new Set(radios.map((radio) => radio.name));
     expect(names.size).toBe(1);
     expect([...names][0]).toMatch(/^ui-segmented-name-/);
-    expect(radios[0].closest('label')!.textContent.trim()).toBe('List');
+    expect(radios[0].closest('label')!.textContent?.trim()).toBe('List');
   });
 
   it('moves the aria-label of an icon-only segment to its radio', () => {
@@ -269,7 +269,8 @@ describe('UiSegmented with Reactive Forms', () => {
   let segmented: UiSegmentedHarness;
 
   /** The message `ui-form-field` shows under the group. */
-  const error = (): string => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const error = (): string =>
+    root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);
