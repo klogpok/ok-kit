@@ -14,7 +14,7 @@
     "lint": "ng lint && stylelint \"projects/**/*.scss\"",
     "format": "prettier --write \"{projects,scripts}/**/*.{ts,mts,mjs,html,scss,json}\"",
     "format:check": "prettier --check \"{projects,scripts}/**/*.{ts,mts,mjs,html,scss,json}\"",
-    "storybook": "ng run ui-kit:storybook",
+    "storybook": "node scripts/storybook-preflight.mjs && ng run ui-kit:storybook",
     "build-storybook": "ng run ui-kit:build-storybook",
     "test-storybook": "node scripts/check-stories.mjs",
     "test-visual": "node scripts/check-visual.mjs",
