@@ -2,6 +2,7 @@
   "name": "ui-kit",
   "version": "0.0.0",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "ng": "ng",
     "start": "ng serve playground",
     "tokens": "node projects/ui-kit/tokens/build-tokens.mts",

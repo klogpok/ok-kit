@@ -23,7 +23,7 @@ pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit
 
 - `pnpm test-storybook` runs axe on every story in three modes (light/rtl, dark/rtl, light/ltr).
 - Budget warnings from `pnpm build:playground` are not failures, but list them in the report. The limits are in [docs/DECISIONS.md](../../../docs/DECISIONS.md) (phase 2 review answers).
-- `pnpm test:coverage` fails below the thresholds in `scripts/check-coverage.mjs` (statements 94, branches 80, functions 88, lines 96); the Angular 20 unit-test builder has no threshold option of its own (see [docs/DECISIONS.md](../../../docs/DECISIONS.md) → the Angular 20 migration). Put the four numbers in the report.
+- `pnpm test:coverage` fails below the thresholds in `scripts/check-coverage.mjs`. Put the four numbers in the report.
 
 ## 2. Visual baselines
 
@@ -35,7 +35,7 @@ New or intentionally changed stories need new baselines:
 
 ## 3. Browser check
 
-Check the new and changed stories in a real browser for light and dark themes and for RTL, including open overlays. The Storybook dev server rebuilds on change but has hot module replacement switched off, so refresh the page by hand. `playwright-core` with `channel: 'msedge'` works without downloading browsers. Vitest does not load component styles, so CSS fixes are verified only here.
+Check the new and changed stories in a real browser for light and dark themes and for RTL, including open overlays. Start the Storybook dev server with `pnpm storybook` and stop it when the check is done. `playwright-core` with `channel: 'msedge'` works without downloading browsers. Vitest does not load component styles, so CSS fixes are verified only here.
 
 ## 4. Report
 
@@ -43,6 +43,6 @@ End the phase with a report:
 
 - what was done (commits, components, numbers: tests, coverage, stories, baselines);
 - what is left;
-- deviations from the plan in [docs/ROADMAP.md](../../../docs/ROADMAP.md) and the decisions the user must make.
+- deviations from the plan in [docs/ROADMAP.md](../../../docs/ROADMAP.md) and the decisions the user must make, each filed as a `needs-info` ticket ([docs/agents/issue-tracker.md](../../../docs/agents/issue-tracker.md) → "Open review questions").
 
-Record the status in `docs/ROADMAP.md`. Wait for approval before starting the next phase; after approval, record the review answers in `docs/DECISIONS.md` and the status line in `CLAUDE.md`.
+Record the status in `docs/ROADMAP.md`. Wait for approval before starting the next phase; after approval, record the review answers in `docs/DECISIONS.md` and close their tickets.
