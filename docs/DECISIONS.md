@@ -273,16 +273,33 @@ Do not re-add Signal Forms, in any shape, without reading this entry first.
   `strictTypeChecked` rule set is unchanged. Three rules ESLint 10 had in its recommended set are
   now enabled by hand in `eslint.config.js`.
 
-Two consequences of the migration are **open and need the user's decision**; they are recorded
-here as facts, not as settled policy:
+## Angular 20 migration: coverage thresholds come back through a script (decided 2026-10-07)
 
-- **Coverage thresholds are gone.** The Angular 20 `@angular/build:unit-test` builder has no
-  threshold option and starts Vitest with `config: false`, so a `vitest.config.ts` cannot supply
-  them either. They were not lowered — the tooling no longer offers them. `pnpm test:coverage`
-  still reports coverage.
-- **`@angular-eslint/template/elements-content` is slightly stricter than before.** v20's default
-  `allowList` does not include `textContent`, v22's does. It was left at the v20 default rather
-  than widened back. No template in the repository is affected.
+The Angular 20 `@angular/build:unit-test` builder has no threshold option and starts Vitest with
+`config: false`, so neither `angular.json` nor a `vitest.config.ts` can set them; after the
+migration `pnpm test:coverage` only reported coverage.
+
+Review answer: **enforce them again.** The builder writes a `json-summary` report
+(`codeCoverageReporters` in `angular.json`), and `scripts/check-coverage.mjs`, run at the end of
+`pnpm test:coverage`, fails when a total is below its threshold.
+
+The thresholds are the pre-migration ones (statements 94, functions 88, lines 96) except
+**branches, which is 80 instead of 90**. The suite did not lose branch coverage: it is the same
+729 tests. Before the migration Vitest 5's v8 coverage remapped through the AST and reported
+93.2% of branches; Vitest 3.2 remaps the compiled output, counts more branches and reports
+81.1% for the same code, and the builder offers no way to switch the remapping on. 80 is the new
+floor for that measure. Raise it again if the toolchain moves to a Vitest that remaps through the
+AST.
+
+## Angular 20 migration: `elements-content` stays at the v20 default (decided 2026-10-07)
+
+`@angular-eslint/template/elements-content` is slightly stricter than before the migration:
+v20's default `allowList` does not include `textContent`, v22's does, so a `<button>`, `<a>` or
+heading whose only content is a `[textContent]` binding is now reported. No template in the
+repository is affected.
+
+Review answer: **leave the v20 default.** If a template ever needs `[textContent]` as its only
+content, add `textContent` to the rule's `allowList` in `eslint.config.js` then.
 
 ## Angular 20 migration: Storybook hot module replacement is back (decided 2026-10-07)
 

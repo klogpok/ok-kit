@@ -23,7 +23,7 @@ pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit
 
 - `pnpm test-storybook` runs axe on every story in three modes (light/rtl, dark/rtl, light/ltr).
 - Budget warnings from `pnpm build:playground` are not failures, but list them in the report. The limits are in [docs/DECISIONS.md](../../../docs/DECISIONS.md) (phase 2 review answers).
-- `pnpm test:coverage` reports coverage but no longer fails on it: the Angular 20 unit-test builder has no threshold option (see [docs/DECISIONS.md](../../../docs/DECISIONS.md) → the Angular 20 migration). Read the numbers and put them in the report.
+- `pnpm test:coverage` fails below the thresholds in `scripts/check-coverage.mjs` (statements 94, branches 80, functions 88, lines 96); the Angular 20 unit-test builder has no threshold option of its own (see [docs/DECISIONS.md](../../../docs/DECISIONS.md) → the Angular 20 migration). Put the four numbers in the report.
 
 ## 2. Visual baselines
 

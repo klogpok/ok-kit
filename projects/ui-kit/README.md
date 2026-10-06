@@ -1562,7 +1562,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast         |
 | `pnpm test`               | Unit tests (Vitest)                                                    |
 | `pnpm test:watch`         | Unit tests in watch mode                                               |
-| `pnpm test:coverage`      | Unit tests with a coverage report (the builder enforces no thresholds) |
+| `pnpm test:coverage`      | Unit tests with a coverage report; fails below the thresholds          |
 | `pnpm test:playground`    | Playground smoke tests                                                 |
 | `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint              |
 | `pnpm format`             | Prettier (write)                                                       |
