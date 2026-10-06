@@ -31,16 +31,16 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ui-kit/tsconfig.spec.json",
-            "coverageExclude": [
+            "buildTarget": "::development",
+            "runner": "vitest",
+            "providersFile": "projects/ui-kit/test-setup/providers.ts",
+            "codeCoverageExclude": [
               "**/*.stories.ts",
               "**/tokens.generated.ts"
             ],
-            "coverageThresholds": {
-              "statements": 94,
-              "branches": 90,
-              "functions": 88,
-              "lines": 96
-            }
+            "setupFiles": [
+              "projects/ui-kit/test-setup/jsdom-event-view.ts"
+            ]
           }
         },
         "lint": {
@@ -154,7 +154,13 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/playground/tsconfig.spec.json",
+            "buildTarget": "::development",
+            "runner": "vitest",
+            "providersFile": "projects/playground/src/test-providers.ts"
+          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
