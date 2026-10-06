@@ -131,3 +131,28 @@ export const States: Story = {
       </div>`,
   }),
 };
+
+const STREETS = Array.from({ length: 1000 }, (_, i) => ({
+  value: `רחוב ${i + 1}`,
+  label: `רחוב ${i + 1}`,
+}));
+
+/** Suggestions as data (`items`); a long list is rendered in a virtual scroll viewport. */
+export const ManyOptions: Story = {
+  render: () => ({
+    props: { streets: STREETS },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:320px;min-block-size:18rem">
+        <ui-form-field label="רחוב">
+          <ui-autocomplete placeholder="הקלידו רחוב" [items]="streets" />
+        </ui-form-field>
+      </div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `<ui-autocomplete formControlName="street" [items]="streets" />`,
+      },
+    },
+  },
+};

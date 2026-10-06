@@ -12,9 +12,15 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
+import { NgTemplateOutlet } from '@angular/common';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import {
+  CdkFixedSizeVirtualScroll,
+  CdkVirtualForOf,
+  CdkVirtualScrollViewport,
+} from '@angular/cdk/scrolling';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
-import { ɵUiOptionPanel, ɵUiOptionParent } from '@vplans/ui-kit/select';
+import { UiOption, ɵUiOptionPanel, ɵUiOptionParent } from '@vplans/ui-kit/select';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 
 /**
@@ -50,7 +56,16 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
  */
 @Component({
   selector: 'ui-autocomplete',
-  imports: [CdkConnectedOverlay, CdkOverlayOrigin, UiSpinner],
+  imports: [
+    CdkConnectedOverlay,
+    CdkOverlayOrigin,
+    CdkFixedSizeVirtualScroll,
+    CdkVirtualForOf,
+    CdkVirtualScrollViewport,
+    NgTemplateOutlet,
+    UiOption,
+    UiSpinner,
+  ],
   template: `
     <div class="ui-autocomplete__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
       <input
@@ -99,6 +114,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
       <div
         role="listbox"
         class="ui-select__panel"
+        [class.ui-select__panel--virtual]="items() && virtual()"
         [style.--_option-padding]="'var(--ui-control-padding-inline-' + size() + ')'"
         [style.--_option-font-size]="'var(--ui-control-font-size-' + size() + ')'"
         [id]="panelId()"
@@ -107,7 +123,33 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
         [attr.aria-busy]="loading() ? 'true' : null"
         (mousedown)="$event.preventDefault()"
       >
-        <ng-content />
+        @if (items()) {
+          @if (virtual()) {
+            <cdk-virtual-scroll-viewport
+              class="ui-select__viewport"
+              [itemSize]="itemSize()"
+              [minBufferPx]="itemSize() * 5"
+              [maxBufferPx]="itemSize() * 10"
+              [style.block-size.px]="visibleItems().length * itemSize()"
+            >
+              <ng-container
+                *cdkVirtualFor="let entry of visibleItems(); trackBy: trackEntry; let i = index"
+              >
+                <ng-container
+                  *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
+                />
+              </ng-container>
+            </cdk-virtual-scroll-viewport>
+          } @else {
+            @for (entry of visibleItems(); track entry; let i = $index) {
+              <ng-container
+                *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
+              />
+            }
+          }
+        } @else {
+          <ng-content />
+        }
         @if (loading()) {
           <div class="ui-select__empty ui-select__loading">
             <ui-spinner size="sm" decorative />
@@ -117,6 +159,23 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
           <div class="ui-select__empty">{{ labels().noOptions }}</div>
         }
       </div>
+    </ng-template>
+
+    <!-- An option of items. The position counts the whole list: the viewport renders only a part. -->
+    <ng-template #itemOptionTemplate let-entry let-index="index">
+      <ui-option
+        #itemOption
+        [value]="entry.item.value"
+        [label]="entry.item.label"
+        [disabled]="entry.isDisabled()"
+        [attr.aria-setsize]="visibleItems().length"
+        [attr.aria-posinset]="index + 1"
+      >
+        {{ entry.item.label }}
+        @if (entry.item.description) {
+          <span uiOptionDescription>{{ entry.item.description }}</span>
+        }
+      </ui-option>
     </ng-template>
   `,
   styleUrl: './autocomplete.scss',

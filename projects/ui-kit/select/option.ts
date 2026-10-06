@@ -32,6 +32,8 @@ export interface UiOptionOwner {
    * whole: their required `value` may not be set yet when this runs.
    */
   isBlocked(option: UiOptionHandle): boolean;
+  /** The option renders an item that the key manager made active (`items` of the list). */
+  isActive(option: UiOptionHandle): boolean;
   selectOption(value: unknown): void;
 }
 
@@ -65,6 +67,10 @@ export class UiOptionParent {
 
   isBlocked(option: UiOptionHandle): boolean {
     return this.owner?.isBlocked(option) ?? false;
+  }
+
+  isActive(option: UiOptionHandle): boolean {
+    return this.owner?.isActive(option) ?? false;
   }
 
   selectOption(value: unknown): void {
@@ -140,7 +146,10 @@ export class UiOption<T = unknown> implements Highlightable {
 
   readonly id = inject(_IdGenerator).getId('ui-option-');
   protected readonly multiple = this.parent.multiple;
-  readonly active = signal(false);
+  /** Set by the key manager when the option itself is in it. */
+  private readonly highlighted = signal(false);
+  /** The option the keyboard is on (`aria-activedescendant` of the control). */
+  readonly active = computed(() => this.highlighted() || this.parent.isActive(this));
   readonly selected = computed(() => this.parent.isSelected(this.value()));
   readonly indeterminate = computed(() => this.parent.isIndeterminate(this));
   readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel(), this));
@@ -177,13 +186,13 @@ export class UiOption<T = unknown> implements Highlightable {
   }
 
   setActiveStyles(): void {
-    this.active.set(true);
+    this.highlighted.set(true);
     // jsdom has no scrollIntoView.
     if ('scrollIntoView' in this.element) this.element.scrollIntoView({ block: 'nearest' });
   }
 
   setInactiveStyles(): void {
-    this.active.set(false);
+    this.highlighted.set(false);
   }
 
   protected onClick(): void {

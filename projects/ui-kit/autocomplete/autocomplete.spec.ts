@@ -378,3 +378,49 @@ describe('UiAutocomplete with Reactive Forms', () => {
     expect(errorText()).toBe('');
   });
 });
+
+@Component({
+  imports: [UiAutocomplete],
+  template: `<ui-autocomplete aria-label="Street" [items]="streets" [(value)]="street" />`,
+})
+class ItemsHost {
+  // Free text: the value of a suggestion is the text it puts in the field.
+  readonly streets = Array.from({ length: 500 }, (_, i) => ({
+    value: `Street ${i + 1}`,
+    label: `Street ${i + 1}`,
+  }));
+  readonly street = signal<string | null>(null);
+}
+
+describe('UiAutocomplete with items', () => {
+  beforeAll(() => {
+    // jsdom has no Element.scrollTo, which the viewport calls.
+    Element.prototype.scrollTo = () => undefined;
+  });
+
+  afterAll(() => {
+    delete (Element.prototype as Partial<Element>).scrollTo;
+  });
+
+  it('filters every item and picks one that was not rendered', async () => {
+    const fixture = TestBed.createComponent(ItemsHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    const input = root.querySelector<HTMLInputElement>('input')!;
+    input.value = 'Street 49';
+    input.dispatchEvent(new Event('input'));
+    await settle(fixture);
+    expect(document.querySelector('cdk-virtual-scroll-viewport')).not.toBeNull();
+
+    // Street 49 and 490–499; the last one is outside the first window of the viewport.
+    keydown(input, 'ArrowDown');
+    keydown(input, 'PageDown', { keyCode: 34 });
+    await settle(fixture);
+    keydown(input, 'Enter');
+    await settle(fixture);
+    expect(fixture.componentInstance.street()).toBe('Street 499');
+    expect(input.value).toBe('Street 499');
+    root.remove();
+  });
+});

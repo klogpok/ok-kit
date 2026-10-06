@@ -111,6 +111,7 @@
   <div
     role="listbox"
     class="ui-select__panel"
+    [class.ui-select__panel--virtual]="items() && virtual()"
     [style.--_option-padding]="'var(--ui-control-padding-inline-' + size() + ')'"
     [style.--_option-font-size]="'var(--ui-control-font-size-' + size() + ')'"
     [id]="panelId()"
@@ -125,7 +126,33 @@
         labels().selectAll
       }}</ui-option>
     }
-    <ng-content />
+    @if (items()) {
+      @if (virtual()) {
+        <cdk-virtual-scroll-viewport
+          class="ui-select__viewport"
+          [itemSize]="itemSize()"
+          [minBufferPx]="itemSize() * 5"
+          [maxBufferPx]="itemSize() * 10"
+          [style.block-size.px]="visibleItems().length * itemSize()"
+        >
+          <ng-container
+            *cdkVirtualFor="let entry of visibleItems(); trackBy: trackEntry; let i = index"
+          >
+            <ng-container
+              *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
+            />
+          </ng-container>
+        </cdk-virtual-scroll-viewport>
+      } @else {
+        @for (entry of visibleItems(); track entry; let i = $index) {
+          <ng-container
+            *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
+          />
+        }
+      }
+    } @else {
+      <ng-content />
+    }
     @if (loading()) {
       <div class="ui-select__empty ui-select__loading">
         <ui-spinner size="sm" decorative />
@@ -135,4 +162,21 @@
       <div class="ui-select__empty">{{ labels().noOptions }}</div>
     }
   </div>
+</ng-template>
+
+<!-- An option of `items`. The position counts the whole list: the viewport renders only a part. -->
+<ng-template #itemOptionTemplate let-entry let-index="index">
+  <ui-option
+    #itemOption
+    [value]="entry.item.value"
+    [label]="entry.item.label"
+    [disabled]="entry.isDisabled()"
+    [attr.aria-setsize]="visibleItems().length"
+    [attr.aria-posinset]="index + 1"
+  >
+    {{ entry.item.label }}
+    @if (entry.item.description) {
+      <span uiOptionDescription>{{ entry.item.description }}</span>
+    }
+  </ui-option>
 </ng-template>

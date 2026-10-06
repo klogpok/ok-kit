@@ -162,3 +162,35 @@ export const RichOptions: Story = {
       </div>`,
   }),
 };
+
+const APARTMENTS = Array.from({ length: 2000 }, (_, i) => ({
+  value: i + 1,
+  label: `דירה ${i + 1}`,
+  disabled: i % 50 === 49,
+}));
+
+/**
+ * Options as data (`items`). From 100 items on (`virtualThreshold`) the list renders only the
+ * options in view; the keyboard, typeahead and search still reach all of them.
+ */
+export const ManyOptions: Story = {
+  render: () => ({
+    props: { apartments: APARTMENTS },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:320px;min-block-size:18rem">
+        <ui-form-field label="דירה" hint="2,000 דירות">
+          <ui-select placeholder="בחירת דירה" searchable [items]="apartments" [value]="1234" />
+        </ui-form-field>
+      </div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `<!-- apartments: { value, label, description?, disabled? }[] -->
+<ui-form-field label="דירה">
+  <ui-select formControlName="apartment" searchable [items]="apartments" />
+</ui-form-field>`,
+      },
+    },
+  },
+};

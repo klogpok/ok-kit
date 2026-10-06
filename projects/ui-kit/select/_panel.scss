@@ -15,6 +15,20 @@
     overscroll-behavior: contain;
   }
 
+  // `items` from the virtual scroll threshold on: the viewport scrolls, and shrinks to the
+  // panel's max height under "select all".
+  .ui-select__panel--virtual {
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+  }
+
+  .ui-select__viewport {
+    flex: 0 1 auto;
+    min-block-size: 0;
+    overscroll-behavior: contain;
+  }
+
   .ui-select__loading {
     display: flex;
     align-items: center;

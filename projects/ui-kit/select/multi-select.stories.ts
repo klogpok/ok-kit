@@ -152,3 +152,29 @@ export const MaxSelections: Story = {
       </div>`,
   }),
 };
+
+const UNITS = Array.from({ length: 500 }, (_, i) => ({
+  value: `unit-${i + 1}`,
+  label: `יחידה ${i + 1}`,
+  description: i % 2 ? 'בניין ב' : 'בניין א',
+}));
+
+/** Options as data (`items`) in a virtual scroll viewport; "select all" stays above it. */
+export const ManyOptions: Story = {
+  render: () => ({
+    props: { units: UNITS },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:360px;min-block-size:18rem">
+        <ui-form-field label="יחידות">
+          <ui-multi-select selectAll searchable [items]="units" [value]="['unit-3', 'unit-120']" />
+        </ui-form-field>
+      </div>`,
+  }),
+  parameters: {
+    docs: {
+      source: {
+        code: `<ui-multi-select formControlName="units" selectAll searchable [items]="units" />`,
+      },
+    },
+  },
+};

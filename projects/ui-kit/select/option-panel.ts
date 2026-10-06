@@ -5,7 +5,9 @@ import {
   Injector,
   Signal,
   WritableSignal,
+  afterEveryRender,
   afterNextRender,
+  afterRenderEffect,
   booleanAttribute,
   computed,
   contentChildren,
@@ -13,14 +15,16 @@ import {
   inject,
   input,
   linkedSignal,
+  numberAttribute,
   output,
   signal,
   untracked,
   viewChild,
   viewChildren,
 } from '@angular/core';
-import { ActiveDescendantKeyManager, _IdGenerator } from '@angular/cdk/a11y';
+import { ActiveDescendantKeyManager, Highlightable, _IdGenerator } from '@angular/cdk/a11y';
 import { CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
   UI_LABELS,
   UiFormControlBase,
@@ -29,6 +33,21 @@ import {
   resolveDirection,
 } from '@vplans/ui-kit/core';
 import { UiOption, UiOptionHandle, UiOptionParent } from './option';
+import { UiItemEntry, UiOptionItem } from './option-items';
+
+/** An option of the list: a projected `ui-option` or an entry of `items`. Internal. */
+export interface UiListEntry<T> extends Highlightable, UiOptionHandle {
+  value(): T;
+  getLabel(): string;
+  /** Disabled by the app, not blocked by the list. */
+  isDisabled(): boolean;
+  filteredOut(): boolean;
+  /** For the key manager: disabled or blocked. */
+  readonly disabled: boolean;
+}
+
+/** Height of an item option until a rendered one is measured. */
+const DEFAULT_ITEM_SIZE = 32;
 
 const POSITIONS: ConnectedPosition[] = [
   { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
@@ -40,6 +59,11 @@ const POSITIONS: ConnectedPosition[] = [
  * `ui-multi-select`, `ui-autocomplete`): the listbox overlay, the active option
  * (`aria-activedescendant`), filtering, labels of selected values and forms integration.
  * Internal: exported for the kit's own entry points only.
+ *
+ * The options are projected `ui-option`s or, with `items`, data that the control renders itself:
+ * in a virtual scroll viewport once there are `virtualThreshold` items. The key manager then
+ * moves through entries of the data, so the keyboard reaches options that are not rendered, and
+ * `aria-activedescendant` names the active option once it is rendered.
  *
  * Subclasses declare the `value` model, render the control (`#control`) and the overlay, and
  * decide what selecting an option does.
@@ -86,19 +110,73 @@ export abstract class UiOptionPanel<T, V>
    */
   readonly displayWith = input<((value: T) => string) | null>(null);
 
+  /**
+   * The options as data, instead of projected `ui-option`s. Projected options are ignored while
+   * it is set (`[]` is an empty list).
+   */
+  readonly items = input<readonly UiOptionItem<T>[] | null>(null);
+  /**
+   * From this many `items` on, the list renders only the options in view (a virtual scroll
+   * viewport). The options must then all have the same height.
+   */
+  readonly virtualThreshold = input(100, { transform: numberAttribute });
+
   readonly opened = output();
   readonly closed = output();
 
-  protected readonly options = contentChildren<UiOption<T>>(UiOption, { descendants: true });
-  /** Options of the control's own template, e.g. "select all"; listed before the app's options. */
-  private readonly ownOptions = viewChildren<UiOption<T>>(UiOption);
+  /** The projected options. */
+  private readonly contentOptions = contentChildren<UiOption<T>>(UiOption, { descendants: true });
+  /**
+   * Options of the control's own template that the keyboard reaches ("select all"); listed
+   * before the app's options. The options that render `items` are not among them.
+   */
+  private readonly ownOptions = viewChildren<UiOption<T>>('selectAllOption');
+  /** The rendered options of `items`. */
+  private readonly itemOptions = viewChildren<UiOption<T>>('itemOption');
+  private readonly itemEntries = computed(() =>
+    (this.items() ?? []).map(
+      (item) =>
+        new UiItemEntry<T>(item, {
+          isFilteredOut: (label, option) => this.isFilteredOut(label, option),
+          isBlocked: (option) => this.isBlocked(option),
+          reveal: (entry) => this.reveal(entry as UiItemEntry<T>),
+        }),
+    ),
+  );
+  /** Every option of the list, shown or filtered out. */
+  protected readonly options: Signal<readonly UiListEntry<T>[]> = computed(() =>
+    this.items() ? this.itemEntries() : this.contentOptions(),
+  );
+  /** The `items` the search shows; the control renders these. */
+  protected readonly visibleItems = computed(() =>
+    this.itemEntries().filter((entry) => !entry.filteredOut()),
+  );
   /** Every option the keyboard moves through. */
-  private readonly listOptions = computed(() => [...this.ownOptions(), ...this.options()]);
+  private readonly listOptions = computed((): readonly UiListEntry<T>[] => [
+    ...this.ownOptions(),
+    ...(this.items() ? this.visibleItems() : this.contentOptions()),
+  ]);
+  /** Render the `items` in a virtual scroll viewport. */
+  protected readonly virtual = computed(
+    () => (this.items()?.length ?? 0) >= this.virtualThreshold(),
+  );
+  /** Height of one item option in the viewport, in pixels. */
+  protected readonly itemSize = signal(DEFAULT_ITEM_SIZE);
+  private readonly viewport = viewChild(CdkVirtualScrollViewport);
+  /** An item to scroll to once the viewport has sized its content. */
+  private pendingReveal: UiItemEntry<T> | null = null;
   protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
   private readonly overlay = viewChild(CdkConnectedOverlay);
 
   protected readonly isOpen = signal(false);
-  protected readonly activeId = signal<string | null>(null);
+  private readonly activeEntry = signal<UiListEntry<T> | null>(null);
+  /** Id of the active option; `null` while an active item is not rendered. */
+  protected readonly activeId = computed(() => {
+    const entry = this.activeEntry();
+    if (entry instanceof UiOption) return entry.id;
+    if (!entry) return null;
+    return this.itemOptions().find((option) => option.value() === entry.value())?.id ?? null;
+  });
   protected readonly panelWidth = signal(0);
   protected readonly positions = POSITIONS;
 
@@ -134,7 +212,7 @@ export abstract class UiOptionPanel<T, V>
     () => !this.loading() && this.options().every((option) => option.filteredOut()),
   );
 
-  protected readonly keyManager = new ActiveDescendantKeyManager<UiOption<T>>(
+  protected readonly keyManager = new ActiveDescendantKeyManager<UiListEntry<T>>(
     this.listOptions,
     this.injector,
   )
@@ -152,11 +230,10 @@ export abstract class UiOptionPanel<T, V>
       isIndeterminate: (option) => this.isIndeterminate(option),
       isFilteredOut: (label, option) => this.isFilteredOut(label, option),
       isBlocked: (option) => this.isBlocked(option),
+      isActive: (option) => this.isActiveItem(option),
       selectOption: (value) => this.pick(value),
     });
-    this.keyManager.change.subscribe(() =>
-      this.activeId.set(this.keyManager.activeItem?.id ?? null),
-    );
+    this.keyManager.change.subscribe(() => this.activeEntry.set(this.keyManager.activeItem));
     // A list opened before the control became readonly or disabled must not stay open.
     effect(() => {
       if (this.readonly() || this.isDisabled()) untracked(() => this.close());
@@ -169,9 +246,24 @@ export abstract class UiOptionPanel<T, V>
         const active = this.keyManager.activeItem;
         if (!active || options.includes(active)) return;
         this.keyManager.setActiveItem(-1);
-        this.activeId.set(null);
+        this.activeEntry.set(null);
         if (this.isOpen() && this.activateOnOpen()) this.keyManager.setFirstItemActive();
       });
+    });
+    // The viewport needs the height of an option in pixels; it depends on the font size and on a
+    // description line, so measure a rendered one.
+    afterRenderEffect({
+      read: () => {
+        const rendered = this.itemOptions().length > 0;
+        const option = rendered
+          ? this.viewport()?.elementRef.nativeElement.querySelector('.ui-option')
+          : null;
+        const height = option?.getBoundingClientRect().height ?? 0;
+        if (height > 0 && height !== untracked(this.itemSize)) this.itemSize.set(height);
+      },
+    });
+    afterEveryRender(() => {
+      if (this.pendingReveal) this.reveal(this.pendingReveal);
     });
   }
 
@@ -220,6 +312,12 @@ export abstract class UiOptionPanel<T, V>
     return !label.toLocaleLowerCase().includes(query);
   }
 
+  /** Whether a rendered option shows the active entry of `items`. */
+  private isActiveItem(option: UiOptionHandle): boolean {
+    const entry = this.activeEntry();
+    return entry instanceof UiItemEntry && entry.value() === option.value();
+  }
+
   // --- Public API -----------------------------------------------------------------------
 
   focus(options?: FocusOptions): void {
@@ -241,7 +339,8 @@ export abstract class UiOptionPanel<T, V>
     if (!this.isOpen()) return;
     this.isOpen.set(false);
     this.keyManager.setActiveItem(-1);
-    this.activeId.set(null);
+    this.activeEntry.set(null);
+    this.pendingReveal = null;
     this.closed.emit();
   }
 
@@ -255,6 +354,9 @@ export abstract class UiOptionPanel<T, V>
   protected onOutsideClick(event: MouseEvent): void {
     if (!this.host.contains(event.target as Node)) this.close();
   }
+
+  /** Keeps the rendered options of `items` when the viewport recycles their views. */
+  protected readonly trackEntry = (_index: number, entry: UiItemEntry<T>): UiItemEntry<T> => entry;
 
   /** Selects the active option, if there is one that can be selected. Returns whether it did. */
   protected selectActive(): boolean {
@@ -280,5 +382,42 @@ export abstract class UiOptionPanel<T, V>
     const index = first ? this.listOptions().indexOf(first) : -1;
     if (index >= 0) this.keyManager.setActiveItem(index);
     else this.keyManager.setFirstItemActive();
+  }
+
+  /** Scrolls an active item into view; in the viewport it may not be rendered yet. */
+  private reveal(entry: UiItemEntry<T>): void {
+    const viewport = this.viewport();
+    if (!viewport) {
+      afterNextRender(
+        () => {
+          const id = this.activeId();
+          const element = id ? document.getElementById(id) : null;
+          // jsdom has no scrollIntoView.
+          if (element && 'scrollIntoView' in element) element.scrollIntoView({ block: 'nearest' });
+        },
+        { injector: this.injector },
+      );
+      return;
+    }
+    this.pendingReveal = null;
+    const index = this.visibleItems().indexOf(entry);
+    if (index < 0) return;
+    const size = this.itemSize();
+    const start = index * size;
+    const end = start + size;
+    const element = viewport.elementRef.nativeElement;
+    const offset = viewport.measureScrollOffset('top');
+    const height = element.clientHeight;
+    // Right after the list opens the viewport has not sized its content yet, and the browser
+    // would cut the scroll short. Try again after a render.
+    if (height > 0 && element.scrollHeight < end) {
+      this.pendingReveal = entry;
+      return;
+    }
+    if (start < offset || height === 0) {
+      if (start !== offset) viewport.scrollToOffset(start);
+    } else if (end > offset + height) {
+      viewport.scrollToOffset(end - height);
+    }
   }
 }
