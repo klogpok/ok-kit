@@ -7,8 +7,13 @@ Issues and specs for this repo live as markdown files in `.scratch/`.
 - One feature per directory: `.scratch/<feature-slug>/`
 - The spec is `.scratch/<feature-slug>/spec.md`
 - Implementation issues are one file per ticket at `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01`, never a single combined tickets file
-- Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings)
+- Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings), mirrored by a `Статус:` line in the translation. A finished ticket is `done` (`сделано` in Russian); the triage roles stay in English in both lines
 - Comments and conversation history append to the bottom of the file under a `## Comments` heading
+- `node scripts/check-scratch.mjs` checks the status lines, the translation section and that both checklists tick the same items; the pre-commit hook runs it
+
+## Open review questions
+
+Every question a phase report leaves to the user is its own ticket in that feature's `issues/`, with `Status: needs-info`, the facts in the body and the options to choose from. Answered, it becomes `done`, and the answer goes to `docs/DECISIONS.md`. So "what is still open" is the list of `needs-info` tickets: `DECISIONS.md` holds answers only.
 
 ## When a skill says "publish to the issue tracker"
 
