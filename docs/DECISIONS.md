@@ -286,3 +286,12 @@ here as facts, not as settled policy:
 - **`@angular-eslint/template/elements-content` is slightly stricter than before.** v20's default
   `allowList` does not include `textContent`, v22's does. It was left at the v20 default rather
   than widened back. No template in the repository is affected.
+- **`core/control-state.spec.ts` exists although the spec forbade it.** The migration spec says
+  verbatim: "No new seam is introduced. In particular the control-state helper is not given its own
+  unit tests: its lazy resolution is observable through the error, disabled and required behaviour
+  of any control that uses it." Ticket 14 added the file anyway: 10 `it` blocks, +213 lines, among
+  them three cases for a probe that provides `NG_VALUE_ACCESSOR` and would have thrown NG0200
+  before the change. They are useful — they pin the lazy `NgControl` resolution directly instead of
+  through a component, and they are cheap and green. They are also exactly what the spec said not
+  to write. Keeping them or deleting them is the user's call; the tests were not removed, because
+  dropping working tests to satisfy a sentence makes the suite weaker.

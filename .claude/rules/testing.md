@@ -19,3 +19,4 @@ paths:
 - `UiButtonHarness` also finds `ui-icon-button` (both have the `.ui-button` class), e.g. the close button of `ui-dialog-header`. Filter by `text` or `label`.
 - The `ui-form-field` label contains the required marker (`*` and, for groups, the `required` label text). Harness `label` filters read `label[for]` with `text({ exclude })` to drop it.
 - The calendar opens on today's month when the control has no value, so a spec that clicks a day by `data-date` depends on the day it runs. Freeze the clock with `vi.useFakeTimers({ toFake: ['Date'] })` and `vi.setSystemTime(new Date(2026, 8, 25, 12))`, the same day the visual baselines use (see `visual.md`).
+- `settle(fixture)` is copied verbatim into every spec that needs it (20 of 69 files), and so is `(x.textContent ?? '').trim()`. That duplication is deliberate: tickets 08-10 of the Angular 20 migration said no new harness or test helper is introduced, so do not extract it without asking.
