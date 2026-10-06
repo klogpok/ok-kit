@@ -1,6 +1,6 @@
 # ui-kit workspace
 
-This Angular 22 workspace contains the `@vplans/ui-kit` design system.
+This Angular 20 workspace contains the `@vplans/ui-kit` design system.
 
 | Project                | Path                   | Purpose                                                           |
 | ---------------------- | ---------------------- | ----------------------------------------------------------------- |
