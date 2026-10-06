@@ -273,7 +273,7 @@ Do not re-add Signal Forms, in any shape, without reading this entry first.
   `strictTypeChecked` rule set is unchanged. Three rules ESLint 10 had in its recommended set are
   now enabled by hand in `eslint.config.js`.
 
-Four consequences of the migration are **open and need the user's decision**; they are recorded
+Three consequences of the migration are **open and need the user's decision**; they are recorded
 here as facts, not as settled policy:
 
 - **Coverage thresholds are gone.** The Angular 20 `@angular/build:unit-test` builder has no
@@ -286,12 +286,21 @@ here as facts, not as settled policy:
 - **`@angular-eslint/template/elements-content` is slightly stricter than before.** v20's default
   `allowList` does not include `textContent`, v22's does. It was left at the v20 default rather
   than widened back. No template in the repository is affected.
-- **`core/control-state.spec.ts` exists although the spec forbade it.** The migration spec says
-  verbatim: "No new seam is introduced. In particular the control-state helper is not given its own
-  unit tests: its lazy resolution is observable through the error, disabled and required behaviour
-  of any control that uses it." Ticket 14 added the file anyway: 10 `it` blocks, +213 lines, among
-  them three cases for a probe that provides `NG_VALUE_ACCESSOR` and would have thrown NG0200
-  before the change. They are useful — they pin the lazy `NgControl` resolution directly instead of
-  through a component, and they are cheap and green. They are also exactly what the spec said not
-  to write. Keeping them or deleting them is the user's call; the tests were not removed, because
-  dropping working tests to satisfy a sentence makes the suite weaker.
+
+## Angular 20 migration: `core/control-state.spec.ts` stays (decided 2026-10-07)
+
+The migration spec forbade it in so many words: "No new seam is introduced. In particular the
+control-state helper is not given its own unit tests: its lazy resolution is observable through the
+error, disabled and required behaviour of any control that uses it." The reason was that tests
+should assert what a user of a control observes, not how the control obtained its form state —
+the internals the migration was rewriting.
+
+The file was written anyway: ticket 13 created it (a probe directive on a native input, bound and
+unbound), and ticket 14 added three cases for a probe that provides `NG_VALUE_ACCESSOR` and would
+have thrown NG0200 before the change — 10 `it` blocks in all.
+
+Review answer: **keep the tests.** `injectControlState()` is exported from `@vplans/ui-kit/core`
+and native inputs use it directly, so it is public API and a legitimate seam of its own, not an
+internal. The tests assert the `UiControlState` signals (`bound`, required, disabled, invalid,
+touched), not when or how `NgControl` was injected, and the NG0200 cases pin the migration's main
+risk directly instead of through a whole control failing.
