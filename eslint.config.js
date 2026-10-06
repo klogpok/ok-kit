@@ -42,6 +42,13 @@ module.exports = tseslint.config(
       '@angular-eslint/prefer-standalone': 'error',
       '@angular-eslint/use-lifecycle-interface': 'error',
       'no-console': ['error', { allow: ['warn', 'error'] }],
+      // ESLint 10 promoted these three rules into `eslint:recommended` and flipped the
+      // `reportGlobalThis` default to true. ESLint 9 ships all four, so they are configured by
+      // hand to keep the rule set the workspace had before the Angular 20 downgrade.
+      'no-unassigned-vars': 'error',
+      'no-useless-assignment': 'error',
+      'preserve-caught-error': 'error',
+      'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
       // `() => this.value.set(x)` is the usual Angular callback shape.
       '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
       // Numbers read fine in template strings (ids, labels such as "Page 3").
