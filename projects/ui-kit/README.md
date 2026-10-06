@@ -1601,6 +1601,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
    ```
 
    The accessor provider goes on **every** concrete control: Angular does not inherit `providers` metadata into a subclass that carries its own decorator, and `UiFormControlBase` stays the only implementation of the accessor methods. Such a control must not inject `NgControl` while it is constructed — that is a circular dependency (NG0200); the base class reads its form state through `injectControlState()`, which resolves `NgControl` lazily on the first `sync()`. For a native element, use `injectControlState()` and provide no accessor of your own (Angular's default one already covers it). A checkbox-like control extends `UiCheckableBase` and also provides `provideUiCheckedValidator()`, so `required` means checked.
+
 7. Add a harness for the component to `projects/ui-kit/testing/` (`<name>-harness.ts` extending `UiHarness`, with a spec), export it from `public-api.ts` and list it under [Testing](#testing).
 8. Required tests:
    - rendering and inputs;
