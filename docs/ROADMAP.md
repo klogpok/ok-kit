@@ -293,8 +293,6 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 - **порогов покрытия больше нет**: у билдера `@angular/build:unit-test` 20.3 нет опции порогов, и он
   стартует Vitest с `config: false`, так что `vitest.config.ts` их тоже не подаст. Пороги не
   понижали — инструмент их больше не предлагает;
-- **hot module replacement в Storybook выключен** на webpack-билдере (с ним preview не
-  отрисовывался вовсе); dev-сервер пересобирается, но страницу надо обновлять руками;
 - **правило `@angular-eslint/template/elements-content` стало чуть строже**: в `allowList` по
   умолчанию у v20 нет `textContent`, в отличие от v22. Оставлено на умолчании v20; ни один шаблон в
   репозитории это не задевает.

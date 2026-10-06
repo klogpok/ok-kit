@@ -273,19 +273,35 @@ Do not re-add Signal Forms, in any shape, without reading this entry first.
   `strictTypeChecked` rule set is unchanged. Three rules ESLint 10 had in its recommended set are
   now enabled by hand in `eslint.config.js`.
 
-Three consequences of the migration are **open and need the user's decision**; they are recorded
+Two consequences of the migration are **open and need the user's decision**; they are recorded
 here as facts, not as settled policy:
 
 - **Coverage thresholds are gone.** The Angular 20 `@angular/build:unit-test` builder has no
   threshold option and starts Vitest with `config: false`, so a `vitest.config.ts` cannot supply
   them either. They were not lowered — the tooling no longer offers them. `pnpm test:coverage`
   still reports coverage.
-- **Storybook hot module replacement is off** on the webpack builder. With it on, the preview
-  never rendered (the hot middleware reported a compilation hash the served bundle did not have).
-  The dev server still rebuilds on change; the page has to be refreshed by hand.
 - **`@angular-eslint/template/elements-content` is slightly stricter than before.** v20's default
   `allowList` does not include `textContent`, v22's does. It was left at the v20 default rather
   than widened back. No template in the repository is affected.
+
+## Angular 20 migration: Storybook hot module replacement is back (decided 2026-10-07)
+
+Ticket 17 switched hot module replacement off in `.storybook/main.ts` because the preview never
+rendered with it: the hot middleware reported a compilation hash the served bundle did not have,
+the client asked for a `hot-update.json` that was never emitted, and the page reloaded in a loop.
+
+The cause was not the webpack builder. While ticket 17 was being worked, eight Storybook dev
+servers were started one after another and never stopped. Every dev server writes the preview to
+the same directory, `node_modules/.cache/storybook/<version>/<hash>/public`, and serves it from
+there; on any source change all of them rebuilt and overwrote each other's bundles. The servers
+started earlier also still resolved `@storybook/angular` to copies that the install had since
+replaced, so the overwritten `main.iframe.bundle.js` waited for a vendor chunk that `iframe.html`
+did not load, and the preview stayed blank without an error.
+
+Review answer: **turn it back on.** With a single dev server, a story edit is applied in place, an
+edit to a component's template or stylesheet is applied and followed by one automatic reload (the
+component module does not accept updates itself), and a global stylesheet edit is applied in
+place. Run one Storybook dev server at a time.
 
 ## Angular 20 migration: `core/control-state.spec.ts` stays (decided 2026-10-07)
 

@@ -149,3 +149,29 @@ Storybook.
 каждую стори пиксель в пиксель так же, как Vite. Тикет 16: `pnpm lint` проходит, уведомление
 angular-eslint о несовпадении мажора не изменилось. Тикет 20: hot module replacement в витрине —
 единственная возможность, которую миграция потеряла.
+
+### 2026-10-07 — hot module replacement is back
+
+The "hash mismatch" above was not the webpack builder. Eight Storybook dev servers had been started
+while this ticket was worked and were still running; all of them write the preview to the same
+`node_modules/.cache/storybook/.../public` and serve it from there, so every rebuild overwrote the
+others' bundles. The older ones still resolved `@storybook/angular` to copies the install had
+replaced, so `main.iframe.bundle.js` ended up waiting for a vendor chunk `iframe.html` never
+loaded. With the stale servers stopped and a single dev server running, hot module replacement
+works: a story edit is applied in place, a component template or stylesheet edit is applied and
+followed by one automatic reload, a global stylesheet edit is applied in place, and a full reload
+after any rebuild renders. The stripping in `main.ts` is removed. See DECISIONS, "Storybook hot
+module replacement is back".
+
+### 2026-10-07 — hot module replacement возвращён
+
+«Расхождение хешей» выше было не из-за webpack-билдера. Пока шла работа над тикетом, было запущено
+восемь dev-серверов Storybook, и они продолжали работать; все они пишут preview в одну и ту же папку
+`node_modules/.cache/storybook/.../public` и отдают его оттуда, поэтому каждая пересборка затирала
+бандлы остальных. Старые серверы к тому же резолвили `@storybook/angular` в копии, которые установка
+уже заменила, и `main.iframe.bundle.js` ждал vendor-чанк, который `iframe.html` не загружал. Когда
+старые серверы остановлены и работает один dev-сервер, hot module replacement работает: правка
+стори применяется на месте, правка шаблона или стилей компонента применяется и сопровождается одной
+автоматической перезагрузкой, правка глобальных стилей применяется на месте, а полная перезагрузка
+после любой пересборки отрисовывает стори. Вырезание HMR из `main.ts` убрано. См. DECISIONS, «Storybook
+hot module replacement is back».
