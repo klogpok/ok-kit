@@ -13,6 +13,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LiveAnnouncer, _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -92,6 +93,7 @@ import { UiChip, UiChipSet, UiChipSetFallback } from './chip';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiChipInput) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiChipInput), multi: true },
     UiChipSetFallback,
   ],
   host: {

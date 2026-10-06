@@ -15,6 +15,7 @@ import {
   viewChild,
   viewChildren,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -461,7 +462,10 @@ const HOST = {
   template: TEMPLATE,
   styleUrl: './slider.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSlider) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSlider) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSlider), multi: true },
+  ],
   host: HOST,
 })
 export class UiSlider extends UiSliderBase<number> {
@@ -512,7 +516,10 @@ export class UiSlider extends UiSliderBase<number> {
   template: TEMPLATE,
   styleUrl: './slider.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRangeSlider) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRangeSlider) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiRangeSlider), multi: true },
+  ],
   host: {
     ...HOST,
     role: 'group',

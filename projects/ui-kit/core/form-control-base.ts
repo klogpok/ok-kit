@@ -8,18 +8,19 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { ControlValueAccessor } from '@angular/forms';
 import { injectControlState } from './control-state';
 import { UI_FORM_FIELD } from './form-field-control';
 
 /**
  * Base class for custom (non-native) form controls such as checkbox, switch and radio group.
  *
- * Reactive and template forms are the forms contract: the control registers itself as the
- * `ControlValueAccessor` of the host's `NgControl`. It assigns `valueAccessor` directly rather than
- * providing `NG_VALUE_ACCESSOR`, which a control that injects `NgControl` cannot do without a
- * circular dependency. Subclasses keep their `value` or `checked` model, so a control also works
- * standalone with `[(value)]` / `[(checked)]`.
+ * Reactive and template forms are the forms contract. The base class is the only implementation of
+ * the accessor methods, but each concrete control declares the `NG_VALUE_ACCESSOR` provider itself:
+ * Angular does not inherit `providers` metadata into a subclass that carries its own decorator.
+ * Because of that provider the control must not inject `NgControl` while it is being constructed
+ * (NG0200); the control state resolves the directive lazily instead. Subclasses keep their `value`
+ * or `checked` model, so a control also works standalone with `[(value)]` / `[(checked)]`.
  *
  * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`. `writeValue` sets the
  * model, so its output (`valueChange` / `checkedChange`) also fires for values written by the
@@ -29,8 +30,6 @@ import { UI_FORM_FIELD } from './form-field-control';
 export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCheck {
   protected readonly controlState = injectControlState();
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
-  /** Reactive / template forms directive on the host, when bound through CVA. */
-  protected readonly ngControl = inject(NgControl, { self: true, optional: true });
 
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly required = input(false, { transform: booleanAttribute });
@@ -57,7 +56,7 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   readonly showError = computed(
     () =>
       this.ownErrors().length > 0 ||
-      (this.controlState.bound
+      (this.controlState.bound()
         ? this.controlState.invalid() && this.controlState.touched()
         : this.invalid()),
   );
@@ -68,10 +67,6 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   readonly errorMessages = computed(() => [
     ...new Set([...this.ownErrors(), ...this.controlState.errorMessages()]),
   ]);
-
-  constructor() {
-    if (this.ngControl) this.ngControl.valueAccessor = this;
-  }
 
   /** `setValidators()` and `addValidators()` emit no event, so re-read the control state here. */
   ngDoCheck(): void {

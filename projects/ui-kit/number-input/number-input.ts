@@ -13,6 +13,7 @@ import {
   numberAttribute,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -124,7 +125,10 @@ const optionalNumber = (value: unknown): number | null =>
   `,
   styleUrl: './number-input.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiNumberInput) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiNumberInput) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiNumberInput), multi: true },
+  ],
   host: {
     class: 'ui-number-input',
     '[class]': '"ui-number-input--" + size()',
