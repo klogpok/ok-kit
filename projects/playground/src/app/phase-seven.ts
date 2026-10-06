@@ -27,6 +27,7 @@ import {
   uiSortData,
 } from '@vplans/ui-kit/table';
 import { UiToast } from '@vplans/ui-kit/toast';
+import { readyToSubmit } from './submit';
 import { uiAtLeastOne, uiRequired } from './validators';
 
 interface Person {
@@ -145,11 +146,7 @@ export class PhaseSeven {
 
   protected async save(event: Event): Promise<void> {
     event.preventDefault();
-    // The messages show only on a touched field, so an empty submit has to touch them all.
-    if (this.order.invalid) {
-      this.order.markAllAsTouched();
-      return;
-    }
+    if (!readyToSubmit(this.order)) return;
     await this.upload(this.order.getRawValue().files);
     this.toast.success('The work order was saved');
   }

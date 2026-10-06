@@ -31,6 +31,7 @@ import { PhaseEight } from './phase-eight';
 import { PhaseSeven } from './phase-seven';
 import { PhaseSix } from './phase-six';
 import { PhaseThree } from './phase-three';
+import { readyToSubmit } from './submit';
 
 interface Plan {
   name: string;
@@ -164,11 +165,7 @@ export class App {
 
   protected async save(event: Event): Promise<void> {
     event.preventDefault();
-    // The messages show only on a touched field, so an empty submit has to touch them all.
-    if (this.profile.invalid) {
-      this.profile.markAllAsTouched();
-      return;
-    }
+    if (!readyToSubmit(this.profile)) return;
     this.saving.set(true);
     await new Promise((resolve) => setTimeout(resolve, 1200));
     this.saving.set(false);
