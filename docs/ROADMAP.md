@@ -7,7 +7,7 @@
 В ките есть:
 - базовые контролы, оверлеи, таблица, datepicker;
 - токены, тема и RTL;
-- проверки: coverage-пороги, `pnpm test-storybook` (axe по всем stories в 3 режимах), ESLint strictTypeChecked.
+- проверки: coverage-пороги, `pnpm test-storybook` (axe по всем stories в 3 режимах), ESLint strictTypeChecked. *(Пороги покрытия исчезли при переходе на Angular 20 — см. фазу «Миграция на Angular 20».)*
 
 Приложению VPlans всё ещё не хватает частых блоков: алерты, пустые состояния, drawer, popover, breadcrumbs, выбор строк в таблице, числовой ввод, chips, диапазон дат и т.д. Без них команды пишут одноразовые решения, а SPEC ставит цель это прекратить.
 
@@ -38,7 +38,7 @@
 - Формконтролы:
   - кастомные — наследовать `UiFormControlBase` (`core/form-control-base.ts`), а для checkbox-подобных — `UiCheckableBase`, это даёт readonly, describedby и required;
   - нативные — `injectControlState()`;
-  - Signal Forms напрямую, CVA через `ngControl.valueAccessor`.
+  - формы — только реактивные и шаблонные через `ControlValueAccessor`: каждый конкретный контрол сам отдаёт `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }` (Signal Forms удалены, см. журнал решений).
 - Stories: по одной на состояние, args только там, где шаблон их использует; `pnpm test-storybook` и визуальные снимки должны проходить.
 
 ---
@@ -237,6 +237,60 @@
   - tree принимает вложенные `children` (+ accessor).
 - **9:** визуальные базовые снимки хранятся в git.
 
+## Миграция на Angular 20 (сделано 2026-10-06)
+
+> **Статус: сделано, ждёт ревью пользователя.** Отдельная фаза между 8.5 и 8.6: фазы 8.6 и 8.7
+> сознательно отложены до её окончания, чтобы ни один новый компонент не писался под удаляемый API.
+> Спека и тикеты — в `.scratch/ng20-migration/`.
+
+**Зачем.** Единственное приложение, которое потребляет кит, работает на Angular 20 и обновлено не
+будет (решение организационное). Оно берёт кит копированием исходников, поэтому исходники обязаны
+компилироваться компилятором Angular 20, а Signal Forms в Angular 20 не существует. До миграции
+приложение не могло пользоваться китом вообще.
+
+**Что дала фаза.**
+
+- **Signal Forms удалены целиком** — без флага, отдельной точки входа и локальной замены. Решение
+  фазы 2 отменено; причина записана в [DECISIONS.md](DECISIONS.md), исходное решение не стёрто.
+  `ControlValueAccessor` — единственный контракт форм: `formControl`, `formControlName`, `ngModel`.
+- **Регистрация через `NG_VALUE_ACCESSOR`.** Шестнадцать конкретных контролов сами отдают токен
+  (Angular не наследует `providers` в наследника со своим декоратором); `UiFormControlBase` остаётся
+  единственной реализацией методов accessor и больше не присваивает себя в `NgControl.valueAccessor`.
+  `injectControlState()` принимает `Injector` и разрешает `NgControl` на первом `sync()` — иначе
+  NG0200; `UiControlState.bound` стал сигналом. Оба базовых класса синхронизируются ещё и в
+  `ngAfterViewInit`.
+- **Сообщения разбора текста** у `ui-number-input`, `ui-time-input`, `ui-datepicker`,
+  `ui-date-range-picker` и `ui-file-upload` живут в `ownErrors()` компонента и не доходят до контрола
+  формы потребителя. У `ui-stepper` `control` шага — только `AbstractControl`.
+- **Тулчейна на Angular 20**: Angular и CLI/build — `^20.3.0`, `@angular/cdk` — `^20.2.0` (релиза
+  20.3 у CDK нет), TypeScript `~5.8.3`, Vitest `^3.2.0`, Vite `^7.1.11`, `ng-packagr` `^20.3.0`.
+  Библиотека осталась зонлесс: Angular 20 по умолчанию зонный, поэтому TestBed каждого проекта
+  получает `providersFile` с `provideZonelessChangeDetection()`.
+- **Линт** — `angular-eslint` 20.7.0 и ESLint 9; `typescript-eslint` остался на 8.69.0, так что
+  наборы `strictTypeChecked` и `stylisticTypeChecked` те же. Три правила, которые ESLint 10 держал в
+  recommended, включены вручную в `eslint.config.js`.
+- **Storybook** остался на 10.6.0, но переехал с `@storybook/angular-vite` на `@storybook/angular`
+  (webpack): Vite-фреймворк требует Angular 21 или новее. Зонлесс сохранён опцией
+  `experimentalZoneless` билдера. Визуальные бейслайны **не переснимались** — webpack рисует каждую
+  стори пиксель в пиксель так же, как Vite.
+- Публичная поверхность точек входа, кроме слоя форм, не изменилась; внешний вид компонентов —
+  тоже.
+
+**Проверки.** Полный чеклист зелёный на каждом этапе: 729 юнит-тестов в 69 файлах, 7 тестов
+playground, `lint` и `format:check` чисто, обе сборки и `build-storybook` успешны, 263 стори в
+3 режимах без нарушений axe и без визуальных изменений.
+
+**Открыто — нужно решение пользователя (не считать принятым):**
+
+- **порогов покрытия больше нет**: у билдера `@angular/build:unit-test` 20.3 нет опции порогов, и он
+  стартует Vitest с `config: false`, так что `vitest.config.ts` их тоже не подаст. Пороги не
+  понижали — инструмент их больше не предлагает;
+- **hot module replacement в Storybook выключен** на webpack-билдере (с ним preview не
+  отрисовывался вовсе); dev-сервер пересобирается, но страницу надо обновлять руками;
+- **правило `@angular-eslint/template/elements-content` стало чуть строже**: в `allowList` по
+  умолчанию у v20 нет `textContent`, в отличие от v22. Оставлено на умолчании v20; ни один шаблон в
+  репозитории это не задевает.
+
 ## Критичные файлы и что переиспользовать
 
 - `select/select-base.ts`, `select/option.ts` — оверлей, `labelFor`, `matches` → общая панель (7.7), clearable и loading (6.8).
@@ -250,6 +304,6 @@
 ## Проверка (каждая фаза)
 
 1. `pnpm tokens && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm test:playground && pnpm build && pnpm build:playground && pnpm build-storybook && pnpm test-storybook && pnpm test-visual`, плюс `pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit`.
-2. Для каждого компонента: спеки на рендер, inputs/outputs, клавиатуру и ARIA; для контролов ещё Signal Forms, Reactive (включая `formControlName`) и ngModel. Harness из 6.0 для новых компонентов.
+2. Для каждого компонента: спеки на рендер, inputs/outputs, клавиатуру и ARIA; для контролов ещё Reactive (включая `formControlName`) и ngModel. Harness из 6.0 для новых компонентов.
 3. Браузер (Edge через `playwright-core`) в light/dark/RTL: CSS-замеры и скриншоты ключевых состояний, как `browser-check.mjs` из фазы 5.
 4. Отчёт фазы: что сделано, что осталось, решения. Ждать одобрения.
