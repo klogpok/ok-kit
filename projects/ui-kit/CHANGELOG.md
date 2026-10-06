@@ -48,7 +48,7 @@ alongside it.
 - **storybook:** the workbench builds through `@storybook/angular` (webpack) instead of
   `@storybook/angular-vite`, which has no Angular 20 release. Stories, autodocs and the visual
   baselines are unchanged - every story renders pixel-identically. Hot module replacement in the
-  dev server is off; the page has to be refreshed by hand after a change.
+  dev server works as before.
 - **tooling:** coverage thresholds are no longer enforced. The Angular 20 unit-test builder has no
   threshold option and starts Vitest with `config: false`. They were not lowered; the tooling
   stopped offering them.
