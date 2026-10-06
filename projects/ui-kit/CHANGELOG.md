@@ -3,6 +3,56 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## 0.2.0 - 2026-10-06 (Angular 20 migration)
+
+The library targets Angular 20 and Signal Forms is gone. Both are breaking: the package no longer
+compiles or installs against Angular 21 or 22, and every binding written against the Signal Forms
+API has to be rewritten as a Reactive or template-driven form. The sections below cover the
+migration only; the component work listed under the phase headings further down is unreleased
+alongside it.
+
+### Breaking
+
+- **forms:** Signal Forms support is removed from the library entirely - no entry point, no flag,
+  no compatibility shim. `ControlValueAccessor` is the only forms contract: bind every control
+  with `formControl`, `formControlName` or `ngModel`. `[field]` bindings, the `FormValueControl`
+  implementations and every import of `@angular/forms/signals` are gone. Reactive and
+  template-driven behaviour is unchanged: value in both directions, `disable()`, `readonly`, the
+  required marker, `touched` on blur, and errors shown once a control is both invalid and touched.
+- **forms:** custom controls now register through the `NG_VALUE_ACCESSOR` provider instead of
+  assigning `NgControl.valueAccessor`. A consumer that subclasses `UiFormControlBase` must declare
+  `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }` on its own
+  decorator; Angular does not inherit `providers` metadata into a subclass that carries its own
+  decorator.
+- **core:** `injectControlState()` takes an `Injector` and resolves `NgControl` lazily, on the
+  first `sync()`, because a control that provides `NG_VALUE_ACCESSOR` and injects `NgControl`
+  eagerly is a circular dependency (NG0200). `UiControlState` keeps every member; `bound` is now a
+  `Signal<boolean>` rather than a plain boolean.
+- **stepper:** `ui-step`'s `control` accepts a Reactive Forms control only. The union with a
+  Signal Forms field, and the branch that read validity out of it, are removed.
+- **number-input / time / datepicker / file-upload:** a parse error is held in the component's own
+  error collection instead of a Signal Forms transform. It is displayed as before and never
+  reaches the consumer's form control, so typed garbage no longer makes the form invalid by
+  itself.
+
+### Changed
+
+- **peer dependencies:** Angular 20 only. `@angular/common`, `@angular/core`, `@angular/forms`,
+  `@angular/platform-browser` and the optional `@angular/router` are `^20.3.0`; `@angular/cdk` is
+  `^20.2.0`, the last line the CDK published for v20. `rxjs` stays `^7.8.0`. Angular 21 and 22 are
+  no longer supported.
+- The package name is unchanged: `@vplans/ui-kit`.
+- **tooling:** TypeScript 5.8, Vitest 3, ESLint 9 with angular-eslint 20, ng-packagr 20. The
+  library remains zoneless; tests and the playground provide `provideZonelessChangeDetection()`
+  explicitly, since Angular 20 is zone-based by default.
+- **storybook:** the workbench builds through `@storybook/angular` (webpack) instead of
+  `@storybook/angular-vite`, which has no Angular 20 release. Stories, autodocs and the visual
+  baselines are unchanged - every story renders pixel-identically. Hot module replacement in the
+  dev server is off; the page has to be refreshed by hand after a change.
+- **tooling:** coverage thresholds are no longer enforced. The Angular 20 unit-test builder has no
+  threshold option and starts Vitest with `config: false`. They were not lowered; the tooling
+  stopped offering them.
+
 ## Unreleased (phase 8: complex widgets)
 
 ### Added
