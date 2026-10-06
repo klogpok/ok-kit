@@ -166,3 +166,27 @@ Also updated `.claude/rules/forms.md`, whose CVA bullet described the assignment
 
 Также обновлён `.claude/rules/forms.md`: его пункт про CVA описывал то самое присваивание, которое
 этот тикет убрал.
+
+### 2026-10-06 (recorded after the review)
+
+**Deviation, recorded late.** The checkbox above says native text inputs "keep working unchanged",
+and the spec says they are "unaffected beyond the helper's internal change". That is not literally
+true: `UiTextControlBase` gained an `ngAfterViewInit` that calls `state.sync()` a second time. The
+reason is the hook ordering described in the entry above — without the eager `inject(NgControl)`,
+the single `ngDoCheck` of a native input runs before `setUpControl`, so the first `sync()` finds no
+control and `aria-required` / the control-derived error state never appear. The change is necessary
+and correct, and the rendered behaviour is the same as before; what was missing is this note. The
+identical hook on `UiFormControlBase` was recorded in ticket 15, this one was not. It is now also
+stated in `.claude/rules/forms.md`.
+
+#### Русский перевод
+
+**Отклонение, записанное задним числом.** Галочка выше говорит, что нативные текстовые поля
+«продолжают работать без изменений», а спека — что их не затрагивает ничего, кроме внутреннего
+изменения помощника. Буквально это не так: у `UiTextControlBase` появился `ngAfterViewInit`,
+который второй раз зовёт `state.sync()`. Причина — порядок хуков, описанный в записи выше: без
+раннего `inject(NgControl)` единственный `ngDoCheck` нативного поля отрабатывает до `setUpControl`,
+первый `sync()` не находит контрола, и ни `aria-required`, ни состояние ошибки из контрола не
+появляются. Изменение необходимо и корректно, отрисовка не изменилась — не хватало именно этой
+записи. Такой же хук у `UiFormControlBase` был записан в тикете 15, а этот — нет. Теперь он назван
+и в `.claude/rules/forms.md`.
