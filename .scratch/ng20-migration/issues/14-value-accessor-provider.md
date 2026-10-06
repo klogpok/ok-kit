@@ -29,14 +29,14 @@ ngOnInit(): void {
 
 **Blocked by:** 13
 
-**Status:** ready-for-agent
+**Status:** done, waiting for the user's review
 
-- [ ] Each of the fifteen concrete custom controls provides the value accessor token pointing at itself; the shared base class remains the only implementation of the accessor methods
-- [ ] The base class no longer injects the forms directive during construction and no longer assigns itself to it
-- [ ] The control-state helper resolves the forms directive lazily, inside the synchronisation call its interface already declares
-- [ ] The "is a forms directive bound" flag of the control state becomes a signal, and everything reading it is updated
-- [ ] Native text inputs, which provide no accessor of their own, keep working unchanged
-- [ ] The full check passes, and no spec is weakened or skipped to get there
+- [x] Each of the fifteen concrete custom controls provides the value accessor token pointing at itself; the shared base class remains the only implementation of the accessor methods
+- [x] The base class no longer injects the forms directive during construction and no longer assigns itself to it
+- [x] The control-state helper resolves the forms directive lazily, inside the synchronisation call its interface already declares
+- [x] The "is a forms directive bound" flag of the control state becomes a signal, and everything reading it is updated
+- [x] Native text inputs, which provide no accessor of their own, keep working unchanged
+- [x] The full check passes, and no spec is weakened or skipped to get there
 
 ## Русский перевод
 
@@ -70,11 +70,99 @@ ngOnInit(): void {
 
 **Блокируется:** 13
 
-**Статус:** ready-for-agent
+**Статус:** done, waiting for the user's review
 
-- [ ] Каждый из пятнадцати конкретных кастомных контролов отдаёт токен value accessor, указывающий на себя; общий базовый класс остаётся единственной реализацией методов accessor
-- [ ] Базовый класс больше не инжектит директиву формы при конструировании и не присваивает себя в неё
-- [ ] Помощник состояния контрола разрешает директиву формы лениво, внутри вызова синхронизации, который уже объявлен в его интерфейсе
-- [ ] Флаг «директива формы связана» в состоянии контрола становится сигналом, всё читающее его обновлено
-- [ ] Нативные текстовые поля, которые своего accessor не отдают, продолжают работать без изменений
-- [ ] Полная проверка проходит, и ни один спек ради этого не ослаблен и не пропущен
+- [x] Каждый из пятнадцати конкретных кастомных контролов отдаёт токен value accessor, указывающий на себя; общий базовый класс остаётся единственной реализацией методов accessor
+- [x] Базовый класс больше не инжектит директиву формы при конструировании и не присваивает себя в неё
+- [x] Помощник состояния контрола разрешает директиву формы лениво, внутри вызова синхронизации, который уже объявлен в его интерфейсе
+- [x] Флаг «директива формы связана» в состоянии контрола становится сигналом, всё читающее его обновлено
+- [x] Нативные текстовые поля, которые своего accessor не отдают, продолжают работать без изменений
+- [x] Полная проверка проходит, и ни один спек ради этого не ослаблен и не пропущен
+
+## Comments
+
+### 2026-10-06
+
+Sixteen concrete controls, not fifteen, carry the provider: `slider` holds both `ui-slider` and
+`ui-range-slider`. The count in the ticket came from the entry points; the two sliders are separate
+components with separate decorators, so each needs its own `providers` entry.
+
+What changed:
+
+- `injectControlState()` takes an `Injector` and resolves `NgControl` on the first `sync()`;
+  `UiControlState.bound` is a `Signal<boolean>`. Its two readers, `UiFormControlBase.showError` and
+  `UiTextControlBase.showError`, call it.
+- `UiFormControlBase` no longer injects `NgControl` and has no constructor.
+- Each concrete control adds `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }`.
+
+One decision had to be made. Dropping the eager `inject(NgControl)` broke two native-input specs in
+`form-field.spec.ts` (`aria-required` missing). The cause is not the laziness itself: injecting a
+directive also instantiates it, and Angular registers the pre-order hooks in instantiation order, so
+the old eager injection put `FormControlName.ngOnChanges` ahead of `UiTextControlBase.ngDoCheck`.
+Without it, the first and only `ngDoCheck` of that spec ran before `setUpControl`, so `sync()` found
+no control. A custom control does not have this problem, because `setUpControl` calls
+`registerOnChange` / `registerOnTouched` on it and both call `sync()`. A native input provides no
+accessor, so nothing calls it back. The fix is one hook: `UiTextControlBase` syncs again in
+`ngAfterViewInit`, which runs after every pre-order hook of the view. No spec was changed to
+accommodate this.
+
+Rejected alternatives: giving the helper an "eager" option (two resolution paths for one helper),
+and retrying the resolution on every `sync()` (does not help, the spec only runs `ngDoCheck` once).
+
+Tests: three cases added to `control-state.spec.ts` for a probe that provides `NG_VALUE_ACCESSOR` —
+it would have thrown NG0200 before this change. The existing suites are the regression net.
+
+Full check, all green: lint, `format:check`, 729 unit tests (69 files, coverage 96.08% stmts /
+93.5% branches / 98.18% lines), 7 playground tests, `build`, `build:playground` (no budget
+warnings), `build-storybook`, 263 stories x 3 modes with no a11y violations, visual comparison with
+no changes, and the story type-check. Browser check in the playground: required markers, errors on
+submit, error clearing, and two-way value flow through the checkbox and switch all behave as before;
+no console errors.
+
+Drive-by: `chip-input.spec.ts` and `multi-select.spec.ts` were left unformatted by an earlier
+ticket and failed `format:check`. Reformatted in a separate commit.
+
+Also updated `.claude/rules/forms.md`, whose CVA bullet described the assignment this ticket removed.
+
+### Русский перевод
+
+Провайдер несут шестнадцать конкретных контролов, а не пятнадцать: в `slider` живут и `ui-slider`,
+и `ui-range-slider`. Число в тикете шло от точек входа, а это два отдельных компонента со своими
+декораторами, поэтому у каждого свой `providers`.
+
+Что изменилось:
+
+- `injectControlState()` принимает `Injector` и разрешает `NgControl` при первом `sync()`;
+  `UiControlState.bound` стал `Signal<boolean>`. Его читают `UiFormControlBase.showError` и
+  `UiTextControlBase.showError` — оба обновлены.
+- `UiFormControlBase` больше не инжектит `NgControl`, конструктор удалён.
+- В каждый конкретный контрол добавлен `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }`.
+
+Пришлось принять одно решение. Снятие раннего `inject(NgControl)` сломало два спека нативного поля
+в `form-field.spec.ts` (пропал `aria-required`). Причина не в ленивости как таковой: инжект
+директивы её же и создаёт, а Angular регистрирует pre-order хуки в порядке создания, поэтому раньше
+`FormControlName.ngOnChanges` шёл перед `UiTextControlBase.ngDoCheck`. Без инжекта единственный в
+том спеке `ngDoCheck` отработал до `setUpControl`, и `sync()` не нашёл контрола. У кастомного
+контрола такой проблемы нет: `setUpControl` зовёт у него `registerOnChange` / `registerOnTouched`, а
+они зовут `sync()`. Нативное поле accessor не отдаёт, и звать его некому. Починка — один хук:
+`UiTextControlBase` синхронизируется ещё раз в `ngAfterViewInit`, который идёт после всех pre-order
+хуков вью. Ни один спек ради этого не менялся.
+
+Отвергнутые варианты: опция «eager» у помощника (два пути разрешения в одном помощнике) и повторное
+разрешение на каждом `sync()` (не помогает — `ngDoCheck` в том спеке случается один раз).
+
+Тесты: в `control-state.spec.ts` добавлены три кейса на пробу, которая отдаёт `NG_VALUE_ACCESSOR`, —
+до этого изменения она падала бы с NG0200. Остальные наборы работают как сетка от регрессий.
+
+Полная проверка, всё зелёное: lint, `format:check`, 729 юнит-тестов (69 файлов, покрытие 96.08%
+операторов / 93.5% ветвей / 98.18% строк), 7 тестов playground, `build`, `build:playground` (без
+предупреждений по бюджетам), `build-storybook`, 263 истории в 3 режимах без нарушений доступности,
+сравнение бейслайнов без изменений и typecheck историй. Проверка в браузере на playground: маркеры
+обязательности, ошибки при отправке, их снятие и значение в обе стороны через чекбокс и свитч ведут
+себя как раньше; ошибок в консоли нет.
+
+Попутно: `chip-input.spec.ts` и `multi-select.spec.ts` остались неотформатированными после прошлого
+тикета и валили `format:check`. Переформатированы отдельным коммитом.
+
+Также обновлён `.claude/rules/forms.md`: его пункт про CVA описывал то самое присваивание, которое
+этот тикет убрал.
