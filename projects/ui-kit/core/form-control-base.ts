@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   DoCheck,
   Directive,
   booleanAttribute,
@@ -27,7 +28,7 @@ import { UI_FORM_FIELD } from './form-field-control';
  * forms directive; only `notifyChange` is limited to user changes.
  */
 @Directive()
-export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCheck {
+export abstract class UiFormControlBase<T> implements ControlValueAccessor, AfterViewInit, DoCheck {
   protected readonly controlState = injectControlState();
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
 
@@ -67,6 +68,16 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   readonly errorMessages = computed(() => [
     ...new Set([...this.ownErrors(), ...this.controlState.errorMessages()]),
   ]);
+
+  /**
+   * `registerOnChange` / `registerOnTouched` run while the forms directive is still attaching:
+   * `FormControlName` only assigns its `control` once `addControl()` has returned, and the first
+   * `ngDoCheck` of the component runs before that. Read the state again once the view is in place,
+   * when the directive is fully set up.
+   */
+  ngAfterViewInit(): void {
+    this.controlState.sync();
+  }
 
   /** `setValidators()` and `addValidators()` emit no event, so re-read the control state here. */
   ngDoCheck(): void {
