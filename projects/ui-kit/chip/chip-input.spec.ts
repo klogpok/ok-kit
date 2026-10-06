@@ -229,10 +229,10 @@ const atLeastTwo: ValidatorFn = (control) => {
 })
 class ReactiveHost {
   readonly locked = signal(false);
-  readonly emails = new FormControl<readonly string[]>(['dana@vplans.com'], [
-    Validators.required,
-    atLeastTwo,
-  ]);
+  readonly emails = new FormControl<readonly string[]>(
+    ['dana@vplans.com'],
+    [Validators.required, atLeastTwo],
+  );
 }
 
 describe('UiChipInput with Reactive Forms', () => {
