@@ -4,16 +4,14 @@ paths:
   - "projects/playground/**/*.ts"
 ---
 
-# Form controls: Signal Forms and CVA
+# Form controls: reactive and template forms through CVA
 
-- Signal Forms' `[formField]` sets the inputs `disabled`, `invalid`, `required`, `touched` and `name` on **every** directive of the host.
-- If a component provides `NG_VALUE_ACCESSOR`, `[formField]` falls back to CVA interop.
+- There is one forms contract: `ControlValueAccessor`, bound with `formControl`, `formControlName` or `ngModel`. Signal Forms is removed and must not come back — the consuming app is on Angular 20, where it does not exist (see `docs/DECISIONS.md`).
 - Every concrete custom control declares `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }` itself: Angular does not inherit `providers` metadata into a subclass with its own decorator. `UiFormControlBase` stays the only implementation of the accessor methods.
 - A component that provides `NG_VALUE_ACCESSOR` must not inject `NgControl` while it is constructed (NG0200). `injectControlState()` therefore resolves `NgControl` from an `Injector` on the first `sync()`, and `UiControlState.bound` is a signal, not a plain boolean.
 - Injecting a directive in a constructor also instantiates it, and Angular registers the pre-order hooks in instantiation order. Dropping the eager `inject(NgControl)` moved `UiTextControlBase.ngDoCheck` ahead of `FormControlName.ngOnChanges`, so the first `sync()` saw no control yet. Both bases therefore sync again in `ngAfterViewInit`.
 - `registerOnChange` / `registerOnTouched` are not enough on their own: `FormControlName._setUpControl()` only assigns `this.control` once `addControl()` has returned, and `setUpControl()` calls the accessor from inside that call, so `NgControl.control` is still undefined during both callbacks. On Angular 20 nothing else re-checks a clean OnPush control, so the required marker and the control-derived error state stayed off until `UiFormControlBase.ngAfterViewInit` was added.
 - A component cannot provide `NG_VALIDATORS` pointing at itself when it injects `NgControl` (circular DI). Provide a separate injectable (see `provideUiCheckedValidator()`).
-- Signal Forms `required()` treats only `null`, `''` and `false` as empty. An empty array needs `minLength(path, 1)`. `[formField]` also binds `min`/`max` (a `Date` for `minDate()`/`maxDate()`), so date inputs must accept `Date | null | undefined`.
-- `[formField]` forbids static or bound `min`/`max` (and the other state inputs) on the same element (NG8022). With Signal Forms, set limits with the `min()`/`max()` rules. These rules take only number, string or date fields, so a tuple control needs another input for its limits (`ui-range-slider` has `limits`).
-  For the same reason `ui-date-range-picker` and `ui-time-input` take `minDate`/`maxDate` and `minTime`/`maxTime`; do not add `min`/`max` inputs to them, `[formField]` would overwrite them with `undefined`.
+- `Validators.required` passes on an empty array, so a control whose value is a list (multi-select, chip input, toggle group, file upload) needs its own validator for "at least one" — the playground's `uiAtLeastOne` is the example.
+- The limit inputs of the controls that were shaped by Signal Forms stay as they are: `ui-range-slider` takes `limits`, `ui-date-range-picker` takes `minDate`/`maxDate` and `ui-time-input` takes `minTime`/`maxTime`. Do not rename them or add `min`/`max` inputs to them; the names are public API and nothing forces a change.
 - A field that cannot read its typed text keeps the message to itself: it writes `null` to the bound control and returns the message from `ownErrors()`, which the base class merges into `errorMessages()` and `showError()`. Validity then stays with the consumer's own validators (`ui-number-input`, `ui-time-input`, `ui-datepicker`, `ui-date-range-picker`). Such a field has no `invalidState` of its own; `showError()` already covers both. `ui-date-range-picker` keeps an `invalidState(edge)` only to mark the one field whose text is wrong, and falls back to `showError()` for everything else.

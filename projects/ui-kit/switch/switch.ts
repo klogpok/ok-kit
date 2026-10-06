@@ -16,7 +16,7 @@ import {
 
 /**
  * On/off toggle for settings that apply immediately. Native checkbox with `role="switch"`.
- * Implements `FormCheckboxControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example <ui-switch [(checked)]="notifications">Email notifications</ui-switch>
  */

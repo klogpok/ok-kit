@@ -17,11 +17,11 @@ import { UiSelectBase } from './select-base';
  * - `searchable` turns the trigger into a text input that filters the options by label.
  *   Listen to `searchChange` and set `filterOptions="false"` to filter on the server instead.
  *
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="Coordinator">
- *   <ui-select [formField]="form.coordinator" placeholder="Choose">
+ *   <ui-select formControlName="coordinator" placeholder="Choose">
  *     @for (c of coordinators; track c.id) {
  *       <ui-option [value]="c.id">{{ c.name }}</ui-option>
  *     }

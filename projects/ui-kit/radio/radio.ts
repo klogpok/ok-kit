@@ -30,11 +30,11 @@ class UiRadioGroupControl {
 /**
  * Group of mutually exclusive options. Uses native radios sharing a `name`, so arrow-key
  * navigation and the single tab stop come from the browser.
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="Delivery">
- *   <ui-radio-group [formField]="form.delivery">
+ *   <ui-radio-group formControlName="delivery">
  *     <ui-radio value="pickup">Pickup</ui-radio>
  *     <ui-radio value="courier">Courier</ui-radio>
  *   </ui-radio-group>
