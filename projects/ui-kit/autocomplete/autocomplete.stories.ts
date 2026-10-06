@@ -99,7 +99,7 @@ export const Default: Story = {
     docs: {
       source: {
         code: `<ui-form-field label="עיר">
-  <ui-autocomplete [formField]="form.city" placeholder="הקלידו עיר">
+  <ui-autocomplete formControlName="city" placeholder="הקלידו עיר">
     @for (city of cities; track city) {
       <ui-option [value]="city">{{ city }}</ui-option>
     }

@@ -60,7 +60,7 @@ export class UiSuffix {}
  * `for` / `aria-labelledby` and `aria-describedby`.
  *
  * Errors come from projected `<ui-error>` elements; if none are projected, messages supplied by
- * the forms layer are shown (Signal Forms `message`, or string-valued Reactive Forms errors).
+ * the forms layer are shown (string-valued Reactive Forms errors, or errors with a `message`).
  *
  * @example
  * <ui-form-field label="Email" hint="We never share it">

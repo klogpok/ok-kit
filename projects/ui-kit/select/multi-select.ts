@@ -33,12 +33,12 @@ const SELECT_ALL = Symbol('ui-select-all');
  * - `chips` shows the selected values as chips in the trigger; their x removes a value with the
  *   mouse, the keyboard deselects in the list.
  *
- * The value is a new array on every change. Implements `FormValueControl` (Signal Forms) and
- * `ControlValueAccessor`.
+ * The value is a new array on every change. Implements `ControlValueAccessor`: bind it with
+ * `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="Coordinators">
- *   <ui-multi-select [formField]="form.coordinators" placeholder="Choose">
+ *   <ui-multi-select formControlName="coordinators" placeholder="Choose">
  *     @for (c of coordinators; track c.id) {
  *       <ui-option [value]="c.id">{{ c.name }}</ui-option>
  *     }

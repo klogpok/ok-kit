@@ -16,7 +16,7 @@ export interface UiFormFieldControl {
   readonly isRequired: Signal<boolean>;
   /** Whether the control is in an error state that should be shown to the user. */
   readonly showError: Signal<boolean>;
-  /** Error messages supplied by the forms layer (Signal Forms `message`, or string-valued errors). */
+  /** Error messages supplied by the forms layer (string-valued errors, or errors with a `message`). */
   readonly errorMessages: Signal<readonly string[]>;
   focus(options?: FocusOptions): void;
 }

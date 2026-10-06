@@ -34,13 +34,12 @@ import { UiChip, UiChipSet, UiChipSetFallback } from './chip';
  *   one, and the other arrow key at the last chip returns to the field.
  * - The same text is not added twice (ignoring case) unless `allowDuplicates` is set.
  *
- * The value is a new `string[]` on every change. Implements `FormValueControl` (Signal Forms)
- * and `ControlValueAccessor`. For a required field with Signal Forms, add `minLength(path, 1)`:
- * `required()` does not treat an empty array as empty.
+ * The value is a new `string[]` on every change. Implements `ControlValueAccessor`. For a
+ * required field add a validator of your own: `Validators.required` passes on an empty array.
  *
  * @example
  * <ui-form-field label="Tags" hint="Press Enter after each tag">
- *   <ui-chip-input [formField]="form.tags" placeholder="Add a tag" />
+ *   <ui-chip-input formControlName="tags" placeholder="Add a tag" />
  * </ui-form-field>
  */
 @Component({

@@ -113,7 +113,7 @@ export class UiSegment<T = unknown> {
  * accessible name of each segment come from the browser. The arrow keys move and select, and
  * ←/→ follow the visual direction (in RTL ← moves to the next segment); Home and End go to the
  * first and the last segment. `orientation="vertical"` stacks the segments.
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * Mark an icon with `uiSegmentIcon`; give an icon-only segment an `aria-label`.
  *

@@ -456,9 +456,8 @@ const HOST = {
  *
  * The value is a `number` or `null`; `null` shows the thumb at `min`. A value off the step grid
  * or outside the limits is shown at the nearest allowed value and stays unchanged until the user
- * moves the thumb. Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`. With
- * Signal Forms, set the limits with `min()` and `max()` rules: `[formField]` does not allow
- * `min`/`max` attributes on the same element.
+ * moves the thumb. Implements `ControlValueAccessor`: bind it with `formControl`,
+ * `formControlName` or `ngModel`. The scale comes from the `min` and `max` inputs.
  *
  * @example
  * <ui-form-field label="Opacity">
@@ -511,12 +510,11 @@ export class UiSlider extends UiSliderBase<number> {
  *
  * The value is a `[start, end]` tuple or `null`; `null` shows the whole scale. Each thumb is a
  * slider named by the field label and `startLabel` / `endLabel` (default: the `rangeStart` and
- * `rangeEnd` labels). With Signal Forms, set the limits with `limits`: `[formField]` does not allow
- * `min`/`max` attributes, and the `min()`/`max()` rules do not apply to a tuple.
+ * `rangeEnd` labels). The scale comes from the `limits` input, one input for the whole tuple.
  *
  * @example
  * <ui-form-field label="Price">
- *   <ui-range-slider [formField]="filters.price" [limits]="[0, 5000]" step="100" />
+ *   <ui-range-slider formControlName="price" [limits]="[0, 5000]" step="100" />
  * </ui-form-field>
  */
 @Component({
@@ -538,7 +536,7 @@ export class UiRangeSlider extends UiSliderBase<UiSliderRange> {
   readonly value = model<UiSliderRange | null>(null);
   /** Host id; the thumbs get `${id}-start` and `${id}-end`. */
   readonly id = input(inject(_IdGenerator).getId('ui-range-slider-'));
-  /** `[min, max]` of the scale; wins over `min` and `max`. Use it with Signal Forms. */
+  /** `[min, max]` of the scale; wins over `min` and `max`. */
   readonly limits = input<UiSliderRange | null>(null);
   /** Name of the start thumb, read after the field label. */
   readonly startLabel = input<string | null>(null);

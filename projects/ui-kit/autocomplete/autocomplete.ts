@@ -33,11 +33,11 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
  * ArrowDown/ArrowUp open the list and move (Alt+ArrowDown opens it without moving), Enter picks
  * the active option, Escape closes the list or clears the field, Tab closes the list.
  *
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="City">
- *   <ui-autocomplete [formField]="form.city">
+ *   <ui-autocomplete formControlName="city">
  *     @for (city of cities; track city) { <ui-option [value]="city">{{ city }}</ui-option> }
  *   </ui-autocomplete>
  * </ui-form-field>

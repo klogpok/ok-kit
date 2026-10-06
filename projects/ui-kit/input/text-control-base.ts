@@ -14,9 +14,8 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
 
 /**
  * Shared behavior for native text controls (`input[ui-input]`, `textarea[ui-textarea]`).
- * The value is handled by the forms layer directly on the native element
- * (DefaultValueAccessor or the Signal Forms native binding); this directive only adds
- * styling, ids and ARIA wiring.
+ * The value is handled by the forms layer directly on the native element (Angular's
+ * `DefaultValueAccessor`); this directive only adds styling, ids and ARIA wiring.
  */
 @Directive({
   host: {

@@ -18,9 +18,9 @@ import {
 
 /**
  * Checkbox built on a native `<input type="checkbox">`. The projected content is its label.
- * Implements `FormCheckboxControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
- * @example <ui-checkbox [formField]="form.terms">I accept the terms</ui-checkbox>
+ * @example <ui-checkbox formControlName="terms">I accept the terms</ui-checkbox>
  * @example <ui-checkbox [(checked)]="all" [indeterminate]="some()">Select all</ui-checkbox>
  */
 @Component({
