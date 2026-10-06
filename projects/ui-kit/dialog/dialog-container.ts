@@ -45,7 +45,9 @@ const TABBABLE = 'button, [href], input, select, textarea, [tabindex]';
  * and focus returns to the opener on close. Internal. A component, since it extends the CDK
  * container component.
  */
-@Component({ template: '' })
+// On Angular 20 an omitted `changeDetection` means eager checking, and a subclass that carries no
+// decorator of its own inherits this metadata verbatim, so the strategy is declared here too.
+@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 export abstract class UiDialogContainerBase extends CdkDialogContainer<UiDialogConfig> {
   private readonly checker = inject(InteractivityChecker);
   private readonly injector = inject(Injector);
