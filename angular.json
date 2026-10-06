@@ -54,8 +54,9 @@
           }
         },
         "storybook": {
-          "builder": "@storybook/angular-vite:start-storybook",
+          "builder": "@storybook/angular:start-storybook",
           "options": {
+            "browserTarget": "ui-kit:build-storybook",
             "configDir": "projects/ui-kit/.storybook",
             "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
             "styles": [
@@ -65,11 +66,13 @@
               "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss"
             ],
-            "port": 6006
+            "port": 6006,
+            "compodoc": false,
+            "experimentalZoneless": true
           }
         },
         "build-storybook": {
-          "builder": "@storybook/angular-vite:build-storybook",
+          "builder": "@storybook/angular:build-storybook",
           "options": {
             "configDir": "projects/ui-kit/.storybook",
             "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
@@ -80,7 +83,9 @@
               "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss"
             ],
-            "outputDir": "dist/storybook/ui-kit"
+            "outputDir": "dist/storybook/ui-kit",
+            "compodoc": false,
+            "experimentalZoneless": true
           }
         }
       }
