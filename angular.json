@@ -38,6 +38,7 @@
               "**/*.stories.ts",
               "**/tokens.generated.ts"
             ],
+            "codeCoverageReporters": ["text", "html", "json", "json-summary"],
             "setupFiles": [
               "projects/ui-kit/test-setup/jsdom-event-view.ts"
             ]
