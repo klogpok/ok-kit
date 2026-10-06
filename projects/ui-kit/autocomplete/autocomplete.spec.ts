@@ -1,9 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, required } from '@angular/forms/signals';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiOption } from '@vplans/ui-kit/select';
+import { UiAutocompleteHarness } from '@vplans/ui-kit/testing';
 import { UiAutocomplete } from './autocomplete';
 
 const KEY_CODES: Record<string, number> = {
@@ -35,7 +37,7 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
 const listbox = () => document.querySelector<HTMLElement>('[role="listbox"]');
 const shown = () =>
   [...document.querySelectorAll<HTMLElement>('ui-option:not([hidden])')].map((o) =>
-    o.textContent.trim(),
+    o.textContent?.trim(),
   );
 
 const CITIES = ['Haifa', 'Hadera', 'Eilat', 'Acre'];
@@ -115,7 +117,7 @@ describe('UiAutocomplete (free text)', () => {
     await press('ArrowDown');
     await press('ArrowDown');
     const active = input().getAttribute('aria-activedescendant')!;
-    expect(document.getElementById(active)!.textContent.trim()).toBe('Hadera');
+    expect(document.getElementById(active)!.textContent?.trim()).toBe('Hadera');
     expect((await press('Enter')).defaultPrevented).toBe(true);
     expect(host.city()).toBe('Hadera');
     expect(input().value).toBe('Hadera');
@@ -143,7 +145,7 @@ describe('UiAutocomplete (free text)', () => {
     await press('Escape');
     await press('ArrowUp');
     const active = input().getAttribute('aria-activedescendant')!;
-    expect(document.getElementById(active)!.textContent.trim()).toBe('Acre');
+    expect(document.getElementById(active)!.textContent?.trim()).toBe('Acre');
   });
 
   it('hides the list without matches', async () => {
@@ -264,72 +266,115 @@ describe('UiAutocomplete (pick one)', () => {
   });
 });
 
+/** Reactive forms show the message of an error value that is a string. */
+const enterACity: ValidatorFn = (control) => (control.value ? null : { enterCity: 'Enter a city' });
+
 @Component({
   imports: [UiAutocomplete, UiOption, UiFormField, ReactiveFormsModule],
   template: `
     <ui-form-field label="City">
-      <ui-autocomplete [formControl]="city">
-        <ui-option value="Haifa">Haifa</ui-option>
+      <ui-autocomplete [formControl]="city" [readonly]="locked()">
+        @for (city of cities; track city) {
+          <ui-option [value]="city">{{ city }}</ui-option>
+        }
       </ui-autocomplete>
     </ui-form-field>
   `,
 })
 class ReactiveHost {
-  readonly city = new FormControl<string | null>(null, Validators.required);
+  readonly cities = CITIES;
+  readonly locked = signal(false);
+  readonly city = new FormControl<string | null>(null, [Validators.required, enterACity]);
 }
 
-describe('UiAutocomplete with forms', () => {
-  it('works with Reactive Forms', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
-    const root = fixture.nativeElement as HTMLElement;
+describe('UiAutocomplete with Reactive Forms', () => {
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
+  let root: HTMLElement;
+  let loader: HarnessLoader;
+  const field = () => loader.getHarness(UiAutocompleteHarness.with({ label: 'City' }));
+  /** The message `ui-form-field` shows under the field. */
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
+    root = fixture.nativeElement as HTMLElement;
+    loader = TestbedHarnessEnvironment.loader(fixture);
+    document.body.appendChild(root);
     await settle(fixture);
-    const { city } = fixture.componentInstance;
-    const input = root.querySelector('input')!;
-    expect(input.getAttribute('aria-required')).toBe('true');
-    input.value = 'Tel Aviv';
-    input.dispatchEvent(new Event('input'));
-    input.dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(city.value).toBe('Tel Aviv');
-    expect(city.touched).toBe(true);
-    city.setValue('Haifa');
-    await settle(fixture);
-    expect(input.value).toBe('Haifa');
-    city.disable();
-    await settle(fixture);
-    expect(input.disabled).toBe(true);
-    fixture.destroy();
   });
 
-  it('works with Signal Forms', async () => {
-    @Component({
-      imports: [UiAutocomplete, UiOption, UiFormField, FormField],
-      template: `
-        <ui-form-field label="City">
-          <ui-autocomplete [formField]="plan.city">
-            <ui-option value="Haifa">Haifa</ui-option>
-          </ui-autocomplete>
-        </ui-form-field>
-      `,
-    })
-    class SignalHost {
-      readonly model = signal({ city: '' });
-      readonly plan = form(this.model, (p) => {
-        required(p.city, { message: 'Enter a city' });
-      });
-    }
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
-    await settle(fixture);
-    const input = root.querySelector('input')!;
-    input.dispatchEvent(new FocusEvent('blur'));
-    await settle(fixture);
-    expect(input.getAttribute('aria-invalid')).toBe('true');
-    expect(root.querySelector('.ui-form-field__error')!.textContent).toContain('Enter a city');
-    input.value = 'Acre';
-    input.dispatchEvent(new Event('input'));
-    await settle(fixture);
-    expect(fixture.componentInstance.model().city).toBe('Acre');
+  afterEach(() => {
     fixture.destroy();
+    root.remove();
+  });
+
+  it('binds the typed text and a picked suggestion both ways', async () => {
+    const city = await field();
+    await city.enterText('Tel Aviv');
+    expect(host.city.value).toBe('Tel Aviv');
+
+    await city.enterText('ha');
+    await city.selectOption({ text: 'Hadera' });
+    expect(host.city.value).toBe('Hadera');
+
+    host.city.setValue('Acre');
+    await settle(fixture);
+    expect(await city.getText()).toBe('Acre');
+  });
+
+  it('marks the field required from the validators of the control', async () => {
+    expect(await (await field()).isRequired()).toBe(true);
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
+  });
+
+  it('disables the field from the control', async () => {
+    const city = await field();
+    host.city.disable();
+    await settle(fixture);
+    expect(await city.isDisabled()).toBe(true);
+    await city.open();
+    expect(await city.isOpen()).toBe(false);
+  });
+
+  it('keeps the field readonly and does not open the list', async () => {
+    const city = await field();
+    host.locked.set(true);
+    await settle(fixture);
+    expect(await city.isReadonly()).toBe(true);
+    expect(await city.isDisabled()).toBe(false);
+    await city.open();
+    expect(await city.isOpen()).toBe(false);
+  });
+
+  it('closes the list and marks the control touched when focus leaves', async () => {
+    const city = await field();
+    await city.open();
+    expect(await city.isOpen()).toBe(true);
+    expect(host.city.touched).toBe(false);
+
+    await city.blur();
+    await settle(fixture);
+    expect(await city.isOpen()).toBe(false);
+    expect(host.city.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    const city = await field();
+    expect(host.city.invalid).toBe(true);
+    expect(await city.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
+
+    await city.blur();
+    await settle(fixture);
+    expect(await city.isInvalid()).toBe(true);
+    expect(errorText()).toContain('Enter a city');
+
+    await city.enterText('Acre');
+    await settle(fixture);
+    expect(host.city.valid).toBe(true);
+    expect(await city.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
   });
 });

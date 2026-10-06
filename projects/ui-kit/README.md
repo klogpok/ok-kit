@@ -38,8 +38,9 @@ The kit is not published. Apps in this monorepo use it from source:
   ```
 
 - **Dependencies**: the app needs the peer dependencies of `projects/ui-kit/package.json`
-  (`@angular/cdk`, `@angular/forms`, …) in the same major version. `@angular/router` is optional:
-  only `ui-tab-nav` (`@vplans/ui-kit/tabs`) needs it.
+  (`@angular/cdk`, `@angular/forms`, …) in the same major version. The kit targets **Angular 20**
+  (`@angular/cdk` 20.2 — the CDK's v20 line stops there). `@angular/router` is optional: only
+  `ui-tab-nav` (`@vplans/ui-kit/tabs`) needs it.
 
 The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
 Hebrew and Latin. If the app does not load the font already, add it together with the global
@@ -121,48 +122,49 @@ A bare `checked` attribute is a compile error.
 
 ## Forms
 
-All form controls work with **Signal Forms**, **Reactive Forms** and **template-driven forms**:
+All form controls work with **Reactive Forms** and **template-driven forms** through
+`ControlValueAccessor`: bind them with `formControl`, `formControlName` or `ngModel`. Signal
+Forms is **not** supported — the kit targets Angular 20, where it does not exist.
 
-| Control                    | Signal Forms contract             | Other forms            |
-| -------------------------- | --------------------------------- | ---------------------- |
-| `input[ui-input]`          | native binding                    | `DefaultValueAccessor` |
-| `textarea[ui-textarea]`    | native binding                    | `DefaultValueAccessor` |
-| `ui-checkbox`, `ui-switch` | `FormCheckboxControl` (`checked`) | `ControlValueAccessor` |
-| `ui-radio-group`           | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-select`                | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-multi-select`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-datepicker`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-date-range-picker`     | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-time-input`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-number-input`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-chip-input`            | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-autocomplete`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-file-upload`           | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-slider`                | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-range-slider`          | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-segmented`             | `FormValueControl` (`value`)      | `ControlValueAccessor` |
-| `ui-button-toggle-group`   | `FormValueControl` (`value`)      | `ControlValueAccessor` |
+| Control                    | Value            | How it registers                          |
+| -------------------------- | ---------------- | ----------------------------------------- |
+| `input[ui-input]`          | the native value | Angular's `DefaultValueAccessor`          |
+| `textarea[ui-textarea]`    | the native value | Angular's `DefaultValueAccessor`          |
+| `ui-checkbox`, `ui-switch` | `checked`        | `NG_VALUE_ACCESSOR` (`UiCheckableBase`)   |
+| `ui-radio-group`           | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-select`                | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-multi-select`          | `value` (array)  | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-datepicker`            | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-date-range-picker`     | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-time-input`            | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-number-input`          | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-chip-input`            | `value` (array)  | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-autocomplete`          | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-file-upload`           | `value` (array)  | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-slider`                | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-range-slider`          | `value` (tuple)  | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-segmented`             | `value`          | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
+| `ui-button-toggle-group`   | `value` (array)  | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
 
-Every control supports `disabled`, `readonly` (also from a Signal Forms `readonly()` rule),
-`required` and `aria-describedby`. A readonly control stays focusable and reports
-`aria-readonly`. A `required` checkbox or switch is invalid until checked, also in Reactive and
-template forms.
+Every control supports `disabled`, `readonly`, `required` and `aria-describedby`. `disabled` and
+`required` are also read from the bound control (`control.disable()`, `Validators.required`). A
+readonly control stays focusable and reports `aria-readonly`. A `required` checkbox or switch is
+invalid until checked.
 
 The model outputs (`valueChange`, `checkedChange`) also fire when a forms directive writes a value
-(`setValue()`, `reset()`, a Signal Forms model change), not only for user input. With a forms
-directive bound, react to the form (`valueChanges`, the field signal) instead of these outputs.
+(`setValue()`, `reset()`), not only for user input. With a forms directive bound, react to the
+form (`valueChanges`) instead of these outputs.
 
 `ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
 `aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
 once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `submit()`).
 
 ```html
-<!-- Signal Forms: messages from validators are shown automatically -->
+<!-- Project <ui-error>, or let your validators return string-valued errors / { message } -->
 <ui-form-field label="Email" hint="We never share it">
-  <input ui-input type="email" [formField]="form.email" />
+  <input ui-input type="email" formControlName="email" />
 </ui-form-field>
 
-<!-- Reactive Forms: project <ui-error>, or use string-valued errors / { message } -->
 <ui-form-field label="Username">
   <input ui-input formControlName="username" />
   @if (username.hasError('required')) {
@@ -171,7 +173,7 @@ once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `
 </ui-form-field>
 
 <ui-form-field label="Delivery">
-  <ui-radio-group [formField]="form.delivery">
+  <ui-radio-group formControlName="delivery">
     <ui-radio value="pickup">Pickup</ui-radio>
     <ui-radio value="courier">Courier</ui-radio>
   </ui-radio-group>
@@ -184,20 +186,21 @@ Without a forms directive, use the `invalid` input to show the error state manua
 `(option: City, selected: City) => option.id === selected.id`. It is called as
 `compareWith(option, selected)` and never with `null`; a `null` value matches only `null`.
 
-`ui-datepicker` reports typed text that is not an allowed date as a `uiDateParse` error with the
-`invalidDate` label as its message; the value is `null` meanwhile.
+`ui-datepicker` sets `null` for typed text that is not an allowed date and, once the user leaves
+the field, shows the `invalidDate` label. That message is the field's own: it never becomes an
+error of the bound form control, so the control stays as valid as your validators say.
 
 `ui-number-input` reads and shows numbers in the format of the `locale` label ("1,234.5" in
-he-IL). The value is a `number` or `null`. Text that is not a number sets `null` and reports a
-`uiNumberParse` error with the `invalidNumber` label. Leaving the field formats the text, rounds
-to `maxFractionDigits` and clamps to `min`/`max`. With Signal Forms, set the limits with the
-`min()` and `max()` rules: `[formField]` does not allow `min`/`max` attributes on the same element. ArrowUp/Down step by `step`, PageUp/Down by ten steps, Home/End go to the limits; the
+he-IL). The value is a `number` or `null`. Text that is not a number sets `null` and, once the
+user leaves the field, shows the `invalidNumber` label. That message is the field's own: it never
+becomes an error of the bound form control, so the control stays as valid as your validators say.
+Leaving the field formats the text, rounds to `maxFractionDigits` and clamps to `min`/`max`.
+ArrowUp/Down step by `step`, PageUp/Down by ten steps, Home/End go to the limits; the
 − and + buttons repeat while held.
 
 ```html
 <ui-form-field label="Area">
-  <!-- form(model, (p) => { min(p.area, 0); }) -->
-  <ui-number-input [formField]="form.area" maxFractionDigits="2" />
+  <ui-number-input formControlName="area" min="0" maxFractionDigits="2" />
   <span uiSuffix>m²</span>
 </ui-form-field>
 <ui-form-field label="Price">
@@ -209,25 +212,25 @@ to `maxFractionDigits` and clamps to `min`/`max`. With Signal Forms, set the lim
 `ui-chip-input` turns typed text into chips; the value is a `string[]`. Enter or a separator
 (`separators`, default `[',']`) adds a chip, pasted text is split, leaving the field adds the
 typed text (`addOnBlur`), Backspace in the empty field removes the last chip, and the same text
-is not added twice unless `allowDuplicates`. With Signal Forms, add `minLength(path, 1)` for a
-required field.
+is not added twice unless `allowDuplicates`. `Validators.required` passes on an empty array, so a
+required chip input needs a validator of its own (the playground's `uiAtLeastOne`).
 
 ```html
 <ui-form-field label="Tags" hint="Press Enter after each tag">
-  <ui-chip-input [formField]="form.tags" placeholder="Add a tag" />
+  <ui-chip-input formControlName="tags" placeholder="Add a tag" />
 </ui-form-field>
 ```
 
 `ui-file-upload` picks files with a drop area (a button) and lists them with a remove button.
 The value is a `File[]`. `accept`, `maxSize` (bytes) and `maxFiles` do not drop files: a file
-that breaks them stays in the list, marked, and the control reports `uiFileType`,
-`uiFileSize` or `uiFileCount` with a message, so the form stays invalid until the user removes
-it. The kit does not upload: pass the progress per file (0–100) in `progress`.
+that breaks them stays in the list, marked, and the field says why. That message is the control's
+own: it never becomes an error of the bound form control, so the form stays as valid as your
+validators say. The kit does not upload: pass the progress per file (0–100) in `progress`.
 
 ```html
 <ui-form-field label="Plans" hint="PDF, up to 10 MB">
   <ui-file-upload
-    [formField]="form.plans"
+    formControlName="plans"
     accept=".pdf"
     multiple
     [maxSize]="10 * 1024 * 1024"
@@ -248,19 +251,17 @@ readers read (`aria-valuetext`); by default it is the mark label or the number i
 format. `valueChange` fires while dragging; `valueCommit` fires when the user lets go, which suits
 server requests.
 
-With Signal Forms, set the limits of `ui-slider` with `min()` and `max()` rules, and those of
-`ui-range-slider` with `limits`: `[formField]` does not allow `min`/`max` attributes, and the
-rules do not apply to a tuple. The thumbs of a range are named by the field label and the
+`ui-slider` takes its scale from `min` / `max`; `ui-range-slider` takes it from `limits`, a
+single input for the tuple. The thumbs of a range are named by the field label and the
 `rangeStart` / `rangeEnd` labels (or `startLabel` / `endLabel`).
 
 ```html
 <ui-form-field label="Rooms">
-  <!-- form(model, (p) => { min(p.rooms, 1); max(p.rooms, 6); }) -->
-  <ui-slider [formField]="filters.rooms" marks />
+  <ui-slider formControlName="rooms" min="1" max="6" marks />
 </ui-form-field>
 <ui-form-field label="Rent per month">
   <ui-range-slider
-    [formField]="filters.price"
+    formControlName="price"
     [limits]="[0, 15000]"
     step="500"
     [valueText]="(v) => v + ' ₪'"
@@ -280,8 +281,8 @@ control and shares the width equally.
 `ui-button-toggle-group` is for several choices at once: each `button[ui-button-toggle]` is a tab
 stop with `aria-pressed`, and a pressed button also shows a check mark. The value is the list of
 pressed values in the order they were pressed. A readonly group keeps its buttons focusable with
-`aria-disabled`. With Signal Forms use `minLength(path, 1)` for a required choice, as with
-`ui-multi-select`. Both controls take `size`, `fullWidth`, `compareWith` and `orientation`:
+`aria-disabled`. A required choice needs an "at least one" validator, as with `ui-multi-select`:
+`Validators.required` passes on an empty array. Both controls take `size`, `fullWidth`, `compareWith` and `orientation`:
 `vertical` stacks the items, as wide as the widest one, with the text at the start edge.
 
 ```html
@@ -291,7 +292,7 @@ pressed values in the order they were pressed. A readonly group keeps its button
 </ui-segmented>
 
 <ui-form-field label="Visit days">
-  <ui-button-toggle-group [formField]="form.days">
+  <ui-button-toggle-group formControlName="days">
     <button ui-button-toggle value="sun">Sun</button>
     <button ui-button-toggle value="mon">Mon</button>
   </ui-button-toggle-group>
@@ -309,16 +310,17 @@ the dialog; until then the day under the pointer or the focused day previews the
 before the start starts a new range. `presets` add quick picks; a preset `range` may be a
 function, for ranges relative to today.
 
-Text that is not an allowed date reports `uiDateParse`; an end before the start reports
-`uiDateRangeOrder` (`invalidDateRange` label) and leaves the field typed last empty. A range with
+Text that is not an allowed date sets that field to `null`; an end before the start empties the
+field typed last. Once the user leaves the field, the picker shows the `invalidDate` or the
+`invalidDateRange` label. Those messages are the picker's own: they never become errors of the
+bound form control, so the control stays as valid as your validators say. A range with
 one open end is a valid value (e.g. "from September 1"); add a validator when both ends are
-needed. With Signal Forms set the limits with `minDate` / `maxDate`: `[formField]` does not
-allow `min`/`max`, and the date rules do not apply to a range. The group is named by the field
+needed. The limits are `minDate` / `maxDate`, not `min` / `max`. The group is named by the field
 label, and the fields by the `startDate` / `endDate` labels.
 
 ```html
 <ui-form-field label="Report period">
-  <ui-date-range-picker [formField]="form.period" [maxDate]="today" [presets]="presets" />
+  <ui-date-range-picker formControlName="period" [maxDate]="today" [presets]="presets" />
 </ui-form-field>
 ```
 
@@ -342,24 +344,24 @@ several months side by side.
 minutes (default 30). The value is a 24-hour `"HH:mm"` string or `null`; it is shown in the
 format of the `locale` label: "14:30" in `he-IL`, "2:30 PM" in `en-US`. Typing keeps only the
 characters of a time and adds the ":" ("1430" → "14:30"); "930", "9" and "2:30 pm" are read too.
-Text that is not a time, or a time outside `minTime`/`maxTime`, sets `null` and reports
-`uiTimeParse` (`invalidTime` label). A click or ArrowDown opens the list at the selected time
-or the next one; Enter picks, Escape closes. With Signal Forms set the limits with
-`minTime`/`maxTime`: `[formField]` does not allow `min`/`max`, and the `min()`/`max()` rules take
-only numbers.
+Text that is not a time, or a time outside `minTime`/`maxTime`, sets `null` and, once the user
+leaves the field, shows the `invalidTime` label. That message is the field's own: it never becomes
+an error of the bound form control, so the control stays as valid as your validators say. A click
+or ArrowDown opens the list at the selected time or the next one; Enter picks, Escape closes.
 
 To pick a date and a time, put `ui-datepicker` and `ui-time-input` side by side and join their
 values with `uiDateWithTime(date, time)`; `uiTimeOf(date)` gives the `"HH:mm"` of a `Date`.
 
 ```html
-<ui-form-field label="Date"><ui-datepicker [formField]="form.date" /></ui-form-field>
+<ui-form-field label="Date"><ui-datepicker formControlName="date" /></ui-form-field>
 <ui-form-field label="Time">
-  <ui-time-input [formField]="form.time" minTime="08:00" maxTime="18:00" interval="15" />
+  <ui-time-input formControlName="time" minTime="08:00" maxTime="18:00" interval="15" />
 </ui-form-field>
 ```
 
 ```ts
-readonly meeting = computed(() => uiDateWithTime(this.model().date, this.model().time));
+const { date, time } = this.form.getRawValue();
+const meeting = uiDateWithTime(date, time);
 ```
 
 ### Prefix and suffix
@@ -559,7 +561,7 @@ this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 
 <!-- Select -->
 <ui-form-field label="Coordinator">
-  <ui-select [formField]="form.coordinator" placeholder="Choose" searchable>
+  <ui-select formControlName="coordinator" placeholder="Choose" searchable>
     @for (c of coordinators; track c.id) {
     <ui-option [value]="c.id">{{ c.name }}</ui-option>
     }
@@ -568,7 +570,7 @@ this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 
 <!-- Multi-select: the value is an array; the list stays open while toggling -->
 <ui-form-field label="Recipients">
-  <ui-multi-select [formField]="form.recipients" placeholder="Choose">
+  <ui-multi-select formControlName="recipients" placeholder="Choose">
     @for (c of coordinators; track c.id) {
     <ui-option [value]="c.id">{{ c.name }}</ui-option>
     }
@@ -612,7 +614,7 @@ after the click has followed the link.
 ```html
 <!-- Autocomplete: free text with suggestions; the value is the text -->
 <ui-form-field label="City">
-  <ui-autocomplete [formField]="form.city">
+  <ui-autocomplete formControlName="city">
     @for (city of cities; track city) {
     <ui-option [value]="city">{{ city }}</ui-option>
     }
@@ -645,12 +647,12 @@ every enabled option the search shows (mixed while some are selected), and `maxS
 disables the other options once reached (it hides "select all").
 
 ```html
-<ui-multi-select [formField]="form.trades" chips selectAll searchable>...</ui-multi-select>
-<ui-multi-select [formField]="form.leads" chips maxSelections="2">...</ui-multi-select>
+<ui-multi-select formControlName="trades" chips selectAll searchable>...</ui-multi-select>
+<ui-multi-select formControlName="leads" chips maxSelections="2">...</ui-multi-select>
 ```
 
-Signal Forms `required()` does not treat an empty array as empty. For a required multi-select, add
-`minLength(path.recipients, 1)` next to `required()`.
+`Validators.required` does not treat an empty array as empty. For a required multi-select, add an
+"at least one" validator of your own; the playground's `uiAtLeastOne` is one line.
 
 For server-side search, set `[filterOptions]="false"` and load the options from `(searchChange)`.
 It emits `''` when the list closes, so the full list can come back. The trigger keeps the label of
@@ -871,7 +873,7 @@ With more links than `maxItems` (default 4), the links after the first one and b
 
 `ui-stepper` shows the content of the current step in a region named by its button; the content
 of the other steps is kept, not destroyed, so their forms keep their state. A step with a
-`control` (a Reactive Forms control or a Signal Forms field) is done once the user leaves it
+`control` (a Reactive Forms control, e.g. a `FormGroup`) is done once the user leaves it
 valid and shows an error once the user leaves it, or tries to, invalid. `completed` and `error`
 (a string is shown under the label) set the state yourself. In a `linear` stepper a step can be
 reached only when the steps before it are valid or `optional`; a blocked Next marks the form of
@@ -1560,7 +1562,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast         |
 | `pnpm test`               | Unit tests (Vitest)                                                    |
 | `pnpm test:watch`         | Unit tests in watch mode                                               |
-| `pnpm test:coverage`      | Unit tests with coverage; fails below the thresholds in `angular.json` |
+| `pnpm test:coverage`      | Unit tests with a coverage report (the builder enforces no thresholds) |
 | `pnpm test:playground`    | Playground smoke tests                                                 |
 | `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint              |
 | `pnpm format`             | Prettier (write)                                                       |
@@ -1589,14 +1591,24 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
    - Private per-component variables use the `--_name` form.
    - Stylelint enforces these rules.
    - New component tokens go into `tokens.json` → `component.<name>`, and reference semantic tokens.
-6. For a form control, extend `UiFormControlBase` (from `@vplans/ui-kit/core`) and provide `UI_FORM_FIELD_CONTROL`. For a native element, use `injectControlState()`. A checkbox-like control extends `UiCheckableBase` and provides `provideUiCheckedValidator()`, so `required` means checked in Reactive and template forms.
+6. For a form control, extend `UiFormControlBase` (from `@vplans/ui-kit/core`) and provide both `UI_FORM_FIELD_CONTROL` and `NG_VALUE_ACCESSOR`, each `useExisting` and pointing at the component itself:
+
+   ```ts
+   providers: [
+     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiThing) },
+     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiThing), multi: true },
+   ],
+   ```
+
+   The accessor provider goes on **every** concrete control: Angular does not inherit `providers` metadata into a subclass that carries its own decorator, and `UiFormControlBase` stays the only implementation of the accessor methods. Such a control must not inject `NgControl` while it is constructed — that is a circular dependency (NG0200); the base class reads its form state through `injectControlState()`, which resolves `NgControl` lazily on the first `sync()`. For a native element, use `injectControlState()` and provide no accessor of your own (Angular's default one already covers it). A checkbox-like control extends `UiCheckableBase` and also provides `provideUiCheckedValidator()`, so `required` means checked.
+
 7. Add a harness for the component to `projects/ui-kit/testing/` (`<name>-harness.ts` extending `UiHarness`, with a spec), export it from `public-api.ts` and list it under [Testing](#testing).
 8. Required tests:
    - rendering and inputs;
    - outputs and model updates;
    - keyboard interaction;
    - ARIA attributes;
-   - for form controls, Reactive Forms and Signal Forms (value both ways, disabled, touched, error linking).
+   - for form controls, Reactive Forms (including `formControlName`) and `ngModel`: value both ways, disabled from the control, readonly, the required marker, touched on blur, and the error shown only when invalid and touched.
 9. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL.
 10. Visual baselines: after `pnpm build-storybook`, run `pnpm test-visual:update` for new or intentionally changed stories and look at the new PNGs in `visual/` before you commit them. `pnpm test-visual` must pass. A failure writes the new screenshot and a diff to `dist/visual-diff/`. The baselines are taken in the installed Edge at 1024×768 with reduced motion and a fixed date (2026-09-25), so a new Edge version may need an update of all baselines.
 11. Keep commits small, one per component: `feat(<name>): ...`.

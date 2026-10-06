@@ -21,12 +21,11 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import { AbstractControl } from '@angular/forms';
-import { FieldTree, isFieldTree } from '@angular/forms/signals';
 import { UI_LABELS } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCheck } from '@vplans/ui-kit/icon';
 
-/** The form of a step: a Reactive Forms control (e.g. a `FormGroup`) or a Signal Forms field. */
-export type UiStepControl = AbstractControl | FieldTree<unknown>;
+/** The form of a step: a Reactive Forms control, e.g. a `FormGroup`. */
+export type UiStepControl = AbstractControl;
 
 export type UiStepperOrientation = 'horizontal' | 'vertical';
 
@@ -77,10 +76,6 @@ export class UiStep {
   readonly valid = computed(() => {
     const control = this.control();
     if (!control) return true;
-    if (isFieldTree(control)) {
-      const state = control();
-      return state.valid() || state.disabled();
-    }
     this.controlEvents();
     return control.valid || control.disabled;
   });
@@ -103,7 +98,7 @@ export class UiStep {
   constructor() {
     effect((onCleanup) => {
       const control = this.control();
-      if (!control || isFieldTree(control)) return;
+      if (!control) return;
       const subscription = control.events.subscribe(() => this.controlEvents.update((n) => n + 1));
       onCleanup(() => subscription.unsubscribe());
     });
@@ -111,10 +106,7 @@ export class UiStep {
 
   /** Shows the errors of the step's form, e.g. after a blocked Next. @internal */
   markTouched(): void {
-    const control = this.control();
-    if (!control) return;
-    if (isFieldTree(control)) control().markAsTouched();
-    else control.markAllAsTouched();
+    this.control()?.markAllAsTouched();
   }
 }
 

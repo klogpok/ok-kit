@@ -11,6 +11,7 @@ import {
   input,
   model,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -77,10 +78,10 @@ export class UiButtonToggle<T = unknown> {
  * A group of toggle buttons for several choices at once, e.g. weekdays or filters shown side by
  * side. Each button is a tab stop with `aria-pressed`; Space and Enter toggle it. The value is
  * the list of pressed values, in the order they were pressed. For one choice use `ui-segmented`.
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
- * With Signal Forms, `required()` does not treat an empty list as missing: use
- * `minLength(path, 1)`.
+ * `Validators.required` does not treat an empty list as missing: a required group needs an
+ * "at least one" validator of its own.
  *
  * @example
  * <ui-button-toggle-group [(value)]="days" aria-label="Working days">
@@ -95,6 +96,7 @@ export class UiButtonToggle<T = unknown> {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiButtonToggleGroup) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiButtonToggleGroup), multi: true },
     UiButtonToggleGroupControl,
   ],
   host: {

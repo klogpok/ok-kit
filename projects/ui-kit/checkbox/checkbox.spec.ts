@@ -1,8 +1,17 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, readonly, required } from '@angular/forms/signals';
-import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import {
+  FormControl,
+  FormsModule,
+  NgModel,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiCheckboxHarness } from '@vplans/ui-kit/testing';
 import { UiCheckbox } from './checkbox';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -31,32 +40,20 @@ class StandaloneHost {
   readonly disabled = signal(false);
 }
 
+/** Stands in for an application validator with a message of its own. */
+const mustAccept: ValidatorFn = (control) =>
+  control.value === true ? null : { uiTerms: { message: 'Accept the terms to continue' } };
+
 @Component({
-  imports: [ReactiveFormsModule, UiCheckbox, UiFormField, UiError],
+  imports: [ReactiveFormsModule, UiCheckbox, UiFormField],
   template: `
-    <ui-form-field>
+    <ui-form-field label="Terms">
       <ui-checkbox [formControl]="control">Subscribe</ui-checkbox>
-      <ui-error>Required</ui-error>
     </ui-form-field>
   `,
 })
 class ReactiveHost {
-  readonly control = new FormControl(false, Validators.requiredTrue);
-}
-
-@Component({
-  imports: [FormField, UiCheckbox, UiFormField],
-  template: `
-    <ui-form-field>
-      <ui-checkbox [formField]="f.agree">Agree</ui-checkbox>
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal({ agree: false });
-  readonly f = form(this.model, (p) => {
-    required(p.agree, { message: 'You must agree' });
-  });
+  readonly control = new FormControl(false, [Validators.requiredTrue, mustAccept]);
 }
 
 describe('UiCheckbox', () => {
@@ -120,66 +117,70 @@ describe('UiCheckbox', () => {
 
   describe('with Reactive Forms', () => {
     let fixture: ComponentFixture<ReactiveHost>;
-    let input: HTMLInputElement;
+    let control: ReactiveHost['control'];
+    let loader: HarnessLoader;
+    let checkbox: UiCheckboxHarness;
+    /** The message `ui-form-field` shows under the checkbox. */
+    const error = (): HTMLElement =>
+      (fixture.nativeElement as HTMLElement).querySelector('.ui-form-field__error')!;
 
     beforeEach(async () => {
       fixture = TestBed.createComponent(ReactiveHost);
+      control = fixture.componentInstance.control;
+      loader = TestbedHarnessEnvironment.loader(fixture);
       await settle(fixture);
-      input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
+      checkbox = await loader.getHarness(UiCheckboxHarness.with({ label: 'Subscribe' }));
     });
 
-    it('writes and reads values', async () => {
-      fixture.componentInstance.control.setValue(true);
-      await settle(fixture);
-      expect(input.checked).toBe(true);
+    it('binds checked both ways and marks the field required', async () => {
+      expect(await checkbox.isChecked()).toBe(false);
+      expect(await checkbox.isRequired()).toBe(true);
+      expect(
+        (fixture.nativeElement as HTMLElement).querySelector('.ui-form-field__required'),
+      ).not.toBeNull();
 
-      input.click();
-      expect(fixture.componentInstance.control.value).toBe(false);
+      await checkbox.check();
+      expect(control.value).toBe(true);
+
+      control.setValue(false);
+      await settle(fixture);
+      expect(await checkbox.isChecked()).toBe(false);
     });
 
-    it('marks touched on blur and shows the linked error', async () => {
-      input.dispatchEvent(new Event('blur'));
+    it('disables the checkbox from the control', async () => {
+      control.disable();
       await settle(fixture);
-      expect(fixture.componentInstance.control.touched).toBe(true);
-      expect(input.getAttribute('aria-invalid')).toBe('true');
-      expect(input.required).toBe(true);
-      const error = (fixture.nativeElement as HTMLElement).querySelector('.ui-form-field__error')!;
-      expect(input.getAttribute('aria-describedby')).toBe(error.id);
+      expect(await checkbox.isDisabled()).toBe(true);
     });
 
-    it('follows control.disable()', async () => {
-      fixture.componentInstance.control.disable();
-      await settle(fixture);
-      expect(input.disabled).toBe(true);
-    });
-  });
-
-  describe('with Signal Forms', () => {
-    let fixture: ComponentFixture<SignalHost>;
-    let input: HTMLInputElement;
-
-    beforeEach(async () => {
-      fixture = TestBed.createComponent(SignalHost);
-      await settle(fixture);
-      input = (fixture.nativeElement as HTMLElement).querySelector('input')!;
+    it('marks the control touched when the user leaves it', async () => {
+      expect(control.touched).toBe(false);
+      await checkbox.focus();
+      await checkbox.blur();
+      expect(control.touched).toBe(true);
     });
 
-    it('binds checked both ways', async () => {
-      input.click();
-      await settle(fixture);
-      expect(fixture.componentInstance.model().agree).toBe(true);
+    it('shows the validator message only once the control is invalid and touched', async () => {
+      expect(control.invalid).toBe(true);
+      expect(await checkbox.isInvalid()).toBe(false);
+      expect(error().textContent?.trim()).toBe('');
 
-      fixture.componentInstance.model.set({ agree: false });
+      await checkbox.focus();
+      await checkbox.blur();
       await settle(fixture);
-      expect(input.checked).toBe(false);
-    });
+      expect(await checkbox.isInvalid()).toBe(true);
+      expect(error().textContent).toContain('Accept the terms to continue');
+      expect(
+        (fixture.nativeElement as HTMLElement)
+          .querySelector('input')!
+          .getAttribute('aria-describedby'),
+      ).toBe(error().id);
 
-    it('marks the field touched on blur and shows validator messages', async () => {
-      input.dispatchEvent(new Event('blur'));
+      await checkbox.check();
       await settle(fixture);
-      expect(fixture.componentInstance.f.agree().touched()).toBe(true);
-      expect(input.getAttribute('aria-invalid')).toBe('true');
-      expect((fixture.nativeElement as HTMLElement).textContent).toContain('You must agree');
+      expect(control.valid).toBe(true);
+      expect(await checkbox.isInvalid()).toBe(false);
+      expect(error().textContent?.trim()).toBe('');
     });
   });
 });
@@ -203,37 +204,34 @@ describe('UiCheckbox static attributes', () => {
 });
 
 @Component({
-  imports: [FormField, UiCheckbox],
+  imports: [ReactiveFormsModule, UiCheckbox],
   template: `
-    <ui-checkbox [formField]="f.agree">Agree</ui-checkbox>
+    <ui-checkbox [formControl]="agree" [readonly]="true">Agree</ui-checkbox>
     <ui-checkbox [readonly]="true" [(checked)]="plain">Plain</ui-checkbox>
   `,
 })
 class ReadonlyHost {
-  readonly model = signal({ agree: true });
-  readonly f = form(this.model, (p) => {
-    readonly(p.agree);
-  });
+  readonly agree = new FormControl(true);
   readonly plain = signal(false);
 }
 
 describe('UiCheckbox readonly', () => {
-  it('keeps its state on click and reports aria-readonly, also from a Signal Forms rule', async () => {
+  it('keeps its state on click and reports aria-readonly, also for a bound control', async () => {
     const fixture = TestBed.createComponent(ReadonlyHost);
+    const loader = TestbedHarnessEnvironment.loader(fixture);
     await settle(fixture);
-    const [bound, plain] = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll('input'),
-    );
-    bound.click();
-    plain.click();
+    const [bound, plain] = await loader.getAllHarnesses(UiCheckboxHarness);
+    await bound.toggle();
+    await plain.toggle();
     await settle(fixture);
-    expect(fixture.componentInstance.model().agree).toBe(true);
-    expect(bound.checked).toBe(true);
+    expect(fixture.componentInstance.agree.value).toBe(true);
+    expect(await bound.isChecked()).toBe(true);
     expect(fixture.componentInstance.plain()).toBe(false);
-    expect(plain.checked).toBe(false);
-    expect(bound.getAttribute('aria-readonly')).toBe('true');
-    expect(plain.getAttribute('aria-readonly')).toBe('true');
-    expect(bound.disabled).toBe(false);
+    expect(await plain.isChecked()).toBe(false);
+    expect(await bound.isReadonly()).toBe(true);
+    expect(await plain.isReadonly()).toBe(true);
+    // Readonly is not disabled: the checkbox stays focusable.
+    expect(await bound.isDisabled()).toBe(false);
   });
 });
 

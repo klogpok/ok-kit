@@ -12,6 +12,7 @@ import {
   model,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -112,7 +113,7 @@ export class UiSegment<T = unknown> {
  * accessible name of each segment come from the browser. The arrow keys move and select, and
  * ←/→ follow the visual direction (in RTL ← moves to the next segment); Home and End go to the
  * first and the last segment. `orientation="vertical"` stacks the segments.
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * Mark an icon with `uiSegmentIcon`; give an icon-only segment an `aria-label`.
  *
@@ -129,6 +130,7 @@ export class UiSegment<T = unknown> {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSegmented) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSegmented), multi: true },
     UiSegmentedControl,
   ],
   host: {

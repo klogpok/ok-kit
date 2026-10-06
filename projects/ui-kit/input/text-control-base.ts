@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Directive,
   DoCheck,
   ElementRef,
@@ -13,9 +14,8 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
 
 /**
  * Shared behavior for native text controls (`input[ui-input]`, `textarea[ui-textarea]`).
- * The value is handled by the forms layer directly on the native element
- * (DefaultValueAccessor or the Signal Forms native binding); this directive only adds
- * styling, ids and ARIA wiring.
+ * The value is handled by the forms layer directly on the native element (Angular's
+ * `DefaultValueAccessor`); this directive only adds styling, ids and ARIA wiring.
  */
 @Directive({
   host: {
@@ -28,7 +28,7 @@ import { UI_FORM_FIELD, UiFormFieldControl, UiSize, injectControlState } from '@
     '[attr.aria-required]': 'isRequired() ? "true" : null',
   },
 })
-export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
+export abstract class UiTextControlBase implements UiFormFieldControl, AfterViewInit, DoCheck {
   protected readonly element =
     inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef).nativeElement;
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
@@ -51,12 +51,21 @@ export abstract class UiTextControlBase implements UiFormFieldControl, DoCheck {
   readonly isDisabled = computed(() => this.state.disabled() || this.nativeDisabled());
   readonly isRequired = computed(() => this.state.required() || this.nativeRequired());
   readonly showError = computed(() =>
-    this.state.bound ? this.state.invalid() && this.state.touched() : this.invalid(),
+    this.state.bound() ? this.state.invalid() && this.state.touched() : this.invalid(),
   );
   readonly errorMessages = this.state.errorMessages;
   protected readonly describedBy = computed(
     () => [this.ariaDescribedBy(), this.formField?.describedBy()].filter(Boolean).join(' ') || null,
   );
+
+  /**
+   * A native input provides no value accessor of its own, so nothing calls `sync()` while the
+   * forms directive attaches its control. The first `ngDoCheck` can run before that happens, so
+   * read the state again once the view around the input is initialised.
+   */
+  ngAfterViewInit(): void {
+    this.state.sync();
+  }
 
   ngDoCheck(): void {
     this.state.sync();

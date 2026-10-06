@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   ElementRef,
   Injector,
   afterNextRender,
@@ -15,9 +14,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LiveAnnouncer, _IdGenerator } from '@angular/cdk/a11y';
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { transformedValue } from '@angular/forms/signals';
 import {
   UI_FORM_FIELD_CONTROL,
   UI_LABELS,
@@ -31,12 +29,6 @@ import { UiFileProblem, fileProblem, formatFileSize, sameFile } from './file-uti
 /** Look of the picker: a large drop area, or a compact button. */
 export type UiFileUploadVariant = 'dropzone' | 'button';
 
-/** A problem found in the value, as a forms error. */
-interface FileError {
-  kind: 'uiFileType' | 'uiFileSize' | 'uiFileCount';
-  message: string;
-}
-
 const optionalNumber = (value: unknown): number | null =>
   value == null || value === '' ? null : numberAttribute(value, Number.NaN);
 
@@ -46,19 +38,19 @@ const optionalNumber = (value: unknown): number | null =>
  * progress.
  *
  * - `accept` (like `<input type="file">`), `maxSize` (bytes) and `maxFiles` do not reject files:
- *   the files stay in the list, marked, and the control reports `uiFileType`, `uiFileSize` or
- *   `uiFileCount` errors with messages to Signal Forms or Reactive Forms, so the form is invalid
- *   until the user removes them. `ui-form-field` shows the messages.
+ *   the files stay in the list, marked, and `ui-form-field` says why. Those messages are the
+ *   control's own: they never become errors of a bound form control, so whether the form is
+ *   invalid stays with the consumer's own validators.
  * - Without `multiple`, a new file replaces the old one.
  * - The kit does not upload anything. Upload the files yourself and pass the progress per file
  *   (0–100) in `progress`.
  *
- * The value is a new `File[]` on every change. Implements `FormValueControl` (Signal Forms) and
- * `ControlValueAccessor`.
+ * The value is a new `File[]` on every change. Implements `ControlValueAccessor`, so it binds
+ * with `[formControl]`, `formControlName` and `[(ngModel)]`.
  *
  * @example
  * <ui-form-field label="Plans" hint="PDF, up to 10 MB">
- *   <ui-file-upload [formField]="form.files" accept=".pdf" multiple [maxSize]="10 * 1024 * 1024"
+ *   <ui-file-upload formControlName="files" accept=".pdf" multiple [maxSize]="10 * 1024 * 1024"
  *                   [progress]="uploads()" />
  * </ui-form-field>
  */
@@ -77,7 +69,7 @@ const optionalNumber = (value: unknown): number | null =>
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-labelledby]="ariaLabel() ? null : labelledBy()"
       [attr.aria-required]="isRequired() ? 'true' : null"
-      [attr.aria-invalid]="invalidState() ? 'true' : null"
+      [attr.aria-invalid]="showError() ? 'true' : null"
       [attr.aria-describedby]="describedBy()"
       (click)="browse()"
       (dragenter)="onDragOver($event)"
@@ -142,13 +134,16 @@ const optionalNumber = (value: unknown): number | null =>
   `,
   styleUrl: './file-upload.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiFileUpload) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiFileUpload) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiFileUpload), multi: true },
+  ],
   host: {
     class: 'ui-file-upload',
     '[class]': '"ui-file-upload--" + variant()',
     '[class.ui-file-upload--disabled]': 'isDisabled()',
     '[class.ui-file-upload--readonly]': 'readonly()',
-    '[class.ui-file-upload--invalid]': 'invalidState()',
+    '[class.ui-file-upload--invalid]': 'showError()',
     '[attr.id]': 'id()',
     // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
@@ -207,55 +202,34 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
     return map;
   });
 
-  /** Errors of the current value, with messages. */
-  private readonly fileErrors = computed<FileError[]>(() => this.errorsOf(this.value()));
-
-  /**
-   * Through `transformedValue` Signal Forms receives the file errors of a user change; they
-   * clear when the value changes elsewhere or the form is reset.
-   */
-  private readonly picked = transformedValue(this.value, {
-    parse: (files: readonly File[]) => ({ value: files, error: this.errorsOf(files) }),
-    format: (files: readonly File[]) => files,
+  /** Why the current files are rejected, as the messages shown under the field. */
+  private readonly fileErrors = computed<string[]>(() => {
+    const labels = this.labels();
+    const messages: string[] = [];
+    for (const [file, problem] of this.problems()) {
+      messages.push(
+        problem === 'type'
+          ? labels.fileTypeNotAllowed(file.name)
+          : labels.fileTooLarge(file.name, formatFileSize(this.maxSize() ?? 0, this.locale())),
+      );
+    }
+    const maxFiles = this.maxFiles();
+    if (maxFiles !== null && this.value().length > maxFiles) {
+      messages.push(labels.tooManyFiles(maxFiles));
+    }
+    return messages;
   });
 
-  protected readonly invalidState = computed(
-    () => this.showError() || (!this.controlState.bound && this.fileErrors().length > 0),
-  );
-
-  /** Reports the file errors to Reactive / template forms, which read them only from validators. */
-  private readonly fileValidator: ValidatorFn = (): ValidationErrors | null => {
-    const errors = this.fileErrors();
-    if (!errors.length) return null;
-    return Object.fromEntries(errors.map((error) => [error.kind, { message: error.message }]));
-  };
-
-  private validatedControl: AbstractControl | null = null;
-
-  constructor() {
-    super();
-    inject(DestroyRef).onDestroy(() => this.releaseValidator());
-  }
-
-  /** Without a forms directive, the field itself shows the file errors. */
+  /**
+   * The field says why a file is rejected itself, bound or not: a file the user still has to
+   * remove is not a validation failure of the consumer's control, which only ever sees the files.
+   */
   protected override ownErrors(): readonly string[] {
-    return this.controlState.bound ? [] : this.fileErrors().map((error) => error.message);
+    return this.fileErrors();
   }
 
   writeValue(value: readonly File[] | null | undefined): void {
     this.value.set(value ?? []);
-  }
-
-  override registerOnChange(fn: (value: readonly File[]) => void): void {
-    const control = this.ngControl?.control ?? null;
-    if (control !== this.validatedControl) {
-      this.releaseValidator();
-      if (control && !control.hasValidator(this.fileValidator)) {
-        control.addValidators(this.fileValidator);
-      }
-      this.validatedControl = control;
-    }
-    super.registerOnChange(fn);
   }
 
   focus(options?: FocusOptions): void {
@@ -333,35 +307,8 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
     this.notifyTouched();
   }
 
-  private errorsOf(files: readonly File[]): FileError[] {
-    const labels = this.labels();
-    const errors: FileError[] = [];
-    for (const file of files) {
-      const problem = fileProblem(file, this.accept(), this.maxSize());
-      if (problem === 'type') {
-        errors.push({ kind: 'uiFileType', message: labels.fileTypeNotAllowed(file.name) });
-      } else if (problem === 'size') {
-        const max = formatFileSize(this.maxSize() ?? 0, this.locale());
-        errors.push({ kind: 'uiFileSize', message: labels.fileTooLarge(file.name, max) });
-      }
-    }
-    const maxFiles = this.maxFiles();
-    if (maxFiles !== null && files.length > maxFiles) {
-      errors.push({ kind: 'uiFileCount', message: labels.tooManyFiles(maxFiles) });
-    }
-    return errors;
-  }
-
   private setValue(files: readonly File[]): void {
-    this.picked.set(files);
+    this.value.set(files);
     this.notifyChange(this.value());
-  }
-
-  private releaseValidator(): void {
-    const control = this.validatedControl;
-    this.validatedControl = null;
-    if (!control?.hasValidator(this.fileValidator)) return;
-    control.removeValidators(this.fileValidator);
-    control.updateValueAndValidity();
   }
 }

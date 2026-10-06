@@ -1,14 +1,16 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { FormField, form, minLength, readonly } from '@angular/forms/signals';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiButtonToggleGroupHarness } from '@vplans/ui-kit/testing';
 import { UiButtonToggle, UiButtonToggleGroup } from './button-toggle';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -142,56 +144,119 @@ describe('UiButtonToggleGroup', () => {
   });
 });
 
+/** Stands in for an application validator with a message of its own. */
+const atLeastOneChannel: ValidatorFn = (control) =>
+  (control.value as readonly string[] | null)?.length
+    ? null
+    : { uiChannels: { message: 'Choose at least one channel' } };
+
 @Component({
-  imports: [UiButtonToggleGroup, UiButtonToggle, ReactiveFormsModule],
+  imports: [UiButtonToggleGroup, UiButtonToggle, UiFormField, ReactiveFormsModule],
   template: `
     <form [formGroup]="form">
-      <ui-button-toggle-group formControlName="layers" aria-label="Layers">
-        <button ui-button-toggle value="walls">Walls</button>
-        <button ui-button-toggle value="pipes">Pipes</button>
-      </ui-button-toggle-group>
+      <ui-form-field label="Notify by">
+        <ui-button-toggle-group formControlName="channels" [readonly]="locked()">
+          <button ui-button-toggle value="sms">SMS</button>
+          <button ui-button-toggle value="email">Email</button>
+        </ui-button-toggle-group>
+      </ui-form-field>
     </form>
     <button type="button" class="outside">Outside</button>
   `,
 })
 class ReactiveHost {
+  readonly locked = signal(false);
   readonly form = new FormGroup({
-    layers: new FormControl<readonly string[]>(['pipes'], Validators.required),
+    channels: new FormControl<readonly string[] | null>(
+      ['email'],
+      [Validators.required, atLeastOneChannel],
+    ),
   });
 }
 
 describe('UiButtonToggleGroup with Reactive Forms', () => {
-  it('writes and reads values, marks touched when focus leaves and follows disable()', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
-    const root = fixture.nativeElement as HTMLElement;
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
+  let control: ReactiveHost['form']['controls']['channels'];
+  let root: HTMLElement;
+  let group: UiButtonToggleGroupHarness;
+
+  /** The message `ui-form-field` shows under the group. */
+  const error = (): string =>
+    root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
+    root = fixture.nativeElement as HTMLElement;
     document.body.appendChild(root);
+    control = host.form.controls.channels;
     await settle(fixture);
-    const control = fixture.componentInstance.form.controls.layers;
-    const group = root.querySelector('ui-button-toggle-group')!;
-    const buttons = root.querySelectorAll<HTMLButtonElement>('button[ui-button-toggle]');
-    expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
-    // aria-required is not allowed on role="group".
-    expect(group.hasAttribute('aria-required')).toBe(false);
+    group = await TestbedHarnessEnvironment.loader(fixture).getHarness(
+      UiButtonToggleGroupHarness.with({ label: 'Notify by' }),
+    );
+  });
 
-    buttons[1].focus();
-    buttons[1].click();
-    buttons[0].focus();
-    await settle(fixture);
-    expect(control.value).toEqual([]);
-    expect(control.touched).toBe(false);
-    root.querySelector<HTMLButtonElement>('.outside')!.focus();
-    await settle(fixture);
-    expect(control.touched).toBe(true);
-    expect(group.getAttribute('aria-invalid')).toBe('true');
+  afterEach(() => root.remove());
 
-    control.setValue(null);
-    await settle(fixture);
-    expect(buttons[0].getAttribute('aria-pressed')).toBe('false');
+  it('binds the value both ways and marks the group required in the label', async () => {
+    expect(await group.getPressedTexts()).toEqual(['Email']);
+    // aria-required is not allowed on role="group", so the label carries the marker.
+    expect(root.querySelector('ui-button-toggle-group')!.hasAttribute('aria-required')).toBe(false);
+    expect(
+      root.querySelector('.ui-form-field__required, .ui-form-field__required-text'),
+    ).not.toBeNull();
 
+    await group.toggle({ text: 'SMS' });
+    await settle(fixture);
+    expect(control.value).toEqual(['email', 'sms']);
+
+    control.setValue(['sms']);
+    await settle(fixture);
+    expect(await group.getPressedTexts()).toEqual(['SMS']);
+  });
+
+  it('disables the buttons from the control', async () => {
     control.disable();
     await settle(fixture);
-    expect([...buttons].every((button) => button.disabled)).toBe(true);
-    root.remove();
+    expect(await group.isDisabled()).toBe(true);
+  });
+
+  it('keeps the value when the control is readonly', async () => {
+    host.locked.set(true);
+    await settle(fixture);
+    await group.toggle({ text: 'SMS' });
+    await settle(fixture);
+    expect(control.value).toEqual(['email']);
+    expect(await group.getPressedTexts()).toEqual(['Email']);
+  });
+
+  it('marks the control touched when focus leaves', async () => {
+    await group.focus();
+    expect(control.touched).toBe(false);
+    await group.blur();
+    await settle(fixture);
+    expect(control.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    await group.toggle({ text: 'Email' });
+    await settle(fixture);
+    expect(control.value).toEqual([]);
+    expect(control.invalid).toBe(true);
+    expect(await group.isInvalid()).toBe(false);
+    expect(error()).toBe('');
+
+    await group.focus();
+    await group.blur();
+    await settle(fixture);
+    expect(await group.isInvalid()).toBe(true);
+    expect(error()).toContain('Choose at least one channel');
+
+    await group.toggle({ text: 'SMS' });
+    await settle(fixture);
+    expect(await group.isInvalid()).toBe(false);
+    expect(error()).toBe('');
   });
 });
 
@@ -220,63 +285,6 @@ describe('UiButtonToggleGroup with ngModel', () => {
     fixture.componentInstance.rooms.set([]);
     await settle(fixture);
     expect(buttons[1].getAttribute('aria-pressed')).toBe('false');
-  });
-});
-
-@Component({
-  imports: [UiButtonToggleGroup, UiButtonToggle, FormField, UiFormField],
-  template: `
-    <ui-form-field label="Notify by">
-      <ui-button-toggle-group [formField]="f.channels">
-        <button ui-button-toggle value="sms">SMS</button>
-        <button ui-button-toggle value="email">Email</button>
-      </ui-button-toggle-group>
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly locked = signal(false);
-  readonly model = signal<{ channels: readonly string[] }>({ channels: [] });
-  readonly f = form(this.model, (p) => {
-    minLength(p.channels, 1, { message: 'Choose at least one channel' });
-    readonly(p.channels, () => this.locked());
-  });
-}
-
-describe('UiButtonToggleGroup with Signal Forms', () => {
-  it('binds the value, shows the error after touch and follows a readonly rule', async () => {
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
-    await settle(fixture);
-    const host = fixture.componentInstance;
-    const group = root.querySelector('ui-button-toggle-group')!;
-    const buttons = root.querySelectorAll<HTMLButtonElement>('button');
-
-    buttons[0].focus();
-    buttons[0].blur();
-    await settle(fixture);
-    expect(host.f.channels().touched()).toBe(true);
-    expect(group.getAttribute('aria-invalid')).toBe('true');
-    expect(root.querySelector('.ui-form-field__error')!.textContent).toContain(
-      'Choose at least one channel',
-    );
-
-    buttons[1].click();
-    await settle(fixture);
-    expect(host.model().channels).toEqual(['email']);
-    expect(group.getAttribute('aria-invalid')).toBeNull();
-
-    host.model.set({ channels: ['sms'] });
-    await settle(fixture);
-    expect(buttons[0].getAttribute('aria-pressed')).toBe('true');
-
-    host.locked.set(true);
-    await settle(fixture);
-    buttons[1].click();
-    await settle(fixture);
-    expect(host.model().channels).toEqual(['sms']);
-    root.remove();
   });
 });
 

@@ -19,10 +19,9 @@ import {
   viewChild,
   viewChildren,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ActiveDescendantKeyManager, _IdGenerator } from '@angular/cdk/a11y';
 import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { transformedValue } from '@angular/forms/signals';
 import {
   UI_FORM_FIELD_CONTROL,
   UI_LABELS,
@@ -65,18 +64,18 @@ interface Draft {
  *   label: "14:30" in 24-hour locales such as `he-IL` (the default), "2:30 PM" in 12-hour ones.
  * - Typing keeps only the characters of a time and adds the ":" ("1430" → "14:30"). It also
  *   reads "930", "9", "2:30 pm". Text that is not a time, or a time outside
- *   `minTime`/`maxTime`, sets the value to `null` and reports `uiTimeParse` (`invalidTime`
- *   label) to Signal Forms or Reactive Forms.
+ *   `minTime`/`maxTime`, sets the value to `null`; once the user leaves the field it shows
+ *   `labels().invalidTime`. The message is the field's own: it never becomes an error of a bound
+ *   form control.
  * - A click or ArrowDown/ArrowUp opens the list at the selected time, or the nearest one;
  *   Alt+ArrowDown opens it without moving. Enter picks the active time, Escape closes the list.
  *
- * With Signal Forms set the limits with `minTime`/`maxTime`: `[formField]` does not allow
- * `min`/`max`, and the `min()`/`max()` rules take only numbers. Join the value with a date with
- * `uiDateWithTime()`. Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Join the value with a date with `uiDateWithTime()`. Implements `ControlValueAccessor`, so it
+ * binds with `[formControl]`, `formControlName` and `[(ngModel)]`.
  *
  * @example
  * <ui-form-field label="Meeting">
- *   <ui-time-input [formField]="form.start" minTime="08:00" maxTime="18:00" interval="15" />
+ *   <ui-time-input [formControl]="start" minTime="08:00" maxTime="18:00" interval="15" />
  * </ui-form-field>
  */
 @Component({
@@ -112,7 +111,7 @@ interface Draft {
         [attr.aria-controls]="isOpen() ? listId() : null"
         [attr.aria-activedescendant]="isOpen() ? activeId() : null"
         [attr.aria-required]="isRequired() ? 'true' : null"
-        [attr.aria-invalid]="invalidState() ? 'true' : null"
+        [attr.aria-invalid]="showError() ? 'true' : null"
         [attr.aria-describedby]="describedBy()"
         (input)="onInput($event)"
         (keydown)="onKeydown($event)"
@@ -156,6 +155,7 @@ interface Draft {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiTimeInput) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiTimeInput), multi: true },
     ɵUiOptionParent,
   ],
   host: {
@@ -163,7 +163,7 @@ interface Draft {
     '[class]': '"ui-time-input--" + size()',
     '[class.ui-time-input--disabled]': 'isDisabled()',
     '[class.ui-time-input--readonly]': 'readonly()',
-    '[class.ui-time-input--invalid]': 'invalidState()',
+    '[class.ui-time-input--invalid]': 'showError()',
     '[attr.id]': 'id()',
     // The inner control carries the label and descriptions; static attributes stay on the host too.
     '[attr.aria-label]': 'null',
@@ -235,30 +235,12 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     return toMinutes(value) === null ? null : value;
   });
 
-  /**
-   * Parses typed text into the value. Through `transformedValue` Signal Forms receives the parse
-   * errors; they clear when the value changes elsewhere or the form is reset.
-   */
-  private readonly rawText = transformedValue(this.value, {
-    parse: (text: string) => {
-      const allowed = this.parse(text);
-      return {
-        value: allowed === this.time() ? undefined : allowed,
-        error:
-          text.trim() && !allowed
-            ? { kind: 'uiTimeParse', message: this.labels().invalidTime }
-            : undefined,
-      };
-    },
-    format: (value: string | null) => this.display(value),
-  });
-
-  /** Dropped when the value or the parsed text changes elsewhere, so old text does not come back. */
-  private readonly draft = linkedSignal<{ value: string | null; text: string }, Draft | null>({
-    source: () => ({ value: this.time(), text: this.rawText() }),
-    computation: ({ value, text }, previous) => {
+  /** Dropped when the value changes elsewhere, so old text does not come back. */
+  private readonly draft = linkedSignal<string | null, Draft | null>({
+    source: () => this.time(),
+    computation: (value, previous) => {
       const draft = previous?.value;
-      return draft?.value === value && draft.text === text ? draft : null;
+      return draft?.value === value ? draft : null;
     },
   });
 
@@ -271,23 +253,12 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     return !!draft?.committed && draft.text.trim() !== '' && draft.value === null;
   });
 
-  protected readonly invalidState = computed(() => this.showError() || this.parseError());
-
   private readonly keyManager = new ActiveDescendantKeyManager<UiOption<string>>(
     this.options,
     this.injector,
   )
     .withVerticalOrientation()
     .withPageUpDown();
-
-  /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
-  private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
-    const error = this.rawText.parseErrors().at(0);
-    return error ? { [error.kind]: { message: error.message } } : null;
-  };
-
-  /** The control that holds `parseValidator`; it must not keep it after this field is gone. */
-  private validatedControl: AbstractControl | null = null;
 
   constructor() {
     super();
@@ -306,36 +277,20 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     effect(() => {
       if (this.readonly() || this.isDisabled()) untracked(() => this.close());
     });
-    const destroyRef = inject(DestroyRef);
-    destroyRef.onDestroy(() => {
-      this.keyManager.destroy();
-      this.releaseParseValidator();
-    });
+    inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
   }
 
-  /** Without a forms directive, the field itself shows the parse error. */
+  /**
+   * The field shows the parse message itself, bound or not: a text the user still has to fix is
+   * not a validation failure of the consumer's control, which only ever sees `null`.
+   */
   protected override ownErrors(): readonly string[] {
-    return !this.controlState.bound && this.parseError() ? [this.labels().invalidTime] : [];
+    return this.parseError() ? [this.labels().invalidTime] : [];
   }
 
   writeValue(value: string | null | undefined): void {
-    const time = toMinutes(value) === null ? null : value!;
     this.draft.set(null);
-    this.value.set(time);
-    // A new time clears the parse errors by itself; `null` over `null` (reset) does not.
-    if (time === null) this.rawText.set('');
-  }
-
-  override registerOnChange(fn: (value: string | null) => void): void {
-    const control = this.ngControl?.control ?? null;
-    if (control !== this.validatedControl) {
-      this.releaseParseValidator();
-      if (control && !control.hasValidator(this.parseValidator)) {
-        control.addValidators(this.parseValidator);
-      }
-      this.validatedControl = control;
-    }
-    super.registerOnChange(fn);
+    this.value.set(toMinutes(value) === null ? null : value!);
   }
 
   focus(options?: FocusOptions): void {
@@ -392,14 +347,11 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
       if (text !== input.value) input.value = text;
     }
     const before = this.value();
-    const hadError = this.rawText.parseErrors().length > 0;
-    this.rawText.set(text);
-    const value = this.value();
+    const value = this.parse(text);
+    // Against the shown time: a value that is not a time already shows empty, so it stays.
+    if (value !== this.time()) this.value.set(value);
     this.draft.set({ text, value, committed: false });
-    if (value !== before) this.notifyChange(value);
-    else if (hadError !== this.rawText.parseErrors().length > 0) {
-      this.ngControl?.control?.updateValueAndValidity();
-    }
+    if (this.value() !== before) this.notifyChange(value);
     this.open();
     if (value !== null) this.activateNear(value);
   }
@@ -451,15 +403,12 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
 
   private pick(value: string): void {
     if (this.readonly() || this.isDisabled()) return;
-    const errors = this.rawText.parseErrors().length > 0;
+    // Drops typed text and its message, also when the same time is picked again.
     this.draft.set(null);
     if (value !== this.time()) {
       this.value.set(value);
       this.notifyChange(value);
     }
-    // Drops typed text and its error, also when the same time is picked again.
-    this.rawText.set(this.display(value));
-    if (errors) this.ngControl?.control?.updateValueAndValidity();
     this.close();
   }
 
@@ -481,13 +430,5 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     const draft = this.draft();
     if (!draft) return;
     this.draft.set(draft.value ? null : { ...draft, committed: true });
-  }
-
-  private releaseParseValidator(): void {
-    const control = this.validatedControl;
-    this.validatedControl = null;
-    if (!control?.hasValidator(this.parseValidator)) return;
-    control.removeValidators(this.parseValidator);
-    control.updateValueAndValidity();
   }
 }

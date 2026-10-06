@@ -1,4 +1,4 @@
-import { applicationConfig, type Decorator, type Preview } from '@storybook/angular-vite';
+import { applicationConfig, type Decorator, type Preview } from '@storybook/angular';
 import { UI_ICONS_ALL, provideUiIcons } from '@vplans/ui-kit/icon';
 
 /** Applies the toolbar theme and direction to <html>, exactly like an application would. */

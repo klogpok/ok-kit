@@ -173,7 +173,7 @@ export class UiOption<T = unknown> implements Highlightable {
   /** Text of the label slot, without the icon and the description. */
   private readText(): string {
     const label = this.element.querySelector('.ui-option__label') ?? this.element;
-    return label.textContent.trim();
+    return (label.textContent ?? '').trim();
   }
 
   setActiveStyles(): void {

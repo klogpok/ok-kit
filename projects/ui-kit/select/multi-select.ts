@@ -8,6 +8,7 @@ import {
   model,
   numberAttribute,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
@@ -32,12 +33,12 @@ const SELECT_ALL = Symbol('ui-select-all');
  * - `chips` shows the selected values as chips in the trigger; their x removes a value with the
  *   mouse, the keyboard deselects in the list.
  *
- * The value is a new array on every change. Implements `FormValueControl` (Signal Forms) and
- * `ControlValueAccessor`.
+ * The value is a new array on every change. Implements `ControlValueAccessor`: bind it with
+ * `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="Coordinators">
- *   <ui-multi-select [formField]="form.coordinators" placeholder="Choose">
+ *   <ui-multi-select formControlName="coordinators" placeholder="Choose">
  *     @for (c of coordinators; track c.id) {
  *       <ui-option [value]="c.id">{{ c.name }}</ui-option>
  *     }
@@ -52,6 +53,7 @@ const SELECT_ALL = Symbol('ui-select-all');
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiMultiSelect) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiMultiSelect), multi: true },
     UiOptionParent,
   ],
   host: { class: 'ui-select ui-multi-select' },

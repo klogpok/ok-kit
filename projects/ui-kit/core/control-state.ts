@@ -1,21 +1,26 @@
-import { DestroyRef, Signal, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injector, Signal, computed, inject, signal } from '@angular/core';
 import { AbstractControl, NgControl, ValidationErrors, Validators } from '@angular/forms';
-import { FORM_FIELD } from '@angular/forms/signals';
 import { Subscription } from 'rxjs';
 
-/** Forms-layer state of a control, independent of Signal Forms vs. Reactive/Template forms. */
+/** Forms-layer state of a control, as the Reactive / template forms directives report it. */
 export interface UiControlState {
-  /** Whether a forms directive (`[formField]`, `formControl`, `ngModel`, ...) is bound to the host. */
-  readonly bound: boolean;
+  /**
+   * Whether a forms directive (`formControl`, `formControlName`, `ngModel`, ...) is bound to the
+   * host. A signal, not a plain value: a control that provides `NG_VALUE_ACCESSOR` cannot inject
+   * the directive while it is being constructed, so the answer is only known after the first
+   * `sync()`.
+   */
+  readonly bound: Signal<boolean>;
   readonly disabled: Signal<boolean>;
   readonly invalid: Signal<boolean>;
   readonly touched: Signal<boolean>;
   readonly required: Signal<boolean>;
   readonly errorMessages: Signal<readonly string[]>;
   /**
-   * Re-reads the `NgControl` state. Call it once the control is attached (e.g. from
-   * `registerOnTouched` in a ControlValueAccessor, or from `ngDoCheck` in a directive).
-   * Subsequent changes are tracked automatically via `AbstractControl.events`.
+   * Resolves the `NgControl` of the host, if it has not been resolved yet, and re-reads its state.
+   * Call it once the control is attached (e.g. from `registerOnTouched` in a ControlValueAccessor,
+   * or from `ngDoCheck` in a directive). Subsequent changes are tracked automatically via
+   * `AbstractControl.events`.
    */
   sync(): void;
 }
@@ -68,34 +73,30 @@ function messagesFromErrors(errors: ValidationErrors | null): string[] {
 }
 
 /**
- * Reads the forms state of the host element: the Signal Forms `[formField]` directive when
- * present, otherwise `NgControl` (`formControl`, `formControlName`, `ngModel`).
+ * Reads the forms state of the host element from its `NgControl` (`formControl`,
+ * `formControlName`, `ngModel`).
  * Must be called in an injection context of a directive/component on the control element.
+ *
+ * The directive is resolved lazily, on the first `sync()`, and not injected here: a control that
+ * provides `NG_VALUE_ACCESSOR` and injects `NgControl` while being constructed is a circular
+ * dependency (NG0200). By the time anything calls `sync()` the directive instance exists.
  */
 export function injectControlState(): UiControlState {
-  const formField = inject(FORM_FIELD, { self: true, optional: true });
-  if (formField) {
-    const state = formField.state;
-    return {
-      bound: true,
-      disabled: computed(() => state().disabled()),
-      invalid: computed(() => state().invalid()),
-      touched: computed(() => state().touched()),
-      required: computed(() => state().required()),
-      errorMessages: computed(() =>
-        formField.errors().flatMap((error) => (error.message ? [error.message] : [])),
-      ),
-      sync: () => undefined,
-    };
-  }
-
-  const ngControl = inject(NgControl, { self: true, optional: true });
+  const injector = inject(Injector);
+  const bound = signal(false);
   const current = signal(EMPTY, { equal: sameSnapshot });
+  let ngControl: NgControl | null = null;
+  let resolved = false;
   let tracked: AbstractControl | null = null;
   let subscription: Subscription | undefined;
   inject(DestroyRef).onDestroy(() => subscription?.unsubscribe());
 
   const sync = (): void => {
+    if (!resolved) {
+      resolved = true;
+      ngControl = injector.get(NgControl, null, { self: true, optional: true });
+      bound.set(ngControl !== null);
+    }
     const control = ngControl?.control;
     if (!control) return;
     if (control !== tracked) {
@@ -107,7 +108,7 @@ export function injectControlState(): UiControlState {
   };
 
   return {
-    bound: ngControl !== null,
+    bound,
     disabled: computed(() => current().disabled),
     invalid: computed(() => current().invalid),
     touched: computed(() => current().touched),

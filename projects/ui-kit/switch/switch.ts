@@ -6,6 +6,7 @@ import {
   inject,
   input,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -15,7 +16,7 @@ import {
 
 /**
  * On/off toggle for settings that apply immediately. Native checkbox with `role="switch"`.
- * Implements `FormCheckboxControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example <ui-switch [(checked)]="notifications">Email notifications</ui-switch>
  */
@@ -51,6 +52,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSwitch) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSwitch), multi: true },
     provideUiCheckedValidator(),
   ],
   host: {

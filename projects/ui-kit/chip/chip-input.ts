@@ -13,6 +13,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LiveAnnouncer, _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -33,13 +34,12 @@ import { UiChip, UiChipSet, UiChipSetFallback } from './chip';
  *   one, and the other arrow key at the last chip returns to the field.
  * - The same text is not added twice (ignoring case) unless `allowDuplicates` is set.
  *
- * The value is a new `string[]` on every change. Implements `FormValueControl` (Signal Forms)
- * and `ControlValueAccessor`. For a required field with Signal Forms, add `minLength(path, 1)`:
- * `required()` does not treat an empty array as empty.
+ * The value is a new `string[]` on every change. Implements `ControlValueAccessor`. For a
+ * required field add a validator of your own: `Validators.required` passes on an empty array.
  *
  * @example
  * <ui-form-field label="Tags" hint="Press Enter after each tag">
- *   <ui-chip-input [formField]="form.tags" placeholder="Add a tag" />
+ *   <ui-chip-input formControlName="tags" placeholder="Add a tag" />
  * </ui-form-field>
  */
 @Component({
@@ -92,6 +92,7 @@ import { UiChip, UiChipSet, UiChipSetFallback } from './chip';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiChipInput) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiChipInput), multi: true },
     UiChipSetFallback,
   ],
   host: {

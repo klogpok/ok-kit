@@ -82,7 +82,7 @@ describe('UiBadge extras', () => {
     const badge = el('count');
     expect(badge.classList).toContain('ui-badge--count');
     expect(badge.querySelector('.ui-badge__count')?.textContent).toBe('5');
-    expect(badge.querySelector('.ui-badge__label--hidden')?.textContent.trim()).toBe('unread');
+    expect(badge.querySelector('.ui-badge__label--hidden')?.textContent?.trim()).toBe('unread');
 
     fixture.componentInstance.count.set(120);
     await render();
@@ -108,6 +108,6 @@ describe('UiBadge extras', () => {
     const badge = el('dot');
     expect(badge.classList).toContain('ui-badge--dot');
     expect(badge.querySelector('.ui-badge__dot')?.getAttribute('aria-hidden')).toBe('true');
-    expect(badge.querySelector('.ui-badge__label--hidden')?.textContent.trim()).toBe('Online');
+    expect(badge.querySelector('.ui-badge__label--hidden')?.textContent?.trim()).toBe('Online');
   });
 });

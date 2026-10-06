@@ -10,6 +10,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
@@ -32,11 +33,11 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
  * ArrowDown/ArrowUp open the list and move (Alt+ArrowDown opens it without moving), Enter picks
  * the active option, Escape closes the list or clears the field, Tab closes the list.
  *
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="City">
- *   <ui-autocomplete [formField]="form.city">
+ *   <ui-autocomplete formControlName="city">
  *     @for (city of cities; track city) { <ui-option [value]="city">{{ city }}</ui-option> }
  *   </ui-autocomplete>
  * </ui-form-field>
@@ -122,6 +123,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiAutocomplete) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiAutocomplete), multi: true },
     ɵUiOptionParent,
   ],
   host: {

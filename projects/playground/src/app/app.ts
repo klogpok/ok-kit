@@ -1,6 +1,8 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DOCUMENT, inject, signal } from '@angular/core';
-import { FormField, email, form, required, submit } from '@angular/forms/signals';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -13,7 +15,7 @@ import {
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UiDialog } from '@vplans/ui-kit/dialog';
 import { UiDivider } from '@vplans/ui-kit/divider';
-import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiInput, UiTextarea } from '@vplans/ui-kit/input';
 import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
@@ -29,6 +31,7 @@ import { PhaseEight } from './phase-eight';
 import { PhaseSeven } from './phase-seven';
 import { PhaseSix } from './phase-six';
 import { PhaseThree } from './phase-three';
+import { readyToSubmit } from './submit';
 
 interface Plan {
   name: string;
@@ -41,10 +44,11 @@ interface Plan {
   selector: 'app-root',
   imports: [
     JsonPipe,
-    FormField,
+    ReactiveFormsModule,
     UiButton,
     UiIconButton,
     UiCheckbox,
+    UiError,
     UiFormField,
     UiIcon,
     UiInput,
@@ -134,21 +138,23 @@ export class App {
   // The VPlans apps are Hebrew: index.html starts in RTL.
   protected readonly rtl = signal(this.document.documentElement.dir === 'rtl');
   protected readonly saving = signal(false);
-  protected readonly model = signal({
-    name: '',
-    email: '',
-    team: '',
-    role: 'developer',
-    bio: '',
-    notifications: true,
-    terms: false,
+  protected readonly profile = new FormGroup({
+    name: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email],
+    }),
+    team: new FormControl('', { nonNullable: true }),
+    role: new FormControl('developer', { nonNullable: true }),
+    bio: new FormControl('', { nonNullable: true }),
+    notifications: new FormControl(true, { nonNullable: true }),
+    terms: new FormControl(false, { nonNullable: true, validators: Validators.requiredTrue }),
   });
-  protected readonly profile = form(this.model, (p) => {
-    required(p.name, { message: 'Enter your name' });
-    required(p.email, { message: 'Enter your email' });
-    email(p.email, { message: 'Enter a valid email' });
-    required(p.terms, { message: 'Accept the terms to continue' });
-  });
+  /** The form's value as a signal, for the Model panel. */
+  protected readonly model = toSignal(
+    this.profile.valueChanges.pipe(map(() => this.profile.getRawValue())),
+    { initialValue: this.profile.getRawValue() },
+  );
 
   protected toggleDirection(): void {
     this.rtl.update((rtl) => !rtl);
@@ -159,12 +165,11 @@ export class App {
 
   protected async save(event: Event): Promise<void> {
     event.preventDefault();
-    await submit(this.profile, async () => {
-      this.saving.set(true);
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      this.saving.set(false);
-      this.toast.success('Profile saved');
-    });
+    if (!readyToSubmit(this.profile)) return;
+    this.saving.set(true);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    this.saving.set(false);
+    this.toast.success('Profile saved');
   }
 
   protected async reset(): Promise<void> {
@@ -174,7 +179,7 @@ export class App {
       confirmLabel: 'Reset',
       tone: 'danger',
     });
-    if (confirmed) this.profile().reset();
+    if (confirmed) this.profile.reset();
   }
 
   protected renameFile(file: StoredFile, name: string): void {

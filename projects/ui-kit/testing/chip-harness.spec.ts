@@ -71,6 +71,7 @@ describe('UiChipHarness and UiChipInputHarness', () => {
     expect(await tags.getText()).toBe('');
     expect(await tags.isDisabled()).toBe(false);
     expect(await tags.isReadonly()).toBe(false);
+    expect(await tags.isRequired()).toBe(false);
     expect(await tags.isInvalid()).toBe(false);
   });
 });

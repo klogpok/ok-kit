@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
@@ -16,11 +17,11 @@ import { UiSelectBase } from './select-base';
  * - `searchable` turns the trigger into a text input that filters the options by label.
  *   Listen to `searchChange` and set `filterOptions="false"` to filter on the server instead.
  *
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="Coordinator">
- *   <ui-select [formField]="form.coordinator" placeholder="Choose">
+ *   <ui-select formControlName="coordinator" placeholder="Choose">
  *     @for (c of coordinators; track c.id) {
  *       <ui-option [value]="c.id">{{ c.name }}</ui-option>
  *     }
@@ -35,6 +36,7 @@ import { UiSelectBase } from './select-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSelect) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSelect), multi: true },
     UiOptionParent,
   ],
   host: { class: 'ui-select' },

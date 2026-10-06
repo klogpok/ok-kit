@@ -1,8 +1,16 @@
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, required } from '@angular/forms/signals';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { UiInput, UiTextarea } from '@vplans/ui-kit/input';
+import { UiInputHarness } from '@vplans/ui-kit/testing';
 import { UiError, UiFormField, UiHint, UiPrefix, UiSuffix } from './form-field';
 
 function query(fixture: ComponentFixture<unknown>, selector: string): HTMLElement {
@@ -15,33 +23,31 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
 }
 
+/** Reactive forms show the message of an error value that is a string. */
+const enterYourName: ValidatorFn = (control) =>
+  control.value ? null : { nameRequired: 'Name is required' };
+
 @Component({
   imports: [ReactiveFormsModule, UiFormField, UiInput, UiError],
   template: `
-    <ui-form-field label="Email" hint="Work address">
-      <input ui-input [formControl]="email" />
-      @if (email.hasError('required')) {
-        <ui-error>Email is required</ui-error>
-      }
-    </ui-form-field>
+    <form [formGroup]="form">
+      <ui-form-field label="Email" hint="Work address">
+        <input ui-input formControlName="email" />
+        @if (form.controls.email.hasError('required')) {
+          <ui-error>Email is required</ui-error>
+        }
+      </ui-form-field>
+      <ui-form-field label="Name">
+        <input ui-input formControlName="name" />
+      </ui-form-field>
+    </form>
   `,
 })
 class ReactiveHost {
-  readonly email = new FormControl('', Validators.required);
-}
-
-@Component({
-  imports: [FormField, UiFormField, UiInput],
-  template: `
-    <ui-form-field label="Name">
-      <input ui-input [formField]="f.name" />
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal({ name: '' });
-  readonly f = form(this.model, (path) => {
-    required(path.name, { message: 'Name is required' });
+  readonly form = new FormGroup({
+    email: new FormControl('', Validators.required),
+    // Validators.required marks the control required; the string-valued error carries the text.
+    name: new FormControl('', [Validators.required, enterYourName]),
   });
 }
 
@@ -62,99 +68,112 @@ class ManualHost {
 describe('UiFormField + UiInput', () => {
   describe('with Reactive Forms', () => {
     let fixture: ComponentFixture<ReactiveHost>;
-    let inputEl: HTMLInputElement;
+    let root: HTMLElement;
+    let controls: ReactiveHost['form']['controls'];
+    let loader: HarnessLoader;
+
+    const input = (label: string) => loader.getHarness(UiInputHarness.with({ label }));
+    /** The `ui-form-field` whose label contains this text. */
+    const fieldOf = (label: string): HTMLElement =>
+      [...root.querySelectorAll<HTMLElement>('ui-form-field')].find((it) =>
+        it.querySelector('label')?.textContent?.includes(label),
+      )!;
+    const errorOf = (label: string): HTMLElement =>
+      fieldOf(label).querySelector<HTMLElement>('.ui-form-field__error')!;
+    const hintOf = (label: string): HTMLElement =>
+      fieldOf(label).querySelector<HTMLElement>('.ui-form-field__hint')!;
+    const describedBy = (label: string): string | null =>
+      fieldOf(label).querySelector('input')!.getAttribute('aria-describedby');
 
     beforeEach(async () => {
       fixture = TestBed.createComponent(ReactiveHost);
+      root = fixture.nativeElement as HTMLElement;
+      controls = fixture.componentInstance.form.controls;
+      loader = TestbedHarnessEnvironment.loader(fixture);
       await settle(fixture);
-      inputEl = query(fixture, 'input') as HTMLInputElement;
     });
 
-    it('links label to the input via for/id', () => {
-      const label = query(fixture, 'label') as HTMLLabelElement;
-      expect(inputEl.id).toMatch(/^ui-input-/);
-      expect(label.htmlFor).toBe(inputEl.id);
-      expect(label.textContent).toContain('Email');
+    it('links label to the input via for/id', async () => {
+      const email = await input('Email');
+      const label = fieldOf('Email').querySelector<HTMLLabelElement>('label')!;
+      expect(await email.getLabel()).toBe('Email');
+      expect(await email.getId()).toMatch(/^ui-input-/);
+      expect(label.htmlFor).toBe(await email.getId());
     });
 
-    it('shows the required marker from Validators.required', () => {
-      expect(inputEl.getAttribute('aria-required')).toBe('true');
-      expect(query(fixture, '.ui-form-field__required')).not.toBeNull();
-      expect(query(fixture, '.ui-form-field__required-text')).toBeNull();
+    it('shows the required marker from Validators.required', async () => {
+      expect(await (await input('Email')).isRequired()).toBe(true);
+      expect(fieldOf('Email').querySelector('.ui-form-field__required')).not.toBeNull();
+      expect(fieldOf('Email').querySelector('.ui-form-field__required-text')).toBeNull();
     });
 
-    it('describes the input with the hint while valid or untouched', () => {
-      const hint = query(fixture, '.ui-form-field__hint');
-      expect(inputEl.getAttribute('aria-describedby')).toBe(hint.id);
-      expect(hint.hidden).toBe(false);
-      expect(inputEl.hasAttribute('aria-invalid')).toBe(false);
+    it('describes the input with the hint while valid or untouched', async () => {
+      expect(describedBy('Email')).toBe(hintOf('Email').id);
+      expect(hintOf('Email').hidden).toBe(false);
+      expect(await (await input('Email')).isInvalid()).toBe(false);
+      expect(errorOf('Email').classList).toContain('ui-form-field__error--empty');
     });
 
-    it('shows the error after the control is touched and links it', async () => {
-      inputEl.dispatchEvent(new Event('blur'));
+    it('shows the projected error after the control is touched and links it', async () => {
+      const email = await input('Email');
+      await email.blur();
       await settle(fixture);
 
-      const error = query(fixture, '.ui-form-field__error');
-      expect(inputEl.getAttribute('aria-invalid')).toBe('true');
-      expect(inputEl.classList).toContain('ui-input--invalid');
+      const error = errorOf('Email');
+      expect(await email.isInvalid()).toBe(true);
+      expect(fieldOf('Email').querySelector('input')!.classList).toContain('ui-input--invalid');
       expect(error.classList).not.toContain('ui-form-field__error--empty');
       expect(error.textContent).toContain('Email is required');
       expect(error.getAttribute('aria-live')).toBe('polite');
-      expect(inputEl.getAttribute('aria-describedby')).toBe(error.id);
-      expect(query(fixture, '.ui-form-field__hint').hidden).toBe(true);
+      expect(describedBy('Email')).toBe(error.id);
+      expect(hintOf('Email').hidden).toBe(true);
+    });
+
+    it('shows the message of the validator when no ui-error is projected', async () => {
+      const name = await input('Name');
+      expect(await name.isRequired()).toBe(true);
+      expect(errorOf('Name').textContent?.trim()).toBe('');
+
+      await name.blur();
+      await settle(fixture);
+
+      const error = errorOf('Name');
+      expect(await name.isInvalid()).toBe(true);
+      expect(error.querySelector('.ui-error')!.textContent).toBe('Name is required');
+      expect(describedBy('Name')).toBe(error.id);
+    });
+
+    it('binds the value both ways and clears the error once valid', async () => {
+      const name = await input('Name');
+      controls.name.markAsTouched();
+      await name.setValue('Ada');
+      await settle(fixture);
+      expect(controls.name.value).toBe('Ada');
+      expect(errorOf('Name').textContent?.trim()).toBe('');
+
+      controls.name.setValue('Grace');
+      await settle(fixture);
+      expect(await name.getValue()).toBe('Grace');
     });
 
     it('reacts to programmatic markAsTouched and value changes', async () => {
-      fixture.componentInstance.email.markAsTouched();
+      const email = await input('Email');
+      controls.email.markAsTouched();
       await settle(fixture);
-      expect(inputEl.getAttribute('aria-invalid')).toBe('true');
+      expect(await email.isInvalid()).toBe(true);
 
-      inputEl.value = 'a@b.c';
-      inputEl.dispatchEvent(new Event('input'));
+      await email.setValue('a@b.c');
       await settle(fixture);
-      expect(inputEl.hasAttribute('aria-invalid')).toBe(false);
+      expect(await email.isInvalid()).toBe(false);
+      expect(describedBy('Email')).toBe(hintOf('Email').id);
     });
 
     it('reflects the disabled state on the field', async () => {
-      fixture.componentInstance.email.disable();
+      const email = await input('Email');
+      controls.email.disable();
       await settle(fixture);
-      expect(inputEl.disabled).toBe(true);
-      expect(query(fixture, 'ui-form-field').classList).toContain('ui-form-field--disabled');
-    });
-  });
-
-  describe('with Signal Forms', () => {
-    let fixture: ComponentFixture<SignalHost>;
-    let inputEl: HTMLInputElement;
-
-    beforeEach(async () => {
-      fixture = TestBed.createComponent(SignalHost);
-      await settle(fixture);
-      inputEl = query(fixture, 'input') as HTMLInputElement;
-    });
-
-    it('binds the value both ways', async () => {
-      inputEl.value = 'Ada';
-      inputEl.dispatchEvent(new Event('input'));
-      await settle(fixture);
-      expect(fixture.componentInstance.model().name).toBe('Ada');
-
-      fixture.componentInstance.model.set({ name: 'Grace' });
-      await settle(fixture);
-      expect(inputEl.value).toBe('Grace');
-    });
-
-    it('marks required and shows validator messages after touch', async () => {
-      expect(inputEl.getAttribute('aria-required')).toBe('true');
-      expect(inputEl.hasAttribute('aria-invalid')).toBe(false);
-
-      inputEl.dispatchEvent(new Event('blur'));
-      await settle(fixture);
-
-      const error = query(fixture, '.ui-form-field__error');
-      expect(inputEl.getAttribute('aria-invalid')).toBe('true');
-      expect(error.textContent).toContain('Name is required');
-      expect(inputEl.getAttribute('aria-describedby')).toBe(error.id);
+      expect(await email.isDisabled()).toBe(true);
+      expect(fieldOf('Email').classList).toContain('ui-form-field--disabled');
     });
   });
 

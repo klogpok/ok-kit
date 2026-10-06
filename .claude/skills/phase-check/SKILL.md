@@ -23,6 +23,7 @@ pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit
 
 - `pnpm test-storybook` runs axe on every story in three modes (light/rtl, dark/rtl, light/ltr).
 - Budget warnings from `pnpm build:playground` are not failures, but list them in the report. The limits are in [docs/DECISIONS.md](../../../docs/DECISIONS.md) (phase 2 review answers).
+- `pnpm test:coverage` reports coverage but no longer fails on it: the Angular 20 unit-test builder has no threshold option (see [docs/DECISIONS.md](../../../docs/DECISIONS.md) → the Angular 20 migration). Read the numbers and put them in the report.
 
 ## 2. Visual baselines
 
@@ -34,7 +35,7 @@ New or intentionally changed stories need new baselines:
 
 ## 3. Browser check
 
-Check the new and changed stories in a real browser for light and dark themes and for RTL, including open overlays. `playwright-core` with `channel: 'msedge'` works without downloading browsers. Vitest does not load component styles, so CSS fixes are verified only here.
+Check the new and changed stories in a real browser for light and dark themes and for RTL, including open overlays. The Storybook dev server rebuilds on change but has hot module replacement switched off, so refresh the page by hand. `playwright-core` with `channel: 'msedge'` works without downloading browsers. Vitest does not load component styles, so CSS fixes are verified only here.
 
 ## 4. Report
 

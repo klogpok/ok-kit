@@ -1,15 +1,15 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import {
-  FormField,
-  form,
-  max,
-  min,
-  minDate,
-  minLength,
-  required,
-  validate,
-} from '@angular/forms/signals';
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { UiButton } from '@vplans/ui-kit/button';
 import {
   UiDateRange,
@@ -17,7 +17,7 @@ import {
   UiDateRangePreset,
   UiDatepicker,
 } from '@vplans/ui-kit/datepicker';
-import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
 import {
   UiButtonToggle,
   UiButtonToggleGroup,
@@ -27,6 +27,7 @@ import {
 import { UiRangeSlider, UiSlider, UiSliderMark, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiStep, UiStepper, UiStepperNext, UiStepperPrevious } from '@vplans/ui-kit/stepper';
 import { UiTimeInput, uiDateWithTime } from '@vplans/ui-kit/time';
+import { uiAtLeastOne, uiRequired } from './validators';
 
 interface UnitFilters {
   deal: 'rent' | 'sale';
@@ -36,26 +37,28 @@ interface UnitFilters {
   floors: UiSliderRange;
 }
 
-interface InspectionRequest {
-  permit: { period: UiDateRange | null };
-  visit: { date: Date | null; time: string | null };
-}
-
 /** Midnight of the day `days` after `date`. */
 const addDays = (date: Date, days: number) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+/** A range that has a start needs an end too. */
+const endOfRange = (control: AbstractControl): ValidationErrors | null => {
+  const range = control.value as UiDateRange | null;
+  return range && !range.end ? { end: 'Choose the end date' } : null;
+};
 
 /** Phase 8 components: complex widgets. */
 @Component({
   selector: 'app-phase-eight',
   imports: [
     JsonPipe,
-    FormField,
+    ReactiveFormsModule,
     UiButton,
     UiButtonToggle,
     UiButtonToggleGroup,
     UiDatepicker,
     UiDateRangePicker,
+    UiError,
     UiFormField,
     UiRangeSlider,
     UiSegment,
@@ -72,18 +75,25 @@ const addDays = (date: Date, days: number) =>
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseEight {
-  protected readonly model = signal<UnitFilters>({
-    deal: 'rent',
-    features: ['parking'],
-    rooms: 3,
-    price: [4000, 9000],
-    floors: [2, 8],
+  protected readonly filters = new FormGroup({
+    deal: new FormControl<UnitFilters['deal']>('rent', { nonNullable: true }),
+    features: new FormControl<readonly string[]>(['parking'], {
+      nonNullable: true,
+      validators: uiAtLeastOne,
+    }),
+    // The slider carries its own limits now, so the control only has to match them.
+    rooms: new FormControl(3, {
+      nonNullable: true,
+      validators: [Validators.min(1), Validators.max(6)],
+    }),
+    price: new FormControl<UiSliderRange>([4000, 9000], { nonNullable: true }),
+    floors: new FormControl<UiSliderRange>([2, 8], { nonNullable: true }),
   });
-  protected readonly filters = form(this.model, (p) => {
-    minLength(p.features, 1, { message: 'Choose at least one feature' });
-    min(p.rooms, 1);
-    max(p.rooms, 6);
-  });
+  /** The filters as a signal, for the panel below them. */
+  protected readonly model = toSignal(
+    this.filters.valueChanges.pipe(map(() => this.filters.getRawValue())),
+    { initialValue: this.filters.getRawValue() },
+  );
 
   /** The last price range the user let go of, e.g. for a server request. */
   protected readonly committedPrice = signal<UiSliderRange | null>(null);
@@ -100,19 +110,24 @@ export class PhaseEight {
   /** Midnight today: the first day of the permit and of the visit. */
   protected readonly today = addDays(new Date(), 0);
   protected readonly step = signal(0);
-  protected readonly request = signal<InspectionRequest>({
-    permit: { period: null },
-    visit: { date: null, time: null },
+  protected readonly wizard = new FormGroup({
+    permit: new FormGroup({
+      period: new FormControl<UiDateRange | null>(null, [
+        ...uiRequired('Choose the permit period'),
+        endOfRange,
+      ]),
+    }),
+    visit: new FormGroup({
+      // `[min]="today"` already keeps earlier days out of the control, so `required` is enough.
+      date: new FormControl<Date | null>(null, uiRequired('Choose a date')),
+      time: new FormControl<string | null>(null, uiRequired('Choose a time')),
+    }),
   });
-  protected readonly wizard = form(this.request, (p) => {
-    required(p.permit.period, { message: 'Choose the permit period' });
-    validate(p.permit.period, ({ value }) =>
-      value() && !value()?.end ? { kind: 'end', message: 'Choose the end date' } : undefined,
-    );
-    required(p.visit.date, { message: 'Choose a date' });
-    minDate(p.visit.date, this.today);
-    required(p.visit.time, { message: 'Choose a time' });
-  });
+  /** The wizard's value as a signal, for the summary step. */
+  protected readonly request = toSignal(
+    this.wizard.valueChanges.pipe(map(() => this.wizard.getRawValue())),
+    { initialValue: this.wizard.getRawValue() },
+  );
 
   protected readonly presets: UiDateRangePreset[] = [
     { label: 'Next 30 days', range: () => ({ start: this.today, end: addDays(this.today, 29) }) },
@@ -125,6 +140,6 @@ export class PhaseEight {
 
   /** The visit as one `Date`. */
   protected readonly visit = computed(() =>
-    uiDateWithTime(this.request().visit.date, this.request().visit.time),
+    uiDateWithTime(this.request().visit.date ?? null, this.request().visit.time ?? null),
   );
 }

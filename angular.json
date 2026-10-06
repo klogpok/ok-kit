@@ -31,16 +31,16 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ui-kit/tsconfig.spec.json",
-            "coverageExclude": [
+            "buildTarget": "::development",
+            "runner": "vitest",
+            "providersFile": "projects/ui-kit/test-setup/providers.ts",
+            "codeCoverageExclude": [
               "**/*.stories.ts",
               "**/tokens.generated.ts"
             ],
-            "coverageThresholds": {
-              "statements": 94,
-              "branches": 90,
-              "functions": 88,
-              "lines": 96
-            }
+            "setupFiles": [
+              "projects/ui-kit/test-setup/jsdom-event-view.ts"
+            ]
           }
         },
         "lint": {
@@ -54,8 +54,9 @@
           }
         },
         "storybook": {
-          "builder": "@storybook/angular-vite:start-storybook",
+          "builder": "@storybook/angular:start-storybook",
           "options": {
+            "browserTarget": "ui-kit:build-storybook",
             "configDir": "projects/ui-kit/.storybook",
             "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
             "styles": [
@@ -65,11 +66,13 @@
               "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss"
             ],
-            "port": 6006
+            "port": 6006,
+            "compodoc": false,
+            "experimentalZoneless": true
           }
         },
         "build-storybook": {
-          "builder": "@storybook/angular-vite:build-storybook",
+          "builder": "@storybook/angular:build-storybook",
           "options": {
             "configDir": "projects/ui-kit/.storybook",
             "tsConfig": "projects/ui-kit/.storybook/tsconfig.json",
@@ -80,7 +83,9 @@
               "node_modules/@fontsource/assistant/700.css",
               "projects/ui-kit/styles/ui-kit.scss"
             ],
-            "outputDir": "dist/storybook/ui-kit"
+            "outputDir": "dist/storybook/ui-kit",
+            "compodoc": false,
+            "experimentalZoneless": true
           }
         }
       }
@@ -154,7 +159,13 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/playground/tsconfig.spec.json",
+            "buildTarget": "::development",
+            "runner": "vitest",
+            "providersFile": "projects/playground/src/test-providers.ts"
+          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",

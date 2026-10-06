@@ -1,7 +1,12 @@
 import { JsonPipe } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, email, form, minLength, required, submit } from '@angular/forms/signals';
+import { Component } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { argsToTemplate, moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { UiButton } from '@vplans/ui-kit/button';
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
@@ -10,11 +15,20 @@ import { UiRadio, UiRadioGroup } from '@vplans/ui-kit/radio';
 import { UiSwitch } from '@vplans/ui-kit/switch';
 import { UiError, UiFormField, UiHint } from './form-field';
 
+/**
+ * Wraps a validator so that its error value is the message to show. `ui-form-field` renders
+ * string-valued Reactive Forms errors, so a field needs no projected `<ui-error>` for them.
+ * `Validators.required` itself stays in the list: the required marker reads that exact validator.
+ */
+function withMessage(validator: ValidatorFn, message: string): ValidatorFn {
+  return (control) => (validator(control) ? { uiMessage: message } : null);
+}
+
 @Component({
-  selector: 'ui-story-signal-form',
+  selector: 'ui-story-account-form',
   imports: [
     JsonPipe,
-    FormField,
+    ReactiveFormsModule,
     UiFormField,
     UiInput,
     UiTextarea,
@@ -25,54 +39,65 @@ import { UiError, UiFormField, UiHint } from './form-field';
     UiButton,
   ],
   template: `
-    <form style="display:grid;gap:16px;max-inline-size:400px" (submit)="submit($event)" novalidate>
+    <form
+      [formGroup]="form"
+      style="display:grid;gap:16px;max-inline-size:400px"
+      (submit)="submit($event)"
+      novalidate
+    >
       <ui-form-field label="Full name">
-        <input ui-input [formField]="f.name" autocomplete="name" />
+        <input ui-input formControlName="name" autocomplete="name" />
       </ui-form-field>
       <ui-form-field label="Email" hint="We'll send the receipt here">
-        <input ui-input type="email" [formField]="f.email" autocomplete="email" />
+        <input ui-input type="email" formControlName="email" autocomplete="email" />
       </ui-form-field>
       <ui-form-field label="Plan">
-        <ui-radio-group [formField]="f.plan" orientation="horizontal">
+        <ui-radio-group formControlName="plan" orientation="horizontal">
           <ui-radio value="free">Free</ui-radio>
           <ui-radio value="pro">Pro</ui-radio>
           <ui-radio value="team">Team</ui-radio>
         </ui-radio-group>
       </ui-form-field>
       <ui-form-field label="Notes">
-        <textarea ui-textarea autosize [formField]="f.notes"></textarea>
+        <textarea ui-textarea autosize formControlName="notes"></textarea>
       </ui-form-field>
-      <ui-switch [formField]="f.newsletter">Monthly newsletter</ui-switch>
+      <ui-switch formControlName="newsletter">Monthly newsletter</ui-switch>
       <ui-form-field>
-        <ui-checkbox [formField]="f.terms">I accept the terms of service</ui-checkbox>
+        <ui-checkbox formControlName="terms">I accept the terms of service</ui-checkbox>
       </ui-form-field>
       <div><button ui-button type="submit">Create account</button></div>
-      <pre dir="ltr" style="font-size:12px">{{ model() | json }}</pre>
+      <pre dir="ltr" style="font-size:12px">{{ form.value | json }}</pre>
     </form>
   `,
 })
-class SignalFormStory {
-  readonly model = signal({
-    name: '',
-    email: '',
-    plan: '',
-    notes: '',
-    newsletter: true,
-    terms: false,
-  });
-  readonly f = form(this.model, (p) => {
-    required(p.name, { message: 'Enter your name' });
-    minLength(p.name, 2, { message: 'At least 2 characters' });
-    required(p.email, { message: 'Enter your email' });
-    email(p.email, { message: 'Enter a valid email' });
-    required(p.plan, { message: 'Choose a plan' });
-    required(p.terms, { message: 'You must accept the terms' });
+class AccountFormStory {
+  readonly form = new FormGroup({
+    name: new FormControl('', [
+      Validators.required,
+      withMessage(Validators.required, 'Enter your name'),
+      withMessage(Validators.minLength(2), 'At least 2 characters'),
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      withMessage(Validators.required, 'Enter your email'),
+      withMessage(Validators.email, 'Enter a valid email'),
+    ]),
+    plan: new FormControl('', [
+      Validators.required,
+      withMessage(Validators.required, 'Choose a plan'),
+    ]),
+    notes: new FormControl(''),
+    newsletter: new FormControl(true),
+    terms: new FormControl(false, [
+      Validators.requiredTrue,
+      withMessage(Validators.requiredTrue, 'You must accept the terms'),
+    ]),
   });
 
   submit(event: Event): void {
     event.preventDefault();
-    // Marks every field touched, then runs the action only when the form is valid.
-    void submit(this.f, () => Promise.resolve(undefined));
+    // Marks every field touched, so the messages appear; the action runs only when valid.
+    this.form.markAllAsTouched();
   }
 }
 
@@ -153,9 +178,12 @@ export const WithError: Story = {
   }),
 };
 
+// The export name is the story id, and the visual baseline is keyed by it. It stays as it is
+// so that this ticket removes no baseline; the display name carries the story's current subject.
 export const SignalForms: Story = {
-  decorators: [moduleMetadata({ imports: [SignalFormStory] })],
-  render: () => ({ template: '<ui-story-signal-form />' }),
+  name: 'Account form',
+  decorators: [moduleMetadata({ imports: [AccountFormStory] })],
+  render: () => ({ template: '<ui-story-account-form />' }),
 };
 
 export const ReactiveForms: Story = {

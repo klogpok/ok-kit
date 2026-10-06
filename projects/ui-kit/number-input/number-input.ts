@@ -13,9 +13,8 @@ import {
   numberAttribute,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { transformedValue } from '@angular/forms/signals';
 import {
   UI_FORM_FIELD_CONTROL,
   UI_LABELS,
@@ -53,21 +52,20 @@ const optionalNumber = (value: unknown): number | null =>
  * label (default `he-IL`: "1,234.5").
  *
  * - Typing sets the value as soon as the text is a number. Text that is not a number sets the
- *   value to `null` and reports a `uiNumberParse` error (message `labels().invalidNumber`) to
- *   Signal Forms or Reactive Forms; without forms the field shows it once the user leaves.
+ *   value to `null`; once the user leaves the field it shows `labels().invalidNumber`. The
+ *   message is the field's own: it never becomes an error of a bound form control.
  * - Leaving the field (or Enter) formats the text, rounds to `maxFractionDigits` and clamps the
  *   value to `min`/`max`.
  * - ArrowUp/ArrowDown change the value by `step`, PageUp/PageDown by ten steps, Home/End go to
  *   `min`/`max`. The stepper buttons repeat while held; they are not in the tab order (the keys
  *   do the same).
  *
- * The value is a `number` or `null`. Implements `FormValueControl` (Signal Forms) and
- * `ControlValueAccessor`. With Signal Forms, set the limits with `min()` and `max()` rules:
- * `[formField]` does not allow `min`/`max` attributes on the same element.
+ * The value is a `number` or `null`. Implements `ControlValueAccessor`, so it binds with
+ * `[formControl]`, `formControlName` and `[(ngModel)]`.
  *
  * @example
  * <ui-form-field label="Area">
- *   <ui-number-input [formField]="form.area" maxFractionDigits="2" />
+ *   <ui-number-input [formControl]="area" maxFractionDigits="2" />
  *   <span uiSuffix>m²</span>
  * </ui-form-field>
  */
@@ -96,7 +94,7 @@ const optionalNumber = (value: unknown): number | null =>
         [attr.aria-valuemax]="max()"
         [attr.aria-readonly]="readonly() ? 'true' : null"
         [attr.aria-required]="isRequired() ? 'true' : null"
-        [attr.aria-invalid]="invalidState() ? 'true' : null"
+        [attr.aria-invalid]="showError() ? 'true' : null"
         [attr.aria-describedby]="describedBy()"
         (input)="onInput($event)"
         (keydown)="onKeydown($event)"
@@ -127,13 +125,16 @@ const optionalNumber = (value: unknown): number | null =>
   `,
   styleUrl: './number-input.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiNumberInput) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiNumberInput) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiNumberInput), multi: true },
+  ],
   host: {
     class: 'ui-number-input',
     '[class]': '"ui-number-input--" + size()',
     '[class.ui-number-input--disabled]': 'isDisabled()',
     '[class.ui-number-input--readonly]': 'readonly()',
-    '[class.ui-number-input--invalid]': 'invalidState()',
+    '[class.ui-number-input--invalid]': 'showError()',
     '[class.ui-number-input--affixed]': 'formField?.hasAffixes() ?? false',
     '[attr.id]': 'id()',
     // The inner control carries the label and descriptions; static attributes stay on the host too.
@@ -185,30 +186,12 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
     grouping: this.grouping(),
   }));
 
-  /**
-   * Parses typed text into the value. Through `transformedValue` Signal Forms receives the parse
-   * errors; they clear when the value changes elsewhere or the form is reset.
-   */
-  private readonly rawText = transformedValue(this.value, {
-    parse: (text: string) => {
-      const parsed = parseNumber(text, this.locale());
-      const next = parsed === null || Number.isNaN(parsed) ? null : parsed;
-      return {
-        value: next !== this.value() ? next : undefined,
-        error: Number.isNaN(parsed)
-          ? { kind: 'uiNumberParse', message: this.labels().invalidNumber }
-          : undefined,
-      };
-    },
-    format: (value: number | null) => this.formatted(value),
-  });
-
-  /** Dropped when the value or the parsed text changes elsewhere, so old text does not come back. */
-  private readonly draft = linkedSignal<{ value: number | null; text: string }, Draft | null>({
-    source: () => ({ value: this.value(), text: this.rawText() }),
-    computation: ({ value, text }, previous) => {
+  /** Dropped when the value changes elsewhere, so old text does not come back. */
+  private readonly draft = linkedSignal<number | null, Draft | null>({
+    source: () => this.value(),
+    computation: (value, previous) => {
       const draft = previous?.value;
-      return draft?.value === value && draft.text === text ? draft : null;
+      return draft?.value === value ? draft : null;
     },
   });
 
@@ -227,55 +210,30 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
     return !!draft && draft.committed && Number.isNaN(parseNumber(draft.text, this.locale()));
   });
 
-  protected readonly invalidState = computed(() => this.showError() || this.parseError());
-
   protected readonly inputModeValue = computed(
     () => this.inputMode() ?? (this.maxFractionDigits() === 0 ? 'numeric' : 'decimal'),
   );
 
-  /** Reports the parse errors to Reactive / template forms, which read them only from validators. */
-  private readonly parseValidator: ValidatorFn = (): ValidationErrors | null => {
-    const error = this.rawText.parseErrors().at(0);
-    return error ? { [error.kind]: { message: error.message } } : null;
-  };
-
-  /** The control that holds `parseValidator`; it must not keep it after this field is gone. */
-  private validatedControl: AbstractControl | null = null;
   private repeatTimer: ReturnType<typeof setTimeout> | undefined;
   /** The last step came from a pointer, so the click that follows must not step again. */
   private pointerStepped = false;
 
   constructor() {
     super();
-    inject(DestroyRef).onDestroy(() => {
-      this.stopRepeat();
-      this.releaseParseValidator();
-    });
+    inject(DestroyRef).onDestroy(() => this.stopRepeat());
   }
 
-  /** Without a forms directive, the field itself shows the parse error. */
+  /**
+   * The field shows the parse error itself, bound or not: a text the user still has to fix is not
+   * a validation failure of the consumer's control, which only ever sees `null`.
+   */
   protected override ownErrors(): readonly string[] {
-    return !this.controlState.bound && this.parseError() ? [this.labels().invalidNumber] : [];
+    return this.parseError() ? [this.labels().invalidNumber] : [];
   }
 
   writeValue(value: number | null | undefined): void {
-    const number = validNumber(value);
     this.draft.set(null);
-    this.value.set(number);
-    // A new number clears the parse errors by itself; `null` over `null` (reset) does not.
-    if (number === null) this.rawText.set('');
-  }
-
-  override registerOnChange(fn: (value: number | null) => void): void {
-    const control = this.ngControl?.control ?? null;
-    if (control !== this.validatedControl) {
-      this.releaseParseValidator();
-      if (control && !control.hasValidator(this.parseValidator)) {
-        control.addValidators(this.parseValidator);
-      }
-      this.validatedControl = control;
-    }
-    super.registerOnChange(fn);
+    this.value.set(validNumber(value));
   }
 
   focus(options?: FocusOptions): void {
@@ -303,14 +261,11 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
   protected onInput(event: Event): void {
     const text = (event.target as HTMLInputElement).value;
     const before = this.value();
-    const hadError = this.rawText.parseErrors().length > 0;
-    this.rawText.set(text);
-    const value = this.value();
+    const parsed = parseNumber(text, this.locale());
+    const value = parsed === null || Number.isNaN(parsed) ? null : parsed;
+    this.value.set(value);
     this.draft.set({ text, value, committed: false });
     if (value !== before) this.notifyChange(value);
-    else if (hadError !== this.rawText.parseErrors().length > 0) {
-      this.ngControl?.control?.updateValueAndValidity();
-    }
   }
 
   protected onKeydown(event: KeyboardEvent): void {
@@ -413,13 +368,5 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
     if (value === this.value()) return;
     this.value.set(value);
     this.notifyChange(value);
-  }
-
-  private releaseParseValidator(): void {
-    const control = this.validatedControl;
-    this.validatedControl = null;
-    if (!control?.hasValidator(this.parseValidator)) return;
-    control.removeValidators(this.parseValidator);
-    control.updateValueAndValidity();
   }
 }

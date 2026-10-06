@@ -109,7 +109,7 @@ export class UiSortHeader {
 
   protected onClick(): void {
     this.sort.toggle(this.column());
-    const column = this.label().nativeElement.textContent.trim();
+    const column = (this.label().nativeElement.textContent ?? '').trim();
     const direction = this.direction();
     const labels = this.labels();
     const message =

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   DoCheck,
   Directive,
   booleanAttribute,
@@ -8,39 +9,32 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { FORM_FIELD } from '@angular/forms/signals';
+import { ControlValueAccessor } from '@angular/forms';
 import { injectControlState } from './control-state';
 import { UI_FORM_FIELD } from './form-field-control';
 
 /**
  * Base class for custom (non-native) form controls such as checkbox, switch and radio group.
  *
- * - **Signal Forms**: subclasses expose a `value` or `checked` model, so `[formField]` binds them
- *   natively as `FormValueControl` / `FormCheckboxControl` (inputs `disabled`, `readonly`,
- *   `required`, `invalid` are set by the directive; `touch` marks the field touched).
- * - **Reactive / template forms**: registers itself as the `ControlValueAccessor` of the host's
- *   `NgControl` (instead of `NG_VALUE_ACCESSOR`, which would force `[formField]` into CVA interop).
+ * Reactive and template forms are the forms contract. The base class is the only implementation of
+ * the accessor methods, but each concrete control declares the `NG_VALUE_ACCESSOR` provider itself:
+ * Angular does not inherit `providers` metadata into a subclass that carries its own decorator.
+ * Because of that provider the control must not inject `NgControl` while it is being constructed
+ * (NG0200); the control state resolves the directive lazily instead. Subclasses keep their `value`
+ * or `checked` model, so a control also works standalone with `[(value)]` / `[(checked)]`.
  *
  * Subclasses implement `writeValue` and call `notifyChange` / `notifyTouched`. `writeValue` sets the
  * model, so its output (`valueChange` / `checkedChange`) also fires for values written by the
  * forms directive; only `notifyChange` is limited to user changes.
  */
 @Directive()
-export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCheck {
+export abstract class UiFormControlBase<T> implements ControlValueAccessor, AfterViewInit, DoCheck {
   protected readonly controlState = injectControlState();
   protected readonly formField = inject(UI_FORM_FIELD, { optional: true });
-  /** Reactive / template forms directive on the host, when bound through CVA. */
-  protected readonly ngControl = inject(FORM_FIELD, { self: true, optional: true })
-    ? null
-    : inject(NgControl, { self: true, optional: true });
 
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly required = input(false, { transform: booleanAttribute });
-  /**
-   * The value is shown and focusable but the user cannot change it. Signal Forms binds it from a
-   * `readonly()` rule.
-   */
+  /** The value is shown and focusable but the user cannot change it. */
   readonly readonly = input(false, { transform: booleanAttribute });
   /**
    * Shows the error state when no forms directive is bound. With forms bound, the error state is
@@ -49,7 +43,7 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   readonly invalid = input(false, { transform: booleanAttribute });
   /** Ids of the app's own descriptions, kept before the hint / error of `ui-form-field`. */
   readonly ariaDescribedBy = input<string | null>(null, { alias: 'aria-describedby' });
-  /** Emits when the user leaves the control. Signal Forms uses it to mark the field touched. */
+  /** Emits when the user leaves the control, next to the `touched` the value accessor reports. */
   readonly touch = output();
 
   private readonly cvaDisabled = signal(false);
@@ -63,7 +57,7 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
   readonly showError = computed(
     () =>
       this.ownErrors().length > 0 ||
-      (this.controlState.bound
+      (this.controlState.bound()
         ? this.controlState.invalid() && this.controlState.touched()
         : this.invalid()),
   );
@@ -75,8 +69,14 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, DoCh
     ...new Set([...this.ownErrors(), ...this.controlState.errorMessages()]),
   ]);
 
-  constructor() {
-    if (this.ngControl) this.ngControl.valueAccessor = this;
+  /**
+   * `registerOnChange` / `registerOnTouched` run while the forms directive is still attaching:
+   * `FormControlName` only assigns its `control` once `addControl()` has returned, and the first
+   * `ngDoCheck` of the component runs before that. Read the state again once the view is in place,
+   * when the directive is fully set up.
+   */
+  ngAfterViewInit(): void {
+    this.controlState.sync();
   }
 
   /** `setValidators()` and `addValidators()` emit no event, so re-read the control state here. */

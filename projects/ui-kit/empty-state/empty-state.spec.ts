@@ -34,7 +34,7 @@ describe('UiEmptyState', () => {
   it('projects the icon, description and actions into their slots', () => {
     const state = el('full');
     expect(state.querySelector('.ui-empty-state__icon ui-icon')).not.toBeNull();
-    expect(state.querySelector('.ui-empty-state__description')?.textContent.trim()).toBe(
+    expect(state.querySelector('.ui-empty-state__description')?.textContent?.trim()).toBe(
       'Plans you create show up here.',
     );
     expect(state.querySelector('.ui-empty-state__actions button')?.textContent).toBe(
@@ -46,7 +46,7 @@ describe('UiEmptyState', () => {
     const title = el('full').querySelector('.ui-empty-state__title')!;
     expect(title.getAttribute('role')).toBe('heading');
     expect(title.getAttribute('aria-level')).toBe('2');
-    expect(title.textContent.trim()).toBe('No plans yet');
+    expect(title.textContent?.trim()).toBe('No plans yet');
     expect(el('full').hasAttribute('title')).toBe(false);
   });
 

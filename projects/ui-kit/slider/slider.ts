@@ -15,6 +15,7 @@ import {
   viewChild,
   viewChildren,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -25,6 +26,14 @@ import {
   resolveDirection,
 } from '@vplans/ui-kit/core';
 import { UiSliderScale, percentOf, scaleTop, snapToScale } from './slider-utils';
+
+/** `FocusOptions` plus `focusVisible`, which the DOM supports but the TypeScript lib omits. */
+interface UiFocusOptions extends FocusOptions {
+  focusVisible?: boolean;
+}
+
+/** Moving a thumb with the pointer must not paint the focus ring. */
+const THUMB_FOCUS_OPTIONS: UiFocusOptions = { preventScroll: true, focusVisible: false };
 
 /** A point of the scale shown under the track, e.g. `{ value: 50, label: '50%' }`. */
 export interface UiSliderMark {
@@ -334,7 +343,7 @@ export abstract class UiSliderBase<T>
   }
 
   private focusThumb(index: number): void {
-    this.inputs()[index]?.nativeElement.focus({ preventScroll: true, focusVisible: false });
+    this.inputs()[index]?.nativeElement.focus(THUMB_FOCUS_OPTIONS);
   }
 
   /** Moves a thumb within its limits. Returns whether the value changed. */
@@ -447,9 +456,8 @@ const HOST = {
  *
  * The value is a `number` or `null`; `null` shows the thumb at `min`. A value off the step grid
  * or outside the limits is shown at the nearest allowed value and stays unchanged until the user
- * moves the thumb. Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`. With
- * Signal Forms, set the limits with `min()` and `max()` rules: `[formField]` does not allow
- * `min`/`max` attributes on the same element.
+ * moves the thumb. Implements `ControlValueAccessor`: bind it with `formControl`,
+ * `formControlName` or `ngModel`. The scale comes from the `min` and `max` inputs.
  *
  * @example
  * <ui-form-field label="Opacity">
@@ -461,7 +469,10 @@ const HOST = {
   template: TEMPLATE,
   styleUrl: './slider.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSlider) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSlider) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSlider), multi: true },
+  ],
   host: HOST,
 })
 export class UiSlider extends UiSliderBase<number> {
@@ -499,12 +510,11 @@ export class UiSlider extends UiSliderBase<number> {
  *
  * The value is a `[start, end]` tuple or `null`; `null` shows the whole scale. Each thumb is a
  * slider named by the field label and `startLabel` / `endLabel` (default: the `rangeStart` and
- * `rangeEnd` labels). With Signal Forms, set the limits with `limits`: `[formField]` does not allow
- * `min`/`max` attributes, and the `min()`/`max()` rules do not apply to a tuple.
+ * `rangeEnd` labels). The scale comes from the `limits` input, one input for the whole tuple.
  *
  * @example
  * <ui-form-field label="Price">
- *   <ui-range-slider [formField]="filters.price" [limits]="[0, 5000]" step="100" />
+ *   <ui-range-slider formControlName="price" [limits]="[0, 5000]" step="100" />
  * </ui-form-field>
  */
 @Component({
@@ -512,7 +522,10 @@ export class UiSlider extends UiSliderBase<number> {
   template: TEMPLATE,
   styleUrl: './slider.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRangeSlider) }],
+  providers: [
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRangeSlider) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiRangeSlider), multi: true },
+  ],
   host: {
     ...HOST,
     role: 'group',
@@ -523,7 +536,7 @@ export class UiRangeSlider extends UiSliderBase<UiSliderRange> {
   readonly value = model<UiSliderRange | null>(null);
   /** Host id; the thumbs get `${id}-start` and `${id}-end`. */
   readonly id = input(inject(_IdGenerator).getId('ui-range-slider-'));
-  /** `[min, max]` of the scale; wins over `min` and `max`. Use it with Signal Forms. */
+  /** `[min, max]` of the scale; wins over `min` and `max`. */
   readonly limits = input<UiSliderRange | null>(null);
   /** Name of the start thumb, read after the field label. */
   readonly startLabel = input<string | null>(null);

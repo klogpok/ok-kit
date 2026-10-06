@@ -12,6 +12,7 @@ import {
   model,
   viewChild,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -29,11 +30,11 @@ class UiRadioGroupControl {
 /**
  * Group of mutually exclusive options. Uses native radios sharing a `name`, so arrow-key
  * navigation and the single tab stop come from the browser.
- * Implements `FormValueControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
  * @example
  * <ui-form-field label="Delivery">
- *   <ui-radio-group [formField]="form.delivery">
+ *   <ui-radio-group formControlName="delivery">
  *     <ui-radio value="pickup">Pickup</ui-radio>
  *     <ui-radio value="courier">Courier</ui-radio>
  *   </ui-radio-group>
@@ -46,6 +47,7 @@ class UiRadioGroupControl {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiRadioGroup) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiRadioGroup), multi: true },
     UiRadioGroupControl,
   ],
   host: {

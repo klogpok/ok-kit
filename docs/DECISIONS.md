@@ -207,3 +207,116 @@ Review answers: all deviations in the roadmap are accepted:
 
 Added after the review: `orientation="vertical"` for both controls and Home/End in
 `ui-segmented`.
+
+## Angular 20 migration: parse messages and `ui-form-field` (decided 2026-10-05)
+
+Tickets 02–06 move the "cannot read the typed text" messages of `ui-number-input`,
+`ui-time-input`, `ui-datepicker`, `ui-date-range-picker` and `ui-file-upload` off Signal Forms:
+the field writes `null` to the bound control and returns the message from `ownErrors()`, which
+the base class merges into `errorMessages()`. The control itself therefore never fails.
+
+Review answer: **keep the current `ui-form-field` behaviour.** `ui-form-field` drops the
+control's own `errorMessages()` as soon as a `<ui-error>` is projected, so a consumer who
+projects one does not see `invalidDate`, `invalidDateRange` or the other parse messages. The user
+was asked whether the two should be merged and chose to leave it as is. Do not add a merge of own
+and projected messages without asking again.
+
+## Angular 20 migration: Signal Forms is reversed (decided 2026-10-06)
+
+**The decision of phase 2 — "form controls support Signal Forms natively" — is reversed.** It is
+not edited out of this log: it was the right call for a library on Angular 22, and the record of
+why it was taken stays where it is. From this entry on it no longer holds.
+
+Reason: the single application that consumes the kit runs on Angular 20 and will not be upgraded;
+the decision is organisational, not technical. Signal Forms does not exist in Angular 20 — it
+arrived as an experimental feature in Angular 21 and became public API in 22. The application takes
+the kit as copied source, so every source file has to compile under its Angular 20 compiler, and
+anything importing `@angular/forms/signals` could not. Nothing of Signal Forms is kept: no entry
+point, no flag, no compatibility shim and no local reimplementation.
+
+What the forms contract is now:
+
+- `ControlValueAccessor` is the only forms contract. Controls work with `formControl`,
+  `formControlName` and `ngModel`; rendered behaviour is unchanged.
+- Every concrete custom control provides `{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => X), multi: true }`
+  itself, instead of the base class assigning itself to `NgControl.valueAccessor`. Angular does not
+  inherit `providers` metadata into a subclass that carries its own decorator, so the provider is
+  repeated on each of the sixteen controls; `UiFormControlBase` stays the only implementation of
+  the accessor methods.
+- A control that provides the token cannot inject `NgControl` while it is being constructed
+  (NG0200). `injectControlState()` therefore takes an `Injector` and resolves `NgControl` on the
+  first `sync()`, and `UiControlState.bound` is a `Signal<boolean>` rather than a plain boolean.
+  That is the only change to the interface.
+- The text-parsing controls (`ui-number-input`, `ui-time-input`, `ui-datepicker`,
+  `ui-date-range-picker`, `ui-file-upload`) keep their "cannot read the typed text" messages in
+  `ownErrors()`, which the base class merges into `errorMessages()`. A parse error never reaches
+  the consumer's form control and never makes the form invalid by itself.
+- `ui-stepper`'s step `control` is an `AbstractControl` only; the signal-field branch is gone.
+- Where Signal Forms needed `minLength(path, 1)` for a non-empty list, use a validator — the
+  playground's `uiAtLeastOne` is the example.
+
+Do not re-add Signal Forms, in any shape, without reading this entry first.
+
+## Angular 20 migration: the toolchain (recorded 2026-10-06)
+
+- Angular and the Angular CLI/build packages are on `^20.3.0`, `@angular/cdk` on `^20.2.0` — the
+  CDK's v20 line stops at 20.2.14, there is no 20.3 release of it. TypeScript is `~5.8.3`, Vitest
+  `^3.2.0`, Vite `^7.1.11`, `ng-packagr` `^20.3.0`.
+- Angular 20 is zone-based by default, so each project hands the TestBed a `providersFile` with
+  `provideZonelessChangeDetection()` and the playground's `appConfig` provides it too. The library
+  stays zoneless.
+- Storybook stays on 10.6.0 but moved from `@storybook/angular-vite` to `@storybook/angular`, the
+  webpack framework: the Vite one requires Angular 21 or newer. Zoneless survives through the
+  builder's own `experimentalZoneless` option, and the visual baselines did not need re-taking —
+  the webpack builder renders every story pixel-identically.
+- Lint is on `angular-eslint` 20.7.0 with ESLint 9; `typescript-eslint` stayed on 8.69.0, so the
+  `strictTypeChecked` rule set is unchanged. Three rules ESLint 10 had in its recommended set are
+  now enabled by hand in `eslint.config.js`.
+
+Two consequences of the migration are **open and need the user's decision**; they are recorded
+here as facts, not as settled policy:
+
+- **Coverage thresholds are gone.** The Angular 20 `@angular/build:unit-test` builder has no
+  threshold option and starts Vitest with `config: false`, so a `vitest.config.ts` cannot supply
+  them either. They were not lowered — the tooling no longer offers them. `pnpm test:coverage`
+  still reports coverage.
+- **`@angular-eslint/template/elements-content` is slightly stricter than before.** v20's default
+  `allowList` does not include `textContent`, v22's does. It was left at the v20 default rather
+  than widened back. No template in the repository is affected.
+
+## Angular 20 migration: Storybook hot module replacement is back (decided 2026-10-07)
+
+Ticket 17 switched hot module replacement off in `.storybook/main.ts` because the preview never
+rendered with it: the hot middleware reported a compilation hash the served bundle did not have,
+the client asked for a `hot-update.json` that was never emitted, and the page reloaded in a loop.
+
+The cause was not the webpack builder. While ticket 17 was being worked, eight Storybook dev
+servers were started one after another and never stopped. Every dev server writes the preview to
+the same directory, `node_modules/.cache/storybook/<version>/<hash>/public`, and serves it from
+there; on any source change all of them rebuilt and overwrote each other's bundles. The servers
+started earlier also still resolved `@storybook/angular` to copies that the install had since
+replaced, so the overwritten `main.iframe.bundle.js` waited for a vendor chunk that `iframe.html`
+did not load, and the preview stayed blank without an error.
+
+Review answer: **turn it back on.** With a single dev server, a story edit is applied in place, an
+edit to a component's template or stylesheet is applied and followed by one automatic reload (the
+component module does not accept updates itself), and a global stylesheet edit is applied in
+place. Run one Storybook dev server at a time.
+
+## Angular 20 migration: `core/control-state.spec.ts` stays (decided 2026-10-07)
+
+The migration spec forbade it in so many words: "No new seam is introduced. In particular the
+control-state helper is not given its own unit tests: its lazy resolution is observable through the
+error, disabled and required behaviour of any control that uses it." The reason was that tests
+should assert what a user of a control observes, not how the control obtained its form state —
+the internals the migration was rewriting.
+
+The file was written anyway: ticket 13 created it (a probe directive on a native input, bound and
+unbound), and ticket 14 added three cases for a probe that provides `NG_VALUE_ACCESSOR` and would
+have thrown NG0200 before the change — 10 `it` blocks in all.
+
+Review answer: **keep the tests.** `injectControlState()` is exported from `@vplans/ui-kit/core`
+and native inputs use it directly, so it is public API and a legitimate seam of its own, not an
+internal. The tests assert the `UiControlState` signals (`bound`, required, disabled, invalid,
+touched), not when or how `NgControl` was injected, and the NG0200 cases pin the migration's main
+risk directly instead of through a whole control failing.

@@ -2,6 +2,10 @@
 
 Original brief, kept verbatim. The decisions made since (see CLAUDE.md) take precedence where they differ.
 
+Two points of the brief no longer hold: the kit targets **Angular 20**, and form controls work with
+Reactive and template forms only — Signal Forms was removed, with the reason recorded in
+[DECISIONS.md](DECISIONS.md).
+
 ## Context
 
 - Large Angular application developed by a team of several developers.

@@ -7,6 +7,7 @@ import {
   input,
   model,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
@@ -17,9 +18,9 @@ import {
 
 /**
  * Checkbox built on a native `<input type="checkbox">`. The projected content is its label.
- * Implements `FormCheckboxControl` (Signal Forms) and `ControlValueAccessor`.
+ * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
- * @example <ui-checkbox [formField]="form.terms">I accept the terms</ui-checkbox>
+ * @example <ui-checkbox formControlName="terms">I accept the terms</ui-checkbox>
  * @example <ui-checkbox [(checked)]="all" [indeterminate]="some()">Select all</ui-checkbox>
  */
 @Component({
@@ -29,6 +30,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiCheckbox) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiCheckbox), multi: true },
     provideUiCheckedValidator(),
   ],
   host: {

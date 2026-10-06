@@ -20,40 +20,45 @@
 
 <div class="grid">
   <section aria-labelledby="profile-title">
-    <h2 id="profile-title" class="ui-heading-4">Profile (Signal Forms)</h2>
-    <form class="stack" novalidate (submit)="save($event)">
+    <h2 id="profile-title" class="ui-heading-4">Profile (Reactive Forms)</h2>
+    <form class="stack" novalidate [formGroup]="profile" (submit)="save($event)">
       <ui-form-field label="Full name">
-        <input ui-input autocomplete="name" [formField]="profile.name" />
+        <input ui-input autocomplete="name" formControlName="name" />
+        @if (profile.controls.name.hasError('required')) {
+          <ui-error>Enter your name</ui-error>
+        }
       </ui-form-field>
       <ui-form-field label="Email" hint="Used for notifications only">
-        <input ui-input type="email" autocomplete="email" [formField]="profile.email" />
+        <input ui-input type="email" autocomplete="email" formControlName="email" />
+        @if (profile.controls.email.hasError('required')) {
+          <ui-error>Enter your email</ui-error>
+        } @else if (profile.controls.email.hasError('email')) {
+          <ui-error>Enter a valid email</ui-error>
+        }
       </ui-form-field>
       <ui-form-field label="Team" hint="Type to search">
-        <ui-select searchable placeholder="Choose a team" [formField]="profile.team">
+        <ui-select searchable placeholder="Choose a team" formControlName="team">
           @for (team of teams; track team) {
             <ui-option [value]="team">{{ team }}</ui-option>
           }
         </ui-select>
       </ui-form-field>
       <ui-form-field label="Role">
-        <ui-radio-group orientation="horizontal" [formField]="profile.role">
+        <ui-radio-group orientation="horizontal" formControlName="role">
           <ui-radio value="developer">Developer</ui-radio>
           <ui-radio value="designer">Designer</ui-radio>
           <ui-radio value="manager">Manager</ui-radio>
         </ui-radio-group>
       </ui-form-field>
       <ui-form-field label="Bio">
-        <textarea
-          ui-textarea
-          autosize
-          [minRows]="2"
-          [maxRows]="6"
-          [formField]="profile.bio"
-        ></textarea>
+        <textarea ui-textarea autosize [minRows]="2" [maxRows]="6" formControlName="bio"></textarea>
       </ui-form-field>
-      <ui-switch [formField]="profile.notifications">Email notifications</ui-switch>
+      <ui-switch formControlName="notifications">Email notifications</ui-switch>
       <ui-form-field>
-        <ui-checkbox [formField]="profile.terms">I accept the terms of service</ui-checkbox>
+        <ui-checkbox formControlName="terms">I accept the terms of service</ui-checkbox>
+        @if (profile.controls.terms.hasError('required')) {
+          <ui-error>Accept the terms to continue</ui-error>
+        }
       </ui-form-field>
       <div class="row">
         <button ui-button type="submit" [loading]="saving()">Save profile</button>

@@ -1,9 +1,16 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormField, form, max, min } from '@angular/forms/signals';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import {
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiSliderHarness } from '@vplans/ui-kit/testing';
 import { UiRangeSlider, UiSlider, UiSliderMark, UiSliderRange } from './slider';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
@@ -338,7 +345,7 @@ describe('UiRangeSlider', () => {
     element
       .getAttribute('aria-labelledby')!
       .split(' ')
-      .map((id) => document.getElementById(id)!.textContent.replace('*', '').trim())
+      .map((id) => document.getElementById(id)!.textContent?.replace('*', '').trim())
       .join(' ');
 
   beforeEach(async () => {
@@ -465,16 +472,25 @@ describe('UiRangeSlider', () => {
   });
 });
 
+/** Stands in for an application validator with a message of its own. */
+const quietEnough: ValidatorFn = (control) =>
+  typeof control.value === 'number' && control.value > 8
+    ? { uiTooLoud: { message: 'Keep it below 9' } }
+    : null;
+
 @Component({
-  imports: [UiSlider, UiRangeSlider, ReactiveFormsModule, FormsModule],
+  imports: [UiSlider, UiRangeSlider, UiFormField, ReactiveFormsModule, FormsModule],
   template: `
-    <ui-slider aria-label="Volume" min="0" max="10" [formControl]="volume" />
+    <ui-form-field label="Volume">
+      <ui-slider min="0" max="10" [formControl]="volume" [readonly]="locked()" />
+    </ui-form-field>
     <ui-range-slider aria-label="Area" min="0" max="500" step="50" [formControl]="area" />
     <ui-slider aria-label="Zoom" name="zoom" min="1" max="5" [(ngModel)]="zoom" />
   `,
 })
 class ReactiveHost {
-  readonly volume = new FormControl<number | null>(3);
+  readonly locked = signal(false);
+  readonly volume = new FormControl<number | null>(3, [Validators.required, quietEnough]);
   readonly area = new FormControl<UiSliderRange | null>([100, 200]);
   readonly zoom = signal(2);
 }
@@ -523,52 +539,89 @@ describe('UiSlider with Reactive and template forms', () => {
   });
 });
 
-@Component({
-  imports: [UiSlider, UiRangeSlider, UiFormField, FormField],
-  template: `
-    <ui-form-field label="Rooms">
-      <ui-slider [formField]="filters.rooms" />
-    </ui-form-field>
-    <ui-form-field label="Price">
-      <ui-range-slider [formField]="filters.price" [limits]="[0, 1000]" step="100" />
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal<{ rooms: number; price: UiSliderRange }>({
-    rooms: 3,
-    price: [200, 800],
-  });
-  readonly filters = form(this.model, (p) => {
-    min(p.rooms, 1);
-    max(p.rooms, 8);
-  });
-}
+describe('UiSlider in a form field with Reactive Forms', () => {
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
+  let root: HTMLElement;
+  let slider: UiSliderHarness;
 
-describe('UiSlider with Signal Forms', () => {
-  it('binds the values and takes the limits from the rules', async () => {
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
+  /** The message `ui-form-field` shows under the slider. */
+  const error = (): string =>
+    root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
+    root = fixture.nativeElement as HTMLElement;
     document.body.appendChild(root);
     await settle(fixture);
-    const host = fixture.componentInstance;
-    const [rooms, priceStart, priceEnd] = [...root.querySelectorAll('input')];
-    expect([rooms.min, rooms.max, rooms.value]).toEqual(['1', '8', '3']);
-    expect([priceStart.value, priceEnd.value]).toEqual(['200', '800']);
+    slider = await TestbedHarnessEnvironment.loader(fixture).getHarness(
+      UiSliderHarness.with({ label: 'Volume' }),
+    );
+  });
 
-    keydown(rooms, 'End');
-    keydown(priceStart, 'PageDown');
+  afterEach(() => root.remove());
+
+  it('takes its limits from the inputs and steps with the keyboard', async () => {
+    expect(await slider.getValue()).toBe(3);
+    expect([await slider.getMin(), await slider.getMax()]).toEqual([0, 10]);
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
+
+    await slider.increment();
     await settle(fixture);
-    expect(host.model()).toEqual({ rooms: 8, price: [0, 800] });
+    expect(host.volume.value).toBe(4);
 
-    host.model.set({ rooms: 2, price: [300, 400] });
+    await slider.decrement();
+    await slider.decrement();
     await settle(fixture);
-    expect(rooms.value).toBe('2');
-    expect([priceStart.value, priceEnd.value]).toEqual(['300', '400']);
+    expect(host.volume.value).toBe(2);
 
-    priceEnd.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
-    expect(host.filters.price().touched()).toBe(true);
-    root.remove();
+    host.volume.setValue(7);
+    await settle(fixture);
+    expect(await slider.getValue()).toBe(7);
+  });
+
+  it('disables the slider from the control', async () => {
+    host.volume.disable();
+    await settle(fixture);
+    expect(await slider.isDisabled()).toBe(true);
+  });
+
+  it('keeps the value when the control is readonly', async () => {
+    host.locked.set(true);
+    await settle(fixture);
+    expect(await slider.isReadonly()).toBe(true);
+    await slider.increment();
+    await settle(fixture);
+    expect(host.volume.value).toBe(3);
+    expect(await slider.getValue()).toBe(3);
+  });
+
+  it('marks the control touched when focus leaves', async () => {
+    expect(host.volume.touched).toBe(false);
+    await slider.focus();
+    await slider.blur();
+    await settle(fixture);
+    expect(host.volume.touched).toBe(true);
+  });
+
+  it('shows the validator message only once the control is invalid and touched', async () => {
+    host.volume.setValue(10);
+    await settle(fixture);
+    expect(host.volume.invalid).toBe(true);
+    expect(await slider.isInvalid()).toBe(false);
+    expect(error()).toBe('');
+
+    await slider.focus();
+    await slider.blur();
+    await settle(fixture);
+    expect(await slider.isInvalid()).toBe(true);
+    expect(error()).toContain('Keep it below 9');
+
+    host.volume.setValue(5);
+    await settle(fixture);
+    expect(await slider.isInvalid()).toBe(false);
+    expect(error()).toBe('');
   });
 });
 

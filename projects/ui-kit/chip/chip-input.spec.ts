@@ -1,9 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormField, form, minLength } from '@angular/forms/signals';
+import type { MockInstance } from 'vitest';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
+import { UiChipInputHarness } from '@vplans/ui-kit/testing';
 import { UiChipInput } from './chip-input';
 
 const KEY_CODES: Record<string, number> = {
@@ -62,9 +65,9 @@ describe('UiChipInput', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
   let root: HTMLElement;
-  let announce: ReturnType<typeof vi.spyOn>;
+  let announce: MockInstance<LiveAnnouncer['announce']>;
   const input = () => root.querySelector<HTMLInputElement>('.ui-chip-input__input')!;
-  const chips = () => [...root.querySelectorAll('ui-chip')].map((c) => c.textContent.trim());
+  const chips = () => [...root.querySelectorAll('ui-chip')].map((c) => c.textContent?.trim());
   const removeButtons = () => [...root.querySelectorAll<HTMLButtonElement>('.ui-chip__remove')];
   const type = async (text: string) => {
     input().value = text;
@@ -207,77 +210,116 @@ describe('UiChipInput', () => {
   });
 });
 
+/**
+ * The value is a collection, so the minimum is what `required` cannot express on its own.
+ * Reactive forms show the message of an error value that is a string.
+ */
+const atLeastTwo: ValidatorFn = (control) => {
+  const emails = control.value as readonly string[] | null;
+  return (emails?.length ?? 0) >= 2 ? null : { minEmails: 'Add at least two emails' };
+};
+
 @Component({
   imports: [UiChipInput, UiFormField, ReactiveFormsModule],
   template: `
     <ui-form-field label="Emails">
-      <ui-chip-input [formControl]="emails" />
+      <ui-chip-input [formControl]="emails" [readonly]="locked()" />
     </ui-form-field>
+    <button id="outside">Outside</button>
   `,
 })
 class ReactiveHost {
-  readonly emails = new FormControl<readonly string[]>([], Validators.required);
+  readonly locked = signal(false);
+  readonly emails = new FormControl<readonly string[]>(
+    ['dana@vplans.com'],
+    [Validators.required, atLeastTwo],
+  );
 }
 
 describe('UiChipInput with Reactive Forms', () => {
-  it('binds the value both ways and reads required', async () => {
-    const fixture = TestBed.createComponent(ReactiveHost);
-    const root = fixture.nativeElement as HTMLElement;
-    await settle(fixture);
-    const { emails } = fixture.componentInstance;
-    const input = root.querySelector('input')!;
-    expect(input.getAttribute('aria-required')).toBe('true');
-    expect(emails.invalid).toBe(true);
+  let fixture: ComponentFixture<ReactiveHost>;
+  let host: ReactiveHost;
+  let root: HTMLElement;
+  let loader: HarnessLoader;
+  const field = () => loader.getHarness(UiChipInputHarness.with({ label: 'Emails' }));
+  /** The message `ui-form-field` shows under the field. */
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
-    input.value = 'dana@vplans.com';
-    input.dispatchEvent(new Event('input'));
-    keydown(input, 'Enter');
-    await settle(fixture);
-    expect(emails.value).toEqual(['dana@vplans.com']);
-    expect(emails.valid).toBe(true);
-
-    emails.setValue(['a@b.c', 'd@e.f']);
-    await settle(fixture);
-    expect(root.querySelectorAll('ui-chip')).toHaveLength(2);
-
-    emails.disable();
-    await settle(fixture);
-    expect(input.disabled).toBe(true);
-  });
-});
-
-@Component({
-  imports: [UiChipInput, UiFormField, FormField],
-  template: `
-    <ui-form-field label="Codes">
-      <ui-chip-input [formField]="plan.codes" />
-    </ui-form-field>
-  `,
-})
-class SignalHost {
-  readonly model = signal<{ codes: readonly string[] }>({ codes: ['A1'] });
-  readonly plan = form(this.model, (p) => {
-    minLength(p.codes, 1, { message: 'Add a code' });
-  });
-}
-
-describe('UiChipInput with Signal Forms', () => {
-  it('binds the value and marks the field touched', async () => {
-    const fixture = TestBed.createComponent(SignalHost);
-    const root = fixture.nativeElement as HTMLElement;
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ReactiveHost);
+    host = fixture.componentInstance;
+    root = fixture.nativeElement as HTMLElement;
+    loader = TestbedHarnessEnvironment.loader(fixture);
     document.body.appendChild(root);
     await settle(fixture);
-    const host = fixture.componentInstance;
-    root.querySelector<HTMLButtonElement>('.ui-chip__remove')!.click();
-    await settle(fixture);
-    expect(host.model().codes).toEqual([]);
-    expect(host.plan.codes().invalid()).toBe(true);
+  });
 
-    const input = root.querySelector('input')!;
-    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+  afterEach(() => root.remove());
+
+  it('binds the value both ways and removes a chip into the control', async () => {
+    const emails = await field();
+    expect(await emails.getValues()).toEqual(['dana@vplans.com']);
+
+    await emails.add('yossi@vplans.com');
+    expect(host.emails.value).toEqual(['dana@vplans.com', 'yossi@vplans.com']);
+
+    await emails.removeChip('dana@vplans.com');
+    expect(host.emails.value).toEqual(['yossi@vplans.com']);
+
+    host.emails.setValue(['a@b.c', 'd@e.f']);
     await settle(fixture);
-    expect(host.plan.codes().touched()).toBe(true);
-    expect(root.querySelector('.ui-form-field__error')!.textContent).toContain('Add a code');
-    root.remove();
+    expect(await emails.getValues()).toEqual(['a@b.c', 'd@e.f']);
+  });
+
+  it('marks the field required from the validators of the control', async () => {
+    expect(await (await field()).isRequired()).toBe(true);
+    expect(root.querySelector('.ui-form-field__required')).not.toBeNull();
+  });
+
+  it('disables the field from the control', async () => {
+    const emails = await field();
+    host.emails.disable();
+    await settle(fixture);
+    expect(await emails.isDisabled()).toBe(true);
+    // A disabled chip input has nothing to remove.
+    expect(await (await emails.getChips())[0].isRemovable()).toBe(false);
+  });
+
+  it('keeps the field readonly and the chips unremovable', async () => {
+    const emails = await field();
+    host.locked.set(true);
+    await settle(fixture);
+    expect(await emails.isReadonly()).toBe(true);
+    expect(await emails.isDisabled()).toBe(false);
+    expect(await (await emails.getChips())[0].isRemovable()).toBe(false);
+  });
+
+  it('marks the control touched when focus leaves', async () => {
+    const emails = await field();
+    expect(host.emails.touched).toBe(false);
+    await emails.focus();
+    await emails.blur();
+    await settle(fixture);
+    expect(host.emails.touched).toBe(true);
+  });
+
+  it('shows the minimum-length message only once the control is invalid and touched', async () => {
+    const emails = await field();
+    // One email: too few, but nothing is shown before the user has been there.
+    expect(host.emails.invalid).toBe(true);
+    expect(await emails.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
+
+    await emails.focus();
+    await emails.blur();
+    await settle(fixture);
+    expect(await emails.isInvalid()).toBe(true);
+    expect(errorText()).toContain('Add at least two emails');
+
+    await emails.add('yossi@vplans.com');
+    await settle(fixture);
+    expect(host.emails.valid).toBe(true);
+    expect(await emails.isInvalid()).toBe(false);
+    expect(errorText()).toBe('');
   });
 });

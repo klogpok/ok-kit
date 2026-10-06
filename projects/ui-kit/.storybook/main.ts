@@ -1,23 +1,27 @@
-import type { StorybookConfig } from '@storybook/angular-vite';
-import { fileURLToPath } from 'node:url';
+import type { StorybookConfig } from '@storybook/angular';
 
-const libRoot = fileURLToPath(new URL('..', import.meta.url));
+/**
+ * The story files import the framework under the name of the Vite package the workbench used to
+ * run on; `framework.d.ts` maps the same name for TypeScript.
+ */
+const FRAMEWORK_ALIAS = { '@storybook/angular-vite$': '@storybook/angular' };
 
 const config: StorybookConfig = {
   stories: ['../**/*.mdx', '../**/*.stories.ts'],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
-  framework: { name: '@storybook/angular-vite', options: {} },
-  // Stories import the library by its public entry points, resolved to sources.
-  viteFinal: (viteConfig) => ({
-    ...viteConfig,
-    resolve: {
-      ...viteConfig.resolve,
-      alias: [
-        { find: /^@vplans\/ui-kit\/(.+)$/, replacement: `${libRoot}$1/public-api.ts` },
-        { find: /^@vplans\/ui-kit$/, replacement: `${libRoot}src/public-api.ts` },
-      ],
-    },
-  }),
+  framework: { name: '@storybook/angular', options: {} },
+  webpackFinal: (webpackConfig) => {
+    const alias = webpackConfig.resolve?.alias;
+    return {
+      ...webpackConfig,
+      resolve: {
+        ...webpackConfig.resolve,
+        alias: Array.isArray(alias)
+          ? [...alias, { name: '@storybook/angular-vite', alias: '@storybook/angular' }]
+          : { ...alias, ...FRAMEWORK_ALIAS },
+      },
+    };
+  },
 };
 
 export default config;

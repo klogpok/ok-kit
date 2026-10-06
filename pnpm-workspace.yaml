@@ -3,5 +3,8 @@ allowBuilds:
   esbuild: true
   lmdb: true
   msgpackr-extract: true
-minimumReleaseAgeExclude:
-  - '@analogjs/vite-plugin-angular@2.7.5'
+# Storybook's webpack builder and the Angular webpack build package each bring their own webpack,
+# and the Angular one's plugins run inside the compilation Storybook creates. The Angular package
+# pins this exact version; Storybook's accepts any webpack 5, so pinning keeps one instance.
+overrides:
+  webpack: 5.105.0
