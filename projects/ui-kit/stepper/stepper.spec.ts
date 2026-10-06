@@ -58,13 +58,13 @@ describe('UiStepper', () => {
   const content = () => root.querySelector<HTMLElement>('.ui-stepper__content');
   const button = (text: string) =>
     [...root.querySelectorAll<HTMLButtonElement>('.ui-stepper__content button')].find(
-      (b) => b.textContent.trim() === text,
+      (b) => b.textContent?.trim() === text,
     )!;
   const click = async (element: HTMLElement) => {
     element.click();
     await settle(fixture);
   };
-  const name = (header: HTMLElement) => header.textContent.replace(/\s+/g, ' ').trim();
+  const name = (header: HTMLElement) => header.textContent?.replace(/\s+/g, ' ').trim();
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(Host);

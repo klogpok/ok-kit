@@ -230,7 +230,7 @@ describe('UiDatepicker', () => {
       ...dialog()!.querySelectorAll<HTMLButtonElement>('.ui-datepicker__footer button'),
     ];
     // No value yet: only "Today".
-    expect(today.map((b) => b.textContent.trim())).toEqual(['היום']);
+    expect(today.map((b) => b.textContent?.trim())).toEqual(['היום']);
     today[0].click();
     await settle(fixture);
     const now = new Date();
@@ -246,7 +246,7 @@ describe('UiDatepicker', () => {
     await settle(fixture);
     const clear = () =>
       [...dialog()!.querySelectorAll<HTMLButtonElement>('.ui-datepicker__footer button')].find(
-        (b) => b.textContent.trim() === 'ניקוי',
+        (b) => b.textContent?.trim() === 'ניקוי',
       )!;
     clear().click();
     await settle(fixture);
@@ -323,14 +323,14 @@ describe('UiDatepicker with Reactive Forms', () => {
   let controls: ReactiveHost['form']['controls'];
   const fieldOf = (label: string): HTMLElement =>
     [...root.querySelectorAll<HTMLElement>('ui-form-field')].find((it) =>
-      it.querySelector('label')!.textContent.includes(label),
+      it.querySelector('label')!.textContent?.includes(label),
     )!;
   const input = (label: string) => fieldOf(label).querySelector('input')!;
   const toggleOf = (label: string) =>
     fieldOf(label).querySelector<HTMLButtonElement>('.ui-datepicker__toggle')!;
   /** The message `ui-form-field` shows under the field with this label. */
   const errorOf = (label: string): string =>
-    fieldOf(label).querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+    fieldOf(label).querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
   const type = async (label: string, text: string) => {
     input(label).value = text;
     input(label).dispatchEvent(new Event('input'));

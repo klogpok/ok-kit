@@ -280,11 +280,11 @@ describe('UiNumberInput with Reactive Forms', () => {
   /** The `ui-form-field` that carries this label, for what the harness does not expose. */
   const fieldOf = (label: string): Element =>
     [...(fixture.nativeElement as HTMLElement).querySelectorAll('ui-form-field')].find((it) =>
-      it.querySelector('label')?.textContent.includes(label),
+      it.querySelector('label')?.textContent?.includes(label),
     )!;
   /** The message `ui-form-field` shows under the field with this label. */
   const errorOf = (label: string): string =>
-    fieldOf(label).querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+    fieldOf(label).querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);

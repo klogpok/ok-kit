@@ -101,7 +101,7 @@ describe('UiSwitch', () => {
     await settle(fixture);
     expect(fixture.componentInstance.control.invalid).toBe(true);
     expect(input('reactive').hasAttribute('aria-invalid')).toBe(false);
-    expect(error().textContent.trim()).toBe('');
+    expect(error().textContent?.trim()).toBe('');
 
     input('reactive').dispatchEvent(new Event('blur'));
     await settle(fixture);
@@ -113,7 +113,7 @@ describe('UiSwitch', () => {
     await settle(fixture);
     expect(fixture.componentInstance.control.valid).toBe(true);
     expect(input('reactive').hasAttribute('aria-invalid')).toBe(false);
-    expect(error().textContent.trim()).toBe('');
+    expect(error().textContent?.trim()).toBe('');
   });
 });
 

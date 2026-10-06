@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import type { MockInstance } from 'vitest';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
@@ -86,10 +87,10 @@ describe('UiFileUpload', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
   let root: HTMLElement;
-  let announce: ReturnType<typeof vi.spyOn>;
+  let announce: MockInstance<LiveAnnouncer['announce']>;
   const zone = () => root.querySelector<HTMLButtonElement>('.ui-file-upload__zone')!;
   const names = () =>
-    [...root.querySelectorAll('.ui-file-upload__name')].map((n) => n.textContent.trim());
+    [...root.querySelectorAll('.ui-file-upload__name')].map((n) => n.textContent?.trim());
   const errors = () => root.querySelector('.ui-form-field__error')!.textContent;
 
   beforeEach(async () => {
@@ -108,7 +109,7 @@ describe('UiFileUpload', () => {
     expect(zone().type).toBe('button');
     const [labelId, promptId] = zone().getAttribute('aria-labelledby')!.split(' ');
     expect(labelId).toBe(label.id);
-    expect(document.getElementById(promptId)!.textContent.trim()).toBe(
+    expect(document.getElementById(promptId)!.textContent?.trim()).toBe(
       'גררו קבצים לכאן או לחצו לבחירה',
     );
     const picker = root.querySelector<HTMLInputElement>('input[type=file]')!;
@@ -260,8 +261,8 @@ describe('UiFileUpload with Reactive Forms', () => {
   /** The message `ui-form-field` shows under the field with this label. */
   const errorOf = (label: string): string => {
     const fields = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ui-form-field')];
-    const owner = fields.find((it) => it.querySelector('label')?.textContent.includes(label));
-    return owner?.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+    const owner = fields.find((it) => it.querySelector('label')?.textContent?.includes(label));
+    return owner?.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
   };
 
   beforeEach(async () => {

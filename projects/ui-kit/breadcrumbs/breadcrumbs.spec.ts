@@ -93,7 +93,7 @@ describe('UiBreadcrumbs', () => {
     more()!.click();
     await settle();
     const items = [...document.querySelectorAll<HTMLButtonElement>('[ui-menu-item]')];
-    expect(items.map((item) => item.textContent.trim())).toEqual(['Projects', 'Tower B']);
+    expect(items.map((item) => item.textContent?.trim())).toEqual(['Projects', 'Tower B']);
 
     items[1].click();
     await settle();

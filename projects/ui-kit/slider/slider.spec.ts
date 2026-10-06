@@ -345,7 +345,7 @@ describe('UiRangeSlider', () => {
     element
       .getAttribute('aria-labelledby')!
       .split(' ')
-      .map((id) => document.getElementById(id)!.textContent.replace('*', '').trim())
+      .map((id) => document.getElementById(id)!.textContent?.replace('*', '').trim())
       .join(' ');
 
   beforeEach(async () => {
@@ -546,7 +546,8 @@ describe('UiSlider in a form field with Reactive Forms', () => {
   let slider: UiSliderHarness;
 
   /** The message `ui-form-field` shows under the slider. */
-  const error = (): string => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const error = (): string =>
+    root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);

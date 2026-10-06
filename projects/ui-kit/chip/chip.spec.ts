@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import type { MockInstance } from 'vitest';
 import { UiChip, UiChipSet, UiFilterChip } from './chip';
 
 const KEY_CODES: Record<string, number> = {
@@ -56,7 +57,7 @@ describe('UiChip and UiChipSet', () => {
   let fixture: ComponentFixture<ChipsHost>;
   let host: ChipsHost;
   let root: HTMLElement;
-  let announce: ReturnType<typeof vi.spyOn>;
+  let announce: MockInstance<LiveAnnouncer['announce']>;
   const set = () => root.querySelector('ui-chip-set')!;
   const removeButtons = () => [...set().querySelectorAll<HTMLButtonElement>('.ui-chip__remove')];
 

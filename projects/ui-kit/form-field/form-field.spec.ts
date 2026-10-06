@@ -76,7 +76,7 @@ describe('UiFormField + UiInput', () => {
     /** The `ui-form-field` whose label contains this text. */
     const fieldOf = (label: string): HTMLElement =>
       [...root.querySelectorAll<HTMLElement>('ui-form-field')].find((it) =>
-        it.querySelector('label')?.textContent.includes(label),
+        it.querySelector('label')?.textContent?.includes(label),
       )!;
     const errorOf = (label: string): HTMLElement =>
       fieldOf(label).querySelector<HTMLElement>('.ui-form-field__error')!;
@@ -132,7 +132,7 @@ describe('UiFormField + UiInput', () => {
     it('shows the message of the validator when no ui-error is projected', async () => {
       const name = await input('Name');
       expect(await name.isRequired()).toBe(true);
-      expect(errorOf('Name').textContent.trim()).toBe('');
+      expect(errorOf('Name').textContent?.trim()).toBe('');
 
       await name.blur();
       await settle(fixture);
@@ -149,7 +149,7 @@ describe('UiFormField + UiInput', () => {
       await name.setValue('Ada');
       await settle(fixture);
       expect(controls.name.value).toBe('Ada');
-      expect(errorOf('Name').textContent.trim()).toBe('');
+      expect(errorOf('Name').textContent?.trim()).toBe('');
 
       controls.name.setValue('Grace');
       await settle(fixture);

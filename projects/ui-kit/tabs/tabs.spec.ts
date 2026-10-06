@@ -75,7 +75,7 @@ describe('UiTabGroup', () => {
   it('renders a tablist with linked tabs and panels', () => {
     expect(root.querySelector('[role="tablist"]')!.getAttribute('aria-label')).toBe('Plan');
     expect(root.querySelector('ui-tab-group')!.hasAttribute('aria-label')).toBe(false);
-    expect(tabs().map((t) => t.textContent.trim())).toEqual([
+    expect(tabs().map((t) => t.textContent?.trim())).toEqual([
       'Details',
       'Disabled',
       'Docs 3',

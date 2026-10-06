@@ -75,7 +75,7 @@ describe('UiMultiSelect', () => {
   afterEach(() => root.remove());
 
   it('shows the placeholder and a multiselectable listbox with checkboxes', async () => {
-    expect(control().textContent.trim()).toBe('Choose');
+    expect(control().textContent?.trim()).toBe('Choose');
     expect(root.querySelector('ui-multi-select')!.classList).toContain('ui-select');
     await open();
     expect(listbox()!.getAttribute('aria-multiselectable')).toBe('true');
@@ -93,7 +93,7 @@ describe('UiMultiSelect', () => {
     expect(fixture.componentInstance.value()).toEqual(['yael', 'dana']);
     expect(options()[0].getAttribute('aria-selected')).toBe('true');
     // The trigger lists the labels in option order.
-    expect(control().textContent.trim()).toBe('Dana, Yael');
+    expect(control().textContent?.trim()).toBe('Dana, Yael');
 
     options()[2].click();
     await settle(fixture);
@@ -150,7 +150,7 @@ describe('UiMultiSelect', () => {
     input.dispatchEvent(new Event('input'));
     await settle(fixture);
     const visible = options().filter((o) => !o.hidden);
-    expect(visible.map((o) => o.textContent.trim())).toEqual(['Yossi']);
+    expect(visible.map((o) => o.textContent?.trim())).toEqual(['Yossi']);
 
     keydown(input, 'Enter');
     await settle(fixture);
@@ -206,7 +206,7 @@ describe('UiMultiSelect with Reactive Forms', () => {
   const cities = () => loader.getHarness(UiSelectHarness.with({ label: 'Cities' }));
   const trigger = () => root.querySelector<HTMLButtonElement>('.ui-select__control')!;
   /** The message `ui-form-field` shows under the select. */
-  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent.trim() ?? '';
+  const errorText = () => root.querySelector('.ui-form-field__error')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(ReactiveHost);
@@ -358,7 +358,7 @@ describe('UiMultiSelect extras', () => {
   let root: HTMLElement;
   const control = () => root.querySelector<HTMLInputElement>('.ui-select__control')!;
   const all = () => document.querySelector<HTMLElement>('ui-option.ui-select__all');
-  const option = (text: string) => options().find((o) => o.textContent.includes(text))!;
+  const option = (text: string) => options().find((o) => o.textContent?.includes(text))!;
   const open = async () => {
     keydown(control(), 'ArrowDown');
     await settle(fixture);
@@ -379,7 +379,7 @@ describe('UiMultiSelect extras', () => {
 
   it('selects and deselects every enabled option with "select all"', async () => {
     await open();
-    expect(all()!.textContent.trim()).toBe('בחירת הכול');
+    expect(all()!.textContent?.trim()).toBe('בחירת הכול');
     expect(options()[0]).toBe(all());
     all()!.click();
     await settle(fixture);
@@ -444,7 +444,7 @@ describe('UiMultiSelect extras', () => {
     host.value.set(['plumbing', 'electric']);
     await settle(fixture);
     const chips = [...root.querySelectorAll('.ui-select__chips ui-chip')];
-    expect(chips.map((c) => c.textContent.trim())).toEqual(['Plumbing', 'Electric']);
+    expect(chips.map((c) => c.textContent?.trim())).toEqual(['Plumbing', 'Electric']);
     expect(root.querySelector('.ui-select__chips')!.getAttribute('aria-hidden')).toBe('true');
     const remove = root.querySelector<HTMLButtonElement>('.ui-select__chips .ui-chip__remove')!;
     expect(remove.tabIndex).toBe(-1);

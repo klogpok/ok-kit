@@ -9,7 +9,8 @@ import { App } from './app';
 
 /** The playground, with every `@defer (on viewport)` phase section rendered. */
 async function renderPlayground(): Promise<ComponentFixture<App>> {
-  TestBed.configureTestingModule({ deferBlockBehavior: DeferBlockBehavior.Manual });
+  TestBed.configureTestingModule({ imports: [App], deferBlockBehavior: DeferBlockBehavior.Manual });
+  await TestBed.compileComponents();
   const fixture = TestBed.createComponent(App);
   await fixture.whenStable();
   for (const block of await fixture.getDeferBlocks()) {
@@ -21,13 +22,13 @@ async function renderPlayground(): Promise<ComponentFixture<App>> {
 /** The messages the form fields of `scope` currently show. */
 function errorsIn(root: Element, scope: string): string[] {
   return [...root.querySelectorAll(`${scope} .ui-form-field__error .ui-error`)].map((e) =>
-    e.textContent.trim(),
+    (e.textContent ?? '').trim(),
   );
 }
 
 /** Clicks the button with this text. */
 function click(root: Element, text: string): void {
-  const button = [...root.querySelectorAll('button')].find((b) => b.textContent.trim() === text);
+  const button = [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === text);
   button!.click();
 }
 
@@ -36,7 +37,7 @@ describe('App', () => {
     const fixture = await renderPlayground();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('h1')?.textContent).toContain('ui-kit playground');
-    const sections = [...el.querySelectorAll('section h2')].map((h) => h.textContent.trim());
+    const sections = [...el.querySelectorAll('section h2')].map((h) => h.textContent?.trim());
     expect(sections).toEqual(
       expect.arrayContaining(['Profile (Reactive Forms)', 'Plans', 'Actions']),
     );
@@ -56,7 +57,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const toggle = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
-      (b) => b.textContent.trim() === 'LTR',
+      (b) => b.textContent?.trim() === 'LTR',
     )!;
     toggle.click();
     await fixture.whenStable();

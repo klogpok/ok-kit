@@ -65,7 +65,7 @@ describe('UiMenu', () => {
   ];
   const item = (label: string) =>
     [...document.querySelectorAll<HTMLButtonElement>('[ui-menu-item]')].find(
-      (el) => el.textContent.trim() === label,
+      (el) => el.textContent?.trim() === label,
     )!;
   const settle = async () => {
     fixture.detectChanges();
@@ -233,7 +233,7 @@ describe('UiMenu links, groups and selectable items', () => {
   };
   const find = (label: string) =>
     [...document.querySelectorAll<HTMLElement>('.ui-menu-item')].find(
-      (el) => el.textContent.trim() === label,
+      (el) => el.textContent?.trim() === label,
     )!;
   const menus = () => document.querySelectorAll('ui-menu');
   const settle = async () => {

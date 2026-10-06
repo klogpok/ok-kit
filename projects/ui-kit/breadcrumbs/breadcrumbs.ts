@@ -153,7 +153,7 @@ export class UiBreadcrumbs {
   }
 
   protected labelOf(item: UiBreadcrumb): string {
-    return this.context.items.get(item)?.host.textContent.trim() ?? '';
+    return this.context.items.get(item)?.host.textContent?.trim() ?? '';
   }
 
   /** Follows a collapsed link: its click runs `routerLink` or the `href`. */

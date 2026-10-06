@@ -54,10 +54,10 @@ describe('UiPagination', () => {
     root().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
   const pages = () =>
     [...root().querySelectorAll<HTMLButtonElement>('.ui-pagination__page')].map((b) =>
-      b.textContent.trim(),
+      b.textContent?.trim(),
     );
   const current = () => root().querySelector<HTMLButtonElement>('[aria-current="page"]');
-  const range = () => root().querySelector('.ui-pagination__range')!.textContent.trim();
+  const range = () => root().querySelector('.ui-pagination__range')!.textContent?.trim();
   const settle = async () => {
     fixture.detectChanges();
     await fixture.whenStable();
@@ -83,7 +83,7 @@ describe('UiPagination', () => {
     expect(root().getAttribute('role')).toBe('navigation');
     expect(root().getAttribute('aria-label')).toBe('Pagination');
     expect(pages()).toEqual(['1', '2', '3', '4', '5', '10']);
-    expect(current()?.textContent.trim()).toBe('1');
+    expect(current()?.textContent?.trim()).toBe('1');
     expect(current()?.getAttribute('aria-label')).toBe('Page 1');
     expect(root().querySelectorAll('[aria-current]')).toHaveLength(1);
   });
@@ -159,7 +159,7 @@ describe('UiPagination', () => {
   it('moves an out of range page index to the last page and reports it', async () => {
     host.pageIndex.set(40);
     await settle();
-    expect(current()?.textContent.trim()).toBe('10');
+    expect(current()?.textContent?.trim()).toBe('10');
     expect(host.pageIndex()).toBe(9);
     expect(host.events.at(-1)).toMatchObject({ pageIndex: 9, previousPageIndex: 40 });
   });
@@ -174,7 +174,7 @@ describe('UiPagination', () => {
     host.length.set(12);
     await settle();
     expect(host.pageIndex()).toBe(1);
-    expect(current()?.textContent.trim()).toBe('2');
+    expect(current()?.textContent?.trim()).toBe('2');
   });
 
   it('changes the page size and keeps the first item visible', async () => {
