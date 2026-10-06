@@ -211,3 +211,16 @@
     color: SelectedItemText;
   }
 }
+
+// `cdk-virtual-scroll-viewport[uiTableViewport]`: the scrolling region of a virtual table.
+.ui-table-viewport {
+  box-sizing: border-box;
+  padding-block-end: var(--_header-size, 0);
+  overscroll-behavior: contain;
+  @include ui.focus-visible;
+
+  // The transform of the rendered rows, undone for the sticky header (set by `UiTableViewport`).
+  .ui-table.ui-table--sticky-header > thead th {
+    inset-block-start: var(--_header-offset, 0);
+  }
+}

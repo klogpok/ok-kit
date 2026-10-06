@@ -1,4 +1,9 @@
 import { Component, computed, input, signal } from '@angular/core';
+import {
+  CdkFixedSizeVirtualScroll,
+  CdkVirtualForOf,
+  CdkVirtualScrollViewport,
+} from '@angular/cdk/scrolling';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
@@ -9,6 +14,7 @@ import { UiSticky, UiTableContainer } from './sticky';
 import { UiTableSelectAll, UiTableSelectRow, UiTableSelection } from './selection';
 import { UiSort, UiSortHeader, UiSortState, uiSortData } from './sort';
 import { UiTable, UiTableDensity, UiTableMessage, UiTableSkeleton } from './table';
+import { UiTableViewport } from './viewport';
 
 interface Plan {
   id: number;
@@ -267,6 +273,68 @@ class WideTable {
   readonly selected = signal<readonly Plan[]>([PLANS[0]]);
 }
 
+interface Unit {
+  id: number;
+  building: string;
+  floor: number;
+  area: number;
+  status: (typeof STATUSES)[number];
+}
+
+const UNITS: Unit[] = Array.from({ length: 10000 }, (_, i) => ({
+  id: i + 1,
+  building: `בניין ${String.fromCharCode(1488 + (i % 6))}`,
+  floor: (i % 30) + 1,
+  area: 40 + ((i * 7) % 90),
+  status: STATUSES[i % STATUSES.length],
+}));
+
+/** 10,000 rows in a virtual scroll viewport. */
+@Component({
+  selector: 'ui-story-virtual-table',
+  imports: [
+    CdkVirtualScrollViewport,
+    CdkFixedSizeVirtualScroll,
+    CdkVirtualForOf,
+    UiTable,
+    UiTableViewport,
+    UiBadge,
+  ],
+  template: `
+    <cdk-virtual-scroll-viewport uiTableViewport itemSize="48" style="block-size: 24rem">
+      <table ui-table stickyHeader>
+        <caption class="ui-visually-hidden">
+          יחידות
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">יחידה</th>
+            <th scope="col">בניין</th>
+            <th scope="col" class="ui-table-numeric">קומה</th>
+            <th scope="col" class="ui-table-numeric">שטח (מ"ר)</th>
+            <th scope="col">סטטוס</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *cdkVirtualFor="let unit of units; trackBy: trackId">
+            <td>יחידה {{ unit.id }}</td>
+            <td>{{ unit.building }}</td>
+            <td class="ui-table-numeric">{{ unit.floor }}</td>
+            <td class="ui-table-numeric">{{ unit.area }}</td>
+            <td>
+              <ui-badge [tone]="unit.status.tone">{{ unit.status.text }}</ui-badge>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </cdk-virtual-scroll-viewport>
+  `,
+})
+class VirtualTable {
+  readonly units = UNITS;
+  readonly trackId = (_index: number, unit: Unit) => unit.id;
+}
+
 interface TableArgs {
   isLoading: boolean;
   rowDensity: UiTableDensity;
@@ -282,6 +350,7 @@ const meta: Meta<TableArgs> = {
         SelectionTable,
         ExpandableTable,
         WideTable,
+        VirtualTable,
         UiTable,
         UiSort,
         UiSortHeader,
@@ -361,4 +430,27 @@ export const ExpandableRows: Story = {
  */
 export const WideWithStickyColumns: Story = {
   render: () => ({ template: `<ui-story-wide-table dir="rtl" lang="he" />` }),
+};
+
+/**
+ * Thousands of rows: `cdk-virtual-scroll-viewport[uiTableViewport]` renders only the rows in
+ * view. The table reports the whole row count and each row its position to screen readers.
+ */
+export const VirtualRows: Story = {
+  render: () => ({ template: `<ui-story-virtual-table dir="rtl" lang="he" />` }),
+  parameters: {
+    docs: {
+      source: {
+        code: `<cdk-virtual-scroll-viewport uiTableViewport itemSize="48" style="block-size: 24rem">
+  <table ui-table stickyHeader>
+    <caption class="ui-visually-hidden">יחידות</caption>
+    <thead>...</thead>
+    <tbody>
+      <tr *cdkVirtualFor="let unit of units; trackBy: trackId">...</tr>
+    </tbody>
+  </table>
+</cdk-virtual-scroll-viewport>`,
+      },
+    },
+  },
 };
