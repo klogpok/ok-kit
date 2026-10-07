@@ -293,13 +293,28 @@ describe('UiSelect', () => {
     expect(control().getAttribute('aria-activedescendant')).toBe(options()[2].id);
   });
 
-  it('opens at the selected option', async () => {
+  it('opens with a click at the selected option without making it active', async () => {
     fixture.componentInstance.value.set('yael');
     await settle(fixture);
     await open();
-    expect(control().getAttribute('aria-activedescendant')).toBe(options()[2].id);
+    expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+    expect(root.ownerDocument.querySelector('.ui-option--active')).toBeNull();
     expect(options()[2].getAttribute('aria-selected')).toBe('true');
     expect(options()[2].querySelector('ui-icon')).not.toBeNull();
+
+    // The keyboard starts from the selected option.
+    keydown(control(), 'ArrowUp');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[2].id);
+  });
+
+  it('opens with the keyboard at the selected option', async () => {
+    fixture.componentInstance.value.set('yael');
+    await settle(fixture);
+    control().focus();
+    keydown(control(), 'ArrowDown');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[2].id);
   });
 
   it('opens with a click without an active option while nothing is selected', async () => {

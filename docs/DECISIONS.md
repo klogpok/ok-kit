@@ -395,3 +395,11 @@ ArrowDown then starts from the first option and ArrowUp from the last.
 In `ui-multi-select` the selected options were blue and medium weight, so several rows looked
 active at once. With multiple selection the checkbox alone shows the selection; only the active
 option has a background and a focus ring. `ui-select` keeps the blue text and the check mark.
+
+## Select: a click leaves a selected value inactive too (decided 2026-10-07)
+
+This replaces "A selected value is still active on any open" above. Opened with a click, a
+`ui-select` / `ui-multi-select` with a value only scrolls to the first selected option; no row has
+the background and focus ring of the active option. ArrowDown or ArrowUp then activates that
+selected option; without a value they start from the first or the last option as before. Opening
+with the keyboard or `open()` still activates the selected option.

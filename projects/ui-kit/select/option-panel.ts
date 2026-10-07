@@ -170,18 +170,18 @@ export abstract class UiOptionPanel<T, V>
   private readonly viewport = viewChild(CdkVirtualScrollViewport);
   /** An item to scroll to once the viewport has sized its content. */
   private pendingReveal: UiItemEntry<T> | null = null;
+  /**
+   * The selected option a list opened with a click scrolls to without making it active; the
+   * first arrow key activates it.
+   */
+  private restingEntry: UiListEntry<T> | null = null;
   protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
   private readonly overlay = viewChild(CdkConnectedOverlay);
 
   protected readonly isOpen = signal(false);
   private readonly activeEntry = signal<UiListEntry<T> | null>(null);
   /** Id of the active option; `null` while an active item is not rendered. */
-  protected readonly activeId = computed(() => {
-    const entry = this.activeEntry();
-    if (entry instanceof UiOption) return entry.id;
-    if (!entry) return null;
-    return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.id ?? null;
-  });
+  protected readonly activeId = computed(() => this.idOf(this.activeEntry()));
   protected readonly panelWidth = signal(0);
   protected readonly panelOffsetX = signal(0);
   protected readonly positions = POSITIONS;
@@ -260,8 +260,8 @@ export abstract class UiOptionPanel<T, V>
         if (height > 0 && height !== untracked(this.itemSize)) {
           this.itemSize.set(height);
           // An item made active before the measure was scrolled to with the old size.
-          const active = untracked(this.activeEntry);
-          if (active instanceof UiItemEntry) this.pendingReveal = active;
+          const shown = untracked(this.activeEntry) ?? this.restingEntry;
+          if (shown instanceof UiItemEntry) this.pendingReveal = shown;
         }
       },
     });
@@ -342,22 +342,23 @@ export abstract class UiOptionPanel<T, V>
     this.keyManager.setActiveItem(-1);
     this.activeEntry.set(null);
     this.pendingReveal = null;
+    this.restingEntry = null;
     this.closed.emit();
   }
 
   /**
-   * Opens the list and activates the selected option once it is rendered. Without a selected
-   * one, `activateFirst` activates the first option; a click leaves the list without an active
-   * option so the first one does not look selected.
+   * Opens the list and activates the selected option once it is rendered, or without a selected
+   * one the first option. A click (`activate` false) leaves the list without an active option,
+   * so no row looks focused, and only scrolls to the selected option.
    */
-  protected openList(activateFirst: boolean): void {
+  protected openList(activate: boolean): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
     this.panelWidth.set(this.host.getBoundingClientRect().width);
     this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.isOpen.set(true);
     this.opened.emit();
     if (this.activateOnOpen()) {
-      afterNextRender(() => this.activateSelected(activateFirst), { injector: this.injector });
+      afterNextRender(() => this.activateSelected(activate), { injector: this.injector });
     }
   }
 
@@ -392,27 +393,51 @@ export abstract class UiOptionPanel<T, V>
     this.selectOption(value);
   }
 
-  private activateSelected(activateFirst: boolean): void {
+  /**
+   * Activates the selected option a click scrolled to, if it is still in the list. Returns
+   * whether it did.
+   */
+  protected activateResting(): boolean {
+    const resting = this.restingEntry;
+    this.restingEntry = null;
+    const index = resting && !resting.disabled ? this.listOptions().indexOf(resting) : -1;
+    if (index < 0) return false;
+    this.keyManager.setActiveItem(index);
+    return true;
+  }
+
+  private activateSelected(activate: boolean): void {
     // Keys pressed before the list rendered have already moved the active option.
     if (this.keyManager.activeItem) return;
     const first = this.selectedOptions().find((option) => !option.disabled);
     const index = first ? this.listOptions().indexOf(first) : -1;
-    if (index >= 0) this.keyManager.setActiveItem(index);
-    else if (activateFirst) this.keyManager.setFirstItemActive();
+    if (!activate) {
+      if (index < 0) return;
+      this.restingEntry = this.listOptions()[index];
+      this.reveal(this.restingEntry);
+    } else if (index >= 0) this.keyManager.setActiveItem(index);
+    else this.keyManager.setFirstItemActive();
   }
 
-  /** Scrolls an active item into view; in the viewport it may not be rendered yet. */
-  private reveal(entry: UiItemEntry<T>): void {
+  /** Id of a rendered option; `null` while an item is not rendered. */
+  private idOf(entry: UiListEntry<T> | null): string | null {
+    if (entry instanceof UiOption) return entry.id;
+    if (!entry) return null;
+    return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.id ?? null;
+  }
+
+  /** Scrolls an option into view; in the viewport it may not be rendered yet. */
+  private reveal(entry: UiListEntry<T>): void {
     const viewport = this.viewport();
     // A key that opens the list (End) activates an item before the viewport is rendered.
     if (!viewport && this.virtual()) {
-      this.pendingReveal = entry;
+      this.pendingReveal = entry as UiItemEntry<T>;
       return;
     }
     if (!viewport) {
       afterNextRender(
         () => {
-          const id = this.activeId();
+          const id = this.idOf(entry);
           const element = id ? document.getElementById(id) : null;
           // jsdom has no scrollIntoView.
           if (element && 'scrollIntoView' in element) element.scrollIntoView({ block: 'nearest' });
@@ -422,7 +447,7 @@ export abstract class UiOptionPanel<T, V>
       return;
     }
     this.pendingReveal = null;
-    const index = this.visibleItems().indexOf(entry);
+    const index = this.visibleItems().indexOf(entry as UiItemEntry<T>);
     if (index < 0) return;
     const size = this.itemSize();
     // The listbox scrolls (`cdkVirtualScrollingElement`). Offsets are in its coordinates: the
@@ -437,7 +462,7 @@ export abstract class UiOptionPanel<T, V>
     // content, and the browser would cut the scroll short. Try again after a render; without a
     // size, scroll now too (jsdom never lays out).
     if (height === 0 || scroller.scrollHeight < end) {
-      this.pendingReveal = entry;
+      this.pendingReveal = entry as UiItemEntry<T>;
       if (height > 0) return;
     }
     if (start < offset + top || height === 0) {

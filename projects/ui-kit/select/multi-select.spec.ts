@@ -134,10 +134,13 @@ describe('UiMultiSelect', () => {
     expect(listbox()).toBeNull();
   });
 
-  it('activates the first selected option when opening', async () => {
+  it('starts the keyboard at the first selected option of a list opened with a click', async () => {
     fixture.componentInstance.value.set(['yossi', 'yael']);
     await settle(fixture);
     await open();
+    expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+    keydown(control(), 'ArrowDown');
+    await settle(fixture);
     expect(control().getAttribute('aria-activedescendant')).toBe(options()[2].id);
   });
 

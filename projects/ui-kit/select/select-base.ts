@@ -178,10 +178,13 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
       this.close();
     } else if (key === 'Tab') {
       this.close();
-    } else if (key === 'ArrowUp' && !this.keyManager.activeItem) {
-      // A list opened with a click has no active option; the key manager would not move.
+    } else if ((key === 'ArrowDown' || key === 'ArrowUp') && !this.keyManager.activeItem) {
+      // A list opened with a click has no active option: start at the selected one, else at the
+      // end the key points to (the key manager would not move up from no option).
       event.preventDefault();
-      this.keyManager.setLastItemActive();
+      if (this.activateResting()) return;
+      if (key === 'ArrowDown') this.keyManager.setFirstItemActive();
+      else this.keyManager.setLastItemActive();
     } else if (!searchable || NAVIGATION_KEYS.has(key)) {
       this.keyManager.onKeydown(event);
     }

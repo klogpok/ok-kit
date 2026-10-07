@@ -266,6 +266,8 @@ describe('UiSelect with items', () => {
       await settle(fixture);
       await open();
       expect(scroll).toHaveBeenCalled();
+      // The first arrow activates the selected item, the second moves on.
+      keydown(control(), 'ArrowDown');
       keydown(control(), 'ArrowDown');
       keydown(control(), 'Enter');
       await settle(fixture);
