@@ -63,19 +63,20 @@ export const Scale: Story = {
   }),
 };
 
+// Two columns of name / default: as one table the page grew taller than the 16384px a browser
+// screenshot can capture, and the visual baseline failed now and then.
 export const ComponentTokens: Story = {
   render: () => ({
     props: { tokens: component },
     template: `
-      <table class="ui-body-sm" style="border-collapse:collapse">
-        <tr><th style="text-align:start;padding:8px">Token</th><th style="text-align:start;padding:8px">Default</th></tr>
+      <div class="ui-body-sm" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px">
         @for (t of tokens; track t.name) {
-          <tr style="border-block-end:1px solid var(--ui-color-border)">
-            <td style="padding:8px"><code dir="ltr" class="ui-code">{{ t.name }}</code></td>
-            <td style="padding:8px"><code dir="ltr" class="ui-code ui-text-muted">{{ t.light }}</code></td>
-          </tr>
+          <div style="display:grid;padding:4px 8px;border-block-end:1px solid var(--ui-color-border)">
+            <code dir="ltr" class="ui-code">{{ t.name }}</code>
+            <code dir="ltr" class="ui-code ui-text-muted">{{ t.light }}</code>
+          </div>
         }
-      </table>`,
+      </div>`,
   }),
 };
 
