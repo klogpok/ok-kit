@@ -29,6 +29,8 @@ pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit
 
 New or intentionally changed stories need new baselines:
 
+While you iterate on one component's stories, run `pnpm test-storybook --filter <id part>` and `pnpm test-visual:update --filter <id part>` (e.g. `data-display-tree`); keep the full commands for the final pass.
+
 1. `pnpm test-visual:update`.
 2. Look at every new or changed PNG in `visual/` before committing it. Diffs of a failed run are in `dist/visual-diff/`.
 3. Commit the baselines separately (`chore(visual): ...`).

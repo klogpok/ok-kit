@@ -28,6 +28,7 @@ paths:
 
 - `resolveDirection()` skips `dir="auto"` and invalid values. Do not use `closest('[dir]')` directly.
 - In RTL text a numeric range such as "51–75" is shown as "75–51". Wrap it in LRI/PDI (`⁦…⁩`).
+- CDK key managers take `horizontalOrientation` from `Directionality` once, when they are created, so ←/→ stay LTR after a runtime switch to RTL. `ui-tree` provides its own `TREE_KEY_MANAGER` factory that swaps the arrows at key time (`tree/tree-key-manager.ts`).
 - axe rejects `aria-expanded` on a `tr` outside a treegrid (`aria-conditional-attr`); `aria-selected` on a `tr` is fine. Expand state lives on the toggle button.
 
 ## Storybook JIT
