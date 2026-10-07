@@ -255,7 +255,12 @@ export abstract class UiOptionPanel<T, V>
           ? this.viewport()?.elementRef.nativeElement.querySelector('.ui-option')
           : null;
         const height = option?.getBoundingClientRect().height ?? 0;
-        if (height > 0 && height !== untracked(this.itemSize)) this.itemSize.set(height);
+        if (height > 0 && height !== untracked(this.itemSize)) {
+          this.itemSize.set(height);
+          // An item made active before the measure was scrolled to with the old size.
+          const active = untracked(this.activeEntry);
+          if (active instanceof UiItemEntry) this.pendingReveal = active;
+        }
       },
     });
     afterEveryRender(() => {

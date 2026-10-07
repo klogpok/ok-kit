@@ -88,12 +88,19 @@ class SelectHost {
 @Component({
   imports: [UiMultiSelect],
   template: `
-    <ui-multi-select aria-label="Apartments" selectAll [items]="items()" [(value)]="value" />
+    <ui-multi-select
+      aria-label="Apartments"
+      selectAll
+      [searchable]="searchable()"
+      [items]="items()"
+      [(value)]="value"
+    />
   `,
 })
 class MultiHost {
   readonly items = signal(apartments(300));
   readonly value = signal<readonly number[]>([]);
+  readonly searchable = signal(false);
 }
 
 @Component({
@@ -225,6 +232,22 @@ describe('UiSelect with items', () => {
       keydown(control(), 'Enter');
       await settle(fixture);
       expect(fixture.componentInstance.control.value).toBe(999);
+    });
+
+    it('scrolls again once it has measured a taller option', async () => {
+      // Options with a description are taller than the default size of the viewport.
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
+        DOMRect.fromRect({ width: 200, height: 44 }),
+      );
+      // A laid-out viewport, as in the browser.
+      vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(300);
+      vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(100_000);
+      const scroll = vi.spyOn(CdkVirtualScrollViewport.prototype, 'scrollToOffset');
+      keydown(control(), 'End');
+      await frame(fixture);
+      await frame(fixture);
+      // 999 is the last enabled item, at index 998: its end meets the end of the 300px viewport.
+      expect(scroll.mock.lastCall![0]).toBe(999 * 44 - 300);
     });
 
     it('skips disabled items that are not rendered', async () => {
@@ -383,6 +406,18 @@ describe('UiMultiSelect with items', () => {
     await settle(fixture);
     // 300 is disabled, like every tenth one.
     expect(fixture.componentInstance.value()).toEqual([299]);
+  });
+
+  it('opens a closed list at the last item with End and toggles it', async () => {
+    fixture.componentInstance.searchable.set(true);
+    fixture.componentInstance.value.set([3, 120]);
+    await settle(fixture);
+    keydown(control(), 'End');
+    await frame(fixture);
+    keydown(control(), 'Enter');
+    await settle(fixture);
+    // 300 is disabled, like every tenth one.
+    expect(fixture.componentInstance.value()).toEqual([3, 120, 299]);
   });
 
   it('lists the labels of the selected items in the trigger', async () => {
