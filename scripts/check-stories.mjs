@@ -35,7 +35,11 @@ const failures = [];
 for (const story of stories) {
   for (const mode of MODES) {
     errors.length = 0;
-    await openStory(page, server.base, story.id, mode);
+    const playError = await openStory(page, server.base, story.id, mode).catch((error) => {
+      failures.push(`${story.id} [${mode.theme}/${mode.dir}] ${error.message}`);
+      return undefined;
+    });
+    if (playError === undefined) continue;
     // Let entry animations finish, so colours are measured at rest.
     await page.waitForTimeout(400);
     await page.addScriptTag({ content: axeSource });
@@ -50,10 +54,15 @@ for (const story of stories) {
       }));
     });
     const name = `${mode.theme}/${mode.dir}`;
+    if (playError) failures.push(`${story.id} [${name}] play function: ${playError}`);
     for (const v of violations) {
       failures.push(`${story.id} [${name}] ${v.id}: ${v.help}\n      ${v.nodes.join('\n      ')}`);
     }
-    for (const error of errors) failures.push(`${story.id} [${name}] console: ${error}`);
+    for (const error of errors) {
+      // The preview logs a failed play function too, with its stack.
+      if (playError && error.includes(playError)) continue;
+      failures.push(`${story.id} [${name}] console: ${error}`);
+    }
   }
 }
 

@@ -1,4 +1,6 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
+import { press, until } from '../.storybook/play';
 import { UiAvatar } from '@vplans/ui-kit/avatar';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiIcon } from '@vplans/ui-kit/icon';
@@ -192,5 +194,24 @@ export const ManyOptions: Story = {
 </ui-form-field>`,
       },
     },
+  },
+};
+
+/**
+ * End on the closed list opens it at the last enabled item (2000 is disabled), and the viewport
+ * scrolls to it before any other key.
+ */
+export const ManyOptionsAtEnd: Story = {
+  ...ManyOptions,
+  play: async ({ canvasElement }) => {
+    const control = canvasElement.querySelector<HTMLElement>('.ui-select__control')!;
+    control.focus();
+    press('End');
+    const active = () => {
+      const id = control.getAttribute('aria-activedescendant');
+      return id ? document.getElementById(id) : null;
+    };
+    await until(() => !!active()?.textContent?.includes('דירה 1999'), 'not at the last item');
+    await expect(active()?.getAttribute('aria-posinset')).toBe('1999');
   },
 };

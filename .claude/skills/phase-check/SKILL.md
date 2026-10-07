@@ -35,7 +35,7 @@ New or intentionally changed stories need new baselines:
 
 ## 3. Browser check
 
-Check the new and changed stories in a real browser for light and dark themes and for RTL, including open overlays. Start the Storybook dev server with `pnpm storybook` and stop it when the check is done. `playwright-core` with `channel: 'msedge'` works without downloading browsers. Vitest does not load component styles, so CSS fixes are verified only here.
+Open states (a list opened with a key, a scrolled table, an open menu) are play stories: `test-storybook` runs axe on them and `test-visual` takes their snapshots, so give every new overlay or keyboard path one (see `.claude/rules/storybook.md`). Then check the new and changed stories in a real browser for light and dark themes and for RTL, for what the play stories do not assert. Start the Storybook dev server with `pnpm storybook` and stop it when the check is done. `playwright-core` with `channel: 'msedge'` works without downloading browsers. Vitest does not load component styles, so CSS fixes are verified only here.
 
 ## 4. Report
 

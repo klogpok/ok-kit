@@ -1,5 +1,7 @@
 import { JsonPipe } from '@angular/common';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
+import { press, until } from '../.storybook/play';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiMultiSelect } from './multi-select';
 import { UiOption, UiOptionGroup } from './option';
@@ -176,5 +178,47 @@ export const ManyOptions: Story = {
         code: `<ui-multi-select formControlName="units" selectAll searchable [items]="units" />`,
       },
     },
+  },
+};
+
+/** End and Enter toggle the last item, which is not rendered until the viewport scrolls to it. */
+export const ManyOptionsToggleLast: Story = {
+  ...ManyOptions,
+  play: async ({ canvasElement }) => {
+    const control = canvasElement.querySelector<HTMLElement>('.ui-select__control')!;
+    control.focus();
+    press('End');
+    press('Enter');
+    const active = () => {
+      const id = control.getAttribute('aria-activedescendant');
+      return id ? document.getElementById(id) : null;
+    };
+    await until(() => active()?.getAttribute('aria-selected') === 'true', 'not selected yet');
+    await expect(active()?.textContent).toContain('יחידה 500');
+    // "Select all" opens the set.
+    await expect(active()?.getAttribute('aria-posinset')).toBe('501');
+  },
+};
+
+/** PageUp from the end scrolls the rows back under "select all", which stays in view. */
+export const ManyOptionsPageUp: Story = {
+  ...ManyOptions,
+  play: async ({ canvasElement }) => {
+    const control = canvasElement.querySelector<HTMLElement>('.ui-select__control')!;
+    control.focus();
+    press('End');
+    // From item 500, ten items a page: item 10.
+    for (let i = 0; i < 49; i++) press('PageUp');
+    const active = () => {
+      const id = control.getAttribute('aria-activedescendant');
+      return id ? document.getElementById(id) : null;
+    };
+    await until(() => !!active()?.textContent?.includes('יחידה 10'), 'not at item 10');
+    const row = document.querySelector('.ui-select__all-row')!.getBoundingClientRect();
+    const listbox = document.querySelector('[role="listbox"]')!.getBoundingClientRect();
+    // The list is scrolled, "select all" sticks at its top, and the active item shows below it.
+    // (The listbox border is 1px.)
+    await expect(Math.abs(row.top - listbox.top)).toBeLessThan(2);
+    await expect(active()!.getBoundingClientRect().top).toBeGreaterThanOrEqual(row.bottom - 1);
   },
 };

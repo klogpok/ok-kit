@@ -103,7 +103,11 @@ async function run(job) {
   const file = join(baselineDir, `${name}.png`);
   const page = job.page;
   try {
-    await openStory(page, server.base, story.id, mode);
+    const playError = await openStory(page, server.base, story.id, mode);
+    if (playError) {
+      failures.push(`${name}: play function: ${playError}`);
+      return;
+    }
     let buffer = await capture(page);
     let actual = PNG.sync.read(buffer);
     const expected = await readBaseline(file);

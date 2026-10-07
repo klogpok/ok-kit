@@ -22,6 +22,7 @@ paths:
 - Angular `@for` may move a kept DOM node when items before it are removed, which drops focus. Re-focus after render (see the toast `keepFocus`).
 - `focus()` right after a `pointerdown` that called `preventDefault()` shows the focus ring in Edge (`:focus-visible` matches). Pass `focusVisible: false` (see `ui-slider`).
 - An element that sets up a later focus move (`afterNextRender`) must outlive the change: `ui-chip-set` disappears with its last chip, so `ui-chip-input` moves focus itself.
+- jsdom never lays out, but the browser has the same state right after an overlay opens: a size of 0, content not measured yet. A branch written for jsdom ("no size: scroll now") must also be right in that browser moment; a play story checks it (see `.claude/rules/storybook.md`). In the virtual lists such branches lost the scroll on End twice (`reveal()` in `select/option-panel.ts`).
 
 ## RTL and a11y
 

@@ -70,8 +70,39 @@ export function storyUrl(base, id, { theme, dir }) {
   return `${base}/iframe.html?id=${id}&viewMode=story&globals=theme:${theme};dir:${dir}`;
 }
 
-/** Opens a story and waits until it has rendered. */
+// The preview emits `storyFinished` once a story has rendered and its play function has run, and
+// `playFunctionThrewException` before it when the play function threw or an `expect` in it
+// failed. (`storyFinished` reports `success` then too: its status only counts the reporters, such
+// as the a11y addon.) The channel is created before any story renders, so a setter on its global
+// catches it.
+const LISTEN_FOR_FINISH = `(() => {
+  let channel;
+  Object.defineProperty(globalThis, '__STORYBOOK_ADDONS_CHANNEL__', {
+    configurable: true,
+    get: () => channel,
+    set: (value) => {
+      channel = value;
+      value.on('playFunctionThrewException', (error) => { globalThis.__uiPlayError = error.message; });
+      value.on('storyFinished', () => { globalThis.__uiStoryFinished = true; });
+    },
+  });
+})();`;
+const listening = new WeakSet();
+
+/**
+ * Opens a story and waits until it has rendered and its play function (if any) has finished.
+ * Returns the message of a failed play function, or `null`.
+ */
 export async function openStory(page, base, id, mode) {
+  if (!listening.has(page)) {
+    await page.addInitScript(LISTEN_FOR_FINISH);
+    listening.add(page);
+  }
   await page.goto(storyUrl(base, id, mode));
-  await page.waitForSelector('#storybook-root > *', { timeout: 10000 }).catch(() => undefined);
+  const finished = await page
+    .waitForFunction(() => globalThis.__uiStoryFinished, null, { timeout: 15000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!finished) throw new Error(`${id} did not finish rendering in 15 s`);
+  return page.evaluate(() => globalThis.__uiPlayError ?? null);
 }

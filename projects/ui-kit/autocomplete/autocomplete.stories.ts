@@ -1,5 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect, userEvent } from 'storybook/test';
+import { press, until } from '../.storybook/play';
 import { UiAvatar } from '@vplans/ui-kit/avatar';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiOption } from '@vplans/ui-kit/select';
@@ -154,5 +156,22 @@ export const ManyOptions: Story = {
         code: `<ui-autocomplete formControlName="street" [items]="streets" />`,
       },
     },
+  },
+};
+
+/** The search narrows 1000 items to 111; PageDown walks the viewport to the last of them. */
+export const ManyOptionsSearched: Story = {
+  ...ManyOptions,
+  play: async ({ canvasElement }) => {
+    const input = canvasElement.querySelector<HTMLInputElement>('input')!;
+    await userEvent.type(input, 'רחוב 9');
+    press('ArrowDown');
+    for (let i = 0; i < 12; i++) press('PageDown');
+    const active = () => {
+      const id = input.getAttribute('aria-activedescendant');
+      return id ? document.getElementById(id) : null;
+    };
+    await until(() => !!active()?.textContent?.includes('רחוב 999'), 'not at the last item');
+    await expect(active()?.getAttribute('aria-setsize')).toBe('111');
   },
 };

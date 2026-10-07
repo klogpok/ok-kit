@@ -5,6 +5,8 @@ import {
   CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
+import { until } from '../.storybook/play';
 import { UiBadge, UiBadgeTone } from '@vplans/ui-kit/badge';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
@@ -452,5 +454,28 @@ export const VirtualRows: Story = {
 </cdk-virtual-scroll-viewport>`,
       },
     },
+  },
+};
+
+/**
+ * Scrolled to row 5001: the header stays at the top of the viewport and each rendered row keeps
+ * its position in the whole table.
+ */
+export const VirtualRowsScrolled: Story = {
+  ...VirtualRows,
+  play: async ({ canvasElement }) => {
+    const viewport = canvasElement.querySelector<HTMLElement>('.ui-table-viewport')!;
+    // The viewport sizes its content after the first render; a scroll before that is cut short.
+    await until(() => viewport.scrollHeight > 48 * 5000, 'the viewport has no size');
+    viewport.scrollTo({ top: 48 * 5000 });
+    // The viewport also renders a buffer of rows above the ones in view.
+    const row = () =>
+      [...viewport.querySelectorAll<HTMLTableRowElement>('tbody tr')].find((tr) =>
+        tr.cells.item(0)?.textContent?.includes('יחידה 5001'),
+      );
+    await until(() => row() !== undefined, 'not scrolled yet');
+    await expect(row()?.getAttribute('aria-rowindex')).toBe('5002');
+    const header = viewport.querySelector('th')!.getBoundingClientRect();
+    await expect(Math.abs(header.top - viewport.getBoundingClientRect().top)).toBeLessThan(1);
   },
 };
