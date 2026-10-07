@@ -388,6 +388,11 @@ export abstract class UiOptionPanel<T, V>
   /** Scrolls an active item into view; in the viewport it may not be rendered yet. */
   private reveal(entry: UiItemEntry<T>): void {
     const viewport = this.viewport();
+    // A key that opens the list (End) activates an item before the viewport is rendered.
+    if (!viewport && this.virtual()) {
+      this.pendingReveal = entry;
+      return;
+    }
     if (!viewport) {
       afterNextRender(
         () => {
@@ -409,11 +414,12 @@ export abstract class UiOptionPanel<T, V>
     const element = viewport.elementRef.nativeElement;
     const offset = viewport.measureScrollOffset('top');
     const height = element.clientHeight;
-    // Right after the list opens the viewport has not sized its content yet, and the browser
-    // would cut the scroll short. Try again after a render.
-    if (height > 0 && element.scrollHeight < end) {
+    // Right after the list opens the viewport has no size yet, or has not sized its content, and
+    // the browser would cut the scroll short. Try again after a render; without a size, scroll
+    // now too (jsdom never lays out).
+    if (height === 0 || element.scrollHeight < end) {
       this.pendingReveal = entry;
-      return;
+      if (height > 0) return;
     }
     if (start < offset || height === 0) {
       if (start !== offset) viewport.scrollToOffset(start);

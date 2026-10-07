@@ -216,6 +216,17 @@ describe('UiSelect with items', () => {
       expect(control().textContent!.trim()).toBe('Apartment 999');
     });
 
+    it('opens a closed list at the last item with End', async () => {
+      const scroll = vi.spyOn(CdkVirtualScrollViewport.prototype, 'scrollToOffset');
+      keydown(control(), 'End');
+      await frame(fixture);
+      expect(scroll).toHaveBeenCalled();
+      expect(scroll.mock.lastCall![0]).toBeGreaterThan(0);
+      keydown(control(), 'Enter');
+      await settle(fixture);
+      expect(fixture.componentInstance.control.value).toBe(999);
+    });
+
     it('skips disabled items that are not rendered', async () => {
       keydown(control(), 'ArrowDown');
       await settle(fixture);
