@@ -22,6 +22,7 @@ module.exports = tseslint.config(
           './projects/ui-kit/tsconfig.lib.json',
           './projects/ui-kit/tsconfig.spec.json',
           './projects/ui-kit/.storybook/tsconfig.json',
+          './projects/ui-kit/.storybook/tsconfig.main.json',
           './projects/playground/tsconfig.app.json',
           './projects/playground/tsconfig.spec.json',
         ],
