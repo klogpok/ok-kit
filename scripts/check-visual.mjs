@@ -19,6 +19,8 @@ const filter = option('--filter');
 const update = process.argv.includes('--update');
 /** Share of pixels that may differ. */
 const MAX_DIFF_RATIO = 0.001;
+/** Tallest capture Chromium takes reliably (its texture size limit). */
+const MAX_SCREENSHOT_HEIGHT = 16384;
 /** Parallel pages. */
 const WORKERS = 4;
 /** "Today" in calendars, so the baselines do not change every day. */
@@ -67,6 +69,12 @@ async function capture(page) {
       height: bottom - Math.max(0, y),
     };
   });
+  // Past this height Chromium fails the capture now and then with a bare "Protocol error".
+  if (clip && clip.height > MAX_SCREENSHOT_HEIGHT) {
+    throw new Error(
+      `the story is ${clip.height}px tall; a screenshot captures at most ${MAX_SCREENSHOT_HEIGHT}px, so split or reflow it`,
+    );
+  }
   return page.screenshot({
     fullPage: true,
     animations: 'disabled',
