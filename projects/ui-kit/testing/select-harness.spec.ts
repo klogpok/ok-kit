@@ -70,7 +70,8 @@ describe('UiSelectHarness', () => {
       'Eilat',
     ]);
     expect(await options[0].getDescription()).toBe('North');
-    expect(await options[0].isActive()).toBe(true);
+    // A click opens the list without an active option while nothing is selected.
+    expect(await options[0].isActive()).toBe(false);
     expect(await options[2].isDisabled()).toBe(true);
     expect(await city.getOptions({ disabled: false })).toHaveLength(2);
 

@@ -100,7 +100,7 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
     // Clicks in the search text keep the list open; the chevron always toggles it.
     const onChevron = !!(event.target as Element).closest('.ui-select__chevron');
     if (this.isOpen() && (!this.searchable() || onChevron)) this.close();
-    else this.open();
+    else this.openList(false);
     this.focus();
   }
 
@@ -178,6 +178,10 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
       this.close();
     } else if (key === 'Tab') {
       this.close();
+    } else if (key === 'ArrowUp' && !this.keyManager.activeItem) {
+      // A list opened with a click has no active option; the key manager would not move.
+      event.preventDefault();
+      this.keyManager.setLastItemActive();
     } else if (!searchable || NAVIGATION_KEYS.has(key)) {
       this.keyManager.onKeydown(event);
     }

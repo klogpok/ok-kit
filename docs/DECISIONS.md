@@ -381,3 +381,11 @@ Review answers (tickets 01–03 in `.scratch/tree/issues/`), all keeping the bui
   branch whose children are all checked joins the value, a partially checked one leaves it. The
   control does not become dirty.
 - **Enter and Space expand in a tree without selection,** like a click and as the APG has it.
+
+## Select: a click opens the list without an active option (decided 2026-10-07)
+
+With no value, opening `ui-select` / `ui-multi-select` with a click made the first option active,
+and its background and focus ring read as "selected". A click now leaves the list without an
+active option; the keyboard (Arrow keys, Enter, Space, Home/End, typeahead) and `open()` still
+activate the first one, as the APG has it. A selected value is still active on any open.
+ArrowDown then starts from the first option and ArrowUp from the last.

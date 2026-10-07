@@ -331,14 +331,7 @@ export abstract class UiOptionPanel<T, V>
   }
 
   open(): void {
-    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.panelWidth.set(this.host.getBoundingClientRect().width);
-    this.isOpen.set(true);
-    this.opened.emit();
-    // Activate the selected option (or the first one) once the list is rendered.
-    if (this.activateOnOpen()) {
-      afterNextRender(() => this.activateSelected(), { injector: this.injector });
-    }
+    this.openList(true);
   }
 
   close(): void {
@@ -348,6 +341,21 @@ export abstract class UiOptionPanel<T, V>
     this.activeEntry.set(null);
     this.pendingReveal = null;
     this.closed.emit();
+  }
+
+  /**
+   * Opens the list and activates the selected option once it is rendered. Without a selected
+   * one, `activateFirst` activates the first option; a click leaves the list without an active
+   * option so the first one does not look selected.
+   */
+  protected openList(activateFirst: boolean): void {
+    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
+    this.panelWidth.set(this.host.getBoundingClientRect().width);
+    this.isOpen.set(true);
+    this.opened.emit();
+    if (this.activateOnOpen()) {
+      afterNextRender(() => this.activateSelected(activateFirst), { injector: this.injector });
+    }
   }
 
   // --- Template handlers ----------------------------------------------------------------
@@ -381,13 +389,13 @@ export abstract class UiOptionPanel<T, V>
     this.selectOption(value);
   }
 
-  private activateSelected(): void {
+  private activateSelected(activateFirst: boolean): void {
     // Keys pressed before the list rendered have already moved the active option.
     if (this.keyManager.activeItem) return;
     const first = this.selectedOptions().find((option) => !option.disabled);
     const index = first ? this.listOptions().indexOf(first) : -1;
     if (index >= 0) this.keyManager.setActiveItem(index);
-    else this.keyManager.setFirstItemActive();
+    else if (activateFirst) this.keyManager.setFirstItemActive();
   }
 
   /** Scrolls an active item into view; in the viewport it may not be rendered yet. */

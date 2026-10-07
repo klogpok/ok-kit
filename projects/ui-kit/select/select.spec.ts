@@ -302,6 +302,24 @@ describe('UiSelect', () => {
     expect(options()[2].querySelector('ui-icon')).not.toBeNull();
   });
 
+  it('opens with a click without an active option while nothing is selected', async () => {
+    await open();
+    expect(listbox()).not.toBeNull();
+    expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+    expect(root.ownerDocument.querySelector('.ui-option--active')).toBeNull();
+
+    // The keyboard starts from the first or the last option.
+    keydown(control(), 'ArrowDown');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[0].id);
+    keydown(control(), 'Escape');
+    await settle(fixture);
+    await open();
+    keydown(control(), 'ArrowUp');
+    await settle(fixture);
+    expect(control().getAttribute('aria-activedescendant')).toBe(options()[3].id);
+  });
+
   it('closes on Escape without letting the event reach a dialog', async () => {
     const outer = vi.fn();
     document.body.addEventListener('keydown', outer);
