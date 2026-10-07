@@ -1,7 +1,7 @@
 # План фаз 6–9 @vplans/ui-kit
 
 > **Сейчас (2026-10-07):** фазы 1–7, 8.1–8.5 и миграция на Angular 20 сделаны и одобрены;
-> 8.6 тоже сделана и одобрена; следующая — 8.7. Статус каждой фазы — в её разделе ниже.
+> 8.6 тоже сделана и одобрена; 8.7 сделана и ждёт ревью. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -223,6 +223,10 @@
 | 8.5 | `ui-segmented` и `ui-button-toggle-group` (`segmented`) | одиночный выбор (семантика radiogroup) и множественный (`aria-pressed`) | S–M |
 | 8.6 | Virtual scroll | `cdk-virtual-scroll-viewport` в панелях select/multi-select/autocomplete (порог по числу опций) и в строках таблицы. Главная сложность — key manager и `aria-activedescendant` для неотрендеренных опций | L |
 | 8.7 | `ui-tree` (`tree`) | CDK Tree, APG tree view; раскрытие и сворачивание; выбор (одиночный или трёхсостоянные checkbox'ы); ленивые дети | L |
+
+> **8.7 — спека согласована (2026-10-07):** [.scratch/tree/spec.md](../.scratch/tree/spec.md), термины в [GLOSSARY.md](../GLOSSARY.md), значение — [ADR 0001](adr/0001-tree-value-is-every-checked-key.md).
+>
+> **Статус (2026-10-07): 8.7 сделана, ждёт ревью.** Точка входа `@vplans/ui-kit/tree` (`ui-tree`, `UiTreeNodeDef`) на CDK Tree; режимы `none`/`single`/`multiple`, каскад галочек, ленивые ветки с повтором, `loading` и пустое состояние, свой шаблон узла; `UiTreeHarness` и `UiTreeNodeHarness`; токены `--ui-tree-*`; тексты `noItems`, `loadFailed`, `retry`; в core — `UiControlState.writeDerivedValue()`. История «Foundations/Tokens → Component tokens» переложена в две колонки: страница переросла 16384px, и её снимок падал через раз. Открытые вопросы — тикеты `needs-info` 01–03 в `.scratch/tree/issues/`.
 
 ## Фаза 9 — инфраструктура для команд
 
