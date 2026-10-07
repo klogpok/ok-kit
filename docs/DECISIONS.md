@@ -28,7 +28,7 @@ Review answers:
 - toast defaults stay: `bottom-end`, 5 s, max 3;
 - dialogs focus the first form field on open;
 - budgets: the playground bundle warning is 900 kB (raised in the phase 6 and 7 reviews) and the
-  component style warning is 6 kB (raised in the phase 6 review); errors stay at 1 MB and 8 kB;
+  component style warning is 7 kB (raised in the phase 6 and 8.6 reviews); errors stay at 1 MB and 8 kB;
 - multi-select belongs to phase 3.
 
 ## Phase 3: data and navigation (approved 2026-09-25)
@@ -338,7 +338,14 @@ internal. The tests assert the `UiControlState` signals (`bound`, required, disa
 touched), not when or how `NgControl` was injected, and the NG0200 cases pin the migration's main
 risk directly instead of through a whole control failing.
 
-## Phase 8.6: virtual scroll (decided 2026-10-07)
+## Phase 8.6: virtual scroll (approved 2026-10-07)
+
+Delivered: `items` / `UiOptionItem` / `virtualThreshold` on `ui-select`, `ui-multi-select` and
+`ui-autocomplete` with a `cdk-virtual-scroll-viewport` from 100 items, and
+`cdk-virtual-scroll-viewport[uiTableViewport]` for table rows; 801 baselines.
+
+Review answers: the deviations in the roadmap are accepted, and the component style warning is
+raised from 6 kB to 7 kB (`select.scss` is 6.07 kB; the error stays at 8 kB).
 
 Decided in the code review of 8.6, before the phase report:
 
