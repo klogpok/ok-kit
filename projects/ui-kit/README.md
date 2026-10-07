@@ -960,6 +960,10 @@ works (without the required marker). Every harness extends `UiHarness`: `focus()
 `isFocused()` act on the element that takes focus, and `getHarness()` loads harnesses inside it
 (e.g. the buttons of a dialog).
 
+With `items` in a virtual scroll viewport, `getOptions()` of the select and autocomplete
+harnesses (and `clickOptions()` / `selectOption()`, which use it) finds only the rendered options. To reach another option, search for
+it or give the test fewer items than `virtualThreshold`.
+
 ```ts
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { UiDialogHarness, UiInputHarness, UiSelectHarness } from '@vplans/ui-kit/testing';

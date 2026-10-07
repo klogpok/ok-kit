@@ -58,6 +58,13 @@ interface Unit {
             <td>{{ unit.name }}</td>
           </tr>
         </tbody>
+        @if (total()) {
+          <tbody>
+            <tr class="total">
+              <td>Total</td>
+            </tr>
+          </tbody>
+        }
       </table>
     </cdk-virtual-scroll-viewport>
   `,
@@ -68,6 +75,7 @@ class Host {
   );
   readonly caption = signal(true);
   readonly label = signal('');
+  readonly total = signal(false);
   readonly trackId = (_: number, unit: Unit) => unit.id;
 }
 
@@ -107,6 +115,16 @@ describe('UiTableViewport', () => {
     await frame(fixture);
     expect(table().getAttribute('aria-rowcount')).toBe('2');
     expect(bodyRows().map((row) => row.getAttribute('aria-rowindex'))).toEqual(['2']);
+  });
+
+  it('numbers only the rows of the virtual list', async () => {
+    fixture.componentInstance.total.set(true);
+    await frame(fixture);
+    const total = root.querySelector('tr.total')!;
+    expect(total.hasAttribute('aria-rowindex')).toBe(false);
+    expect(bodyRows().map((row) => row.getAttribute('aria-rowindex'))).toEqual(
+      bodyRows().map((_, i) => String(i + 2)),
+    );
   });
 
   it('is a region named by the table caption', () => {

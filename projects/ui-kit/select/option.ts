@@ -33,7 +33,7 @@ export interface UiOptionOwner {
    */
   isBlocked(option: UiOptionHandle): boolean;
   /** The option renders an item that the key manager made active (`items` of the list). */
-  isActive(option: UiOptionHandle): boolean;
+  isActive?(option: UiOptionHandle): boolean;
   selectOption(value: unknown): void;
 }
 
@@ -70,7 +70,7 @@ export class UiOptionParent {
   }
 
   isActive(option: UiOptionHandle): boolean {
-    return this.owner?.isActive(option) ?? false;
+    return this.owner?.isActive?.(option) ?? false;
   }
 
   selectOption(value: unknown): void {

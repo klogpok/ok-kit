@@ -20,7 +20,7 @@ import {
   CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
-import { UiOption, ɵUiOptionPanel, ɵUiOptionParent } from '@vplans/ui-kit/select';
+import { UiOption, ɵUiItemOption, ɵUiOptionPanel, ɵUiOptionParent } from '@vplans/ui-kit/select';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 
 /**
@@ -65,6 +65,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
     NgTemplateOutlet,
     UiOption,
     UiSpinner,
+    ɵUiItemOption,
   ],
   template: `
     <div class="ui-autocomplete__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
@@ -164,7 +165,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
     <!-- An option of items. The position counts the whole list: the viewport renders only a part. -->
     <ng-template #itemOptionTemplate let-entry let-index="index">
       <ui-option
-        #itemOption
+        [uiItemEntry]="entry"
         [value]="entry.item.value"
         [label]="entry.item.label"
         [disabled]="entry.isDisabled()"

@@ -122,9 +122,15 @@
     (mousedown)="$event.preventDefault()"
   >
     @if (showSelectAll()) {
-      <ui-option #selectAllOption class="ui-select__all" [value]="selectAllValue">{{
-        labels().selectAll
-      }}</ui-option>
+      <!-- With items it opens the set that their aria-posinset continues. -->
+      <ui-option
+        #selectAllOption
+        class="ui-select__all"
+        [value]="selectAllValue"
+        [attr.aria-setsize]="items() ? visibleItems().length + 1 : null"
+        [attr.aria-posinset]="items() ? 1 : null"
+        >{{ labels().selectAll }}</ui-option
+      >
     }
     @if (items()) {
       @if (virtual()) {
@@ -167,12 +173,12 @@
 <!-- An option of `items`. The position counts the whole list: the viewport renders only a part. -->
 <ng-template #itemOptionTemplate let-entry let-index="index">
   <ui-option
-    #itemOption
+    [uiItemEntry]="entry"
     [value]="entry.item.value"
     [label]="entry.item.label"
     [disabled]="entry.isDisabled()"
-    [attr.aria-setsize]="visibleItems().length"
-    [attr.aria-posinset]="index + 1"
+    [attr.aria-setsize]="visibleItems().length + (showSelectAll() ? 1 : 0)"
+    [attr.aria-posinset]="index + 1 + (showSelectAll() ? 1 : 0)"
   >
     {{ entry.item.label }}
     @if (entry.item.description) {

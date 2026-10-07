@@ -268,7 +268,6 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
       isIndeterminate: () => false,
       isFilteredOut: () => false,
       isBlocked: () => false,
-      isActive: () => false,
       selectOption: (value) => this.pick(value as string),
     });
     this.keyManager.change.subscribe(() =>

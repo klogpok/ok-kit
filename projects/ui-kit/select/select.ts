@@ -12,6 +12,7 @@ import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import { UiOption, UiOptionParent } from './option';
+import { UiItemOption } from './option-items';
 import { UiSelectBase } from './select-base';
 
 /**
@@ -45,6 +46,7 @@ import { UiSelectBase } from './select-base';
     NgTemplateOutlet,
     UiChip,
     UiIcon,
+    UiItemOption,
     UiOption,
     UiSpinner,
   ],

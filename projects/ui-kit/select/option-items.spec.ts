@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { UiMultiSelect } from './multi-select';
 import { UiOptionItem } from './option-items';
@@ -15,6 +15,7 @@ const KEY_CODES: Record<string, number> = {
   Home: 36,
   End: 35,
   PageDown: 34,
+  PageUp: 33,
   ' ': 32,
 };
 
@@ -93,6 +94,15 @@ class SelectHost {
 class MultiHost {
   readonly items = signal(apartments(300));
   readonly value = signal<readonly number[]>([]);
+}
+
+@Component({
+  imports: [UiSelect, FormsModule],
+  template: `<ui-select aria-label="Apartment" [items]="items" [(ngModel)]="value" />`,
+})
+class NgModelHost {
+  readonly items = apartments(300);
+  value: number | null = 42;
 }
 
 describe('UiSelect with items', () => {
@@ -246,6 +256,54 @@ describe('UiSelect with items', () => {
       expect(fixture.componentInstance.control.value).toBe(99);
     });
 
+    it('jumps with typeahead to an option that is not rendered', async () => {
+      fixture.componentInstance.items.set([
+        ...apartments(999),
+        { value: 'zion', label: 'Zion tower' },
+      ]);
+      await settle(fixture);
+      vi.useFakeTimers();
+      try {
+        keydown(control(), 'ArrowDown');
+        fixture.detectChanges();
+        keydown(control(), 'z');
+        vi.advanceTimersByTime(250);
+        fixture.detectChanges();
+      } finally {
+        vi.useRealTimers();
+      }
+      keydown(control(), 'Enter');
+      await settle(fixture);
+      expect(fixture.componentInstance.control.value).toBe('zion');
+    });
+
+    it('moves a page up from an option that is not rendered', async () => {
+      keydown(control(), 'ArrowDown');
+      await settle(fixture);
+      keydown(control(), 'End');
+      keydown(control(), 'PageUp');
+      keydown(control(), 'Enter');
+      await settle(fixture);
+      // From 999 (1000 is disabled) ten options up.
+      expect(fixture.componentInstance.control.value).toBe(989);
+    });
+
+    it('marks only the active one of two items with the same value', async () => {
+      fixture.componentInstance.items.set([
+        { value: 1, label: 'Apartment 1' },
+        { value: 1, label: 'Apartment 1 (copy)' },
+        ...apartments(200).slice(1),
+      ]);
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await frame(fixture);
+      const active = options().filter((option) => option.classList.contains('ui-option--active'));
+      expect(active).toEqual([options()[1]]);
+      expect(control().getAttribute('aria-activedescendant')).toBe(options()[1].id);
+    });
+
     it('drops the active option when the items change', async () => {
       keydown(control(), 'ArrowDown');
       await settle(fixture);
@@ -255,6 +313,25 @@ describe('UiSelect with items', () => {
       await settle(fixture);
       expect(fixture.componentInstance.control.value).toBe(1);
     });
+  });
+});
+
+describe('UiSelect with items and ngModel', () => {
+  it('shows the model value and writes the chosen item back', async () => {
+    const fixture = TestBed.createComponent(NgModelHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    const control = root.querySelector<HTMLElement>('.ui-select__control')!;
+    expect(control.textContent!.trim()).toBe('Apartment 42');
+
+    keydown(control, 'ArrowDown');
+    await settle(fixture);
+    keydown(control, 'ArrowDown');
+    keydown(control, 'Enter');
+    await settle(fixture);
+    expect(fixture.componentInstance.value).toBe(43);
+    root.remove();
   });
 });
 
@@ -274,9 +351,14 @@ describe('UiMultiSelect with items', () => {
 
   it('keeps "select all" above the viewport and selects every enabled item', async () => {
     control().click();
-    await settle(fixture);
+    await frame(fixture);
     const all = document.querySelector<HTMLElement>('.ui-select__all')!;
     expect(all.closest('cdk-virtual-scroll-viewport')).toBeNull();
+    // "Select all" opens the set that the items continue.
+    expect(all.getAttribute('aria-posinset')).toBe('1');
+    expect(all.getAttribute('aria-setsize')).toBe('301');
+    expect(options()[1].getAttribute('aria-posinset')).toBe('2');
+    expect(options()[1].getAttribute('aria-setsize')).toBe('301');
     all.click();
     await settle(fixture);
     expect(fixture.componentInstance.value().length).toBe(270);

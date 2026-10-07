@@ -32,8 +32,8 @@ import {
   UiSize,
   resolveDirection,
 } from '@vplans/ui-kit/core';
-import { UiOption, UiOptionHandle, UiOptionParent } from './option';
-import { UiItemEntry, UiOptionItem } from './option-items';
+import { UiOption, UiOptionHandle, UiOptionOwner, UiOptionParent } from './option';
+import { UiItemEntry, UiItemEntryOwner, UiItemOption, UiOptionItem } from './option-items';
 
 /** An option of the list: a projected `ui-option` or an entry of `items`. Internal. */
 export interface UiListEntry<T> extends Highlightable, UiOptionHandle {
@@ -132,16 +132,20 @@ export abstract class UiOptionPanel<T, V>
    */
   private readonly ownOptions = viewChildren<UiOption<T>>('selectAllOption');
   /** The rendered options of `items`. */
-  private readonly itemOptions = viewChildren<UiOption<T>>('itemOption');
+  private readonly itemOptions = viewChildren<UiItemOption<T>>(UiItemOption);
+  /** What the options and the entries of `items` ask of the list. */
+  private readonly owner: UiOptionOwner & UiItemEntryOwner = {
+    multiple: () => this.multiple,
+    isSelected: (value) => this.isSelected(value),
+    isIndeterminate: (option) => this.isIndeterminate(option),
+    isFilteredOut: (label, option) => this.isFilteredOut(label, option),
+    isBlocked: (option) => this.isBlocked(option),
+    isActive: (option) => this.isActiveItem(option),
+    selectOption: (value) => this.pick(value),
+    reveal: (entry) => this.reveal(entry as UiItemEntry<T>),
+  };
   private readonly itemEntries = computed(() =>
-    (this.items() ?? []).map(
-      (item) =>
-        new UiItemEntry<T>(item, {
-          isFilteredOut: (label, option) => this.isFilteredOut(label, option),
-          isBlocked: (option) => this.isBlocked(option),
-          reveal: (entry) => this.reveal(entry as UiItemEntry<T>),
-        }),
-    ),
+    (this.items() ?? []).map((item) => new UiItemEntry<T>(item, this.owner)),
   );
   /** Every option of the list, shown or filtered out. */
   protected readonly options: Signal<readonly UiListEntry<T>[]> = computed(() =>
@@ -175,7 +179,7 @@ export abstract class UiOptionPanel<T, V>
     const entry = this.activeEntry();
     if (entry instanceof UiOption) return entry.id;
     if (!entry) return null;
-    return this.itemOptions().find((option) => option.value() === entry.value())?.id ?? null;
+    return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.id ?? null;
   });
   protected readonly panelWidth = signal(0);
   protected readonly positions = POSITIONS;
@@ -224,15 +228,7 @@ export abstract class UiOptionPanel<T, V>
 
   constructor() {
     super();
-    inject(UiOptionParent).connect({
-      multiple: () => this.multiple,
-      isSelected: (value) => this.isSelected(value),
-      isIndeterminate: (option) => this.isIndeterminate(option),
-      isFilteredOut: (label, option) => this.isFilteredOut(label, option),
-      isBlocked: (option) => this.isBlocked(option),
-      isActive: (option) => this.isActiveItem(option),
-      selectOption: (value) => this.pick(value),
-    });
+    inject(UiOptionParent).connect(this.owner);
     this.keyManager.change.subscribe(() => this.activeEntry.set(this.keyManager.activeItem));
     // A list opened before the control became readonly or disabled must not stay open.
     effect(() => {
@@ -315,7 +311,12 @@ export abstract class UiOptionPanel<T, V>
   /** Whether a rendered option shows the active entry of `items`. */
   private isActiveItem(option: UiOptionHandle): boolean {
     const entry = this.activeEntry();
-    return entry instanceof UiItemEntry && entry.value() === option.value();
+    return (
+      entry instanceof UiItemEntry &&
+      this.itemOptions().some(
+        (rendered) => rendered.option === option && rendered.entry() === entry,
+      )
+    );
   }
 
   // --- Public API -----------------------------------------------------------------------

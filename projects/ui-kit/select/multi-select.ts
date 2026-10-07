@@ -21,6 +21,7 @@ import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import { UiOption, UiOptionHandle, UiOptionParent } from './option';
+import { UiItemOption } from './option-items';
 import { UiSelectBase } from './select-base';
 
 /** Value of the "select all" option; never part of the value. */
@@ -62,6 +63,7 @@ const SELECT_ALL = Symbol('ui-select-all');
     NgTemplateOutlet,
     UiChip,
     UiIcon,
+    UiItemOption,
     UiOption,
     UiSpinner,
   ],

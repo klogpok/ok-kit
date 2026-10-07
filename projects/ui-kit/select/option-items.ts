@@ -1,5 +1,6 @@
+import { Directive, inject, input } from '@angular/core';
 import { Highlightable } from '@angular/cdk/a11y';
-import { UiOptionHandle } from './option';
+import { UiOption, UiOptionHandle } from './option';
 
 /**
  * An option given as data, through `items` of `ui-select`, `ui-multi-select` or
@@ -60,4 +61,14 @@ export class UiItemEntry<T = unknown> implements Highlightable {
   setInactiveStyles(): void {
     // The rendered option reads the active entry from the list.
   }
+}
+
+/**
+ * Ties a rendered option to the entry of `items` it shows. Values may repeat, so the list finds
+ * the option of the active entry through this, not through the value. Internal.
+ */
+@Directive({ selector: 'ui-option[uiItemEntry]' })
+export class UiItemOption<T = unknown> {
+  readonly entry = input.required<UiItemEntry<T>>({ alias: 'uiItemEntry' });
+  readonly option = inject<UiOption<T>>(UiOption);
 }
