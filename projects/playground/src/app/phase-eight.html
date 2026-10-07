@@ -42,6 +42,28 @@
   <p>Last committed rent: {{ committedPrice() | json }}</p>
 </section>
 
+<section aria-labelledby="scope-title">
+  <h3 id="scope-title" class="ui-heading-4">Report scope (tree, lazy branches, Reactive Forms)</h3>
+  <div class="filters">
+    <ui-form-field label="Regions" hint="Checking a region checks its projects">
+      <ui-tree
+        selection="multiple"
+        [formControl]="scope"
+        [data]="regions"
+        [displayWith]="regionName"
+        [hasChildrenWith]="isLazyRegion"
+        [loadChildren]="loadProjects"
+        [expanded]="['north']"
+      />
+      @if (scope.hasError('minLength')) {
+        <ui-error>Choose at least one region</ui-error>
+      }
+    </ui-form-field>
+  </div>
+  <pre>{{ scopeValue() | json }}</pre>
+  <p>Dirty: {{ scope.dirty }}</p>
+</section>
+
 <section aria-labelledby="inspection-title">
   <h3 id="inspection-title" class="ui-heading-4">
     Inspection request (stepper, date range, date and time)

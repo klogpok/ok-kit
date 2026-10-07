@@ -27,7 +27,16 @@ import {
 import { UiRangeSlider, UiSlider, UiSliderMark, UiSliderRange } from '@vplans/ui-kit/slider';
 import { UiStep, UiStepper, UiStepperNext, UiStepperPrevious } from '@vplans/ui-kit/stepper';
 import { UiTimeInput, uiDateWithTime } from '@vplans/ui-kit/time';
+import { UiTree } from '@vplans/ui-kit/tree';
 import { uiAtLeastOne, uiRequired } from './validators';
+
+interface Region {
+  id: string;
+  name: string;
+  /** Its projects load from the server on the first expand. */
+  lazy?: boolean;
+  children?: Region[];
+}
 
 interface UnitFilters {
   deal: 'rent' | 'sale';
@@ -69,6 +78,7 @@ const endOfRange = (control: AbstractControl): ValidationErrors | null => {
     UiStepperNext,
     UiStepperPrevious,
     UiTimeInput,
+    UiTree,
   ],
   templateUrl: './phase-eight.html',
   styleUrl: './phase-eight.scss',
@@ -104,6 +114,43 @@ export class PhaseEight {
   }));
 
   protected readonly priceText = (value: number): string => `${value.toLocaleString('he-IL')} ₪`;
+
+  // --- Report scope: tree with lazy branches ------------------------------------------------
+
+  protected readonly regions: Region[] = [
+    {
+      id: 'north',
+      name: 'North',
+      children: [
+        { id: 'haifa', name: 'Haifa' },
+        { id: 'akko', name: 'Akko' },
+      ],
+    },
+    { id: 'center', name: 'Center', lazy: true },
+    { id: 'south', name: 'South', lazy: true },
+  ];
+  protected readonly regionName = (region: Region): string => region.name;
+  protected readonly isLazyRegion = (region: Region): boolean => !!region.lazy;
+  /** Projects of a region "from the server"; the south fails once, to show the retry. */
+  private southFailed = false;
+  protected readonly loadProjects = (region: Region): Promise<Region[]> =>
+    new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (region.id === 'south' && !this.southFailed) {
+          this.southFailed = true;
+          reject(new Error('Server unavailable'));
+          return;
+        }
+        resolve([1, 2, 3].map((n) => ({ id: `${region.id}-${n}`, name: `Project ${n}` })));
+      }, 600);
+    });
+  protected readonly scope = new FormControl<readonly string[]>(['north'], {
+    nonNullable: true,
+    validators: uiAtLeastOne,
+  });
+  protected readonly scopeValue = toSignal(this.scope.valueChanges, {
+    initialValue: this.scope.value,
+  });
 
   // --- Inspection request: stepper, date range, date and time -------------------------------
 
