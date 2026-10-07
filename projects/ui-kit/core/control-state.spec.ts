@@ -10,7 +10,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   ControlValueAccessor,
   FormControl,
+  FormsModule,
   NG_VALUE_ACCESSOR,
+  NgModel,
   ReactiveFormsModule,
   ValidatorFn,
   Validators,
@@ -209,5 +211,65 @@ describe('injectControlState in a control that provides NG_VALUE_ACCESSOR', () =
     settle();
     expect(probes[0].state.touched()).toBe(true);
     expect(probes[0].state.errorMessages()).toEqual(['Only Oleg may pass']);
+  });
+});
+
+@Component({
+  imports: [ReactiveFormsModule, FormsModule, AccessorProbe],
+  template: `
+    <ui-accessor-probe [formControl]="control" />
+    <ui-accessor-probe [(ngModel)]="model" />
+    <ui-accessor-probe />
+    <span>{{ tick() }}</span>
+  `,
+})
+class DerivedValueHost {
+  readonly control = new FormControl('first');
+  readonly model = signal('first');
+  readonly tick = signal(0);
+}
+
+describe('UiControlState.writeDerivedValue', () => {
+  let fixture: ComponentFixture<DerivedValueHost>;
+  let host: DerivedValueHost;
+  let probes: AccessorProbe[];
+
+  async function settle(): Promise<void> {
+    host.tick.update((value) => value + 1);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(DerivedValueHost);
+    host = fixture.componentInstance;
+    await settle();
+    probes = fixture.debugElement
+      .queryAllNodes((node) => node.providerTokens.includes(AccessorProbe))
+      .map((node) => node.injector.get(AccessorProbe));
+    await settle();
+  });
+
+  it('sets the value of a reactive control without marking it dirty or writing it back', () => {
+    probes[0].written.set(null);
+    probes[0].state.writeDerivedValue('derived');
+    expect(host.control.value).toBe('derived');
+    expect(host.control.dirty).toBe(false);
+    expect(probes[0].written()).toBeNull();
+  });
+
+  it('updates an ngModel binding without marking it dirty', async () => {
+    probes[1].state.writeDerivedValue('derived');
+    await settle();
+    expect(host.model()).toBe('derived');
+    const ngModel = fixture.debugElement.children[1].injector.get(NgModel);
+    expect(ngModel.dirty).toBe(false);
+  });
+
+  it('does nothing when no forms directive is bound', () => {
+    expect(() => {
+      probes[2].state.writeDerivedValue('derived');
+    }).not.toThrow();
   });
 });

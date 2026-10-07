@@ -23,6 +23,13 @@ export interface UiControlState {
    * `AbstractControl.events`.
    */
   sync(): void;
+  /**
+   * Writes a value the control derived itself rather than one the user entered, e.g. children of a
+   * checked tree branch that have just loaded. It reaches the bound control and an `ngModel`
+   * binding, but neither marks the control dirty nor writes the value back into the control, which
+   * the accessor's `onChange` would both do. Does nothing when no forms directive is bound.
+   */
+  writeDerivedValue(value: unknown): void;
 }
 
 interface Snapshot {
@@ -115,5 +122,11 @@ export function injectControlState(): UiControlState {
     required: computed(() => current().required),
     errorMessages: computed(() => messagesFromErrors(current().errors)),
     sync,
+    writeDerivedValue: (value) => {
+      sync();
+      if (!ngControl?.control) return;
+      ngControl.control.setValue(value, { emitModelToViewChange: false });
+      ngControl.viewToModelUpdate(value);
+    },
   };
 }
