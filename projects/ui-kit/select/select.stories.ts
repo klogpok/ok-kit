@@ -55,6 +55,26 @@ export const Default: Story = {
   }),
 };
 export const WithValue: Story = { ...Default, args: { ...Default.args, value: 'Yael Mizrahi' } };
+/**
+ * A click opens the list without an active option, also with a value: only the checkbox or the
+ * check mark shows the selection.
+ */
+export const WithValueOpenedByClick: Story = {
+  ...WithValue,
+  play: async ({ canvasElement }) => {
+    const control = canvasElement.querySelector<HTMLElement>('.ui-select__control')!;
+    control.click();
+    await until(
+      () => !!document.querySelector('[role="option"][aria-selected="true"]'),
+      'the list did not open',
+    );
+    // The selected option would be activated after the first render of the list.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await expect(document.querySelector('.ui-option--active')).toBeNull();
+    await expect(control.hasAttribute('aria-activedescendant')).toBe(false);
+  },
+};
+
 export const Searchable: Story = { ...Default, args: { ...Default.args, searchable: true } };
 export const Disabled: Story = {
   ...Default,
