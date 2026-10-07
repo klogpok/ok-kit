@@ -28,6 +28,7 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  overlayOffsetX,
   resolveDirection,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
@@ -129,6 +130,7 @@ interface Draft {
       [cdkConnectedOverlayOrigin]="origin"
       [cdkConnectedOverlayOpen]="isOpen()"
       [cdkConnectedOverlayPositions]="positions"
+      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
       [cdkConnectedOverlayMinWidth]="panelWidth()"
       (attach)="onAttach()"
       (detach)="close()"
@@ -202,6 +204,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   protected readonly isOpen = signal(false);
   protected readonly activeId = signal<string | null>(null);
   protected readonly panelWidth = signal(0);
+  protected readonly panelOffsetX = signal(0);
   protected readonly positions = POSITIONS;
   protected readonly clockIcon = uiIconClock;
 
@@ -299,6 +302,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
+    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.panelWidth.set(this.host.getBoundingClientRect().width);
     this.isOpen.set(true);
     this.opened.emit();

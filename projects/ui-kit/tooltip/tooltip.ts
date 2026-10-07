@@ -25,7 +25,7 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { resolveDirection } from '@vplans/ui-kit/core';
+import { overlayOffsetX, resolveDirection } from '@vplans/ui-kit/core';
 
 export type UiTooltipPosition = 'top' | 'bottom' | 'start' | 'end';
 
@@ -205,6 +205,7 @@ export class UiTooltip {
     const preferred = this.position();
     this.placement = preferred;
     overlayRef.setDirection(resolveDirection(this.host));
+    this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     // The margin token may change with the theme or the root font size.
     this.positionStrategy!.withViewportMargin(this.viewportMargin());
     this.positionStrategy!.withPositions([

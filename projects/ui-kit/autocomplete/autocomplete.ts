@@ -108,6 +108,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
       [cdkConnectedOverlayOrigin]="origin"
       [cdkConnectedOverlayOpen]="panelShown()"
       [cdkConnectedOverlayPositions]="positions"
+      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
       [cdkConnectedOverlayMinWidth]="panelWidth()"
       (attach)="onAttach()"
       (detach)="close()"

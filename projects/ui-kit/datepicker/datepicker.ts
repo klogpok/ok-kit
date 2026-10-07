@@ -25,6 +25,7 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  overlayOffsetX,
   resolveDirection,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
@@ -128,6 +129,7 @@ interface Draft {
       [cdkConnectedOverlayOrigin]="origin"
       [cdkConnectedOverlayOpen]="isOpen()"
       [cdkConnectedOverlayPositions]="positions"
+      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
       (attach)="onAttach()"
       (detach)="close()"
       (overlayOutsideClick)="onOutsideClick($event)"
@@ -223,6 +225,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected readonly isOpen = signal(false);
   protected readonly positions = POSITIONS;
+  protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
   /** Dropped when the value changes elsewhere, so old text does not come back. */
@@ -286,6 +289,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
+    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.commitDraft();
     this.isOpen.set(true);
     this.opened.emit();

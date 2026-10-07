@@ -30,6 +30,7 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  overlayOffsetX,
   resolveDirection,
 } from '@vplans/ui-kit/core';
 import { UiOption, UiOptionHandle, UiOptionOwner, UiOptionParent } from './option';
@@ -182,6 +183,7 @@ export abstract class UiOptionPanel<T, V>
     return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.id ?? null;
   });
   protected readonly panelWidth = signal(0);
+  protected readonly panelOffsetX = signal(0);
   protected readonly positions = POSITIONS;
 
   readonly labelStrategy = 'for' as const;
@@ -351,6 +353,7 @@ export abstract class UiOptionPanel<T, V>
   protected openList(activateFirst: boolean): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
     this.panelWidth.set(this.host.getBoundingClientRect().width);
+    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.isOpen.set(true);
     this.opened.emit();
     if (this.activateOnOpen()) {

@@ -16,3 +16,20 @@ export function resolveDirection(element: Element): 'ltr' | 'rtl' {
   }
   return 'ltr';
 }
+
+/**
+ * Horizontal offset that keeps a connected overlay on its origin. The CDK places overlays in
+ * viewport coordinates from 0, but the fixed overlay container starts after a page scrollbar on
+ * the left (Chrome draws it there in an RTL document inside an iframe, e.g. Storybook), so every
+ * overlay would move by the scrollbar width. Read it each time the overlay opens.
+ */
+export function overlayOffsetX(document: Document): number {
+  // A fixed element starts where the overlay container does. The container itself may not be
+  // fixed yet: the CDK loads its styles with the first overlay.
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;top:0;visibility:hidden';
+  document.body.appendChild(probe);
+  const left = probe.getBoundingClientRect().left;
+  probe.remove();
+  return -left || 0;
+}

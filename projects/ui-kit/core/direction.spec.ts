@@ -1,4 +1,4 @@
-import { resolveDirection } from './direction';
+import { overlayOffsetX, resolveDirection } from './direction';
 
 describe('resolveDirection', () => {
   let root: HTMLElement;
@@ -27,5 +27,22 @@ describe('resolveDirection', () => {
       </div>
     `;
     expect(resolveDirection(root.querySelector('#probe')!)).toBe('rtl');
+  });
+});
+
+describe('overlayOffsetX', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('is 0 when fixed elements start at the viewport edge', () => {
+    expect(overlayOffsetX(document)).toBe(0);
+  });
+
+  it('moves overlays back by a scrollbar on the left', () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(15, 0, 0, 0),
+    );
+    expect(overlayOffsetX(document)).toBe(-15);
+    // The probe is removed.
+    expect(document.body.children.length).toBe(0);
   });
 });

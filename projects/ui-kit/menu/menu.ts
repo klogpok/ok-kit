@@ -5,14 +5,17 @@ import {
   Directive,
   ElementRef,
   Renderer2,
+  SimpleChange,
   ViewEncapsulation,
   booleanAttribute,
   effect,
   inject,
   input,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { _IdGenerator } from '@angular/cdk/a11y';
 import {
+  CDK_MENU,
   CdkMenu,
   CdkMenuGroup,
   CdkMenuItem,
@@ -21,8 +24,12 @@ import {
   CdkMenuTrigger,
   MENU_STACK,
 } from '@angular/cdk/menu';
-import { ConnectedPosition } from '@angular/cdk/overlay';
-import { provideUiLiveDirectionality } from '@vplans/ui-kit/core';
+import {
+  ConnectedPosition,
+  STANDARD_DROPDOWN_ADJACENT_POSITIONS,
+  STANDARD_DROPDOWN_BELOW_POSITIONS,
+} from '@angular/cdk/overlay';
+import { overlayOffsetX, provideUiLiveDirectionality } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCheck, uiIconChevronRight } from '@vplans/ui-kit/icon';
 
 /**
@@ -94,6 +101,8 @@ const POSITIONS: Record<UiMenuPosition, ConnectedPosition[]> = {
 })
 export class UiMenuTrigger {
   private readonly trigger = inject(CdkMenuTrigger);
+  private readonly parentMenu = inject(CDK_MENU, { optional: true });
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   /**
    * A preset, or CDK connected positions. Defaults to `bottom-start` for a button and to the
@@ -111,6 +120,8 @@ export class UiMenuTrigger {
         ? POSITIONS[position]
         : position) as unknown as ConnectedPosition[];
     });
+    // CDK Menu emits `opened` before it creates or positions the overlay.
+    this.trigger.opened.pipe(takeUntilDestroyed()).subscribe(() => this.applyOverlayOffset());
   }
 
   isOpen(): boolean {
@@ -127,6 +138,28 @@ export class UiMenuTrigger {
 
   toggle(): void {
     this.trigger.toggle();
+  }
+
+  /**
+   * Adds the scrollbar offset of `overlayOffsetX()` to the positions. CDK Menu reads them when it
+   * creates the overlay and again on a `menuPosition` change.
+   */
+  private applyOverlayOffset(): void {
+    const offsetX = overlayOffsetX(this.host.ownerDocument);
+    const position = this.position();
+    // Without a value, the defaults of CDK Menu.
+    const positions =
+      typeof position === 'string'
+        ? POSITIONS[position]
+        : (position ??
+          (!this.parentMenu || this.parentMenu.orientation === 'horizontal'
+            ? STANDARD_DROPDOWN_BELOW_POSITIONS
+            : STANDARD_DROPDOWN_ADJACENT_POSITIONS));
+    const previous = this.trigger.menuPosition;
+    this.trigger.menuPosition = positions.map((p) => ({ offsetX, ...p }));
+    this.trigger.ngOnChanges({
+      menuPosition: new SimpleChange(previous, this.trigger.menuPosition, false),
+    });
   }
 }
 

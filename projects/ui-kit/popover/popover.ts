@@ -26,7 +26,7 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { resolveDirection } from '@vplans/ui-kit/core';
+import { overlayOffsetX, resolveDirection } from '@vplans/ui-kit/core';
 
 export type UiPopoverPosition = 'top' | 'bottom' | 'start' | 'end';
 
@@ -153,6 +153,7 @@ export class UiPopoverTrigger {
     const preferred = this.position();
     // The CDK reads the direction once; follow runtime `dir` changes.
     overlayRef.setDirection(resolveDirection(this.host));
+    this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     this.positionStrategy!.withViewportMargin(this.viewportMargin());
     this.positionStrategy!.withPositions([
       { ...POSITIONS[preferred], panelClass: `ui-popover-pane--${preferred}` },

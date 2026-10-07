@@ -28,6 +28,7 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  overlayOffsetX,
   resolveDirection,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
@@ -175,6 +176,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
       [cdkConnectedOverlayOrigin]="origin"
       [cdkConnectedOverlayOpen]="isOpen()"
       [cdkConnectedOverlayPositions]="positions"
+      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
       (attach)="onAttach()"
       (detach)="close()"
       (overlayOutsideClick)="onOutsideClick($event)"
@@ -293,6 +295,7 @@ export class UiDateRangePicker
   protected readonly edges: readonly Edge[] = ['start', 'end'];
   protected readonly isOpen = signal(false);
   protected readonly positions = POSITIONS;
+  protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
   private readonly breakpoints = inject(BreakpointObserver);
@@ -386,6 +389,7 @@ export class UiDateRangePicker
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
+    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.commitDraft();
     this.isOpen.set(true);
     this.opened.emit();
