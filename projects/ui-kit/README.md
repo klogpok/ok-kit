@@ -664,6 +664,21 @@ spinner instead of the chevron and marks the list busy, e.g. during server-side 
 option, mark an icon or avatar with `uiOptionIcon` and a second line with `uiOptionDescription`;
 the trigger shows only the label.
 
+Long lists: give the options as data with `items` instead of projecting `ui-option`s. An item is
+`{ value, label, description?, disabled? }`; projected options are ignored while `items` is set.
+From `virtualThreshold` items on (100 by default) `ui-select`, `ui-multi-select` and
+`ui-autocomplete` render only the options in view, in a `cdk-virtual-scroll-viewport`. The
+keyboard, typeahead, search and "select all" work on every item, not only the rendered ones;
+`aria-activedescendant` names the active option once it is rendered, and every option reports
+its position in the whole list (`aria-posinset` / `aria-setsize`). In the viewport all options
+have the height of the first rendered one, so give every item a description or none. Groups
+(`ui-option-group`) and option icons need projected options.
+
+```html
+<!-- apartments: UiOptionItem<number>[] -->
+<ui-select formControlName="apartment" searchable [items]="apartments" />
+```
+
 Change the toast position, duration or stack size with
 `provideUiToast({ position: 'top-center', duration: 4000, max: 3 })`. Set dialog defaults with
 `provideUiDialog({ size: 'lg', disableClose: true })`; options passed to `open()` win.
@@ -845,6 +860,35 @@ wider than the box, the box is focusable and a region named by `label`, the capt
 `scrollableTable` label. With a `max-block-size` the box also scrolls vertically, and
 `stickyHeader` sticks to its top.
 
+```html
+<!-- Thousands of rows: only the rows in view are rendered -->
+<cdk-virtual-scroll-viewport uiTableViewport itemSize="48" style="block-size: 30rem">
+  <table ui-table stickyHeader>
+    <caption class="ui-visually-hidden">
+      Units
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Unit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *cdkVirtualFor="let unit of units; trackBy: trackId">
+        <td>{{ unit.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+</cdk-virtual-scroll-viewport>
+```
+
+`uiTableViewport` (import `CdkVirtualScrollViewport`, `CdkFixedSizeVirtualScroll` and
+`CdkVirtualForOf` from `@angular/cdk/scrolling` next to it) gives the table `aria-rowcount` and
+each rendered row its `aria-rowindex`, so screen readers announce the position in the whole
+table. The viewport is a focusable region named by its `aria-label`, the caption or the
+`scrollableTable` label, and `stickyHeader` stays at its top. Every row must be `itemSize` pixels
+high: detail rows of `uiExpandableRow` do not fit, and `ui-table-container` (sticky columns) is a
+separate box.
+
 ## Navigation
 
 ```html
@@ -955,7 +999,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/progress`     | `UiProgressBar`, `UiProgressTone`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `@vplans/ui-kit/avatar`       | `UiAvatar`, `UiAvatarGroup`, `UiAvatarSize`, `uiInitials`, `uiAvatarColor`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/badge`        | `UiBadge`, `UiBadgeTone`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `@vplans/ui-kit/table`        | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`, `UiExpandableRow`, `UiRowToggle`, `UiRowDetail`, `UiTableContainer`, `UiSticky`, `UiStickySide`                                                                                                                                                                                                                                                                           |
+| `@vplans/ui-kit/table`        | `UiTable`, `UiTableMessage`, `UiTableSkeleton`, `UiSort`, `UiSortHeader`, `uiSortData`, `UiTableDensity`, sort types, `UiTableSelection`, `UiTableSelectAll`, `UiTableSelectRow`, `UiExpandableRow`, `UiRowToggle`, `UiRowDetail`, `UiTableContainer`, `UiSticky`, `UiStickySide`, `UiTableViewport`                                                                                                                                                                                                                                                        |
 | `@vplans/ui-kit/card`         | `UiCard`, `UiCardHeader`, `UiCardTitle`, `UiCardSubtitle`, `UiCardContent`, `UiCardFooter`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/accordion`    | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `@vplans/ui-kit/breadcrumbs`  | `UiBreadcrumbs`, `UiBreadcrumb`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -967,7 +1011,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/menu`         | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`, `UiMenuGroup`, `UiMenuItemCheckbox`, `UiMenuItemRadio`, `UiMenuPosition`                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `@vplans/ui-kit/dialog`       | `UiDialog`, `provideUiDialog`, `UI_DIALOG_DEFAULT_OPTIONS`, `UiDialogDefaults`, `UiDialogOptions`, `UiDrawerOptions`, `UiDrawerPosition`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose`                                                                                                                                                                                                                                                     |
 | `@vplans/ui-kit/toast`        | `UiToast`, `UiToastRef`, `provideUiToast`, `UI_TOAST_CONFIG`, toast types                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `@vplans/ui-kit/select`       | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `@vplans/ui-kit/select`       | `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`, `UiOptionItem`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `@vplans/ui-kit/chip`         | `UiChip`, `UiFilterChip`, `UiChipSet`, `UiChipInput`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `@vplans/ui-kit/number-input` | `UiNumberInput`, `UiNumberFormat`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `@vplans/ui-kit/slider`       | `UiSlider`, `UiRangeSlider`, `UiSliderMark`, `UiSliderRange`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |

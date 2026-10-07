@@ -94,6 +94,16 @@ alongside it.
   vertical `orientation`; Home/End in `ui-segmented`;
   `UiSegmentedHarness` and `UiButtonToggleGroupHarness` in testing.
 - **tokens:** `--ui-segmented-*`.
+- **select / autocomplete:** `items` (`UiOptionItem[]`: `value`, `label`, `description`,
+  `disabled`) gives the options as data instead of projected `ui-option`s. From
+  `virtualThreshold` items on (100 by default) the list is a `cdk-virtual-scroll-viewport` that
+  renders only the options in view; the keyboard, typeahead, search and "select all" still reach
+  every item, `aria-activedescendant` names the active option once it is rendered, and each
+  option reports its `aria-posinset` / `aria-setsize` in the whole list.
+- **table:** `cdk-virtual-scroll-viewport[uiTableViewport]` for thousands of rows with
+  `*cdkVirtualFor`: `aria-rowcount` on the table and `aria-rowindex` on each rendered row, a
+  focusable region named by the caption, and a `stickyHeader` that stays at the top of the
+  viewport.
 
 ## Unreleased (phase 7: data)
 
