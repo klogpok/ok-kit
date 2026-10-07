@@ -26,7 +26,8 @@
   outline-offset: calc(var(--ui-focus-ring-width) * -1);
 }
 
-:host(.ui-option--selected) {
+// With multiple selection the checkbox alone shows the selection, so only the active option stands out.
+:host(.ui-option--selected:not(.ui-option--multiple)) {
   color: var(--ui-select-option-selected-text);
   font-weight: var(--ui-font-weight-medium);
 }
@@ -117,7 +118,7 @@
     outline-color: Highlight;
   }
 
-  :host(.ui-option--selected) {
+  :host(.ui-option--selected:not(.ui-option--multiple)) {
     color: Highlight;
   }
 

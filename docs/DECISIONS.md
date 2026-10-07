@@ -389,3 +389,9 @@ and its background and focus ring read as "selected". A click now leaves the lis
 active option; the keyboard (Arrow keys, Enter, Space, Home/End, typeahead) and `open()` still
 activate the first one, as the APG has it. A selected value is still active on any open.
 ArrowDown then starts from the first option and ArrowUp from the last.
+
+## Multi-select: selected options keep the plain text color (decided 2026-10-07)
+
+In `ui-multi-select` the selected options were blue and medium weight, so several rows looked
+active at once. With multiple selection the checkbox alone shows the selection; only the active
+option has a background and a focus ring. `ui-select` keeps the blue text and the check mark.

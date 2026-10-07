@@ -125,6 +125,7 @@ export class UiOptionParent {
     '[attr.aria-disabled]': 'unavailable() ? "true" : null',
     '[class.ui-option--active]': 'active()',
     '[class.ui-option--selected]': 'selected() || indeterminate()',
+    '[class.ui-option--multiple]': 'multiple',
     '[class.ui-option--disabled]': 'unavailable()',
     '[hidden]': 'filteredOut()',
     '(click)': 'onClick()',
