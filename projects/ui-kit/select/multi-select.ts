@@ -14,6 +14,7 @@ import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
   CdkFixedSizeVirtualScroll,
   CdkVirtualForOf,
+  CdkVirtualScrollableElement,
   CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
@@ -59,6 +60,7 @@ const SELECT_ALL = Symbol('ui-select-all');
     CdkOverlayOrigin,
     CdkFixedSizeVirtualScroll,
     CdkVirtualForOf,
+    CdkVirtualScrollableElement,
     CdkVirtualScrollViewport,
     NgTemplateOutlet,
     UiChip,

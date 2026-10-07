@@ -120,26 +120,29 @@
     [attr.aria-multiselectable]="multiple || null"
     [attr.aria-busy]="loading() ? 'true' : null"
     (mousedown)="$event.preventDefault()"
+    cdkVirtualScrollingElement
   >
     @if (showSelectAll()) {
-      <!-- With items it opens the set that their aria-posinset continues. -->
-      <ui-option
-        #selectAllOption
-        class="ui-select__all"
-        [value]="selectAllValue"
-        [attr.aria-setsize]="items() ? visibleItems().length + 1 : null"
-        [attr.aria-posinset]="items() ? 1 : null"
-        >{{ labels().selectAll }}</ui-option
-      >
+      <!-- The row sticks over a virtual list. With items the option opens the set that their
+           aria-posinset continues. -->
+      <div class="ui-select__all-row" role="none">
+        <ui-option
+          #selectAllOption
+          class="ui-select__all"
+          [value]="selectAllValue"
+          [attr.aria-setsize]="items() ? visibleItems().length + 1 : null"
+          [attr.aria-posinset]="items() ? 1 : null"
+          >{{ labels().selectAll }}</ui-option
+        >
+      </div>
     }
     @if (items()) {
       @if (virtual()) {
+        <!-- The listbox scrolls, so axe sees the combobox popup it is. -->
         <cdk-virtual-scroll-viewport
-          class="ui-select__viewport"
           [itemSize]="itemSize()"
           [minBufferPx]="itemSize() * 5"
           [maxBufferPx]="itemSize() * 10"
-          [style.block-size.px]="visibleItems().length * itemSize()"
         >
           <ng-container
             *cdkVirtualFor="let entry of visibleItems(); trackBy: trackEntry; let i = index"

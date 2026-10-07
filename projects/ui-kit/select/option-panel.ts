@@ -414,20 +414,23 @@ export abstract class UiOptionPanel<T, V>
     const index = this.visibleItems().indexOf(entry);
     if (index < 0) return;
     const size = this.itemSize();
-    const start = index * size;
+    // The listbox scrolls (`cdkVirtualScrollingElement`). Offsets are in its coordinates: the
+    // viewport starts `top` below its start, under "select all", which sticks over the rows.
+    const scroller = viewport.scrollable.getElementRef().nativeElement;
+    const top = viewport.measureViewportOffset('top');
+    const start = top + index * size;
     const end = start + size;
-    const element = viewport.elementRef.nativeElement;
-    const offset = viewport.measureScrollOffset('top');
-    const height = element.clientHeight;
-    // Right after the list opens the viewport has no size yet, or has not sized its content, and
-    // the browser would cut the scroll short. Try again after a render; without a size, scroll
-    // now too (jsdom never lays out).
-    if (height === 0 || element.scrollHeight < end) {
+    const offset = scroller.scrollTop;
+    const height = scroller.clientHeight;
+    // Right after the list opens the listbox has no size yet, or the viewport has not sized its
+    // content, and the browser would cut the scroll short. Try again after a render; without a
+    // size, scroll now too (jsdom never lays out).
+    if (height === 0 || scroller.scrollHeight < end) {
       this.pendingReveal = entry;
       if (height > 0) return;
     }
-    if (start < offset || height === 0) {
-      if (start !== offset) viewport.scrollToOffset(start);
+    if (start < offset + top || height === 0) {
+      if (start - top !== offset) viewport.scrollToOffset(start - top);
     } else if (end > offset + height) {
       viewport.scrollToOffset(end - height);
     }

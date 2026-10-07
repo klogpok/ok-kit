@@ -17,6 +17,7 @@ import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
   CdkFixedSizeVirtualScroll,
   CdkVirtualForOf,
+  CdkVirtualScrollableElement,
   CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
@@ -61,6 +62,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
     CdkOverlayOrigin,
     CdkFixedSizeVirtualScroll,
     CdkVirtualForOf,
+    CdkVirtualScrollableElement,
     CdkVirtualScrollViewport,
     NgTemplateOutlet,
     UiOption,
@@ -123,15 +125,15 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
         [attr.aria-labelledby]="listLabelledBy()"
         [attr.aria-busy]="loading() ? 'true' : null"
         (mousedown)="$event.preventDefault()"
+        cdkVirtualScrollingElement
       >
         @if (items()) {
           @if (virtual()) {
+            <!-- The listbox scrolls, so axe sees the combobox popup it is. -->
             <cdk-virtual-scroll-viewport
-              class="ui-select__viewport"
               [itemSize]="itemSize()"
               [minBufferPx]="itemSize() * 5"
               [maxBufferPx]="itemSize() * 10"
-              [style.block-size.px]="visibleItems().length * itemSize()"
             >
               <ng-container
                 *cdkVirtualFor="let entry of visibleItems(); trackBy: trackEntry; let i = index"

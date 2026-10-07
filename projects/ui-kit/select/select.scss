@@ -201,6 +201,16 @@
   border-block-end: var(--ui-border-width-default) solid var(--ui-select-panel-border);
 }
 
+// Over a virtual list "select all" stays in view while the rows scroll under it.
+.ui-select__panel--virtual .ui-select__all-row {
+  position: sticky;
+  // Over the panel padding too, so no row shows above it.
+  inset-block-start: calc(-1 * var(--ui-space-2xs));
+  z-index: var(--ui-z-sticky);
+  display: flow-root;
+  background-color: var(--ui-select-panel-bg);
+}
+
 @media (forced-colors: active) {
   :host(.ui-select--invalid) .ui-select__trigger {
     border-style: dashed;

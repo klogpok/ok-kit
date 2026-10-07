@@ -5,6 +5,7 @@ import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
   CdkFixedSizeVirtualScroll,
   CdkVirtualForOf,
+  CdkVirtualScrollableElement,
   CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
@@ -42,6 +43,7 @@ import { UiSelectBase } from './select-base';
     CdkOverlayOrigin,
     CdkFixedSizeVirtualScroll,
     CdkVirtualForOf,
+    CdkVirtualScrollableElement,
     CdkVirtualScrollViewport,
     NgTemplateOutlet,
     UiChip,
