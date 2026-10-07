@@ -337,3 +337,15 @@ and native inputs use it directly, so it is public API and a legitimate seam of 
 internal. The tests assert the `UiControlState` signals (`bound`, required, disabled, invalid,
 touched), not when or how `NgControl` was injected, and the NG0200 cases pin the migration's main
 risk directly instead of through a whole control failing.
+
+## Phase 8.6: virtual scroll (decided 2026-10-07)
+
+Decided in the code review of 8.6, before the phase report:
+
+- **The options as data.** `ui-select`, `ui-multi-select` and `ui-autocomplete` take `items`
+  (`UiOptionItem<T>`: `value`, `label`, `description?`, `disabled?`) instead of projected
+  `ui-option`s, with `virtualThreshold` (100 by default). The new API is accepted as built.
+- **Only `items` are virtualized.** Projected `ui-option`s are never put in a viewport, whatever
+  their number; groups (`ui-option-group`) and option icons need projected options. Virtualizing
+  projected options with groups and icons would be a large job of its own, and nothing needs it
+  yet.
