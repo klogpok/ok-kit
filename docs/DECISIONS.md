@@ -356,3 +356,11 @@ Decided in the code review of 8.6, before the phase report:
   their number; groups (`ui-option-group`) and option icons need projected options. Virtualizing
   projected options with groups and icons would be a large job of its own, and nothing needs it
   yet.
+
+Decided in the retro of 8.6 (2026-10-07), after the first play stories ran axe on the open lists:
+
+- **The listbox scrolls a virtual list.** With the viewport scrolling inside the listbox, axe
+  reported `scrollable-region-focusable`: it exempts a scrolling combobox popup, not a region
+  inside one. The listbox is now the scrolling element (`cdkVirtualScrollingElement`) instead of
+  suppressing the rule, and "select all" sticks at its top over a virtual list. Lists below the
+  threshold are unchanged.

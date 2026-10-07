@@ -99,7 +99,8 @@ alongside it.
   `virtualThreshold` items on (100 by default) the list is a `cdk-virtual-scroll-viewport` that
   renders only the options in view; the keyboard, typeahead, search and "select all" still reach
   every item, `aria-activedescendant` names the active option once it is rendered, and each
-  option reports its `aria-posinset` / `aria-setsize` in the whole list.
+  option reports its `aria-posinset` / `aria-setsize` in the whole list. The listbox itself
+  scrolls, and "select all" stays at its top while the rows scroll under it.
 - **table:** `cdk-virtual-scroll-viewport[uiTableViewport]` for thousands of rows with
   `*cdkVirtualFor`: `aria-rowcount` on the table and `aria-rowindex` on each rendered row, a
   focusable region named by the caption, and a `stickyHeader` that stays at the top of the
