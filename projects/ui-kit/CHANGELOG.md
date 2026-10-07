@@ -105,6 +105,18 @@ alongside it.
   `*cdkVirtualFor`: `aria-rowcount` on the table and `aria-rowindex` on each rendered row, a
   focusable region named by the caption, and a `stickyHeader` that stays at the top of the
   viewport.
+- **tree:** new entry point with `ui-tree`, an APG tree view on CDK Tree over nested data
+  (`childrenWith`, `keyWith`, `displayWith`). `selection` is `none`, `single` (the key of one
+  node) or `multiple` (tri-state checkboxes that cascade; the value is the key of every checked
+  node, see docs/adr/0001); `disabledWith`, `[(expanded)]`, `expandAll()` / `collapseAll()`,
+  lazy branches through `hasChildrenWith` + `loadChildren` with a busy state and a retry,
+  `loading` skeleton rows, an empty text, and `ng-template[uiTreeNode]` for custom node content.
+  ←/→ follow the direction at the time of the key press. `UiTreeHarness` and `UiTreeNodeHarness`
+  in testing.
+- **tokens:** `--ui-tree-*`.
+- **labels:** `noItems`, `loadFailed`, `retry`.
+- **core:** `UiControlState.writeDerivedValue()` writes a value the control derived itself to the
+  bound control and an `ngModel` binding without marking the control dirty.
 
 ## Unreleased (phase 7: data)
 

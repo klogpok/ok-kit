@@ -865,4 +865,15 @@
   --ui-datepicker-panel-radius: var(--ui-radius-container);
   --ui-datepicker-panel-shadow: var(--ui-shadow-md);
   --ui-datepicker-panel-padding: var(--ui-space-md);
+  --ui-tree-indent: var(--ui-space-xl);
+  --ui-tree-node-height: var(--ui-control-height-sm);
+  --ui-tree-node-padding-inline: var(--ui-space-sm);
+  --ui-tree-node-gap: var(--ui-space-xs);
+  --ui-tree-node-radius: var(--ui-radius-sm);
+  --ui-tree-text: var(--ui-color-text);
+  --ui-tree-icon-color: var(--ui-color-text-muted);
+  --ui-tree-hover-bg: var(--ui-color-surface-hover);
+  --ui-tree-selected-bg: var(--ui-color-primary-subtle);
+  --ui-tree-selected-text: var(--ui-color-primary-text);
+  --ui-tree-error-text: var(--ui-color-danger-text);
 }

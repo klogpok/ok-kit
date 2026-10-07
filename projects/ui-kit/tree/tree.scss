@@ -1,0 +1,177 @@
+@use '../styles/mixins';
+
+:host {
+  display: block;
+  color: var(--ui-tree-text);
+  font-family: var(--ui-font-family-sans);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-snug);
+}
+
+.ui-tree__tree {
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-tree__node {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-tree-node-gap);
+  min-block-size: var(--ui-tree-node-height);
+  // --_level is the depth of the node, set by ui-tree.
+  --_indent: calc(var(--_level, 0) * var(--ui-tree-indent));
+
+  padding-inline: calc(var(--_indent) + var(--ui-tree-node-padding-inline))
+    var(--ui-tree-node-padding-inline);
+  border-radius: var(--ui-tree-node-radius);
+  cursor: pointer;
+  user-select: none;
+  // Inset, so a container that clips its overflow does not cut the ring.
+  @include mixins.focus-visible(calc(var(--ui-focus-ring-width) * -1));
+  @include mixins.transition(background-color);
+
+  &:hover {
+    background-color: var(--ui-tree-hover-bg);
+  }
+}
+
+.ui-tree__node--selected {
+  background-color: var(--ui-tree-selected-bg);
+  color: var(--ui-tree-selected-text);
+
+  &:hover {
+    background-color: var(--ui-tree-selected-bg);
+  }
+}
+
+.ui-tree__node--disabled {
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+}
+
+:host(.ui-tree--disabled) .ui-tree__node {
+  color: var(--ui-color-text-disabled);
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+// The chevron cell keeps its width on leaves, so the labels of one level line up.
+.ui-tree__toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ui-icon-size-md);
+  block-size: var(--ui-icon-size-md);
+  color: var(--ui-tree-icon-color);
+  font-size: var(--ui-icon-size-sm);
+}
+
+// chevron-down, turned towards the reading direction while the branch is collapsed.
+.ui-tree__chevron {
+  transform: rotate(-90deg);
+  @include mixins.transition(transform);
+
+  &:dir(rtl) {
+    transform: rotate(90deg);
+  }
+
+  .ui-tree__node[aria-expanded='true'] & {
+    transform: none;
+  }
+}
+
+.ui-tree__checkbox {
+  display: inline-flex;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  inline-size: var(--ui-checkbox-size);
+  block-size: var(--ui-checkbox-size);
+  border: var(--ui-border-width-default) solid var(--ui-checkbox-border);
+  border-radius: var(--ui-checkbox-radius);
+  background-color: var(--ui-checkbox-bg);
+
+  &[data-state='checked'],
+  &[data-state='partial'] {
+    border-color: var(--ui-checkbox-checked-bg);
+    background-color: var(--ui-checkbox-checked-bg);
+  }
+
+  .ui-tree__node--disabled &,
+  :host(.ui-tree--disabled) & {
+    border-color: var(--ui-color-border);
+    background-color: var(--ui-color-control-bg-disabled);
+  }
+
+  :host(.ui-tree--invalid) &[data-state='unchecked'] {
+    border-color: var(--ui-checkbox-invalid-border);
+  }
+}
+
+.ui-tree__mark {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: none;
+  stroke: var(--ui-checkbox-checked-color);
+  stroke-width: var(--ui-border-width-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+
+  [data-state='checked'] > &,
+  [data-state='partial'] > & {
+    opacity: 1;
+  }
+
+  .ui-tree__node--disabled &,
+  :host(.ui-tree--disabled) & {
+    stroke: var(--ui-color-text-disabled);
+  }
+}
+
+.ui-tree__label {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--ui-tree-node-gap);
+  min-inline-size: 0;
+}
+
+.ui-tree__error {
+  flex-shrink: 0;
+  color: var(--ui-tree-error-text);
+  font-size: var(--ui-font-size-xs);
+}
+
+.ui-tree__retry {
+  flex-shrink: 0;
+}
+
+.ui-tree__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-sm);
+  padding: var(--ui-space-sm) var(--ui-tree-node-padding-inline);
+}
+
+.ui-tree__empty {
+  padding: var(--ui-space-sm) var(--ui-tree-node-padding-inline);
+  color: var(--ui-color-text-muted);
+}
+
+@media (forced-colors: active) {
+  .ui-tree__node--selected {
+    outline: var(--ui-border-width-default) solid Highlight;
+  }
+
+  .ui-tree__checkbox {
+    border-color: CanvasText;
+  }
+
+  .ui-tree__mark {
+    stroke: CanvasText;
+  }
+}

@@ -4308,5 +4308,71 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-space-md)",
     "dark": "var(--ui-space-md)"
+  },
+  {
+    "name": "--ui-tree-indent",
+    "layer": "component",
+    "light": "var(--ui-space-xl)",
+    "dark": "var(--ui-space-xl)"
+  },
+  {
+    "name": "--ui-tree-node-height",
+    "layer": "component",
+    "light": "var(--ui-control-height-sm)",
+    "dark": "var(--ui-control-height-sm)"
+  },
+  {
+    "name": "--ui-tree-node-padding-inline",
+    "layer": "component",
+    "light": "var(--ui-space-sm)",
+    "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-tree-node-gap",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-tree-node-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-sm)",
+    "dark": "var(--ui-radius-sm)"
+  },
+  {
+    "name": "--ui-tree-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-tree-icon-color",
+    "layer": "component",
+    "light": "var(--ui-color-text-muted)",
+    "dark": "var(--ui-color-text-muted)"
+  },
+  {
+    "name": "--ui-tree-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-hover)",
+    "dark": "var(--ui-color-surface-hover)"
+  },
+  {
+    "name": "--ui-tree-selected-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
+    "name": "--ui-tree-selected-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-text)",
+    "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-tree-error-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-text)",
+    "dark": "var(--ui-color-danger-text)"
   }
 ];

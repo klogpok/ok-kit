@@ -117,6 +117,12 @@ export interface UiLabels {
   rangeStart: string;
   /** End thumb of `ui-range-slider`, read after the field label. */
   rangeEnd: string;
+  /** Shown by `ui-tree` when it has no nodes. */
+  noItems: string;
+  /** Shown in a `ui-tree` node whose children failed to load. */
+  loadFailed: string;
+  /** Button that loads the children of a `ui-tree` node again after a failure. */
+  retry: string;
   previousMonth: string;
   nextMonth: string;
   previousYear: string;
@@ -184,6 +190,9 @@ export const UI_LABELS_HE: UiLabels = {
   stepError: 'יש שגיאות',
   rangeStart: 'מינימום',
   rangeEnd: 'מקסימום',
+  noItems: 'אין פריטים',
+  loadFailed: 'הטעינה נכשלה',
+  retry: 'ניסיון חוזר',
   previousMonth: 'חודש קודם',
   nextMonth: 'חודש הבא',
   previousYear: 'שנה קודמת',
@@ -248,6 +257,9 @@ export const UI_LABELS_EN: UiLabels = {
   stepError: 'has errors',
   rangeStart: 'Minimum',
   rangeEnd: 'Maximum',
+  noItems: 'No items',
+  loadFailed: 'Could not load',
+  retry: 'Retry',
   previousMonth: 'Previous month',
   nextMonth: 'Next month',
   previousYear: 'Previous year',
