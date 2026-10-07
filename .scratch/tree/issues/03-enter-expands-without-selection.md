@@ -1,6 +1,6 @@
 # Enter and Space expand a branch in a tree without selection
 
-Status: needs-info
+Status: done
 
 ## Question
 
@@ -21,11 +21,15 @@ In `selection="none"`, should Enter and Space expand and collapse a branch?
 1. **Keep it (recommended):** the keyboard matches the mouse; in `none` the click is the expand.
 2. Enter and Space do nothing in `none`; only the arrows expand.
 
+## Answer
+
+Keep it: Enter and Space act like a click in `none`. Recorded in docs/DECISIONS.md (2026-10-07).
+
 ## Русский перевод
 
 # Enter и Space раскрывают ветку в дереве без выбора
 
-Статус: needs-info
+Статус: сделано
 
 ## Вопрос
 
@@ -45,3 +49,7 @@ In `selection="none"`, should Enter and Space expand and collapse a branch?
 
 1. **Оставить (рекомендую):** клавиатура ведёт себя как мышь; в `none` клик и есть раскрытие.
 2. В `none` Enter и Space ничего не делают; раскрывают только стрелки.
+
+## Ответ
+
+Оставить: в `none` Enter и Space работают как клик. Записано в docs/DECISIONS.md (2026-10-07).

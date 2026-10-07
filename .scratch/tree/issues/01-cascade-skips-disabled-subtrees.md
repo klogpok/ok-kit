@@ -1,6 +1,6 @@
 # Cascade skips disabled branches together with their subtrees
 
-Status: needs-info
+Status: done
 
 ## Question
 
@@ -23,11 +23,15 @@ nodes that sit under a **disabled branch**?
 1. **Keep it (recommended):** a disabled branch locks its whole subtree, as a locked section.
 2. Skip only the disabled node itself; its enabled descendants follow the cascade.
 
+## Answer
+
+Keep it: a disabled branch locks its whole subtree. Recorded in docs/DECISIONS.md (2026-10-07).
+
 ## Русский перевод
 
 # Каскад пропускает выключенные ветки вместе с их поддеревьями
 
-Статус: needs-info
+Статус: сделано
 
 ## Вопрос
 
@@ -49,3 +53,7 @@ nodes that sit under a **disabled branch**?
 
 1. **Оставить (рекомендую):** выключенная ветка блокирует всё своё поддерево, как закрытый раздел.
 2. Пропускать только сам выключенный узел; его включённые потомки следуют каскаду.
+
+## Ответ
+
+Оставить: выключенная ветка блокирует всё своё поддерево. Записано в docs/DECISIONS.md (2026-10-07).

@@ -226,7 +226,7 @@
 
 > **8.7 — спека согласована (2026-10-07):** [.scratch/tree/spec.md](../.scratch/tree/spec.md), термины в [GLOSSARY.md](../GLOSSARY.md), значение — [ADR 0001](adr/0001-tree-value-is-every-checked-key.md).
 >
-> **Статус (2026-10-07): 8.7 сделана, ждёт ревью.** Точка входа `@vplans/ui-kit/tree` (`ui-tree`, `UiTreeNodeDef`) на CDK Tree; режимы `none`/`single`/`multiple`, каскад галочек, ленивые ветки с повтором, `loading` и пустое состояние, свой шаблон узла; `UiTreeHarness` и `UiTreeNodeHarness`; токены `--ui-tree-*`; тексты `noItems`, `loadFailed`, `retry`; в core — `UiControlState.writeDerivedValue()`. История «Foundations/Tokens → Component tokens» переложена в две колонки: страница переросла 16384px, и её снимок падал через раз. Открытые вопросы — тикеты `needs-info` 01–03 в `.scratch/tree/issues/`.
+> **Статус (2026-10-07): 8.7 сделана, ждёт ревью.** Точка входа `@vplans/ui-kit/tree` (`ui-tree`, `UiTreeNodeDef`) на CDK Tree; режимы `none`/`single`/`multiple`, каскад галочек, ленивые ветки с повтором, `loading` и пустое состояние, свой шаблон узла; `UiTreeHarness` и `UiTreeNodeHarness`; токены `--ui-tree-*`; тексты `noItems`, `loadFailed`, `retry`; в core — `UiControlState.writeDerivedValue()`. История «Foundations/Tokens → Component tokens» переложена в две колонки: страница переросла 16384px, и её снимок падал через раз. Вопросы ревью (тикеты 01–03 в `.scratch/tree/issues/`) закрыты 2026-10-07: всё поведение оставлено как сделано, ответы — в [DECISIONS.md](DECISIONS.md).
 
 ## Фаза 9 — инфраструктура для команд
 

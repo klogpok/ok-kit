@@ -364,3 +364,20 @@ Decided in the retro of 8.6 (2026-10-07), after the first play stories ran axe o
   inside one. The listbox is now the scrolling element (`cdkVirtualScrollingElement`) instead of
   suppressing the rule, and "select all" sticks at its top over a virtual list. Lists below the
   threshold are unchanged.
+
+## Phase 8.7: tree (review questions answered 2026-10-07)
+
+Delivered: `@vplans/ui-kit/tree` (`ui-tree`, `UiTreeNodeDef`) on CDK Tree with `none`, `single`
+and cascading `multiple` selection, lazy branches with a retry, `UiTreeHarness`, and
+`UiControlState.writeDerivedValue()` in core; 809 unit tests, 287 stories. The spec is
+`.scratch/tree/spec.md`, the value semantics are ADR 0001.
+
+Review answers (tickets 01–03 in `.scratch/tree/issues/`), all keeping the built behaviour:
+
+- **A disabled branch locks its subtree.** The cascade skips a disabled node together with
+  everything under it, so its enabled descendants keep their state too.
+- **A written value follows the cascade.** A value the app writes to the control is brought in
+  line like one outdated by loaded children: a branch key checks everything enabled under it, a
+  branch whose children are all checked joins the value, a partially checked one leaves it. The
+  control does not become dirty.
+- **Enter and Space expand in a tree without selection,** like a click and as the APG has it.

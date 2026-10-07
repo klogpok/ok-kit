@@ -1,6 +1,6 @@
 # A value written to the control is brought in line with the cascade
 
-Status: needs-info
+Status: done
 
 ## Question
 
@@ -29,11 +29,15 @@ Should the same rule also apply to a value the app **writes** to the control?
 2. Apply it only when children load; a written value stays exactly as written, even if it breaks
    the invariant.
 
+## Answer
+
+Keep it: one rule for every source of the value. Recorded in docs/DECISIONS.md (2026-10-07).
+
 ## Русский перевод
 
 # Значение, записанное в контрол, приводится к правилам каскада
 
-Статус: needs-info
+Статус: сделано
 
 ## Вопрос
 
@@ -61,3 +65,7 @@ Should the same rule also apply to a value the app **writes** to the control?
    или с сервера с ключами веток работает как ожидается.
 2. Применять только при загрузке детей; записанное значение остаётся как есть, даже если нарушает
    инвариант.
+
+## Ответ
+
+Оставить: одно правило для любого источника значения. Записано в docs/DECISIONS.md (2026-10-07).
