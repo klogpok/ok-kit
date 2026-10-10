@@ -5,19 +5,21 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
+  EnvironmentProviders,
+  InjectionToken,
   Injector,
   booleanAttribute,
   computed,
   effect,
   inject,
   input,
+  makeEnvironmentProviders,
   numberAttribute,
   output,
   signal,
 } from '@angular/core';
 import { AriaDescriber, FocusMonitor } from '@angular/cdk/a11y';
 import {
-  ConnectedPosition,
   FlexibleConnectedPositionStrategy,
   OverlayRef,
   createFlexibleConnectedPositionStrategy,
@@ -25,23 +27,9 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { overlayOffsetX, resolveDirection } from '@vplans/ui-kit/core';
+import { overlayOffsetX, sideOverlayPositions, syncOverlayDirection } from '@vplans/ui-kit/core';
 
 export type UiTooltipPosition = 'top' | 'bottom' | 'start' | 'end';
-
-const POSITIONS: Record<UiTooltipPosition, ConnectedPosition> = {
-  top: { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom' },
-  bottom: { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top' },
-  start: { originX: 'start', originY: 'center', overlayX: 'end', overlayY: 'center' },
-  end: { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center' },
-};
-
-const OPPOSITE: Record<UiTooltipPosition, UiTooltipPosition> = {
-  top: 'bottom',
-  bottom: 'top',
-  start: 'end',
-  end: 'start',
-};
 
 /**
  * Tooltip bubble. Internal. Hidden from assistive technologies: the host element gets the same
@@ -72,6 +60,30 @@ export class UiTooltipPanel {
   }
 }
 
+/** Options that `provideUiTooltip()` can set for every tooltip. */
+export interface UiTooltipDefaults {
+  position?: UiTooltipPosition;
+  /** Milliseconds before the tooltip appears on hover. */
+  showDelay?: number;
+  /** Milliseconds before the tooltip hides after the pointer leaves. */
+  hideDelay?: number;
+}
+
+export const UI_TOOLTIP_DEFAULT_OPTIONS = new InjectionToken<UiTooltipDefaults>(
+  'UiTooltipDefaultOptions',
+  { providedIn: 'root', factory: () => ({}) },
+);
+
+/**
+ * Sets the position, show delay and hide delay of every tooltip in the app. An input on the
+ * tooltip wins; options left out keep `top`, 300 and 100.
+ *
+ * @example provideUiTooltip({ position: 'bottom', showDelay: 500 })
+ */
+export function provideUiTooltip(defaults: UiTooltipDefaults): EnvironmentProviders {
+  return makeEnvironmentProviders([{ provide: UI_TOOLTIP_DEFAULT_OPTIONS, useValue: defaults }]);
+}
+
 /**
  * Short description shown on hover and keyboard focus. The text is also exposed to screen readers
  * through `aria-describedby`. Do not put interactive content or essential information in it.
@@ -99,14 +111,30 @@ export class UiTooltip {
   private readonly injector = inject(Injector);
   private readonly describer = inject(AriaDescriber);
   private readonly focusMonitor = inject(FocusMonitor);
+  private readonly defaults = inject(UI_TOOLTIP_DEFAULT_OPTIONS);
 
   readonly message = input('', { alias: 'uiTooltip' });
-  readonly position = input<UiTooltipPosition>('top', { alias: 'uiTooltipPosition' });
+  /** Defaults to `provideUiTooltip()`, then to `top`. */
+  readonly position = input<UiTooltipPosition>(this.defaults.position ?? 'top', {
+    alias: 'uiTooltipPosition',
+  });
   readonly disabled = input(false, { alias: 'uiTooltipDisabled', transform: booleanAttribute });
-  /** Milliseconds before the tooltip appears on hover. Keyboard focus shows it at once. */
-  readonly showDelay = input(300, { alias: 'uiTooltipShowDelay', transform: numberAttribute });
-  /** Milliseconds before the tooltip hides after the pointer leaves. */
-  readonly hideDelay = input(100, { alias: 'uiTooltipHideDelay', transform: numberAttribute });
+  /**
+   * Milliseconds before the tooltip appears on hover. Keyboard focus shows it at once.
+   * Defaults to `provideUiTooltip()`, then to 300.
+   */
+  readonly showDelay = input(this.defaults.showDelay ?? 300, {
+    alias: 'uiTooltipShowDelay',
+    transform: numberAttribute,
+  });
+  /**
+   * Milliseconds before the tooltip hides after the pointer leaves.
+   * Defaults to `provideUiTooltip()`, then to 100.
+   */
+  readonly hideDelay = input(this.defaults.hideDelay ?? 100, {
+    alias: 'uiTooltipHideDelay',
+    transform: numberAttribute,
+  });
 
   /** The message to show and describe; empty when disabled or blank. */
   private readonly effectiveMessage = computed(() =>
@@ -204,14 +232,11 @@ export class UiTooltip {
     const overlayRef = this.overlayRef ?? this.createOverlay();
     const preferred = this.position();
     this.placement = preferred;
-    overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(overlayRef, this.host);
     this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     // The margin token may change with the theme or the root font size.
     this.positionStrategy!.withViewportMargin(this.viewportMargin());
-    this.positionStrategy!.withPositions([
-      { ...POSITIONS[preferred], panelClass: `ui-tooltip-pane--${preferred}` },
-      { ...POSITIONS[OPPOSITE[preferred]], panelClass: `ui-tooltip-pane--${OPPOSITE[preferred]}` },
-    ]);
+    this.positionStrategy!.withPositions(sideOverlayPositions(preferred, 'ui-tooltip-pane'));
 
     const panel = overlayRef.attach(new ComponentPortal(UiTooltipPanel, null, this.injector));
     panel.instance.message.set(this.describedMessage);

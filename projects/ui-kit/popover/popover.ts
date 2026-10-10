@@ -18,7 +18,6 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FocusMonitor, InteractivityChecker, _IdGenerator } from '@angular/cdk/a11y';
 import {
-  ConnectedPosition,
   FlexibleConnectedPositionStrategy,
   OverlayRef,
   createFlexibleConnectedPositionStrategy,
@@ -26,7 +25,7 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { overlayOffsetX, resolveDirection } from '@vplans/ui-kit/core';
+import { overlayOffsetX, sideOverlayPositions, syncOverlayDirection } from '@vplans/ui-kit/core';
 
 export type UiPopoverPosition = 'top' | 'bottom' | 'start' | 'end';
 
@@ -35,20 +34,6 @@ export interface UiPopoverContext {
   /** Closes the popover and returns focus to the trigger. */
   close: () => void;
 }
-
-const POSITIONS: Record<UiPopoverPosition, ConnectedPosition> = {
-  top: { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom' },
-  bottom: { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top' },
-  start: { originX: 'start', originY: 'center', overlayX: 'end', overlayY: 'center' },
-  end: { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center' },
-};
-
-const OPPOSITE: Record<UiPopoverPosition, UiPopoverPosition> = {
-  top: 'bottom',
-  bottom: 'top',
-  start: 'end',
-  end: 'start',
-};
 
 const TABBABLE = 'button, [href], input, select, textarea, [tabindex]';
 
@@ -151,21 +136,14 @@ export class UiPopoverTrigger {
     if (this.isOpen() || this.disabled()) return;
     const overlayRef = this.overlayRef ?? this.createOverlay();
     const preferred = this.position();
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(overlayRef, this.host);
     this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     const margin = this.viewportMargin();
     this.positionStrategy!.withViewportMargin(margin);
     // The pane spans the overlay container, which ends at the page scrollbar (viewport units run
     // under it). A percentage on the panel would be resolved against a pane sized by its content.
     overlayRef.updateSize({ maxWidth: `calc(100% - ${margin * 2}px)` });
-    this.positionStrategy!.withPositions([
-      { ...POSITIONS[preferred], panelClass: `ui-popover-pane--${preferred}` },
-      {
-        ...POSITIONS[OPPOSITE[preferred]],
-        panelClass: `ui-popover-pane--${OPPOSITE[preferred]}`,
-      },
-    ]);
+    this.positionStrategy!.withPositions(sideOverlayPositions(preferred, 'ui-popover-pane'));
 
     const panel = overlayRef.attach(new ComponentPortal(UiPopoverPanel, null, this.injector));
     const instance = panel.instance;

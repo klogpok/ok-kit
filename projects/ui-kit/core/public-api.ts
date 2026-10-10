@@ -4,6 +4,7 @@ export * from './control-state';
 export * from './form-control-base';
 export * from './checkable-base';
 export * from './direction';
+export * from './overlay';
 export * from './labels';
 export * from './live-directionality';
 export * from './checked-validator';

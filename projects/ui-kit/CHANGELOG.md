@@ -17,6 +17,11 @@ so versions mark review points rather than releases.
   `--ui-chip-bg`, `--ui-chip-radius` and `--ui-chip-filter-*` are replaced by
   `--ui-chip-outline-*` and `--ui-chip-soft-*` (`radius`, `bg`, `border`, `filter-bg`,
   `filter-border`, `filter-hover-bg`, `filter-selected-bg/border/text`).
+- **select:** `UiOption` exposes only its inputs (`value`, `disabled`, `label`), `getLabel()`
+  (the CDK typeahead calls it) and the `Highlightable` methods. `active`, `selected`,
+  `indeterminate`, `filteredOut` and `unavailable` are protected; `id` and the `disabled` getter
+  are renamed to the internal `ɵid` and `ɵdisabled`. Read an option's state from the DOM or
+  `UiOptionHarness` instead.
 
 ### Added
 
@@ -32,6 +37,16 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **core:** overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`,
+  `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `sideOverlayPositions()` and `syncOverlayDirection()`.
+  Select, time input, datepicker, date-range-picker, tooltip, popover and toast use them; they
+  open where they did before.
+- **pagination:** `provideUiPagination()` (with `UI_PAGINATION_DEFAULT_OPTIONS` and
+  `UiPaginationDefaults`) sets the page size, page size options, sibling count and first/last
+  buttons of every paginator; an input bound on a paginator wins.
+- **tooltip:** `provideUiTooltip({ position, showDelay, hideDelay })` sets app-wide tooltip
+  defaults over the built-in `top` / 300 / 100; an input on the tooltip wins. Also exported:
+  `UI_TOOLTIP_DEFAULT_OPTIONS` and `UiTooltipDefaults`.
 
 ### Fixed
 
