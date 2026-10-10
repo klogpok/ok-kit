@@ -1,7 +1,7 @@
 import { applicationConfig, type Decorator, type Preview } from '@storybook/angular';
 import { UI_ICONS_ALL, provideUiIcons } from '@vplans/ui-kit/icon';
 
-/** Applies the toolbar theme and direction to <html>, exactly like an application would. */
+/** Applies the toolbar theme, direction and density to <html>, exactly like an application would. */
 const withThemeAndDirection: Decorator = (story, context) => {
   const root = document.documentElement;
   const theme = context.globals['theme'] as string;
@@ -10,6 +10,8 @@ const withThemeAndDirection: Decorator = (story, context) => {
   else root.setAttribute('data-theme', theme);
   root.setAttribute('dir', dir);
   root.setAttribute('lang', dir === 'rtl' ? 'he' : 'en');
+  if (context.globals['density'] === 'compact') root.setAttribute('data-density', 'compact');
+  else root.removeAttribute('data-density');
   return story();
 };
 
@@ -44,8 +46,20 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    density: {
+      description: 'Control density (data-density on the root element)',
+      toolbar: {
+        title: 'Density',
+        icon: 'component',
+        items: [
+          { value: 'default', title: 'Default' },
+          { value: 'compact', title: 'Compact' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
-  initialGlobals: { theme: 'light', dir: 'ltr' },
+  initialGlobals: { theme: 'light', dir: 'ltr', density: 'default' },
   parameters: {
     controls: { expanded: true, matchers: { color: /(background|color)$/i } },
     a11y: { test: 'error' },
