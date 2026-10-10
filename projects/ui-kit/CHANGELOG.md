@@ -17,6 +17,11 @@ so versions mark review points rather than releases.
   `--ui-chip-bg`, `--ui-chip-radius` and `--ui-chip-filter-*` are replaced by
   `--ui-chip-outline-*` and `--ui-chip-soft-*` (`radius`, `bg`, `border`, `filter-bg`,
   `filter-border`, `filter-hover-bg`, `filter-selected-bg/border/text`).
+- **select:** `UiOption` exposes only its inputs (`value`, `disabled`, `label`), `getLabel()`
+  (the CDK typeahead calls it) and the `Highlightable` methods. `active`, `selected`,
+  `indeterminate`, `filteredOut` and `unavailable` are protected; `id` and the `disabled` getter
+  are renamed to the internal `ɵid` and `ɵdisabled`. Read an option's state from the DOM or
+  `UiOptionHarness` instead.
 
 ### Added
 
