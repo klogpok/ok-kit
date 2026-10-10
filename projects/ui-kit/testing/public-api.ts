@@ -17,3 +17,4 @@ export * from './tree-harness';
 export * from './datepicker-harness';
 export * from './switch-harness';
 export * from './radio-harness';
+export * from './form-field-harness';

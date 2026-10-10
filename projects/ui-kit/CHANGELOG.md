@@ -77,8 +77,8 @@ so versions mark review points rather than releases.
   `ui-container` (centered, up to `--ui-layout-container-max-width`, 80rem), with gap
   modifiers `ui-gap-3xs` … `ui-gap-3xl` (md by default), and the mixins `ui.stack($gap)`,
   `ui.cluster($gap)`, `ui.grid($min, $gap)` and `ui.container()`. Story Foundations/Layout.
-- **testing:** harnesses `UiDatepickerHarness`, `UiRadioGroupHarness` (+ `UiRadioHarness`),
-  `UiSwitchHarness`.
+- **testing:** harnesses `UiDatepickerHarness`, `UiFormFieldHarness` (label, hint, errors and
+  `getControl()`), `UiRadioGroupHarness` (+ `UiRadioHarness`), `UiSwitchHarness`.
 
 ### Fixed
 
