@@ -90,6 +90,8 @@ so versions mark review points rather than releases.
   `UiMenuHarness` (+ `UiMenuItemHarness`), `UiPopoverHarness`, `UiTooltipHarness` and
   `UiToastHarness`. The popover and tooltip triggers get the classes `ui-popover-trigger` and
   `ui-tooltip-trigger`.
+- **testing:** `UiTableHarness` with `UiTableRowHarness` and `UiTableCellHarness`: rows and
+  cells by column, sorting, row selection and select all, row expansion.
 
 ### Fixed
 
