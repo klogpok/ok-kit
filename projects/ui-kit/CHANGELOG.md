@@ -86,6 +86,10 @@ so versions mark review points rather than releases.
 - **testing:** harnesses for the status components: `UiAlertHarness`, `UiAvatarHarness`,
   `UiAvatarGroupHarness`, `UiBadgeHarness`, `UiEmptyStateHarness`,
   `UiProgressBarHarness`.
+- **testing:** overlay harnesses that find their content from the document root:
+  `UiMenuHarness` (+ `UiMenuItemHarness`), `UiPopoverHarness`, `UiTooltipHarness` and
+  `UiToastHarness`. The popover and tooltip triggers get the classes `ui-popover-trigger` and
+  `ui-tooltip-trigger`.
 
 ### Fixed
 
