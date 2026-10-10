@@ -15,3 +15,4 @@ export * from './stepper-harness';
 export * from './segmented-harness';
 export * from './tree-harness';
 export * from './datepicker-harness';
+export * from './switch-harness';
