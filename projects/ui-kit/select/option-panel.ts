@@ -45,6 +45,8 @@ export interface UiListEntry<T> extends Highlightable, UiOptionHandle {
   isDisabled(): boolean;
   /** For the key manager: disabled or blocked. */
   readonly ɵdisabled: boolean;
+  /** The search hides it. */
+  ɵfilteredOut(): boolean;
 }
 
 /** Height of an item option until a rendered one is measured. */
@@ -149,7 +151,7 @@ export abstract class UiOptionPanel<T, V>
   );
   /** The `items` the search shows; the control renders these. */
   protected readonly visibleItems = computed(() =>
-    this.itemEntries().filter((entry) => !entry.filteredOut()),
+    this.itemEntries().filter((entry) => !entry.ɵfilteredOut()),
   );
   /** Every option the keyboard moves through. */
   private readonly listOptions = computed((): readonly UiListEntry<T>[] => [
@@ -312,7 +314,7 @@ export abstract class UiOptionPanel<T, V>
 
   /** Whether the search hides an option. */
   protected isHidden(option: UiListEntry<T>): boolean {
-    return this.isFilteredOut(option.getLabel(), option);
+    return option.ɵfilteredOut();
   }
 
   /** Whether a rendered option shows the active entry of `items`. */

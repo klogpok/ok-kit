@@ -171,6 +171,11 @@ export class UiOption<T = unknown> implements Highlightable {
     }
   }
 
+  /** Internal: the search of the list hides the option (memoized: the label may read the DOM). */
+  ɵfilteredOut(): boolean {
+    return this.filteredOut();
+  }
+
   /** Internal: the list points `aria-activedescendant` at it. */
   get ɵid(): string {
     return this.optionId;
@@ -236,13 +241,9 @@ export class UiOption<T = unknown> implements Highlightable {
 export class UiOptionGroup {
   readonly label = input.required<string>();
   protected readonly labelId = inject(_IdGenerator).getId('ui-option-group-');
-  private readonly parent = inject(UiOptionParent);
   private readonly options = contentChildren(UiOption);
   protected readonly allFilteredOut = computed(() => {
     const options = this.options();
-    return (
-      options.length > 0 &&
-      options.every((option) => this.parent.isFilteredOut(option.getLabel(), option))
-    );
+    return options.length > 0 && options.every((option) => option.ɵfilteredOut());
   });
 }

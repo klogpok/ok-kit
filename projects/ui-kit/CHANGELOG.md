@@ -19,8 +19,8 @@ so versions mark review points rather than releases.
   `filter-border`, `filter-hover-bg`, `filter-selected-bg/border/text`).
 - **select:** `UiOption` exposes only its inputs (`value`, `disabled`, `label`), `getLabel()`
   (the CDK typeahead calls it) and the `Highlightable` methods. `active`, `selected`,
-  `indeterminate`, `filteredOut` and `unavailable` are protected; `id` and the `disabled` getter
-  are renamed to the internal `ɵid` and `ɵdisabled`. Read an option's state from the DOM or
+  `indeterminate`, `filteredOut` and `unavailable` are protected; `id`, the `disabled` getter and
+  the filter state are the internal `ɵid`, `ɵdisabled` and `ɵfilteredOut()`. Read an option's state from the DOM or
   `UiOptionHarness` instead.
 - **spinner:** `--ui-spinner-stroke-width` is now the final stroke width (its default includes the
   former `* 1.25`), so an override of it gives exactly that width instead of being multiplied by

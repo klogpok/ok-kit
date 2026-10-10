@@ -1,4 +1,4 @@
-import { Directive, inject, input } from '@angular/core';
+import { Directive, computed, inject, input } from '@angular/core';
 import { Highlightable } from '@angular/cdk/a11y';
 import { UiOption, UiOptionHandle } from './option';
 
@@ -45,9 +45,8 @@ export class UiItemEntry<T = unknown> implements Highlightable {
     return this.item.disabled === true;
   }
 
-  filteredOut(): boolean {
-    return this.owner.isFilteredOut(this.item.label, this);
-  }
+  /** Internal: the search of the list hides the entry. */
+  readonly ɵfilteredOut = computed(() => this.owner.isFilteredOut(this.item.label, this));
 
   /** For the CDK key manager: disabled, or blocked by the list (`maxSelections`). */
   get ɵdisabled(): boolean {
