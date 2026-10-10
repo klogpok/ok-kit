@@ -78,8 +78,9 @@ so versions mark review points rather than releases.
   modifiers `ui-gap-3xs` … `ui-gap-3xl` (md by default), and the mixins `ui.stack($gap)`,
   `ui.cluster($gap)`, `ui.grid($min, $gap)` and `ui.container()`. Story Foundations/Layout.
 - **testing:** navigation harnesses `UiAccordionHarness` (+ `UiAccordionItemHarness`),
-  `UiBreadcrumbsHarness` (+ `UiBreadcrumbHarness`, which reads collapsed links too) and
-  `UiPaginationHarness` (current page, page size, moving between pages).
+  `UiBreadcrumbsHarness` (+ `UiBreadcrumbHarness`, which reads collapsed links too),
+  `UiPaginationHarness` (current page, page size, moving between pages), `UiTabGroupHarness`
+  (+ `UiTabHarness`) and `UiTabNavHarness` (+ `UiTabLinkHarness`).
 
 ### Fixed
 

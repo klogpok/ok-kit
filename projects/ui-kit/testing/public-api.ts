@@ -17,3 +17,4 @@ export * from './tree-harness';
 export * from './accordion-harness';
 export * from './breadcrumbs-harness';
 export * from './pagination-harness';
+export * from './tabs-harness';
