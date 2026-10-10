@@ -6,12 +6,14 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `active`, `selected`, `indeterminate`, `filteredOut` and `unavailable` are protected
+- [x] `active`, `selected`, `indeterminate`, `filteredOut` and `unavailable` are protected
 - [ ] `id`, `getLabel` and the `disabled` getter carry the `ɵ` prefix, and every caller in the kit, its harnesses and specs is updated
-- [ ] Select, multi-select and autocomplete specs pass unchanged in behavior
-- [ ] The CHANGELOG lists the rename as a breaking change
+- [x] Select, multi-select and autocomplete specs pass unchanged in behavior
+- [x] The CHANGELOG lists the rename as a breaking change
+
+**Note:** `id` and the `disabled` getter are now `ɵid` and `ɵdisabled`, and every caller is updated. `getLabel` keeps its name: the typeahead of the CDK key manager calls `getLabel()` on every option by that exact name and throws without it (`ListKeyManagerOption.getLabel`), so it stays public like the two `Highlightable` methods. The option panel and `ui-option-group` ask the list whether an option is filtered out instead of reading `filteredOut()`.
 
 ## Русский перевод
 
@@ -23,9 +25,11 @@
 
 **Заблокировано:** Нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] `active`, `selected`, `indeterminate`, `filteredOut` и `unavailable` — protected
+- [x] `active`, `selected`, `indeterminate`, `filteredOut` и `unavailable` — protected
 - [ ] `id`, `getLabel` и геттер `disabled` носят префикс `ɵ`, все вызовы в ките, harnesses и спеках обновлены
-- [ ] Спеки select, multi-select и autocomplete проходят без изменения поведения
-- [ ] CHANGELOG указывает переименование как ломающее изменение
+- [x] Спеки select, multi-select и autocomplete проходят без изменения поведения
+- [x] CHANGELOG указывает переименование как ломающее изменение
+
+**Примечание:** `id` и геттер `disabled` теперь `ɵid` и `ɵdisabled`, все вызовы обновлены. `getLabel` сохраняет имя: typeahead у key manager из CDK вызывает `getLabel()` у каждой опции именно под этим именем и без него бросает ошибку (`ListKeyManagerOption.getLabel`), поэтому метод остаётся публичным, как и два метода `Highlightable`. Панель опций и `ui-option-group` спрашивают у списка, отфильтрована ли опция, вместо чтения `filteredOut()`.

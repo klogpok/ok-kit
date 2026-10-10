@@ -17,7 +17,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
-import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -26,7 +26,8 @@ import {
   UiFormFieldControl,
   UiSize,
   overlayOffsetX,
-  resolveDirection,
+  syncOverlayDirection,
+  UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
@@ -41,12 +42,6 @@ import {
   startOfDay,
   validDay,
 } from './date-utils';
-
-const POSITIONS: ConnectedPosition[] = [
-  { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
-  { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
-  { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
-];
 
 /** Text the user is typing and the value it produced. */
 interface Draft {
@@ -224,7 +219,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
   protected readonly isOpen = signal(false);
-  protected readonly positions = POSITIONS;
+  protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
   protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
@@ -314,8 +309,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   }
 
   protected onAttach(): void {
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
     afterNextRender(
       { write: () => this.calendar()?.focusActiveCell() },
       { injector: this.injector },

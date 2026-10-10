@@ -95,7 +95,7 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   protected override readonly selectAllValue = SELECT_ALL;
   /** Options "select all" acts on: enabled and shown by the search. */
   private readonly selectable = computed(() =>
-    this.options().filter((option) => !option.isDisabled() && !option.filteredOut()),
+    this.options().filter((option) => !option.isDisabled() && !this.isHidden(option)),
   );
   private readonly allSelected = computed(() => {
     const options = this.selectable();

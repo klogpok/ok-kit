@@ -560,6 +560,11 @@ this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 <!-- Tooltip: a description, never the only label of an icon button. Hides the native title while active -->
 <button ui-icon-button label="Delete" uiTooltip="Delete the plan"><ui-icon icon="trash" /></button>
 <button ui-button disabled disabledInteractive uiTooltip="Fill in all required fields">Send</button>
+<!-- App-wide defaults (built-in: top, 300 ms, 100 ms): provideUiTooltip({ position: 'bottom', showDelay: 500 })
+     in app.config.ts. An input on one tooltip wins: -->
+<button ui-button uiTooltip="Saved as a draft" uiTooltipPosition="end" uiTooltipShowDelay="0">
+  Save
+</button>
 
 <!-- Select -->
 <ui-form-field label="Coordinator">
@@ -1003,6 +1008,20 @@ stepper also has `next()`, `previous()`, `select(index)` and `reset()`, and a
 `selectionChange` output. The step state is read after the label (the `stepCompleted` /
 `stepError` labels); the steps run from right to left in RTL.
 
+```html
+<!-- Pagination: a navigation landmark; pageIndex is 0-based -->
+<ui-pagination [length]="total()" [(pageIndex)]="page" [(pageSize)]="size" (page)="load($event)" />
+```
+
+`provideUiPagination()` sets the page size, the page size options, the sibling count and the
+first/last buttons of every paginator. A paginator takes an input bound on it first (two-way
+`[(pageSize)]` included), then the provider, then `10`, `[]`, `1` and `true`.
+
+```ts
+// app.config.ts: every paginator in the app
+provideUiPagination({ pageSize: 25, pageSizeOptions: [25, 50, 100] });
+```
+
 ## Testing
 
 `@vplans/ui-kit/testing` has [component harnesses](https://angular.dev/guide/testing/component-harnesses-overview)
@@ -1086,9 +1105,9 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/accordion`    | `UiAccordion`, `UiAccordionItem`, `UiAccordionContent`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `@vplans/ui-kit/breadcrumbs`  | `UiBreadcrumbs`, `UiBreadcrumb`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `@vplans/ui-kit/tabs`         | `UiTabGroup`, `UiTab`, `UiTabLabel`, `UiTabContent`, `UiTabNav`, `UiTabLink`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `@vplans/ui-kit/pagination`   | `UiPagination`, `UiPageEvent`, `UiPageItem`, `uiPageItems`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `@vplans/ui-kit/pagination`   | `UiPagination`, `UiPageEvent`, `UiPageItem`, `uiPageItems`, `provideUiPagination`, `UI_PAGINATION_DEFAULT_OPTIONS`, `UiPaginationDefaults`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `@vplans/ui-kit/stepper`      | `UiStepper`, `UiStep`, `UiStepperNext`, `UiStepperPrevious`, `UiStepControl`, `UiStepperOrientation`, `UiStepperSelectionChange`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `@vplans/ui-kit/tooltip`      | `UiTooltip`, `UiTooltipPosition`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `@vplans/ui-kit/tooltip`      | `UiTooltip`, `provideUiTooltip`, `UI_TOOLTIP_DEFAULT_OPTIONS`, `UiTooltipDefaults`, `UiTooltipPosition`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `@vplans/ui-kit/popover`      | `UiPopoverTrigger`, `UiPopoverContext`, `UiPopoverPosition`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `@vplans/ui-kit/menu`         | `UiMenu`, `UiMenuItem`, `UiMenuTrigger`, `UiMenuGroup`, `UiMenuItemCheckbox`, `UiMenuItemRadio`, `UiMenuPosition`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `@vplans/ui-kit/dialog`       | `UiDialog`, `provideUiDialog`, `UI_DIALOG_DEFAULT_OPTIONS`, `UiDialogDefaults`, `UiDialogOptions`, `UiDrawerOptions`, `UiDrawerPosition`, `UiConfirmOptions`, `UiDialogSize`, `UiDialogRef`, `UI_DIALOG_DATA`, `UiDialogHeader`, `UiDialogTitle`, `UiDialogContent`, `UiDialogActions`, `UiDialogClose`                                                                                                                                                                                                                                                                                                                      |

@@ -50,7 +50,7 @@ export class UiItemEntry<T = unknown> implements Highlightable {
   }
 
   /** For the CDK key manager: disabled, or blocked by the list (`maxSelections`). */
-  get disabled(): boolean {
+  get ɵdisabled(): boolean {
     return this.isDisabled() || this.owner.isBlocked(this);
   }
 
