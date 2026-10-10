@@ -25,9 +25,14 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { overlayOffsetX, sideOverlayPositions, syncOverlayDirection } from '@vplans/ui-kit/core';
+import {
+  UiOverlaySide,
+  overlayOffsetX,
+  sideOverlayPositions,
+  syncOverlayDirection,
+} from '@vplans/ui-kit/core';
 
-export type UiPopoverPosition = 'top' | 'bottom' | 'start' | 'end';
+export type UiPopoverPosition = UiOverlaySide;
 
 /** Context of the popover template: `let-close="close"`. */
 export interface UiPopoverContext {

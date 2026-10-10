@@ -27,9 +27,14 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { overlayOffsetX, sideOverlayPositions, syncOverlayDirection } from '@vplans/ui-kit/core';
+import {
+  UiOverlaySide,
+  overlayOffsetX,
+  sideOverlayPositions,
+  syncOverlayDirection,
+} from '@vplans/ui-kit/core';
 
-export type UiTooltipPosition = 'top' | 'bottom' | 'start' | 'end';
+export type UiTooltipPosition = UiOverlaySide;
 
 /**
  * Tooltip bubble. Internal. Hidden from assistive technologies: the host element gets the same
