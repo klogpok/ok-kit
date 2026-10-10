@@ -81,7 +81,7 @@ const endOfRange = (control: AbstractControl): ValidationErrors | null => {
     UiTree,
   ],
   templateUrl: './phase-eight.html',
-  styleUrl: './phase-eight.scss',
+  styleUrls: ['./phase.scss', './phase-eight.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseEight {

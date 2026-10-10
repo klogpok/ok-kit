@@ -102,7 +102,7 @@ class PlanDrawer {}
     UiOption,
   ],
   templateUrl: './phase-six.html',
-  styleUrl: './phase-three.scss',
+  styleUrls: ['./phase.scss', './phase-six.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseSix {
