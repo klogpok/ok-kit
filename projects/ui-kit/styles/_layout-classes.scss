@@ -1,0 +1,25 @@
+@use 'layout';
+
+// Global layout classes. Included by ui-kit.scss.
+.ui-stack {
+  @include layout.stack;
+}
+
+.ui-cluster {
+  @include layout.cluster;
+}
+
+.ui-grid {
+  @include layout.grid;
+}
+
+.ui-container {
+  @include layout.container;
+}
+
+// After the layout classes: same specificity, so the later modifier wins on the same element.
+@each $gap in layout.$gaps {
+  .ui-gap-#{$gap} {
+    --ui-gap: var(--ui-space-#{$gap});
+  }
+}

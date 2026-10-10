@@ -1,6 +1,7 @@
 // Import mixins in application SCSS: @use 'ui-kit/styles' as ui; (includePaths: ["projects"])
 @forward 'mixins';
 @forward 'breakpoints';
+@forward 'layout' hide $gaps;
 
 /// Elements that re-declare the component tokens. Override component tokens on all of them, or
 /// a nested [data-theme] / [data-density] / .ui-theme-scope resets them:

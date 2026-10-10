@@ -1,0 +1,60 @@
+// Layout mixins. The global `.ui-stack`, `.ui-cluster`, `.ui-grid` and `.ui-container` classes are
+// built from them in `_layout-classes.scss`, so a mixin and its class produce the same rules.
+@use 'sass:list';
+@use 'sass:map';
+@use 'breakpoints';
+
+/// Names of the spacing scale that a gap can take: `.ui-gap-<name>` or `stack(<name>)`.
+$gaps: 3xs, 2xs, xs, sm, md, lg, xl, 2xl, 3xl;
+
+/// A spacing name becomes its token; any other value (`1.5rem`, `var(--my-gap)`) is used as is.
+@function -space($gap) {
+  @if list.index($gaps, $gap) {
+    @return var(--ui-space-#{$gap});
+  }
+
+  @return $gap;
+}
+
+/// Sets the gap through `--ui-gap`, which the `.ui-gap-*` modifiers override on the same element.
+/// The property is set on every layout element, so a nested layout does not inherit its parent's.
+@mixin _gap($gap) {
+  --ui-gap: #{-space($gap)};
+
+  gap: var(--ui-gap);
+}
+
+/// Children in a column: `@include ui.stack(lg);`.
+@mixin stack($gap: md) {
+  @include _gap($gap);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/// Children in a wrapping row from the inline start, centered on the cross axis.
+@mixin cluster($gap: md) {
+  @include _gap($gap);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/// As many columns as fit, each at least `--ui-grid-min` (else `$min`: 20rem, the md container
+/// width) and never wider than the grid itself.
+@mixin grid($min: var(--ui-container-width-md), $gap: md) {
+  @include _gap($gap);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--ui-grid-min, #{$min}), 100%), 1fr));
+}
+
+/// Page content centered up to the xl breakpoint (80rem) wide, with lg inline padding.
+@mixin container() {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: map.get(breakpoints.$breakpoints, xl);
+  margin-inline: auto;
+  padding-inline: var(--ui-space-lg);
+}
