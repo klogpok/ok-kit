@@ -3,7 +3,7 @@
   gap: var(--ui-space-lg);
 }
 
-.form .row > * {
+.form .ui-cluster > * {
   flex: 1;
   min-inline-size: 10rem;
 }

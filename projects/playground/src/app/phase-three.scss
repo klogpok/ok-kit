@@ -4,19 +4,6 @@
   margin-block-start: var(--ui-space-2xl);
 }
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-md);
-  align-items: center;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: var(--ui-space-xl);
-}
-
 .scroll {
   overflow-x: auto;
 }
