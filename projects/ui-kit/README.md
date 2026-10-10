@@ -535,13 +535,17 @@ const wide = toSignal(
 
 Mark a page region `data-density="compact"` to pack its controls tighter, for filter panels and
 other dense screens. Inside it the control tokens take their compact values; everything else keeps
-its values:
+its values (generated from `tokens.json`):
+
+<!-- density:start -->
 
 | Token                           | sm                     | md                     | lg                    |
 | ------------------------------- | ---------------------- | ---------------------- | --------------------- |
 | `--ui-control-height-*`         | 2rem → **1.75rem**     | 2.5rem → **2rem**      | 2.75rem → **2.5rem**  |
 | `--ui-control-padding-inline-*` | 0.625rem → **0.5rem**  | 0.75rem → **0.625rem** | 1rem → **0.75rem**    |
 | `--ui-control-gap-*`            | 0.375rem → **0.25rem** | 0.5rem → **0.375rem**  | 0.625rem → **0.5rem** |
+
+<!-- density:end -->
 
 Component tokens that alias a control height (select options, menu items, tree nodes, calendar
 cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not

@@ -11,6 +11,7 @@ interface TokenTree {
 }
 
 interface TokenFile {
+  breakpoint: TokenTree;
   primitive: TokenTree;
   semantic: { base: TokenTree; light: TokenTree; dark: TokenTree; compact: TokenTree };
   component: TokenTree;
@@ -27,6 +28,8 @@ export interface TokenDoc {
   layer: 'primitive' | 'semantic' | 'component';
   light: string;
   dark: string;
+  /** The value inside `[data-density='compact']`, for the tokens density changes. */
+  compact?: string;
 }
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -303,6 +306,16 @@ const resolvePrimitives = (value: string): string =>
 const themeValue = (theme: FlatToken[], path: string): string =>
   resolvePrimitives(theme.find((t) => t.path === path)?.value ?? '');
 
+/** `{ compact }` when density overrides the token at `path`, else nothing. */
+function compactDoc(
+  overrides: FlatToken[],
+  path: string,
+  display: (value: string) => string,
+): Pick<TokenDoc, 'compact'> {
+  const token = overrides.find((t) => t.path === path);
+  return token ? { compact: display(token.value) } : {};
+}
+
 const docs: TokenDoc[] = [
   ...primitives.map((t) => ({
     name: cssName('ref-', t.path),
@@ -315,6 +328,7 @@ const docs: TokenDoc[] = [
     layer: 'semantic' as const,
     light: resolvePrimitives(t.value),
     dark: resolvePrimitives(t.value),
+    ...compactDoc(compact, t.path, resolvePrimitives),
   })),
   ...light
     .filter((t) => !THEME_PROPERTIES.has(t.path))
@@ -329,6 +343,7 @@ const docs: TokenDoc[] = [
     layer: 'component' as const,
     light: toCss(t.value, 'component', t.path),
     dark: toCss(t.value, 'component', t.path),
+    ...compactDoc(componentCompact, t.path, (value) => toCss(value, 'component', t.path)),
   })),
 ];
 
@@ -338,6 +353,8 @@ export interface UiTokenDoc {
   layer: 'primitive' | 'semantic' | 'component';
   light: string;
   dark: string;
+  /** The value inside \`[data-density='compact']\`, for the tokens density changes. */
+  compact?: string;
 }
 
 export const UI_TOKENS: readonly UiTokenDoc[] = ${JSON.stringify(docs, null, 2)};
@@ -347,23 +364,61 @@ writeFileSync(resolve(libRoot, 'styles/tokens.css'), css);
 writeFileSync(resolve(libRoot, 'styles/_tokens.scss'), css);
 writeFileSync(resolve(here, 'tokens.generated.ts'), ts);
 
-// README token table between markers.
-const readmePath = resolve(libRoot, 'README.md');
-const readme = readFileSync(readmePath, 'utf8');
-const start = '<!-- tokens:start -->';
-const end = '<!-- tokens:end -->';
-if (readme.includes(start) && readme.includes(end)) {
-  const rows = docs
-    .filter((d) => d.layer !== 'primitive')
-    .map((d) => `| \`${d.name}\` | ${d.layer} | \`${d.light}\` | \`${d.dark}\` |`)
-    .join('\n');
-  const table = `${start}\n| Token | Layer | Light | Dark |\n| --- | --- | --- | --- |\n${rows}\n${end}`;
-  const updated = readme.replace(new RegExp(`${start}[\\s\\S]*${end}`), table);
-  // Keep the README stable under `pnpm format`.
-  const prettier = await import('prettier');
-  const options = (await prettier.resolveConfig(readmePath)) ?? {};
-  writeFileSync(readmePath, await prettier.format(updated, { ...options, filepath: readmePath }));
+// ---- README tables -----------------------------------------------------------
+
+/** Replaces the text between `<!-- name:start -->` and `<!-- name:end -->`, when both exist. */
+function replaceSection(text: string, name: string, table: string): string {
+  const start = `<!-- ${name}:start -->`;
+  const end = `<!-- ${name}:end -->`;
+  if (!text.includes(start) || !text.includes(end)) return text;
+  return text.replace(new RegExp(`${start}[\\s\\S]*${end}`), () => `${start}\n${table}\n${end}`);
 }
+
+const tokenTable = [
+  '| Token | Layer | Light | Dark |',
+  '| --- | --- | --- | --- |',
+  ...docs
+    .filter((d) => d.layer !== 'primitive')
+    .map((d) => `| \`${d.name}\` | ${d.layer} | \`${d.light}\` | \`${d.dark}\` |`),
+].join('\n');
+
+/**
+ * Compact semantic tokens, one row per group and one column per size:
+ * `control.height.sm` is row `--ui-control-height-*`, column sm, as "default → **compact**".
+ */
+function densityTable(): string {
+  const groups = new Map<string, Map<string, FlatToken>>();
+  for (const t of compact) {
+    const cut = t.path.lastIndexOf('.');
+    const group = t.path.slice(0, cut);
+    groups.set(group, (groups.get(group) ?? new Map()).set(t.path.slice(cut + 1), t));
+  }
+  const sizes = [...new Set([...groups.values()].flatMap((row) => [...row.keys()]))];
+  const cell = (t: FlatToken | undefined): string =>
+    t ? `${themeValue(base, t.path)} → **${resolvePrimitives(t.value)}**` : '';
+  return [
+    `| Token | ${sizes.join(' | ')} |`,
+    `| --- | ${sizes.map(() => '---').join(' | ')} |`,
+    ...[...groups].map(
+      ([group, row]) =>
+        `| \`${cssName('', group)}-*\` | ${sizes.map((size) => cell(row.get(size))).join(' | ')} |`,
+    ),
+  ].join('\n');
+}
+
+const readmePath = resolve(libRoot, 'README.md');
+const readme = replaceSection(
+  replaceSection(readFileSync(readmePath, 'utf8'), 'tokens', tokenTable),
+  'density',
+  densityTable(),
+);
+// Keep the README stable under `pnpm format`.
+const prettier = await import('prettier');
+const readmeOptions = (await prettier.resolveConfig(readmePath)) ?? {};
+writeFileSync(
+  readmePath,
+  await prettier.format(readme, { ...readmeOptions, filepath: readmePath }),
+);
 
 console.log(
   `Tokens: ${primitives.length} primitive, ${base.length + light.length} semantic, ${component.length} component. Contrast OK.`,
@@ -430,7 +485,6 @@ ${entries.map((e) => `  ${e.name}: '(min-width: ${e.value})',`).join('\n')}
 export type UiBreakpoint = keyof typeof UI_BREAKPOINTS;
 `;
 
-  const prettier = await import('prettier');
   const outputs: [path: string, content: string][] = [
     [resolve(libRoot, 'styles/_breakpoints.scss'), scss],
     [resolve(libRoot, 'core/breakpoints.generated.ts'), ts],
@@ -442,4 +496,4 @@ export type UiBreakpoint = keyof typeof UI_BREAKPOINTS;
   console.log(`Breakpoints: ${entries.map((e) => `${e.name} ${e.value}`).join(', ')}.`);
 }
 
-await buildBreakpoints((tokens as TokenFile & { breakpoint: TokenTree }).breakpoint);
+await buildBreakpoints(tokens.breakpoint);

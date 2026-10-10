@@ -4,6 +4,8 @@ export interface UiTokenDoc {
   layer: 'primitive' | 'semantic' | 'component';
   light: string;
   dark: string;
+  /** The value inside `[data-density='compact']`, for the tokens density changes. */
+  compact?: string;
 }
 
 export const UI_TOKENS: readonly UiTokenDoc[] = [
@@ -1151,37 +1153,43 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-control-height-sm",
     "layer": "semantic",
     "light": "2rem",
-    "dark": "2rem"
+    "dark": "2rem",
+    "compact": "1.75rem"
   },
   {
     "name": "--ui-control-height-md",
     "layer": "semantic",
     "light": "2.5rem",
-    "dark": "2.5rem"
+    "dark": "2.5rem",
+    "compact": "2rem"
   },
   {
     "name": "--ui-control-height-lg",
     "layer": "semantic",
     "light": "2.75rem",
-    "dark": "2.75rem"
+    "dark": "2.75rem",
+    "compact": "2.5rem"
   },
   {
     "name": "--ui-control-padding-inline-sm",
     "layer": "semantic",
     "light": "0.625rem",
-    "dark": "0.625rem"
+    "dark": "0.625rem",
+    "compact": "0.5rem"
   },
   {
     "name": "--ui-control-padding-inline-md",
     "layer": "semantic",
     "light": "0.75rem",
-    "dark": "0.75rem"
+    "dark": "0.75rem",
+    "compact": "0.625rem"
   },
   {
     "name": "--ui-control-padding-inline-lg",
     "layer": "semantic",
     "light": "1rem",
-    "dark": "1rem"
+    "dark": "1rem",
+    "compact": "0.75rem"
   },
   {
     "name": "--ui-control-font-size-sm",
@@ -1205,19 +1213,22 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-control-gap-sm",
     "layer": "semantic",
     "light": "0.375rem",
-    "dark": "0.375rem"
+    "dark": "0.375rem",
+    "compact": "0.25rem"
   },
   {
     "name": "--ui-control-gap-md",
     "layer": "semantic",
     "light": "0.5rem",
-    "dark": "0.5rem"
+    "dark": "0.5rem",
+    "compact": "0.375rem"
   },
   {
     "name": "--ui-control-gap-lg",
     "layer": "semantic",
     "light": "0.625rem",
-    "dark": "0.625rem"
+    "dark": "0.625rem",
+    "compact": "0.5rem"
   },
   {
     "name": "--ui-icon-size-sm",
@@ -3941,7 +3952,8 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-table-cell-padding-block",
     "layer": "component",
     "light": "var(--ui-table-cell-padding-block-default)",
-    "dark": "var(--ui-table-cell-padding-block-default)"
+    "dark": "var(--ui-table-cell-padding-block-default)",
+    "compact": "var(--ui-table-cell-padding-block-compact)"
   },
   {
     "name": "--ui-table-cell-padding-block-default",
