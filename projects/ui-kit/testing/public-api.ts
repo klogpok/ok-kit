@@ -16,3 +16,4 @@ export * from './segmented-harness';
 export * from './tree-harness';
 export * from './datepicker-harness';
 export * from './switch-harness';
+export * from './radio-harness';
