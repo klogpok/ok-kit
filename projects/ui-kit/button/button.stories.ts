@@ -111,3 +111,19 @@ export const IconButtons: Story = {
       </div>`,
   }),
 };
+
+export const CircleIconButtons: Story = {
+  render: () => ({
+    template: `
+      <div style="display:flex;gap:12px;align-items:center">
+        <button ui-icon-button shape="circle" label="Edit" size="sm"><ui-icon icon="edit" /></button>
+        <button ui-icon-button shape="circle" label="Search"><ui-icon icon="search" /></button>
+        <button ui-icon-button shape="circle" label="Menu" size="lg"><ui-icon icon="menu" /></button>
+        <button ui-icon-button shape="circle" label="Add" variant="primary"><ui-icon icon="plus" /></button>
+        <button ui-icon-button shape="circle" label="Filter" variant="secondary"><ui-icon icon="filter" /></button>
+        <button ui-icon-button shape="circle" label="Delete" variant="danger"><ui-icon icon="trash" /></button>
+        <button ui-icon-button shape="circle" label="Saving" variant="secondary" loading><ui-icon icon="check" /></button>
+        <button ui-icon-button shape="circle" label="Close" disabled><ui-icon icon="x" /></button>
+      </div>`,
+  }),
+};

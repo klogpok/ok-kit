@@ -30,6 +30,8 @@ so versions mark review points rather than releases.
 - **chip:** `provideUiChip()`, `UI_CHIP_DEFAULT_OPTIONS` and the types `UiChipAppearance`,
   `UiChipSize`, `UiChipTone`, `UiChipDefaults`. Tokens `--ui-chip-font-size-sm` and
   `--ui-chip-padding-inline-sm`.
+- **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
+  `--ui-button-circle-radius`.
 
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 

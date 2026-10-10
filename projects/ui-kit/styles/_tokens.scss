@@ -440,6 +440,7 @@
 [data-theme],
 .ui-theme-scope {
   --ui-button-radius: var(--ui-radius-control);
+  --ui-button-circle-radius: var(--ui-radius-full);
   --ui-button-font-weight: var(--ui-font-weight-medium);
   --ui-button-primary-bg: var(--ui-color-primary);
   --ui-button-primary-bg-hover: var(--ui-color-primary-hover);

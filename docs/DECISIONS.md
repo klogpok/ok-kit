@@ -425,3 +425,12 @@ The user did not like the gray pill chips. Chosen from a prototype (ticket
   check mark takes its place while the chip is selected.
 - `ui-chip-input` and the chips of `ui-multi-select` follow the app default like any other chip.
 - Every chip in the app changes look; the CHANGELOG lists it as a visual breaking change.
+
+## Icon button: circle shape (decided 2026-10-10)
+
+The user asked for a round icon-only button. Chosen:
+
+- **`shape: 'square' | 'circle'`** on `ui-icon-button` only, default `square`, so existing buttons
+  do not change. A boolean `rounded` was rejected: every button already has rounded corners.
+- `circle` uses the new token `--ui-button-circle-radius` (`var(--ui-radius-full)`).
+- `ui-button` gets no pill shape for now; if it is needed, the same `shape` input can add it.

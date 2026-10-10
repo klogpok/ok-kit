@@ -117,6 +117,10 @@
   }
 }
 
+:host(.ui-button--circle) {
+  border-radius: var(--ui-button-circle-radius);
+}
+
 :host(.ui-button--icon.ui-button--sm) {
   --_icon-size: var(--ui-icon-size-sm);
 }

@@ -1760,6 +1760,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-radius-control)"
   },
   {
+    "name": "--ui-button-circle-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-full)",
+    "dark": "var(--ui-radius-full)"
+  },
+  {
     "name": "--ui-button-font-weight",
     "layer": "component",
     "light": "var(--ui-font-weight-medium)",

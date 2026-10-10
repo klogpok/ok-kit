@@ -99,16 +99,17 @@ import { UiInput } from '@vplans/ui-kit/input';
 
 Common inputs:
 
-| Input                 | Values                                    | Default                                  |
-| --------------------- | ----------------------------------------- | ---------------------------------------- |
-| `size`                | `sm \| md \| lg`                          | `md`                                     |
-| `variant`             | `primary \| secondary \| ghost \| danger` | `primary` (`ghost` for `ui-icon-button`) |
-| `type`                | `button \| submit \| reset`               | `button` (ignored on `<a>`)              |
-| `disabled`            | `boolean`                                 | `false`                                  |
-| `disabledInteractive` | `boolean`                                 | `false`                                  |
-| `loading`             | `boolean`                                 | `false`                                  |
-| `fullWidth`           | `boolean` (`ui-button` only)              | `false`                                  |
-| `label`               | `string`, required on `ui-icon-button`    | —                                        |
+| Input                 | Values                                     | Default                                  |
+| --------------------- | ------------------------------------------ | ---------------------------------------- |
+| `size`                | `sm \| md \| lg`                           | `md`                                     |
+| `variant`             | `primary \| secondary \| ghost \| danger`  | `primary` (`ghost` for `ui-icon-button`) |
+| `type`                | `button \| submit \| reset`                | `button` (ignored on `<a>`)              |
+| `disabled`            | `boolean`                                  | `false`                                  |
+| `disabledInteractive` | `boolean`                                  | `false`                                  |
+| `loading`             | `boolean`                                  | `false`                                  |
+| `fullWidth`           | `boolean` (`ui-button` only)               | `false`                                  |
+| `label`               | `string`, required on `ui-icon-button`     | —                                        |
+| `shape`               | `square \| circle` (`ui-icon-button` only) | `square`                                 |
 
 `loading` shows a spinner, blocks clicks, keeps the button focusable and announces the `loading`
 label. A disabled or loading `a[ui-button]` has no `href`, so it cannot be opened in a new tab.
@@ -1250,6 +1251,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-shadow-md`                           | semantic  | `0 4px 8px -2px rgb(15 23 42 / 0.10), 0 2px 4px -2px rgb(15 23 42 / 0.06)`   | `0 4px 8px -2px rgb(0 0 0 / 0.5)`                                      |
 | `--ui-shadow-lg`                           | semantic  | `0 12px 24px -6px rgb(15 23 42 / 0.16), 0 4px 8px -4px rgb(15 23 42 / 0.08)` | `0 12px 24px -6px rgb(0 0 0 / 0.6)`                                    |
 | `--ui-button-radius`                       | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
+| `--ui-button-circle-radius`                | component | `var(--ui-radius-full)`                                                      | `var(--ui-radius-full)`                                                |
 | `--ui-button-font-weight`                  | component | `var(--ui-font-weight-medium)`                                               | `var(--ui-font-weight-medium)`                                         |
 | `--ui-button-primary-bg`                   | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
 | `--ui-button-primary-bg-hover`             | component | `var(--ui-color-primary-hover)`                                              | `var(--ui-color-primary-hover)`                                        |

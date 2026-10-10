@@ -29,10 +29,11 @@ import { UiIconButton } from './icon-button';
       (click)="clicks = clicks + 1"
       >Orders</a
     >
-    <button ui-icon-button id="icon" label="Close" size="sm">x</button>
+    <button ui-icon-button id="icon" label="Close" size="sm" [shape]="shape()">x</button>
   `,
 })
 class Host {
+  readonly shape = signal<'square' | 'circle'>('square');
   readonly variant = signal<UiVariant>('primary');
   readonly disabled = signal(false);
   readonly loading = signal(false);
@@ -182,6 +183,16 @@ describe('UiIconButton', () => {
     expect(btn.classList).toContain('ui-button--icon');
     expect(btn.classList).toContain('ui-button--ghost');
     expect(btn.classList).toContain('ui-button--sm');
+  });
+
+  it('is square by default and adds the circle modifier for shape="circle"', () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const btn = (fixture.nativeElement as HTMLElement).querySelector('#icon')!;
+    expect(btn.classList).not.toContain('ui-button--circle');
+    fixture.componentInstance.shape.set('circle');
+    fixture.detectChanges();
+    expect(btn.classList).toContain('ui-button--circle');
   });
 });
 
