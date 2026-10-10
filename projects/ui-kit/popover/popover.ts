@@ -138,7 +138,11 @@ export class UiPopoverTrigger {
     const preferred = this.position();
     syncOverlayDirection(overlayRef, this.host);
     this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
-    this.positionStrategy!.withViewportMargin(this.viewportMargin());
+    const margin = this.viewportMargin();
+    this.positionStrategy!.withViewportMargin(margin);
+    // The pane spans the overlay container, which ends at the page scrollbar (viewport units run
+    // under it). A percentage on the panel would be resolved against a pane sized by its content.
+    overlayRef.updateSize({ maxWidth: `calc(100% - ${margin * 2}px)` });
     this.positionStrategy!.withPositions(sideOverlayPositions(preferred, 'ui-popover-pane'));
 
     const panel = overlayRef.attach(new ComponentPortal(UiPopoverPanel, null, this.injector));

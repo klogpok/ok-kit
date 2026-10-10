@@ -56,6 +56,11 @@ so versions mark review points rather than releases.
   defaults over the built-in `top` / 300 / 100; an input on the tooltip wins. Also exported:
   `UI_TOOLTIP_DEFAULT_OPTIONS` and `UiTooltipDefaults`.
 
+### Fixed
+
+- **dialog, drawer, toast, popover:** the maximum width is measured against the overlay
+  container instead of `100vw`, so on a page with a scrollbar they no longer run under it.
+
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 
 The library targets Angular 20 and Signal Forms is gone. Both are breaking: the package no longer

@@ -196,6 +196,18 @@ describe('UiPopoverTrigger', () => {
     }
   });
 
+  it('fits the overlay container less the viewport margins, not 100vw', async () => {
+    document.documentElement.style.setProperty('--ui-popover-viewport-margin', '12px');
+    try {
+      fixture.componentInstance.trigger().open();
+      await settle();
+      const pane = panel()!.closest<HTMLElement>('.cdk-overlay-pane')!;
+      expect(pane.style.maxWidth).toBe('calc(100% - 24px)');
+    } finally {
+      document.documentElement.style.removeProperty('--ui-popover-viewport-margin');
+    }
+  });
+
   it('closes only itself on Escape inside a dialog', async () => {
     @Component({
       imports: [UiPopoverTrigger],
