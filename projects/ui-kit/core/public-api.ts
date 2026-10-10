@@ -4,7 +4,17 @@ export * from './control-state';
 export * from './form-control-base';
 export * from './checkable-base';
 export * from './direction';
-export * from './overlay';
+export {
+  UI_DROPDOWN_POSITIONS,
+  UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
+  UI_OPPOSITE_SIDE,
+  UI_SIDE_POSITIONS,
+  sideOverlayPositions,
+  syncOverlayDirection,
+  type UiOverlaySide,
+} from './overlay';
+// Internal: shared by the kit's overlays, not part of the public API.
+export { pushOnScreen as ɵpushOnScreen } from './overlay';
 export * from './labels';
 export * from './live-directionality';
 export * from './checked-validator';

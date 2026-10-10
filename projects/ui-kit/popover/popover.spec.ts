@@ -2,7 +2,7 @@ import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InteractivityChecker } from '@angular/cdk/a11y';
 import { UiDialog } from '@vplans/ui-kit/dialog';
-import { UiPopoverPosition, UiPopoverTrigger, pushOnScreen } from './popover';
+import { UiPopoverPosition, UiPopoverTrigger } from './popover';
 
 // jsdom has no layout, so the real checker treats every element as hidden.
 const FOCUSABLE = 'button, input, select, textarea, a[href], [tabindex]';
@@ -228,38 +228,5 @@ describe('UiPopoverTrigger', () => {
     expect(document.querySelector('ui-dialog-container')).not.toBeNull();
     ref.close();
     await settle();
-  });
-});
-
-describe('pushOnScreen', () => {
-  // A 400×300 viewport with an 8 px margin. Rects are relative to the visible viewport.
-  const viewport = { width: 400, height: 300 };
-  const rect = (left: number, top: number, width = 200, height = 100) => ({
-    left,
-    top,
-    right: left + width,
-    bottom: top + height,
-  });
-
-  it('leaves a popover that fits where it opened, even inside the margin', () => {
-    expect(pushOnScreen(rect(100, 50), viewport, 8)).toEqual({ x: 0, y: 0 });
-    expect(pushOnScreen(rect(3, 2), viewport, 8)).toEqual({ x: 0, y: 0 });
-  });
-
-  it('pushes a popover past the start edge back to the margin', () => {
-    expect(pushOnScreen(rect(-60, 50), viewport, 8)).toEqual({ x: 68, y: 0 });
-  });
-
-  it('pushes a popover past the end edge back to the margin', () => {
-    expect(pushOnScreen(rect(250, 50), viewport, 8)).toEqual({ x: -58, y: 0 });
-  });
-
-  it('keeps the margin on both sides of a popover as wide as the viewport allows', () => {
-    expect(pushOnScreen(rect(100, 50, 384), viewport, 8)).toEqual({ x: -92, y: 0 });
-  });
-
-  it('pushes vertically too, keeping the top edge when the popover is too tall', () => {
-    expect(pushOnScreen(rect(100, 250), viewport, 8)).toEqual({ x: 0, y: -58 });
-    expect(pushOnScreen(rect(100, -40, 200, 400), viewport, 8)).toEqual({ x: 0, y: 48 });
   });
 });

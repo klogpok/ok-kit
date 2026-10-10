@@ -60,3 +60,42 @@ export function syncOverlayDirection(
 ): void {
   overlayRef?.setDirection(resolveDirection(host));
 }
+
+/** Edges of a box, in pixels from the top-left corner of the visible viewport. */
+export interface UiOverlayBox {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+/**
+ * How far to move an overlay so it stays `margin` px clear of every viewport edge. Zero when it
+ * fits by the CDK's own test (one of its positions was applied as is), so unpushed overlays stay
+ * put. Too large for the viewport, the overlay keeps its top edge and its inline-start edge (the
+ * left one in LTR, the right one in RTL) on screen.
+ */
+export function pushOnScreen(
+  box: UiOverlayBox,
+  viewport: { width: number; height: number },
+  margin: number,
+  direction: 'ltr' | 'rtl' = 'ltr',
+): { x: number; y: number } {
+  // The CDK's fit test: a position fits from 0 to the size less both margins.
+  const fits =
+    box.left >= 0 &&
+    box.top >= 0 &&
+    box.right <= viewport.width - 2 * margin &&
+    box.bottom <= viewport.height - 2 * margin;
+  if (fits) return { x: 0, y: 0 };
+  // Brings the far edge inside the margin without moving the kept edge past it: when the box is
+  // too large, the kept edge wins.
+  const push = (start: number, end: number, size: number, keepEnd = false) =>
+    (keepEnd
+      ? Math.min(size - margin - end, Math.max(0, margin - start))
+      : Math.max(margin - start, Math.min(0, size - margin - end))) || 0;
+  return {
+    x: push(box.left, box.right, viewport.width, direction === 'rtl'),
+    y: push(box.top, box.bottom, viewport.height),
+  };
+}

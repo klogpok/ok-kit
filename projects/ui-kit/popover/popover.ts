@@ -18,20 +18,23 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FocusMonitor, InteractivityChecker, _IdGenerator } from '@angular/cdk/a11y';
 import {
+  ConnectedPosition,
   FlexibleConnectedPositionStrategy,
-  OverlayContainer,
   OverlayRef,
+  PositionStrategy,
+  createFlexibleConnectedPositionStrategy,
   createOverlayRef,
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
-import { Platform } from '@angular/cdk/platform';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ViewportRuler } from '@angular/cdk/scrolling';
+import { Subscription } from 'rxjs';
 import {
   UiOverlaySide,
   overlayOffsetX,
   sideOverlayPositions,
   syncOverlayDirection,
+  ɵpushOnScreen as pushOnScreen,
 } from '@vplans/ui-kit/core';
 
 export type UiPopoverPosition = UiOverlaySide;
@@ -44,97 +47,86 @@ export interface UiPopoverContext {
 
 const TABBABLE = 'button, [href], input, select, textarea, [tabindex]';
 
-/** Edges of a box, in pixels from the top-left corner of the visible viewport. */
-export interface UiOverlayBox {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-}
-
-/**
- * How far to move a popover so it stays `margin` px clear of every viewport edge. Zero when it fits
- * by the CDK's own test (one of its positions was applied as is), so unpushed popovers stay put.
- * Too large for the viewport, the popover keeps its left and top edges on screen.
- */
-export function pushOnScreen(
-  box: UiOverlayBox,
-  viewport: { width: number; height: number },
-  margin: number,
-): { x: number; y: number } {
-  // The CDK's fit test: a position fits from 0 to the size less both margins.
-  const fits =
-    box.left >= 0 &&
-    box.top >= 0 &&
-    box.right <= viewport.width - 2 * margin &&
-    box.bottom <= viewport.height - 2 * margin;
-  if (fits) return { x: 0, y: 0 };
-  const push = (start: number, end: number, size: number) =>
-    Math.max(margin - start, Math.min(0, size - margin - end)) || 0;
-  return {
-    x: push(box.left, box.right, viewport.width),
-    y: push(box.top, box.bottom, viewport.height),
-  };
-}
-
 /**
  * The CDK pushes an overlay back on screen against the viewport from x=0 and against its width
  * without the start margin, so a pushed popover sits under a left page scrollbar (an RTL document
- * in an iframe) or touches an edge. This strategy turns the CDK push off and pushes the applied
- * position itself, measured from where the visible viewport starts.
+ * in an iframe) or touches an edge. This strategy wraps the CDK one with its push off, delegates
+ * to it, and pushes the applied position itself, measured from where the visible viewport starts.
  */
-class UiPopoverPositionStrategy extends FlexibleConnectedPositionStrategy {
-  private pane: HTMLElement | null = null;
+class UiPopoverPositionStrategy implements PositionStrategy {
+  /** The wrapped CDK strategy, for its `positionChanges`. Configure it through `configure()`. */
+  readonly connected: FlexibleConnectedPositionStrategy;
+  private overlayRef: OverlayRef | null = null;
   private margin = 0;
   private offsetX = 0;
+  private resize = Subscription.EMPTY;
 
   constructor(
     origin: HTMLElement,
-    injector: Injector,
-    private readonly doc: Document,
+    private readonly injector: Injector,
   ) {
-    super(
-      origin,
-      injector.get(ViewportRuler),
-      doc,
-      injector.get(Platform),
-      injector.get(OverlayContainer),
-    );
-    this.withPush(false);
+    this.connected = createFlexibleConnectedPositionStrategy(injector, origin)
+      .withFlexibleDimensions(false)
+      .withPush(false);
   }
 
-  override attach(overlayRef: OverlayRef): void {
-    super.attach(overlayRef);
-    this.pane = overlayRef.overlayElement;
-  }
-
-  override withDefaultOffsetX(offset: number): this {
-    this.offsetX = offset;
-    return super.withDefaultOffsetX(offset);
-  }
-
-  override withViewportMargin(margin: number): this {
+  /**
+   * Sets the positions, the viewport margin and `overlayOffsetX()` (the visible viewport starts
+   * after a page scrollbar on the left). Read them each time the popover opens.
+   */
+  configure(positions: ConnectedPosition[], margin: number, offsetX: number): void {
     this.margin = margin;
-    return super.withViewportMargin(margin);
+    this.offsetX = offsetX;
+    this.connected.withPositions(positions).withViewportMargin(margin).withDefaultOffsetX(offsetX);
   }
 
-  override apply(): void {
-    super.apply();
-    const pane = this.pane;
-    if (!pane?.isConnected) return;
-    // The visible viewport starts after a page scrollbar on the left (`overlayOffsetX()`).
+  attach(overlayRef: OverlayRef): void {
+    this.connected.attach(overlayRef);
+    this.overlayRef = overlayRef;
+    // On a window resize the CDK strategy applies itself, not through apply() here. Subscribed
+    // after it, so the push runs after its position.
+    this.resize.unsubscribe();
+    this.resize = this.injector
+      .get(ViewportRuler)
+      .change()
+      .subscribe(() => this.push());
+  }
+
+  apply(): void {
+    this.connected.apply();
+    this.push();
+  }
+
+  detach(): void {
+    this.resize.unsubscribe();
+    this.connected.detach();
+  }
+
+  dispose(): void {
+    this.resize.unsubscribe();
+    this.connected.dispose();
+    this.overlayRef = null;
+  }
+
+  private push(): void {
+    const pane = this.overlayRef?.overlayElement;
+    if (!this.overlayRef || !pane?.isConnected) return;
     const start = -this.offsetX;
+    const root = pane.ownerDocument.documentElement;
+    // Like the CDK's fit test: the size rounded down (the viewport size is whole), the position
+    // as it is, so a pushed edge lands exactly on the margin.
     const rect = pane.getBoundingClientRect();
-    const root = this.doc.documentElement;
+    const left = rect.left - start;
     const { x, y } = pushOnScreen(
       {
-        left: rect.left - start,
+        left,
         top: rect.top,
-        right: rect.left - start + Math.round(rect.width),
-        bottom: rect.top + Math.round(rect.height),
+        right: left + Math.floor(rect.width),
+        bottom: rect.top + Math.floor(rect.height),
       },
       { width: root.clientWidth, height: root.clientHeight },
       this.margin,
+      this.overlayRef.getDirection(),
     );
     // The CDK resets the transform (it holds the offsets) on every apply.
     if (x || y) pane.style.transform = `${pane.style.transform} translate(${x}px, ${y}px)`.trim();
@@ -222,7 +214,7 @@ export class UiPopoverTrigger {
   protected readonly panelId = this.ids.getId('ui-popover-');
 
   private overlayRef: OverlayRef | null = null;
-  private positionStrategy: FlexibleConnectedPositionStrategy | null = null;
+  private positionStrategy: UiPopoverPositionStrategy | null = null;
   private panel: ComponentRef<UiPopoverPanel> | null = null;
 
   constructor() {
@@ -241,13 +233,15 @@ export class UiPopoverTrigger {
     const overlayRef = this.overlayRef ?? this.createOverlay();
     const preferred = this.position();
     syncOverlayDirection(overlayRef, this.host);
-    this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     const margin = this.viewportMargin();
-    this.positionStrategy!.withViewportMargin(margin);
+    this.positionStrategy!.configure(
+      sideOverlayPositions(preferred, 'ui-popover-pane'),
+      margin,
+      overlayOffsetX(this.host.ownerDocument),
+    );
     // The pane spans the overlay container, which ends at the page scrollbar (viewport units run
     // under it). A percentage on the panel would be resolved against a pane sized by its content.
     overlayRef.updateSize({ maxWidth: `calc(100% - ${margin * 2}px)` });
-    this.positionStrategy!.withPositions(sideOverlayPositions(preferred, 'ui-popover-pane'));
 
     const panel = overlayRef.attach(new ComponentPortal(UiPopoverPanel, null, this.injector));
     const instance = panel.instance;
@@ -320,16 +314,14 @@ export class UiPopoverTrigger {
   }
 
   private createOverlay(): OverlayRef {
-    const strategy = new UiPopoverPositionStrategy(this.host, this.injector, this.document)
-      .withFlexibleDimensions(false)
-      .withViewportMargin(this.viewportMargin());
+    const strategy = new UiPopoverPositionStrategy(this.host, this.injector);
     const overlayRef = createOverlayRef(this.injector, {
       positionStrategy: strategy,
       scrollStrategy: createRepositionScrollStrategy(this.injector),
       panelClass: 'ui-popover-pane',
     });
 
-    strategy.positionChanges.subscribe(({ connectionPair }) => {
+    strategy.connected.positionChanges.subscribe(({ connectionPair }) => {
       const placement = String(connectionPair.panelClass).replace('ui-popover-pane--', '');
       this.panel?.instance.position.set(placement as UiPopoverPosition);
       this.panel?.changeDetectorRef.markForCheck();
