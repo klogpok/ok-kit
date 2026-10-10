@@ -21,7 +21,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ActiveDescendantKeyManager, _IdGenerator } from '@angular/cdk/a11y';
-import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
   UI_FORM_FIELD_CONTROL,
   UI_LABELS,
@@ -29,7 +29,8 @@ import {
   UiFormFieldControl,
   UiSize,
   overlayOffsetX,
-  resolveDirection,
+  syncOverlayDirection,
+  UI_DROPDOWN_POSITIONS,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
 import { UiOption, ɵUiOptionParent } from '@vplans/ui-kit/select';
@@ -43,11 +44,6 @@ import {
   toMinutes,
   uiTimeOf,
 } from './time-utils';
-
-const POSITIONS: ConnectedPosition[] = [
-  { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
-  { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
-];
 
 /** Text the user is typing and the value it produced. */
 interface Draft {
@@ -205,7 +201,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   protected readonly activeId = signal<string | null>(null);
   protected readonly panelWidth = signal(0);
   protected readonly panelOffsetX = signal(0);
-  protected readonly positions = POSITIONS;
+  protected readonly positions = [...UI_DROPDOWN_POSITIONS];
   protected readonly clockIcon = uiIconClock;
 
   readonly labelStrategy = 'for' as const;
@@ -324,8 +320,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   }
 
   protected onAttach(): void {
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
   }
 
   protected onOutsideClick(event: MouseEvent): void {

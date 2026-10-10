@@ -19,7 +19,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { map } from 'rxjs';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -29,7 +29,8 @@ import {
   UiFormFieldControl,
   UiSize,
   overlayOffsetX,
-  resolveDirection,
+  syncOverlayDirection,
+  UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
@@ -52,12 +53,6 @@ export interface UiDateRangePreset {
   /** The range, or a function called on each click (for ranges relative to today). */
   range: UiDateRange | (() => UiDateRange);
 }
-
-const POSITIONS: ConnectedPosition[] = [
-  { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
-  { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
-  { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
-];
 
 /** From this viewport width the calendar shows two months. */
 const TWO_MONTHS_QUERY = '(min-width: 52rem)';
@@ -294,7 +289,7 @@ export class UiDateRangePicker
 
   protected readonly edges: readonly Edge[] = ['start', 'end'];
   protected readonly isOpen = signal(false);
-  protected readonly positions = POSITIONS;
+  protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
   protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
@@ -424,8 +419,7 @@ export class UiDateRangePicker
   }
 
   protected onAttach(): void {
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
     afterNextRender(
       { write: () => this.calendar()?.focusActiveCell() },
       { injector: this.injector },

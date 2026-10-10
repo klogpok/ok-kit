@@ -37,6 +37,10 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **core:** overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`,
+  `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `sideOverlayPositions()` and `syncOverlayDirection()`.
+  Select, time input, datepicker, date-range-picker, tooltip, popover and toast use them; they
+  open where they did before.
 - **pagination:** `provideUiPagination()` (with `UI_PAGINATION_DEFAULT_OPTIONS` and
   `UiPaginationDefaults`) sets the page size, page size options, sibling count and first/last
   buttons of every paginator; an input bound on a paginator wins.
