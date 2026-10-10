@@ -15,3 +15,4 @@ export * from './stepper-harness';
 export * from './segmented-harness';
 export * from './tree-harness';
 export * from './accordion-harness';
+export * from './breadcrumbs-harness';
