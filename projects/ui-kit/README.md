@@ -531,6 +531,56 @@ const wide = toSignal(
 );
 ```
 
+### Layout
+
+`ui-kit.scss` has four layout classes. They use only logical properties, so they mirror in RTL.
+
+| Class          | Layout                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| `ui-stack`     | children in a column                                                                          |
+| `ui-cluster`   | children in a row from the inline start, centered on the cross axis, wrapping                 |
+| `ui-grid`      | as many equal columns as fit, each at least `--ui-grid-min` (20rem); one column when narrower |
+| `ui-container` | content centered up to 80rem (the `xl` breakpoint) wide, with `--ui-space-lg` inline padding  |
+
+The gap of `ui-stack`, `ui-cluster` and `ui-grid` is `--ui-space-md`. A modifier on the same
+element changes it: `ui-gap-3xs`, `ui-gap-2xs`, `ui-gap-xs`, `ui-gap-sm`, `ui-gap-md`, `ui-gap-lg`,
+`ui-gap-xl`, `ui-gap-2xl`, `ui-gap-3xl` (the `--ui-space-*` scale). Each layout element sets its own
+gap, so a nested layout does not inherit the modifier of its parent.
+
+```html
+<form class="ui-stack ui-gap-lg">
+  …
+  <div class="ui-cluster ui-gap-sm"><button ui-button>Save</button>…</div>
+</form>
+
+<ul class="ui-grid" style="--ui-grid-min: 15rem">
+  …
+</ul>
+```
+
+`--ui-grid-min` can be set on the grid or on any ancestor. In component styles, use the mixins of
+the same names. The gap takes a spacing name or any length:
+
+```scss
+@use 'ui-kit/styles' as ui;
+
+.filters {
+  @include ui.cluster(sm);
+}
+
+.cards {
+  @include ui.grid(15rem, lg); // ui.grid() alone gives 20rem and md
+}
+
+.page {
+  @include ui.container;
+}
+```
+
+The mixins set `--ui-gap` in the component's selector, so pass the gap as the argument; a
+`ui-gap-*` class on the same element may lose to the component selector. **Foundations/Layout**
+in Storybook shows each class and gap.
+
 ### Density
 
 Mark a page region `data-density="compact"` to pack its controls tighter, for filter panels and

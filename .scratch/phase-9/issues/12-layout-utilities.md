@@ -6,12 +6,12 @@
 
 **Blocked by:** 11 (Phase 9.2 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The four classes and the gap modifiers are in the kit stylesheet
-- [ ] `stack`, `cluster`, `grid` and `container` mixins are in the kit's SCSS API and produce the same rules
-- [ ] "Foundations/Layout" has baselines in all three modes and passes axe
-- [ ] README and CHANGELOG document the utilities
+- [x] The four classes and the gap modifiers are in the kit stylesheet
+- [x] `stack`, `cluster`, `grid` and `container` mixins are in the kit's SCSS API and produce the same rules
+- [x] "Foundations/Layout" has baselines in all three modes and passes axe
+- [x] README and CHANGELOG document the utilities
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 11 (Отчёт подфазы 9.2)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Четыре класса и модификаторы промежутка есть в стилях кита
-- [ ] Миксины `stack`, `cluster`, `grid` и `container` есть в SCSS API кита и выдают те же правила
-- [ ] «Foundations/Layout» имеет снимки во всех трёх режимах и проходит axe
-- [ ] README и CHANGELOG описывают утилиты
+- [x] Четыре класса и модификаторы промежутка есть в стилях кита
+- [x] Миксины `stack`, `cluster`, `grid` и `container` есть в SCSS API кита и выдают те же правила
+- [x] «Foundations/Layout» имеет снимки во всех трёх режимах и проходит axe
+- [x] README и CHANGELOG описывают утилиты
