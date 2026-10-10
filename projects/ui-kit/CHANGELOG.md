@@ -22,6 +22,10 @@ so versions mark review points rather than releases.
   `indeterminate`, `filteredOut` and `unavailable` are protected; `id` and the `disabled` getter
   are renamed to the internal `ɵid` and `ɵdisabled`. Read an option's state from the DOM or
   `UiOptionHarness` instead.
+- **spinner:** `--ui-spinner-stroke-width` is now the final stroke width (its default includes the
+  former `* 1.25`), so an override of it gives exactly that width instead of being multiplied by
+  1.25. An app that overrides it gets a thinner stroke; multiply the override by 1.25 to keep the
+  old look.
 
 ### Added
 
@@ -41,8 +45,6 @@ so versions mark review points rather than releases.
   defaulting to the old values: `--ui-switch-track-scale-sm/lg`, `--ui-avatar-icon-size-ratio`,
   `--ui-dialog-enter-scale`, `--ui-spinner-duration`, `--ui-spinner-duration-reduced-motion`,
   `--ui-skeleton-duration`, `--ui-progress-indeterminate-duration`, `--ui-table-busy-duration`.
-  `--ui-spinner-stroke-width` is now the final stroke width (its default includes the former
-  `* 1.25`), so an override of it gives exactly that width.
 - **core:** overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`,
   `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `sideOverlayPositions()` and `syncOverlayDirection()`.
   Select, time input, datepicker, date-range-picker, tooltip, popover and toast use them; they
