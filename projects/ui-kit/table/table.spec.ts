@@ -103,7 +103,7 @@ class Host {
   readonly sort = signal<UiSortState | null>(null);
   readonly clearable = signal(true);
   readonly loading = signal(false);
-  readonly density = signal<UiTableDensity>('default');
+  readonly density = signal<UiTableDensity | undefined>(undefined);
   readonly showStatus = signal(false);
   readonly rows = computed(() => uiSortData(this.data(), this.sort()));
 }
@@ -127,14 +127,31 @@ describe('UiTable', () => {
     await settle();
   });
 
-  it('styles the native table with density and sticky header', async () => {
+  it('styles the native table with a sticky header and follows the region density by default', () => {
     expect([...table().classList]).toEqual(
-      expect.arrayContaining(['ui-table', 'ui-table--default', 'ui-table--sticky-header']),
+      expect.arrayContaining(['ui-table', 'ui-table--sticky-header']),
     );
+    // No density class: the cells take the padding of the surrounding [data-density] region.
+    expect([...table().classList].filter((c) => /^ui-table--(default|compact)$/.test(c))).toEqual(
+      [],
+    );
+  });
+
+  it('overrides the region density with an explicit density in both directions', async () => {
     host.density.set('compact');
     await settle();
     expect(table().classList).toContain('ui-table--compact');
     expect(table().classList).not.toContain('ui-table--default');
+
+    host.density.set('default');
+    await settle();
+    expect(table().classList).toContain('ui-table--default');
+    expect(table().classList).not.toContain('ui-table--compact');
+
+    host.density.set(undefined);
+    await settle();
+    expect(table().classList).not.toContain('ui-table--default');
+    expect(table().classList).not.toContain('ui-table--compact');
   });
 
   it('puts the header text in a button and marks only the sorted column with aria-sort', async () => {

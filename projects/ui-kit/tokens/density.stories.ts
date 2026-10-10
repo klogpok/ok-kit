@@ -6,12 +6,13 @@ import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UiInput } from '@vplans/ui-kit/input';
 import { UiSegment, UiSegmented } from '@vplans/ui-kit/segmented';
 import { UiOption, UiSelect } from '@vplans/ui-kit/select';
+import { UiTable } from '@vplans/ui-kit/table';
 
 const meta: Meta = {
   title: 'Foundations/Density',
   decorators: [
     moduleMetadata({
-      imports: [UiButton, UiCheckbox, UiInput, UiSegment, UiSegmented, UiOption, UiSelect],
+      imports: [UiButton, UiCheckbox, UiInput, UiSegment, UiSegmented, UiOption, UiSelect, UiTable],
     }),
   ],
 };
@@ -80,6 +81,54 @@ export const Controls: Story = {
       compact: [32, 28, 32, 40],
       optionHeight: '1.75rem',
     });
+  },
+};
+
+/** A small plans table; `density` is the input binding, if any. */
+const table = (testId: string, caption: string, density = ''): string => `
+  <table ui-table ${density} data-testid="${testId}">
+    <caption>${caption}</caption>
+    <thead>
+      <tr><th scope="col">תוכנית</th><th scope="col" class="ui-table-numeric">יחידות</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>מגדלי הים</td><td class="ui-table-numeric">48</td></tr>
+      <tr><td>שכונת הגפן</td><td class="ui-table-numeric">12</td></tr>
+    </tbody>
+  </table>`;
+
+/**
+ * A table without `density` follows its region; an explicit `density` overrides the region in
+ * both directions.
+ */
+export const Table: Story = {
+  render: () => ({
+    template: `
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px">
+        <section style="display:grid;gap:16px;align-content:start">
+          <h3 class="ui-heading-4">Default</h3>
+          ${table('default', 'Follows the region')}
+          ${table('default-compact', 'Explicit compact', 'density="compact"')}
+        </section>
+        <section data-density="compact" style="display:grid;gap:16px;align-content:start">
+          <h3 class="ui-heading-4">Compact</h3>
+          ${table('compact', 'Follows the region')}
+          ${table('compact-default', 'Explicit default', 'density="default"')}
+        </section>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const padding = (name: string): number => {
+      const cell = canvasElement.querySelector(`[data-testid="${name}"] td`);
+      return cell ? parseFloat(getComputedStyle(cell).paddingBlockStart) : 0;
+    };
+    await until(() => padding('default') > 0, 'the tables did not render');
+    await expect({
+      default: padding('default'),
+      compact: padding('compact'),
+      defaultInCompact: padding('compact-default'),
+      compactInDefault: padding('default-compact'),
+    }).toEqual({ default: 12, compact: 6, defaultInCompact: 12, compactInDefault: 6 });
   },
 };
 
