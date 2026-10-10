@@ -9,6 +9,7 @@ export * from './select-harness';
 export * from './dialog-harness';
 export * from './empty-state-harness';
 export * from './number-input-harness';
+export * from './progress-bar-harness';
 export * from './chip-harness';
 export * from './autocomplete-harness';
 export * from './file-upload-harness';
