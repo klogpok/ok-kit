@@ -10,6 +10,8 @@ import { UiTable } from '@vplans/ui-kit/table';
 
 const meta: Meta = {
   title: 'Foundations/Density',
+  // The stories set their own regions, so the toolbar Density stays off here.
+  globals: { density: 'default' },
   decorators: [
     moduleMetadata({
       imports: [UiButton, UiCheckbox, UiInput, UiSegment, UiSegmented, UiOption, UiSelect, UiTable],
