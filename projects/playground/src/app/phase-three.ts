@@ -88,7 +88,7 @@ const startOfToday = () => {
     UiTableSkeleton,
   ],
   templateUrl: './phase-three.html',
-  styleUrl: './phase-three.scss',
+  styleUrls: ['./phase.scss', './phase-three.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseThree {

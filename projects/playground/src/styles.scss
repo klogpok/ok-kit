@@ -1,1 +1,21 @@
 // Playground-only global styles. Tokens and base styles come from ui-kit.scss.
+
+// Every demo section is a card, also inside the phase components, so the rule is global.
+// `app-root` keeps it off the overlays, which render outside it.
+app-root section {
+  display: grid;
+  gap: var(--ui-space-lg);
+  align-content: start;
+  min-inline-size: 0;
+  padding: var(--ui-space-xl);
+  border: var(--ui-border-width-default) solid var(--ui-color-border);
+  border-radius: var(--ui-radius-container);
+  background: var(--ui-color-surface);
+}
+
+// JSON values; the templates add `dir="ltr"` so they read in order in RTL.
+app-root pre {
+  margin: 0;
+  overflow: auto;
+  font-size: var(--ui-font-size-xs);
+}
