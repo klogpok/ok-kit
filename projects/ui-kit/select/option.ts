@@ -120,7 +120,7 @@ export class UiOptionParent {
   host: {
     role: 'option',
     class: 'ui-option',
-    '[id]': 'id',
+    '[id]': 'optionId',
     '[attr.aria-selected]': 'selected()',
     '[attr.aria-disabled]': 'unavailable() ? "true" : null',
     '[class.ui-option--active]': 'active()',
@@ -145,17 +145,17 @@ export class UiOption<T = unknown> implements Highlightable {
    */
   readonly label = input('');
 
-  readonly id = inject(_IdGenerator).getId('ui-option-');
+  protected readonly optionId = inject(_IdGenerator).getId('ui-option-');
   protected readonly multiple = this.parent.multiple;
   /** Set by the key manager when the option itself is in it. */
   private readonly highlighted = signal(false);
   /** The option the keyboard is on (`aria-activedescendant` of the control). */
-  readonly active = computed(() => this.highlighted() || this.parent.isActive(this));
-  readonly selected = computed(() => this.parent.isSelected(this.value()));
-  readonly indeterminate = computed(() => this.parent.isIndeterminate(this));
-  readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel(), this));
+  protected readonly active = computed(() => this.highlighted() || this.parent.isActive(this));
+  protected readonly selected = computed(() => this.parent.isSelected(this.value()));
+  protected readonly indeterminate = computed(() => this.parent.isIndeterminate(this));
+  protected readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel(), this));
   /** Disabled, or blocked by the list (e.g. `maxSelections` is reached). */
-  readonly unavailable = computed(() => this.isDisabled() || this.parent.isBlocked(this));
+  protected readonly unavailable = computed(() => this.isDisabled() || this.parent.isBlocked(this));
   protected readonly checkIcon = uiIconCheck;
   protected readonly mixedIcon = uiIconMinus;
   /** Content text after the first DOM change; `null` until then (read live). */
@@ -171,11 +171,20 @@ export class UiOption<T = unknown> implements Highlightable {
     }
   }
 
-  /** For the CDK key manager. */
-  get disabled(): boolean {
+  /** Internal: the list points `aria-activedescendant` at it. */
+  get ɵid(): string {
+    return this.optionId;
+  }
+
+  /** Internal: for the key manager of the list. Disabled, or blocked by the list. */
+  get ɵdisabled(): boolean {
     return this.unavailable();
   }
 
+  /**
+   * The label. Public only because the typeahead of the CDK key manager calls it by this name
+   * (`ListKeyManagerOption.getLabel`).
+   */
   getLabel(): string {
     return this.label() || (this.observedText() ?? this.readText());
   }
@@ -227,9 +236,13 @@ export class UiOption<T = unknown> implements Highlightable {
 export class UiOptionGroup {
   readonly label = input.required<string>();
   protected readonly labelId = inject(_IdGenerator).getId('ui-option-group-');
+  private readonly parent = inject(UiOptionParent);
   private readonly options = contentChildren(UiOption);
   protected readonly allFilteredOut = computed(() => {
     const options = this.options();
-    return options.length > 0 && options.every((option) => option.filteredOut());
+    return (
+      options.length > 0 &&
+      options.every((option) => this.parent.isFilteredOut(option.getLabel(), option))
+    );
   });
 }

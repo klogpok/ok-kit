@@ -274,7 +274,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
       selectOption: (value) => this.pick(value as string),
     });
     this.keyManager.change.subscribe(() =>
-      this.activeId.set(this.keyManager.activeItem?.id ?? null),
+      this.activeId.set(this.keyManager.activeItem?.ɵid ?? null),
     );
     // A list opened before the field became readonly or disabled must not stay open.
     effect(() => {
