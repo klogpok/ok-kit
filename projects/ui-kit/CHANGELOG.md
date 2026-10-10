@@ -92,6 +92,10 @@ so versions mark review points rather than releases.
   `ui-tooltip-trigger`.
 - **testing:** `UiTableHarness` with `UiTableRowHarness` and `UiTableCellHarness`: rows and
   cells by column, sorting, row selection and select all, row expansion.
+- **datepicker:** the calendar button names the open dialog in `aria-controls` (the dialog gets
+  the id `${id}-panel`), and "Clear" gets the class `ui-datepicker__clear`.
+- **pagination:** the arrow buttons get the classes `ui-pagination__first`, `__previous`,
+  `__next` and `__last`, and the host `ui-pagination--disabled` while disabled (no visual change).
 
 ### Fixed
 
