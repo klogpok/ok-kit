@@ -1,7 +1,7 @@
 /** @type {import('stylelint').Config} */
 export default {
   extends: ['stylelint-config-standard-scss'],
-  ignoreFiles: ['dist/**', '**/tokens.css', '**/_tokens.scss', 'node_modules/**'],
+  ignoreFiles: ['dist/**', '**/tokens.css', '**/_tokens.scss', '**/_breakpoints.scss', 'node_modules/**'],
   rules: {
     'declaration-no-important': true,
     'selector-pseudo-element-no-unknown': [true, { ignorePseudoElements: [] }],
