@@ -365,7 +365,7 @@ Decided in the retro of 8.6 (2026-10-07), after the first play stories ran axe o
   suppressing the rule, and "select all" sticks at its top over a virtual list. Lists below the
   threshold are unchanged.
 
-## Phase 8.7: tree (review questions answered 2026-10-07)
+## Phase 8.7: tree (review questions answered 2026-10-07, approved 2026-10-10)
 
 Delivered: `@vplans/ui-kit/tree` (`ui-tree`, `UiTreeNodeDef`) on CDK Tree with `none`, `single`
 and cascading `multiple` selection, lazy branches with a retry, `UiTreeHarness`, and

@@ -1,6 +1,6 @@
 # Spec: `ui-tree` (phase 8.7)
 
-Status: ready-for-agent
+Status: done
 
 ## Problem Statement
 
@@ -92,7 +92,7 @@ A new secondary entry point `@vplans/ui-kit/tree` with the `ui-tree` component. 
 
 # Спека: `ui-tree` (фаза 8.7)
 
-Статус: ready-for-agent
+Статус: сделано
 
 ## Постановка проблемы
 
