@@ -17,7 +17,6 @@ import {
 } from '@angular/core';
 import { AriaDescriber, FocusMonitor } from '@angular/cdk/a11y';
 import {
-  ConnectedPosition,
   FlexibleConnectedPositionStrategy,
   OverlayRef,
   createFlexibleConnectedPositionStrategy,
@@ -25,23 +24,9 @@ import {
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { overlayOffsetX, resolveDirection } from '@vplans/ui-kit/core';
+import { overlayOffsetX, sideOverlayPositions, syncOverlayDirection } from '@vplans/ui-kit/core';
 
 export type UiTooltipPosition = 'top' | 'bottom' | 'start' | 'end';
-
-const POSITIONS: Record<UiTooltipPosition, ConnectedPosition> = {
-  top: { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom' },
-  bottom: { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top' },
-  start: { originX: 'start', originY: 'center', overlayX: 'end', overlayY: 'center' },
-  end: { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center' },
-};
-
-const OPPOSITE: Record<UiTooltipPosition, UiTooltipPosition> = {
-  top: 'bottom',
-  bottom: 'top',
-  start: 'end',
-  end: 'start',
-};
 
 /**
  * Tooltip bubble. Internal. Hidden from assistive technologies: the host element gets the same
@@ -204,14 +189,11 @@ export class UiTooltip {
     const overlayRef = this.overlayRef ?? this.createOverlay();
     const preferred = this.position();
     this.placement = preferred;
-    overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(overlayRef, this.host);
     this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     // The margin token may change with the theme or the root font size.
     this.positionStrategy!.withViewportMargin(this.viewportMargin());
-    this.positionStrategy!.withPositions([
-      { ...POSITIONS[preferred], panelClass: `ui-tooltip-pane--${preferred}` },
-      { ...POSITIONS[OPPOSITE[preferred]], panelClass: `ui-tooltip-pane--${OPPOSITE[preferred]}` },
-    ]);
+    this.positionStrategy!.withPositions(sideOverlayPositions(preferred, 'ui-tooltip-pane'));
 
     const panel = overlayRef.attach(new ComponentPortal(UiTooltipPanel, null, this.injector));
     panel.instance.message.set(this.describedMessage);

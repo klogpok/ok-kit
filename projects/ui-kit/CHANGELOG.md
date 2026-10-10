@@ -32,6 +32,10 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **core:** overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`,
+  `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `sideOverlayPositions()` and `syncOverlayDirection()`.
+  Select, time input, datepicker, date-range-picker, tooltip, popover and toast use them; they
+  open where they did before.
 
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 

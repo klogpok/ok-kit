@@ -23,7 +23,7 @@ import {
   viewChildren,
 } from '@angular/core';
 import { ActiveDescendantKeyManager, Highlightable, _IdGenerator } from '@angular/cdk/a11y';
-import { CdkConnectedOverlay, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
   UI_LABELS,
@@ -31,7 +31,8 @@ import {
   UiFormFieldControl,
   UiSize,
   overlayOffsetX,
-  resolveDirection,
+  syncOverlayDirection,
+  UI_DROPDOWN_POSITIONS,
 } from '@vplans/ui-kit/core';
 import { UiOption, UiOptionHandle, UiOptionOwner, UiOptionParent } from './option';
 import { UiItemEntry, UiItemEntryOwner, UiItemOption, UiOptionItem } from './option-items';
@@ -49,11 +50,6 @@ export interface UiListEntry<T> extends Highlightable, UiOptionHandle {
 
 /** Height of an item option until a rendered one is measured. */
 const DEFAULT_ITEM_SIZE = 32;
-
-const POSITIONS: ConnectedPosition[] = [
-  { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
-  { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
-];
 
 /**
  * Shared behavior of the controls with a list of `ui-option`s in an overlay (`ui-select`,
@@ -184,7 +180,7 @@ export abstract class UiOptionPanel<T, V>
   protected readonly activeId = computed(() => this.idOf(this.activeEntry()));
   protected readonly panelWidth = signal(0);
   protected readonly panelOffsetX = signal(0);
-  protected readonly positions = POSITIONS;
+  protected readonly positions = [...UI_DROPDOWN_POSITIONS];
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-control`);
@@ -365,8 +361,7 @@ export abstract class UiOptionPanel<T, V>
   // --- Template handlers ----------------------------------------------------------------
 
   protected onAttach(): void {
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
   }
 
   protected onOutsideClick(event: MouseEvent): void {

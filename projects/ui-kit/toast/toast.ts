@@ -18,7 +18,7 @@ import { OverlayRef, createGlobalPositionStrategy, createOverlayRef } from '@ang
 import { ComponentPortal } from '@angular/cdk/portal';
 import { _CdkPrivateStyleLoader, _VisuallyHiddenLoader } from '@angular/cdk/private';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
-import { UI_LABELS, resolveDirection } from '@vplans/ui-kit/core';
+import { UI_LABELS, syncOverlayDirection } from '@vplans/ui-kit/core';
 import {
   UiIcon,
   UiIconDefinition,
@@ -464,9 +464,7 @@ export class UiToast {
   private attach(): void {
     const overlayRef = (this.overlayRef ??= this.createOverlay());
     // Like dialogs: the direction around the focused element, e.g. an app root with `dir`.
-    overlayRef.setDirection(
-      resolveDirection(this.document.activeElement ?? this.document.documentElement),
-    );
+    syncOverlayDirection(overlayRef, this.document.activeElement ?? this.document.documentElement);
     if (!overlayRef.hasAttached()) {
       const injector = Injector.create({
         providers: [{ provide: UI_TOAST_CONTROL, useValue: this.control }],
