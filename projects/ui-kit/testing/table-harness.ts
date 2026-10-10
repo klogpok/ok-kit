@@ -5,6 +5,7 @@ import {
   HarnessPredicate,
   TestElement,
 } from '@angular/cdk/testing';
+import { UiCheckboxHarness } from './checkbox-harness';
 import { UiHarness } from './harness';
 
 /** A column of a table: the text of its header cell, or its index from 0. */
@@ -131,7 +132,7 @@ export class UiTableRowHarness extends UiHarness {
 
   /** Whether the checkbox of the row is disabled; `false` for a row without one. */
   async isSelectionDisabled(): Promise<boolean> {
-    return (await (await this.checkbox())?.getProperty<boolean>('disabled')) ?? false;
+    return (await (await this.checkbox())?.isDisabled()) ?? false;
   }
 
   /** Checks the checkbox of the row unless the row is selected. */
@@ -151,10 +152,10 @@ export class UiTableRowHarness extends UiHarness {
   async toggleSelection(): Promise<void> {
     const checkbox = await this.checkbox();
     if (!checkbox) throw Error('The row has no selection checkbox (td[ui-table-select-row]).');
-    if (await checkbox.getProperty<boolean>('disabled')) {
+    if (await checkbox.isDisabled()) {
       throw Error('The selection checkbox of the row is disabled.');
     }
-    await checkbox.click();
+    await checkbox.toggle();
   }
 
   /** Whether the row has a detail toggle (`td[ui-row-toggle]`). */
@@ -208,7 +209,7 @@ export class UiTableRowHarness extends UiHarness {
   }
 
   private checkbox() {
-    return this.locatorForOptional('.ui-table-select-row .ui-checkbox__input')();
+    return this.locatorForOptional(UiCheckboxHarness.with({ ancestor: '.ui-table-select-row' }))();
   }
 
   private columnNames(): readonly string[] {
@@ -311,8 +312,8 @@ export class UiTableHarness extends UiHarness {
   async getSelectAllState(): Promise<UiTableSelectAllState | null> {
     const checkbox = await this.selectAllCheckbox();
     if (!checkbox) return null;
-    if (await checkbox.getProperty<boolean>('indeterminate')) return 'partial';
-    return (await checkbox.getProperty<boolean>('checked')) ? 'checked' : 'unchecked';
+    if (await checkbox.isIndeterminate()) return 'partial';
+    return (await checkbox.isChecked()) ? 'checked' : 'unchecked';
   }
 
   /** Selects every row on screen with the header checkbox. */
@@ -329,15 +330,15 @@ export class UiTableHarness extends UiHarness {
     const checkbox = await this.selectAllCheckbox();
     if (!checkbox) throw Error('The table has no select-all checkbox (th[ui-table-select-all]).');
     for (let clicks = 0; clicks < 2 && (await this.getSelectAllState()) !== state; clicks++) {
-      if (await checkbox.getProperty<boolean>('disabled')) {
+      if (await checkbox.isDisabled()) {
         throw Error('The select-all checkbox is disabled.');
       }
-      await checkbox.click();
+      await checkbox.toggle();
     }
   }
 
   private selectAllCheckbox() {
-    return this.locatorForOptional('.ui-table-select-all .ui-checkbox__input')();
+    return this.locatorForOptional(UiCheckboxHarness.with({ ancestor: '.ui-table-select-all' }))();
   }
 
   /** The names of the columns with a sort header (`th[ui-sort-header]`). */
