@@ -32,8 +32,6 @@ export class UiDatepickerHarness extends UiHarness {
 
   private readonly input = this.locatorFor('.ui-datepicker__input');
   private readonly toggle = this.locatorFor('.ui-datepicker__toggle');
-  private readonly panel =
-    this.documentRootLocatorFactory().locatorForOptional('.ui-datepicker__panel');
 
   static with<T extends UiDatepickerHarness>(
     this: ComponentHarnessConstructor<T>,
@@ -88,28 +86,25 @@ export class UiDatepickerHarness extends UiHarness {
   /** Picks the day in the calendar, paging through the months to reach it. The dialog closes. */
   async pick(date: Date): Promise<void> {
     await this.open();
-    await this.requirePanel();
-    await this.clickDay(date);
+    await this.clickDay(await this.requirePanel(), date);
   }
 
   /** Clicks "Today" in the calendar dialog. Opens the dialog. */
   async clickToday(): Promise<void> {
     await this.open();
-    await this.requirePanel();
+    const panel = await this.requirePanel();
     await (
-      await this.documentRootLocatorFactory().locatorFor(
-        '.ui-datepicker__panel .ui-datepicker__today',
-      )()
+      await this.documentRootLocatorFactory().locatorFor(`${panel} .ui-datepicker__today`)()
     ).click();
   }
 
   /** Clicks "Clear" in the calendar dialog, which empties the field. Opens the dialog. */
   async clickClear(): Promise<void> {
     await this.open();
-    await this.requirePanel();
+    const panel = await this.requirePanel();
     // "Clear" is shown only while the field has text.
     const button = await this.documentRootLocatorFactory().locatorForOptional(
-      '.ui-datepicker__panel .ui-datepicker__footer button:not(.ui-datepicker__today)',
+      `${panel} .ui-datepicker__clear`,
     )();
     if (!button) throw Error('The date picker has nothing to clear.');
     await button.click();
@@ -132,26 +127,33 @@ export class UiDatepickerHarness extends UiHarness {
     return (await (await this.input()).getAttribute('aria-invalid')) === 'true';
   }
 
-  private async requirePanel(): Promise<TestElement> {
-    const panel = await this.panel();
-    if (!panel) throw Error('The date picker calendar is not open.');
-    return panel;
+  /**
+   * Selector of this picker's open calendar: the dialog that `aria-controls` of its button names
+   * (other pickers may have their calendars open too).
+   */
+  private async requirePanel(): Promise<string> {
+    const id = await (await this.toggle()).getAttribute('aria-controls');
+    const selector = `[id="${id}"]`;
+    if (!id || !(await this.documentRootLocatorFactory().locatorForOptional(selector)())) {
+      throw Error('The date picker calendar is not open.');
+    }
+    return selector;
   }
 
-  private async clickDay(date: Date): Promise<void> {
+  private async clickDay(panel: string, date: Date): Promise<void> {
     const root = this.documentRootLocatorFactory();
     const key = dayKey(date);
     for (let page = 0; page < MAX_PAGES; page++) {
-      const cell = await root.locatorForOptional(`.ui-datepicker__panel td[data-date="${key}"]`)();
+      const cell = await root.locatorForOptional(`${panel} td[data-date="${key}"]`)();
       if (cell) {
         await cell.click();
         return;
       }
-      const shown = await root.locatorFor('.ui-datepicker__panel td[data-date]')();
+      const shown = await root.locatorFor(`${panel} td[data-date]`)();
       const first = (await shown.getAttribute('data-date')) ?? key;
       const label = key < first ? 'previousMonth' : 'nextMonth';
       const button = await root.locatorForOptional(
-        `.ui-datepicker__panel .ui-calendar__header button[data-nav="${label}"]`,
+        `${panel} .ui-calendar__header button[data-nav="${label}"]`,
       )();
       if (!button || (await button.getAttribute('aria-disabled')) === 'true') break;
       await button.click();

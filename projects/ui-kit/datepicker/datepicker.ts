@@ -113,6 +113,7 @@ interface Draft {
         [label]="labels().chooseDate"
         [disabled]="isDisabled() || readonly()"
         [attr.aria-expanded]="isOpen()"
+        [attr.aria-controls]="isOpen() ? panelId() : null"
         (click)="toggle()"
       >
         <ui-icon [icon]="calendarIcon" />
@@ -133,6 +134,7 @@ interface Draft {
         #panel
         class="ui-datepicker__panel"
         role="dialog"
+        [id]="panelId()"
         aria-modal="true"
         cdkTrapFocus
         [attr.aria-label]="labels().chooseDate"
@@ -147,7 +149,13 @@ interface Draft {
         />
         <div class="ui-datepicker__footer">
           @if (text()) {
-            <button ui-button variant="ghost" size="sm" (click)="onClear()">
+            <button
+              ui-button
+              variant="ghost"
+              size="sm"
+              class="ui-datepicker__clear"
+              (click)="onClear()"
+            >
               {{ labels().clear }}
             </button>
           }
@@ -237,6 +245,8 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
+  /** The calendar dialog, named by `aria-controls` of the button while it is open. */
+  protected readonly panelId = computed(() => `${this.id()}-panel`);
 
   private readonly locale = computed(() => this.labels().locale);
   protected readonly hint = computed(() => formatHint(this.locale()));

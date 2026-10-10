@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, viewChildren } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -20,6 +20,19 @@ import { UiDatepickerHarness } from './datepicker-harness';
 class Host {
   readonly signing = new FormControl<Date | null>(new Date(2026, 8, 20), Validators.required);
   readonly max = new Date(2027, 0, 31);
+}
+
+@Component({
+  imports: [ReactiveFormsModule, UiDatepicker],
+  template: `
+    <ui-datepicker aria-label="Start" [formControl]="start" />
+    <ui-datepicker aria-label="End" [formControl]="end" />
+  `,
+})
+class TwoPickers {
+  readonly pickers = viewChildren(UiDatepicker);
+  readonly start = new FormControl<Date | null>(new Date(2026, 8, 1));
+  readonly end = new FormControl<Date | null>(new Date(2026, 8, 5));
 }
 
 describe('UiDatepickerHarness', () => {
@@ -93,6 +106,32 @@ describe('UiDatepickerHarness', () => {
     expect(host.signing.value).toBeNull();
     expect(await signing.getText()).toBe('');
     expect(await signing.isOpen()).toBe(false);
+  });
+
+  it('acts on its own calendar while another picker is open', async () => {
+    TestBed.resetTestingModule();
+    const fixture = TestBed.createComponent(TwoPickers);
+    const pickers = fixture.componentInstance;
+    const two = TestbedHarnessEnvironment.loader(fixture);
+    const [start, end] = pickers.pickers();
+    start.open();
+    end.open();
+    fixture.detectChanges();
+
+    const endHarness = await two.getHarness(UiDatepickerHarness.with({ label: 'End' }));
+    await endHarness.clickToday();
+    expect(pickers.end.value).toEqual(new Date(2026, 8, 25));
+    expect(pickers.start.value).toEqual(new Date(2026, 8, 1));
+
+    start.open();
+    fixture.detectChanges();
+    await endHarness.clickClear();
+    expect(pickers.end.value).toBeNull();
+    expect(pickers.start.value).toEqual(new Date(2026, 8, 1));
+
+    await endHarness.pick(new Date(2026, 8, 10));
+    expect(pickers.end.value).toEqual(new Date(2026, 8, 10));
+    expect(pickers.start.value).toEqual(new Date(2026, 8, 1));
   });
 
   it('does not open a disabled picker', async () => {
