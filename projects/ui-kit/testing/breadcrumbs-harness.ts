@@ -1,6 +1,5 @@
 import {
   BaseHarnessFilters,
-  ComponentHarness,
   ComponentHarnessConstructor,
   HarnessPredicate,
 } from '@angular/cdk/testing';
@@ -16,7 +15,7 @@ export interface UiBreadcrumbHarnessFilters extends BaseHarnessFilters {
 }
 
 /** A link of `nav[ui-breadcrumbs]`. Get it from `UiBreadcrumbsHarness.getItems()`. */
-export class UiBreadcrumbHarness extends ComponentHarness {
+export class UiBreadcrumbHarness extends UiHarness {
   static hostSelector = '.ui-breadcrumb';
 
   static with<T extends UiBreadcrumbHarness>(

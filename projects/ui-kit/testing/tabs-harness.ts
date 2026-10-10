@@ -1,6 +1,5 @@
 import {
   BaseHarnessFilters,
-  ComponentHarness,
   ComponentHarnessConstructor,
   HarnessPredicate,
 } from '@angular/cdk/testing';
@@ -110,7 +109,7 @@ export interface UiTabLinkHarnessFilters extends BaseHarnessFilters {
 }
 
 /** A link of `nav[ui-tab-nav]`. Get it from `UiTabNavHarness.getLinks()`. */
-export class UiTabLinkHarness extends ComponentHarness {
+export class UiTabLinkHarness extends UiHarness {
   static hostSelector = '.ui-tab-link';
 
   static with<T extends UiTabLinkHarness>(
