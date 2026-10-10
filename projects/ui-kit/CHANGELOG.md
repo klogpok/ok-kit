@@ -77,6 +77,10 @@ so versions mark review points rather than releases.
   `ui-container` (centered, up to `--ui-layout-container-max-width`, 80rem), with gap
   modifiers `ui-gap-3xs` … `ui-gap-3xl` (md by default), and the mixins `ui.stack($gap)`,
   `ui.cluster($gap)`, `ui.grid($min, $gap)` and `ui.container()`. Story Foundations/Layout.
+- **testing:** navigation harnesses `UiAccordionHarness` (+ `UiAccordionItemHarness`),
+  `UiBreadcrumbsHarness` (+ `UiBreadcrumbHarness`, which reads collapsed links too),
+  `UiPaginationHarness` (current page, page size, moving between pages), `UiTabGroupHarness`
+  (+ `UiTabHarness`) and `UiTabNavHarness` (+ `UiTabLinkHarness`).
 - **testing:** overlay harnesses that find their content from the document root:
   `UiMenuHarness` (+ `UiMenuItemHarness`), `UiPopoverHarness`, `UiTooltipHarness` and
   `UiToastHarness`. The popover and tooltip triggers get the classes `ui-popover-trigger` and
