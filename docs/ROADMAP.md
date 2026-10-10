@@ -244,6 +244,21 @@
 > - `time-input` получил `skipPredicate` по `ɵdisabled`: стандартный предикат CDK читает `disabled`.
 >
 > Вопросы для решения: тикеты 25 (`getLabel`), 26 (смысл `--ui-spinner-stroke-width`), 27 (сдвинутый popover под левой полосой в RTL-iframe).
+>
+> **Статус (2026-10-10): 9.2 (брейкпоинты и density) сделана, ждёт одобрения.** Тикеты 08, 09, 10 и 28 (ответ на тикет 27). Коммиты: `feat(tokens)` (брейкпоинты: `$breakpoints`, `ui.up()`/`ui.down()`, `UI_BREAKPOINTS` в core), `feat(datepicker)` (два месяца от md), `feat(tokens)` + `feat(storybook)` (compact density, переключатель Density в тулбаре, «Foundations/Density»), `feat(table)` (`density` по умолчанию `undefined`, таблица следует области), `fix(popover)` (сдвиг у края держит отступ 8 px), `chore(visual)` ×5; по код-ревью: `chore(lint)`, `feat(tokens)` (compact-область заново объявляет `--ui-table-cell-padding-block`), `refactor(popover)` (обёртка над стратегией CDK вместо подкласса, геометрия в `core/overlay.ts`), `feat(tokens)` (таблица density в README и compact-значения в `UI_TOKENS` из генератора), `docs(readme)`; по проверке в браузере: `fix(storybook)` (истории Density не зависят от density в тулбаре).
+>
+> Значения compact: высота контролов sm/md/lg 1.75/2/2.5rem; padding-inline 0.5/0.625/0.75rem; gap 0.25/0.375/0.5rem; отступ ячейки таблицы по блоку — compact-значение таблицы. Шрифты и `--ui-space-*` не меняются.
+>
+> Проверки: полный чеклист зелёный. 845 unit-тестов (+11), coverage 98.32/81.48/93.31/98.32; 300 stories × 3 режима без нарушений axe (+6); 900 снимков (+18; изменён `foundations-tokens--component-tokens` — новая строка токена); ngc без ошибок; бюджеты playground без предупреждений. Браузер (Edge, light/dark, RTL/LTR, density из тулбара): контролы, option, menu, tree, segmented, календарь, tabs, pagination и таблица уменьшаются, шрифты прежние, обрезаний и наложений нет; date-range-picker: один месяц до 831px, два от 832px; popover у начального и конечного края держит 8 px, в том числе в RTL-iframe с левой полосой.
+>
+> Отклонения от спеки:
+> - «Foundations/Density» — четыре истории (`Controls`, `Table`, `OpenListDefault`, `OpenListCompact`), а не одна: overlay получает compact только через корень, поэтому открытый список в compact — отдельная история; таблица отдельно, чтобы не менять снимки контролов. Истории закрепляют density сами и не следуют тулбару.
+> - Таблица: новый токен `--ui-table-cell-padding-block-default`; генератор теперь разрешает ссылку component-токена на токен того же компонента (правило в README).
+> - `table.spec.ts` проверяет классы `ui-table--*`: Vitest не загружает CSS. Поведение в области проверяет play-функция истории `Table` (отступы 12/6/12/6 px).
+> - Popover сдвигается своей обёрткой над стратегией CDK (тикет 28), а не отступом стратегии, как предлагал тикет: отступ стратегии CDK не учитывает левую полосу.
+> - Генерируемый `_breakpoints.scss` исключён из stylelint, как `_tokens.scss`.
+>
+> Вопросы для решения: тикеты 29 (сброс переопределений внутри области density), 30 (возврат к обычной плотности внутри compact), 31 (собственный сдвиг только у popover или и у tooltip).
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**
