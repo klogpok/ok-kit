@@ -3940,6 +3940,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-table-cell-padding-block",
     "layer": "component",
+    "light": "var(--ui-table-cell-padding-block-default)",
+    "dark": "var(--ui-table-cell-padding-block-default)"
+  },
+  {
+    "name": "--ui-table-cell-padding-block-default",
+    "layer": "component",
     "light": "var(--ui-space-md)",
     "dark": "var(--ui-space-md)"
   },

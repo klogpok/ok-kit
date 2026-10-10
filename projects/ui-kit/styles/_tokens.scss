@@ -805,7 +805,8 @@
   --ui-table-scroll-shadow: var(--ui-color-backdrop);
   --ui-table-scroll-shadow-size: var(--ui-space-md);
   --ui-table-cell-padding-inline: var(--ui-space-md);
-  --ui-table-cell-padding-block: var(--ui-space-md);
+  --ui-table-cell-padding-block: var(--ui-table-cell-padding-block-default);
+  --ui-table-cell-padding-block-default: var(--ui-space-md);
   --ui-table-cell-padding-block-compact: var(--ui-space-xs);
   --ui-table-message-padding: var(--ui-space-2xl);
   --ui-table-message-text: var(--ui-color-text-muted);
@@ -926,4 +927,9 @@
   --ui-control-gap-sm: var(--ui-ref-space-1);
   --ui-control-gap-md: var(--ui-ref-space-1-5);
   --ui-control-gap-lg: var(--ui-ref-space-2);
+}
+
+[data-density='compact'],
+[data-density='compact'] :is([data-theme], .ui-theme-scope) {
+  --ui-table-cell-padding-block: var(--ui-table-cell-padding-block-compact);
 }

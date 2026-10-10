@@ -545,8 +545,9 @@ its values:
 
 Component tokens that alias a control height (select options, menu items, tree nodes, calendar
 cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not
-change, so a compact region does not reflow the layout around its controls. Table cells use the
-compact block padding (`--ui-table-cell-padding-block-compact`) unless the table sets `density`.
+change, so a compact region does not reflow the layout around its controls. The region also
+re-declares `--ui-table-cell-padding-block` with the compact table padding
+(`--ui-table-cell-padding-block-compact`), so table cells follow unless the table sets `density`.
 
 ```html
 <aside class="filters" data-density="compact">…</aside>
@@ -1709,7 +1710,8 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-scroll-shadow`                 | component | `var(--ui-color-backdrop)`                                                   | `var(--ui-color-backdrop)`                                             |
 | `--ui-table-scroll-shadow-size`            | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-inline`           | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
-| `--ui-table-cell-padding-block`            | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
+| `--ui-table-cell-padding-block`            | component | `var(--ui-table-cell-padding-block-default)`                                 | `var(--ui-table-cell-padding-block-default)`                           |
+| `--ui-table-cell-padding-block-default`    | component | `var(--ui-space-md)`                                                         | `var(--ui-space-md)`                                                   |
 | `--ui-table-cell-padding-block-compact`    | component | `var(--ui-space-xs)`                                                         | `var(--ui-space-xs)`                                                   |
 | `--ui-table-message-padding`               | component | `var(--ui-space-2xl)`                                                        | `var(--ui-space-2xl)`                                                  |
 | `--ui-table-message-text`                  | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
@@ -1859,7 +1861,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
    - No `!important`, no `::ng-deep`.
    - Private per-component variables use the `--_name` form.
    - Stylelint enforces these rules.
-   - New component tokens go into `tokens.json` → `component.<name>`, and reference semantic tokens. A unitless multiplier with no semantic counterpart (a scale, a ratio) may be a literal.
+   - New component tokens go into `tokens.json` → `component.<name>`, and reference semantic tokens or another token of the same component. A token with a compact value of its own goes into `component-compact`. A unitless multiplier with no semantic counterpart (a scale, a ratio) may be a literal.
 6. For a form control, extend `UiFormControlBase` (from `@vplans/ui-kit/core`) and provide both `UI_FORM_FIELD_CONTROL` and `NG_VALUE_ACCESSOR`, each `useExisting` and pointing at the component itself:
 
    ```ts

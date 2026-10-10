@@ -122,13 +122,27 @@ export const Table: Story = {
       const cell = canvasElement.querySelector(`[data-testid="${name}"] td`);
       return cell ? parseFloat(getComputedStyle(cell).paddingBlockStart) : 0;
     };
+    // The region itself re-declares the token, so cells styled from it anywhere follow too.
+    const regionToken = (name: string): string =>
+      getComputedStyle(canvasElement.querySelector(`[data-testid="${name}"]`)!.parentElement!)
+        .getPropertyValue('--ui-table-cell-padding-block')
+        .trim();
     await until(() => padding('default') > 0, 'the tables did not render');
     await expect({
       default: padding('default'),
       compact: padding('compact'),
       defaultInCompact: padding('compact-default'),
       compactInDefault: padding('default-compact'),
-    }).toEqual({ default: 12, compact: 6, defaultInCompact: 12, compactInDefault: 6 });
+      defaultRegionToken: regionToken('default'),
+      compactRegionToken: regionToken('compact'),
+    }).toEqual({
+      default: 12,
+      compact: 6,
+      defaultInCompact: 12,
+      compactInDefault: 6,
+      defaultRegionToken: '0.75rem',
+      compactRegionToken: '0.375rem',
+    });
   },
 };
 

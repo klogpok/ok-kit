@@ -29,7 +29,9 @@ so versions mark review points rather than releases.
 - **table:** `density` defaults to `undefined` instead of `'default'`: a table without the input
   follows its region and gets compact rows inside `data-density="compact"`. The
   `ui-table--default` class is set only for an explicit `density="default"`; bind it to keep a
-  table at default density inside a compact region.
+  table at default density inside a compact region. A `[data-density='compact']` region
+  re-declares `--ui-table-cell-padding-block` (new `--ui-table-cell-padding-block-default` holds
+  the default), and an explicit `density` re-declares it on the table.
 
 ### Added
 
