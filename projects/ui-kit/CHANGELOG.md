@@ -57,6 +57,10 @@ so versions mark review points rather than releases.
 - **tooltip:** `provideUiTooltip({ position, showDelay, hideDelay })` sets app-wide tooltip
   defaults over the built-in `top` / 300 / 100; an input on the tooltip wins. Also exported:
   `UI_TOOLTIP_DEFAULT_OPTIONS` and `UiTooltipDefaults`.
+- **tokens:** compact density. `data-density="compact"` on any element makes its controls shorter
+  (sm/md/lg 1.75/2/2.5rem) with one step less inline padding and gap; options, menu items and
+  tree nodes follow. On `<html>` it also reaches overlays. `[data-density]` joins
+  `ui.$theme-scopes`. Storybook has a Density toolbar switch and a Foundations/Density story.
 
 ### Fixed
 

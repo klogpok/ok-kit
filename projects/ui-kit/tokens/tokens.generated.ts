@@ -578,6 +578,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "1.5rem"
   },
   {
+    "name": "--ui-ref-size-7",
+    "layer": "primitive",
+    "light": "1.75rem",
+    "dark": "1.75rem"
+  },
+  {
     "name": "--ui-ref-size-8",
     "layer": "primitive",
     "light": "2rem",

@@ -2,5 +2,6 @@
 @forward 'mixins';
 
 /// Elements that re-declare the component tokens. Override component tokens on all of them, or
-/// a nested [data-theme] / .ui-theme-scope resets them: `#{ui.$theme-scopes} { ... }`.
-$theme-scopes: ':root, [data-theme], .ui-theme-scope';
+/// a nested [data-theme] / [data-density] / .ui-theme-scope resets them:
+/// `#{ui.$theme-scopes} { ... }`.
+$theme-scopes: ':root, [data-theme], [data-density], .ui-theme-scope';
