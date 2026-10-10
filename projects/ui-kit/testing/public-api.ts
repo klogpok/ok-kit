@@ -13,4 +13,5 @@ export * from './date-range-picker-harness';
 export * from './time-input-harness';
 export * from './stepper-harness';
 export * from './segmented-harness';
+export * from './table-harness';
 export * from './tree-harness';

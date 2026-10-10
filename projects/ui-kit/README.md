@@ -1188,6 +1188,9 @@ so they keep working when that DOM changes.
 | `UiDateRangePickerHarness`   | `ui-date-range-picker` (fields, calendar, presets)          | `label`, `disabled`                                               |
 | `UiSegmentedHarness`         | `ui-segmented` (segments: `UiSegmentHarness`)               | `label`, `disabled`, `orientation`                                |
 | `UiSegmentHarness`           | a segment (from `UiSegmentedHarness.getSegments()`)         | `text`, `selected`, `disabled`                                    |
+| `UiTableHarness`             | `table[ui-table]` (rows: `UiTableRowHarness`)               | `label` (caption or `aria-label`)                                 |
+| `UiTableRowHarness`          | a data row (from `UiTableHarness.getRows()`)                | `cells` (text by column), `selected`, `expanded`                  |
+| `UiTableCellHarness`         | a body cell (from `UiTableRowHarness.getCell()`)            | `text`                                                            |
 | `UiTreeHarness`              | `ui-tree` (nodes: `UiTreeNodeHarness`)                      | `label`, `disabled`                                               |
 | `UiTreeNodeHarness`          | a visible node (from `UiTreeHarness.getNodes()`)            | `text`, `level`, `expanded`, `selected`, `checkState`, `disabled` |
 | `UiButtonToggleGroupHarness` | `ui-button-toggle-group` (buttons: `UiButtonToggleHarness`) | `label`, `disabled`, `orientation`                                |
@@ -1201,6 +1204,12 @@ works (without the required marker). Every harness extends `UiHarness`: `focus()
 With `items` in a virtual scroll viewport, `getOptions()` of the select and autocomplete
 harnesses (and `clickOptions()` / `selectOption()`, which use it) finds only the rendered options. To reach another option, search for
 it or give the test fewer items than `virtualThreshold`.
+
+`UiTableHarness` reads cells by the text of their column header (`row.getCellText('Units')`,
+`getRow({ cells: { Name: 'Tower A' } })`), sorts with `sortBy()`, selects with `select()` and
+`selectAll()`, and expands rows with `expand()`. In a `uiTableViewport`, `getRows()` finds only
+the rendered rows and `getTotalRowCount()` reads the count of every row. Shift range selection
+is not available through the harness.
 
 ```ts
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
