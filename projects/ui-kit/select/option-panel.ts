@@ -43,9 +43,8 @@ export interface UiListEntry<T> extends Highlightable, UiOptionHandle {
   getLabel(): string;
   /** Disabled by the app, not blocked by the list. */
   isDisabled(): boolean;
-  filteredOut(): boolean;
   /** For the key manager: disabled or blocked. */
-  readonly disabled: boolean;
+  readonly ɵdisabled: boolean;
 }
 
 /** Height of an item option until a rendered one is measured. */
@@ -211,7 +210,7 @@ export abstract class UiOptionPanel<T, V>
     },
   });
   protected readonly noResults = computed(
-    () => !this.loading() && this.options().every((option) => option.filteredOut()),
+    () => !this.loading() && this.options().every((option) => this.isHidden(option)),
   );
 
   protected readonly keyManager = new ActiveDescendantKeyManager<UiListEntry<T>>(
@@ -222,7 +221,7 @@ export abstract class UiOptionPanel<T, V>
     .withHomeAndEnd()
     .withPageUpDown()
     .withTypeAhead()
-    .skipPredicate((option) => option.disabled || option.filteredOut());
+    .skipPredicate((option) => option.ɵdisabled || this.isHidden(option));
 
   constructor() {
     super();
@@ -311,6 +310,11 @@ export abstract class UiOptionPanel<T, V>
     return !label.toLocaleLowerCase().includes(query);
   }
 
+  /** Whether the search hides an option. */
+  protected isHidden(option: UiListEntry<T>): boolean {
+    return this.isFilteredOut(option.getLabel(), option);
+  }
+
   /** Whether a rendered option shows the active entry of `items`. */
   private isActiveItem(option: UiOptionHandle): boolean {
     const entry = this.activeEntry();
@@ -374,7 +378,7 @@ export abstract class UiOptionPanel<T, V>
   /** Selects the active option, if there is one that can be selected. Returns whether it did. */
   protected selectActive(): boolean {
     const active = this.keyManager.activeItem;
-    if (!active || active.disabled) return false;
+    if (!active || active.ɵdisabled) return false;
     this.pick(active.value());
     return true;
   }
@@ -395,7 +399,7 @@ export abstract class UiOptionPanel<T, V>
   protected activateResting(): boolean {
     const resting = this.restingEntry;
     this.restingEntry = null;
-    const index = resting && !resting.disabled ? this.listOptions().indexOf(resting) : -1;
+    const index = resting && !resting.ɵdisabled ? this.listOptions().indexOf(resting) : -1;
     if (index < 0) return false;
     this.keyManager.setActiveItem(index);
     return true;
@@ -404,7 +408,7 @@ export abstract class UiOptionPanel<T, V>
   private activateSelected(activate: boolean): void {
     // Keys pressed before the list rendered have already moved the active option.
     if (this.keyManager.activeItem) return;
-    const first = this.selectedOptions().find((option) => !option.disabled);
+    const first = this.selectedOptions().find((option) => !option.ɵdisabled);
     const index = first ? this.listOptions().indexOf(first) : -1;
     if (!activate) {
       if (index < 0) return;
@@ -416,9 +420,9 @@ export abstract class UiOptionPanel<T, V>
 
   /** Id of a rendered option; `null` while an item is not rendered. */
   private idOf(entry: UiListEntry<T> | null): string | null {
-    if (entry instanceof UiOption) return entry.id;
+    if (entry instanceof UiOption) return entry.ɵid;
     if (!entry) return null;
-    return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.id ?? null;
+    return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.ɵid ?? null;
   }
 
   /** Scrolls an option into view; in the viewport it may not be rendered yet. */
