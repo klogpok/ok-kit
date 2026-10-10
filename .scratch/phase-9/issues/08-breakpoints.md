@@ -6,13 +6,13 @@
 
 **Blocked by:** 07 (Phase 9.1 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The breakpoints live in the token source; the generator emits the SCSS map, the mixins and the TypeScript constant; no CSS custom properties
-- [ ] `up(md)` and `down(md)` do not overlap at the boundary
-- [ ] The mixins are available through the kit's SCSS API, and the constant is exported from core
-- [ ] The date-range-picker uses the md constant; its spec covers one and two months
-- [ ] README and CHANGELOG document the breakpoints
+- [x] The breakpoints live in the token source; the generator emits the SCSS map, the mixins and the TypeScript constant; no CSS custom properties
+- [x] `up(md)` and `down(md)` do not overlap at the boundary
+- [x] The mixins are available through the kit's SCSS API, and the constant is exported from core
+- [x] The date-range-picker uses the md constant; its spec covers one and two months
+- [x] README and CHANGELOG document the breakpoints
 
 ## Русский перевод
 
@@ -24,10 +24,10 @@
 
 **Заблокировано:** 07 (Отчёт подфазы 9.1)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Брейкпоинты лежат в источнике токенов; генератор выдаёт SCSS-map, миксины и TypeScript-константу; без CSS custom properties
-- [ ] `up(md)` и `down(md)` не пересекаются на границе
-- [ ] Миксины доступны через SCSS API кита, константа экспортируется из core
-- [ ] Date-range-picker использует константу md; его спек покрывает один и два месяца
-- [ ] README и CHANGELOG описывают брейкпоинты
+- [x] Брейкпоинты лежат в источнике токенов; генератор выдаёт SCSS-map, миксины и TypeScript-константу; без CSS custom properties
+- [x] `up(md)` и `down(md)` не пересекаются на границе
+- [x] Миксины доступны через SCSS API кита, константа экспортируется из core
+- [x] Date-range-picker использует константу md; его спек покрывает один и два месяца
+- [x] README и CHANGELOG описывают брейкпоинты
