@@ -55,7 +55,7 @@ const PEOPLE = [
   template: `
     <ui-dialog-header><h2 ui-dialog-title>Tower B, floor 4</h2></ui-dialog-header>
     <ui-dialog-content>
-      <div class="stack">
+      <div class="ui-stack ui-gap-lg drawer-body">
         <ui-badge tone="warning">ממתין לחתימה</ui-badge>
         <ui-form-field label="Signing date"><ui-datepicker /></ui-form-field>
       </div>
@@ -66,10 +66,8 @@ const PEOPLE = [
     </ui-dialog-actions>
   `,
   styles: `
-    .stack {
-      display: grid;
-      gap: var(--ui-space-lg);
-      justify-items: start;
+    .drawer-body {
+      align-items: start;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

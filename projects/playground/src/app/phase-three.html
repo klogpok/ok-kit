@@ -2,7 +2,7 @@
 
 <section aria-labelledby="plans-table-title">
   <h3 id="plans-table-title" class="ui-heading-4">Plans table</h3>
-  <div class="row">
+  <div class="ui-cluster">
     <button ui-button variant="secondary" [loading]="loading()" (click)="reload()">Reload</button>
     <ui-switch [(checked)]="empty">No results</ui-switch>
   </div>
@@ -82,7 +82,7 @@
   </ng-template>
 </section>
 
-<div class="grid">
+<div class="ui-grid ui-gap-xl">
   <section aria-labelledby="schedule-title" [formGroup]="schedule">
     <h3 id="schedule-title" class="ui-heading-4">Schedule a meeting (Reactive Forms)</h3>
     <ui-form-field label="Recipients">

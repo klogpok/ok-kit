@@ -14,25 +14,6 @@ header {
   margin-block-end: var(--ui-space-2xl);
 }
 
-.toolbar,
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-sm);
-  align-items: center;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: var(--ui-space-xl);
-}
-
-.stack {
-  display: grid;
-  gap: var(--ui-space-lg);
-}
-
 section {
   display: grid;
   gap: var(--ui-space-lg);

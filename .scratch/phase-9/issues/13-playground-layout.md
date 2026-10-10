@@ -6,10 +6,10 @@
 
 **Blocked by:** 12 (Layout utilities)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The playground defines no local `.row`, `.toolbar`, `.stack` or `.grid`
-- [ ] The playground builds within its budgets and looks the same in the browser in light, dark and RTL
+- [x] The playground defines no local `.row`, `.toolbar`, `.stack` or `.grid`
+- [x] The playground builds within its budgets and looks the same in the browser in light, dark and RTL
 
 ## Русский перевод
 
@@ -21,7 +21,7 @@
 
 **Заблокировано:** 12 (Layout-утилиты)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Playground не определяет локальных `.row`, `.toolbar`, `.stack` или `.grid`
-- [ ] Playground собирается в рамках бюджетов и выглядит так же в браузере в light, dark и RTL
+- [x] Playground не определяет локальных `.row`, `.toolbar`, `.stack` или `.grid`
+- [x] Playground собирается в рамках бюджетов и выглядит так же в браузере в light, dark и RTL
