@@ -83,4 +83,14 @@ describe('UiAlertHarness', () => {
     expect(host.shown()).toBe(false);
     expect(await loader.getAllHarnesses(UiAlertHarness)).toHaveLength(2);
   });
+
+  it('says so when the element has no tone class', async () => {
+    const bare = TestbedHarnessEnvironment.loader(TestBed.createComponent(BareAlert));
+    await expect((await bare.getHarness(UiAlertHarness)).getTone()).rejects.toThrow(
+      'no tone class',
+    );
+  });
 });
+
+@Component({ template: '<div class="ui-alert">Not a ui-alert</div>' })
+class BareAlert {}

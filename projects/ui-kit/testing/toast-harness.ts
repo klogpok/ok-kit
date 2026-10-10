@@ -5,7 +5,7 @@ import {
 } from '@angular/cdk/testing';
 import type { UiToastTone } from '@vplans/ui-kit/toast';
 import { UiHarness } from './harness';
-import { uiModifier } from './modifier';
+import { uiRequiredModifier } from './modifier';
 
 export interface UiToastHarnessFilters extends BaseHarnessFilters {
   message?: string | RegExp;
@@ -47,7 +47,7 @@ export class UiToastHarness extends UiHarness {
   }
 
   async getTone(): Promise<UiToastTone> {
-    return (await uiModifier(await this.host(), 'ui-toast--', TONES))!;
+    return uiRequiredModifier(await this.host(), 'ui-toast--', TONES, 'tone');
   }
 
   /** Label of the action button; `''` without one. */

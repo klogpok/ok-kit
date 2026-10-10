@@ -6,7 +6,7 @@ import {
 import type { UiAlertLive, UiAlertTone } from '@vplans/ui-kit/alert';
 import { UiButtonHarness, UiButtonHarnessFilters } from './button-harness';
 import { UiHarness } from './harness';
-import { uiModifier } from './modifier';
+import { uiRequiredModifier } from './modifier';
 
 export interface UiAlertHarnessFilters extends BaseHarnessFilters {
   /** The projected message (without the title and the actions). */
@@ -39,7 +39,7 @@ export class UiAlertHarness extends UiHarness {
   }
 
   async getTone(): Promise<UiAlertTone> {
-    return (await uiModifier(await this.host(), 'ui-alert--', TONES))!;
+    return uiRequiredModifier(await this.host(), 'ui-alert--', TONES, 'tone');
   }
 
   /** The bold first line, or `''`. */

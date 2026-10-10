@@ -64,4 +64,14 @@ describe('UiToastHarness', () => {
     expect(reasons).toEqual(['action', 'close']);
     expect(await loader.getAllHarnesses(UiToastHarness)).toEqual([]);
   });
+
+  it('says so when the element has no tone class', async () => {
+    const bare = TestbedHarnessEnvironment.loader(TestBed.createComponent(BareToast));
+    await expect((await bare.getHarness(UiToastHarness)).getTone()).rejects.toThrow(
+      'no tone class',
+    );
+  });
 });
+
+@Component({ template: '<div class="ui-toast">Not a toast</div>' })
+class BareToast {}
