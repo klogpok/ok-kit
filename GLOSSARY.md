@@ -31,3 +31,17 @@ _Avoid_: indeterminate (except for the native checkbox property), mixed
 **Selected node**:
 The one node chosen in single selection.
 _Avoid_: active node, current node
+
+## Layout
+
+**Density**:
+How tightly the controls of a page region are packed: default or compact. It applies to a region and every control in it.
+_Avoid_: size (for a region), compact mode
+
+**Size**:
+The sm, md or lg scale of one control, chosen on that control.
+_Avoid_: density (for one control)
+
+**Breakpoint**:
+A named viewport width (sm, md, lg, xl) at which a layout changes.
+_Avoid_: screen size, media size
