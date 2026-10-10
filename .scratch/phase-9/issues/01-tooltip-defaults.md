@@ -6,11 +6,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `provideUiTooltip` is exported from the tooltip entry point and takes partial defaults over the built-in ones
-- [ ] A spec shows that the provider changes the default and that a bound input overrides it
-- [ ] README (tooltip section) and CHANGELOG mention the provider
+- [x] `provideUiTooltip` is exported from the tooltip entry point and takes partial defaults over the built-in ones
+- [x] A spec shows that the provider changes the default and that a bound input overrides it
+- [x] README (tooltip section) and CHANGELOG mention the provider
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** Нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] `provideUiTooltip` экспортируется из entry point tooltip и принимает частичные умолчания поверх встроенных
-- [ ] Спек показывает, что провайдер меняет умолчание, а привязанный вход его перекрывает
-- [ ] README (раздел tooltip) и CHANGELOG упоминают провайдер
+- [x] `provideUiTooltip` экспортируется из entry point tooltip и принимает частичные умолчания поверх встроенных
+- [x] Спек показывает, что провайдер меняет умолчание, а привязанный вход его перекрывает
+- [x] README (раздел tooltip) и CHANGELOG упоминают провайдер
