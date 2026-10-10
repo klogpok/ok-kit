@@ -6,11 +6,11 @@
 
 **Blocked by:** 14 (Phase 9.3 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Four harnesses on the `UiHarness` base, one commit each, each with its own spec
-- [ ] Overlay content is looked up from the document root
-- [ ] Exported from the testing entry point; README table and CHANGELOG updated
+- [x] Four harnesses on the `UiHarness` base, one commit each, each with its own spec
+- [x] Overlay content is looked up from the document root
+- [x] Exported from the testing entry point; README table and CHANGELOG updated
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** 14 (Отчёт подфазы 9.3)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Четыре harness на базе `UiHarness`, по коммиту на каждый, у каждого свой спек
-- [ ] Содержимое оверлеев ищется от корня документа
-- [ ] Экспортируются из entry point testing; таблица README и CHANGELOG обновлены
+- [x] Четыре harness на базе `UiHarness`, по коммиту на каждый, у каждого свой спек
+- [x] Содержимое оверлеев ищется от корня документа
+- [x] Экспортируются из entry point testing; таблица README и CHANGELOG обновлены
