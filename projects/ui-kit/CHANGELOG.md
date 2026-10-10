@@ -46,7 +46,9 @@ so versions mark review points rather than releases.
   `--ui-dialog-enter-scale`, `--ui-spinner-duration`, `--ui-spinner-duration-reduced-motion`,
   `--ui-skeleton-duration`, `--ui-progress-indeterminate-duration`, `--ui-table-busy-duration`.
 - **core:** overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`,
-  `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `sideOverlayPositions()` and `syncOverlayDirection()`.
+  `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `UiOverlaySide`, `sideOverlayPositions()` and
+  `syncOverlayDirection()`. `UiTooltipPosition` and `UiPopoverPosition` are aliases of
+  `UiOverlaySide`.
   Select, time input, datepicker, date-range-picker, tooltip, popover and toast use them; they
   open where they did before.
 - **pagination:** `provideUiPagination()` (with `UI_PAGINATION_DEFAULT_OPTIONS` and
