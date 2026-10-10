@@ -41,13 +41,17 @@ $gaps: 3xs, 2xs, xs, sm, md, lg, xl, 2xl, 3xl;
   align-items: center;
 }
 
-/// As many columns as fit, each at least `--ui-grid-min` (else `$min`: 20rem, the md container
-/// width) and never wider than the grid itself.
+/// As many columns as fit, each at least `--ui-grid-min` and never wider than the grid itself.
+/// Like the gap, the grid sets `--ui-grid-min` to `$min` (20rem, the md container width) on its
+/// own element, so neither a parent grid nor an ancestor's value reaches a nested grid; set the
+/// property on the grid element to change it.
 @mixin grid($min: var(--ui-container-width-md), $gap: md) {
   @include _gap($gap);
 
+  --ui-grid-min: #{$min};
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--ui-grid-min, #{$min}), 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--ui-grid-min), 100%), 1fr));
 }
 
 /// Page content centered up to the xl breakpoint (80rem) wide, with lg inline padding.

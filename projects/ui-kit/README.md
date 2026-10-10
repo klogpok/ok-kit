@@ -558,7 +558,8 @@ gap, so a nested layout does not inherit the modifier of its parent.
 </ul>
 ```
 
-`--ui-grid-min` can be set on the grid or on any ancestor. In component styles, use the mixins of
+Set `--ui-grid-min` on the grid element itself: each grid sets its own minimum, so a value on an
+ancestor or a parent grid does not reach it. In component styles, use the mixins of
 the same names. The gap takes a spacing name or any length:
 
 ```scss

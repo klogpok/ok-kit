@@ -138,6 +138,32 @@ export const Grid: Story = {
   },
 };
 
+/**
+ * Each grid sets its own `--ui-grid-min`: a nested `.ui-grid` keeps 20rem when its parent grid,
+ * or any ancestor, sets a smaller minimum.
+ */
+export const NestedGrid: Story = {
+  render: () => ({
+    template: `
+      <div style="max-inline-size:44rem;--ui-grid-min:6rem">
+        ${caption('ui-grid, --ui-grid-min: 10rem, with a nested ui-grid')}
+        <div class="ui-grid" data-testid="outer" style="--ui-grid-min:10rem">
+          ${tiles(4)}
+          <div class="ui-grid" data-testid="inner" style="grid-column:1/-1">${tiles(2)}</div>
+        </div>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    await rendered(canvasElement);
+    const columns = (id: string): number =>
+      getComputedStyle(byTestId(canvasElement, id)).gridTemplateColumns.split(' ').length;
+    await expect({ outer: columns('outer'), inner: columns('inner') }).toEqual({
+      outer: 4,
+      inner: 2,
+    });
+  },
+};
+
 /** `.ui-container` centers content up to 80rem wide, with lg inline padding. */
 export const Container: Story = {
   render: () => ({
