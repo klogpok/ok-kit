@@ -80,6 +80,10 @@ describe('UiPaginationHarness', () => {
 
     const comments = await loader.getHarness(UiPaginationHarness.with({ label: 'Comments pages' }));
     await expect(comments.goToLastPage()).rejects.toThrow('no first and last page buttons');
+    await expect(comments.goToFirstPage()).rejects.toThrow('no first and last page buttons');
+    await comments.goToNextPage();
+    expect(await comments.getCurrentPage()).toBe(2);
+    expect(await comments.isPreviousPageDisabled()).toBe(false);
   });
 
   it('changes the page size through its select', async () => {

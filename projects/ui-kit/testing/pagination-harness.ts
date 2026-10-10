@@ -15,13 +15,11 @@ export interface UiPaginationHarnessFilters extends BaseHarnessFilters {
 
 /**
  * Harness for `ui-pagination`. Pages are 1-based, as the user sees them. The arrow buttons are
- * found by their place, so the harness works with any labels.
+ * found by their classes, so the harness works with any labels.
  */
 export class UiPaginationHarness extends UiHarness {
   static hostSelector = '.ui-pagination';
 
-  /** First (optional), previous, next and last (optional) buttons, in this order. */
-  private readonly arrows = this.locatorForAll('.ui-pagination__pages > .ui-button');
   private readonly pageButtons = this.locatorForAll('.ui-pagination__page');
   private readonly sizeSelect = this.locatorForOptional(UiSelectHarness);
 
@@ -61,7 +59,11 @@ export class UiPaginationHarness extends UiHarness {
     return (await (await this.locatorFor('.ui-pagination__range')()).text()).trim();
   }
 
-  /** The value of the page size select, or `null` when there is no select. */
+  /**
+   * The value of the page size select, or `null` when there is no select. Without the select the
+   * user sees no page size: the range text ("1–10 of 95") is not one on the last page, so read
+   * `getRangeText()` instead.
+   */
   async getPageSize(): Promise<number | null> {
     const select = await this.sizeSelect();
     return select ? Number(await select.getValueText()) : null;
@@ -114,17 +116,12 @@ export class UiPaginationHarness extends UiHarness {
   }
 
   async isDisabled(): Promise<boolean> {
-    const page = await this.locatorFor('.ui-pagination__page')();
-    return page.getProperty<boolean>('disabled');
+    return (await this.host()).hasClass('ui-pagination--disabled');
   }
 
   private async arrow(which: 'first' | 'previous' | 'next' | 'last'): Promise<TestElement> {
-    const arrows = await this.arrows();
-    const withFirstLast = arrows.length === 4;
-    if (!withFirstLast && (which === 'first' || which === 'last')) {
-      throw Error('The paginator has no first and last page buttons.');
-    }
-    const order = withFirstLast ? ['first', 'previous', 'next', 'last'] : ['previous', 'next'];
-    return arrows[order.indexOf(which)];
+    const arrow = await this.locatorForOptional(`.ui-pagination__${which}`)();
+    if (!arrow) throw Error('The paginator has no first and last page buttons.');
+    return arrow;
   }
 }

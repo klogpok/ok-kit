@@ -127,6 +127,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
       @if (showFirstLast()) {
         <button
           ui-icon-button
+          class="ui-pagination__first"
           size="sm"
           [label]="labels().firstPage"
           [disabled]="disabled() || isFirst()"
@@ -137,6 +138,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
       }
       <button
         ui-icon-button
+        class="ui-pagination__previous"
         size="sm"
         [label]="labels().previousPage"
         [disabled]="disabled() || isFirst()"
@@ -165,6 +167,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
 
       <button
         ui-icon-button
+        class="ui-pagination__next"
         size="sm"
         [label]="labels().nextPage"
         [disabled]="disabled() || isLast()"
@@ -175,6 +178,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
       @if (showFirstLast()) {
         <button
           ui-icon-button
+          class="ui-pagination__last"
           size="sm"
           [label]="labels().lastPage"
           [disabled]="disabled() || isLast()"
@@ -189,6 +193,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'ui-pagination',
+    '[class.ui-pagination--disabled]': 'disabled()',
     role: 'navigation',
     '[attr.aria-label]': 'ariaLabel() || labels().pagination',
   },
