@@ -2,6 +2,7 @@ import {
   BaseHarnessFilters,
   ComponentHarnessConstructor,
   HarnessPredicate,
+  TestElement,
   TestKey,
 } from '@angular/cdk/testing';
 import { UiHarness } from './harness';
@@ -104,7 +105,7 @@ export class UiMenuHarness extends UiHarness {
     return (await this.host()).getAttribute('aria-controls');
   }
 
-  private async panel() {
+  private async panel(): Promise<TestElement | null> {
     const id = await this.panelId();
     return id ? this.documentRootLocatorFactory().locatorForOptional(`#${id}`)() : null;
   }

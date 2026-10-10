@@ -185,6 +185,7 @@ export class UiPopoverPanel {
   selector: '[uiPopoverTriggerFor]',
   exportAs: 'uiPopoverTrigger',
   host: {
+    class: 'ui-popover-trigger',
     'aria-haspopup': 'dialog',
     '[attr.aria-expanded]': 'isOpen()',
     '[attr.aria-controls]': 'isOpen() ? panelId : null',
