@@ -303,19 +303,49 @@ describe('UiDateRangePicker', () => {
 })
 class WideHost {}
 
+/** A `BreakpointObserver` for a viewport `rem` wide that understands `(min-width: Nrem)`. */
+function viewport(rem: number) {
+  const matches = (query: string) => {
+    const min = /^\(min-width: ([\d.]+)rem\)$/.exec(query);
+    if (!min) throw new Error(`Unexpected query ${query}`);
+    return rem >= Number(min[1]);
+  };
+  return {
+    provide: BreakpointObserver,
+    useValue: {
+      isMatched: matches,
+      observe: (query: string) => of({ matches: matches(query), breakpoints: {} }),
+    },
+  };
+}
+
+describe('UiDateRangePicker months by viewport', () => {
+  async function monthsAt(rem: number): Promise<number> {
+    TestBed.configureTestingModule({ providers: [viewport(rem)] });
+    const fixture = TestBed.createComponent(WideHost);
+    const root = fixture.nativeElement as HTMLElement;
+    document.body.appendChild(root);
+    await settle(fixture);
+    root.querySelector<HTMLButtonElement>('.ui-date-range-picker__toggle')!.click();
+    await settle(fixture);
+    const months = panel()!.querySelectorAll('table').length;
+    fixture.destroy();
+    root.remove();
+    return months;
+  }
+
+  it('shows one month below the md breakpoint (52rem)', async () => {
+    expect(await monthsAt(51.9)).toBe(1);
+  });
+
+  it('shows two months from the md breakpoint (52rem) up', async () => {
+    expect(await monthsAt(52)).toBe(2);
+  });
+});
+
 describe('UiDateRangePicker on wide screens', () => {
   it('shows two months and names the group by its aria-label', async () => {
-    TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: BreakpointObserver,
-          useValue: {
-            isMatched: () => true,
-            observe: () => of({ matches: true, breakpoints: {} }),
-          },
-        },
-      ],
-    });
+    TestBed.configureTestingModule({ providers: [viewport(80)] });
     const fixture = TestBed.createComponent(WideHost);
     const root = fixture.nativeElement as HTMLElement;
     document.body.appendChild(root);
