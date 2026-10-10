@@ -37,6 +37,9 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **pagination:** `provideUiPagination()` (with `UI_PAGINATION_DEFAULT_OPTIONS` and
+  `UiPaginationDefaults`) sets the page size, page size options, sibling count and first/last
+  buttons of every paginator; an input bound on a paginator wins.
 - **tooltip:** `provideUiTooltip({ position, showDelay, hideDelay })` sets app-wide tooltip
   defaults over the built-in `top` / 300 / 100; an input on the tooltip wins. Also exported:
   `UI_TOOLTIP_DEFAULT_OPTIONS` and `UiTooltipDefaults`.
