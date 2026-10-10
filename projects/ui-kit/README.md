@@ -1229,7 +1229,9 @@ works (without the required marker). Every harness extends `UiHarness`: `focus()
 The menu, popover and tooltip harnesses sit on the trigger, so the fixture's loader finds them;
 they find the menu, popover or tooltip from the document root. `getHarness()` of a popover loads
 harnesses inside the open popover. `UiTooltipHarness.show()` focuses the trigger from the
-keyboard, so the show delay does not apply. Toasts, like dialogs, are loaded with
+keyboard, so the show delay does not apply. The tooltip is not linked to its trigger in the DOM,
+so the harness matches it by text: two triggers with the same tooltip text cannot be told apart
+while one of them shows it. Toasts, like dialogs, are loaded with
 `documentRootLoader(fixture)`.
 
 With `items` in a virtual scroll viewport, `getOptions()` of the select and autocomplete

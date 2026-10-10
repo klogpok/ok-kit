@@ -20,7 +20,8 @@ const POSITIONS: readonly UiTooltipPosition[] = ['top', 'bottom', 'start', 'end'
 
 /**
  * Harness for a tooltip: the element with `uiTooltip`. The tooltip lives in an overlay, found
- * from the document root.
+ * from the document root by its text. Two triggers with the same tooltip text cannot be told
+ * apart: while one shows its tooltip, `isOpen()` of the other is `true` too.
  */
 export class UiTooltipHarness extends UiHarness {
   static hostSelector = '.ui-tooltip-trigger';
@@ -83,8 +84,10 @@ export class UiTooltipHarness extends UiHarness {
   }
 
   /**
-   * The shown tooltip of this trigger. The tooltip is not linked to its trigger in the DOM, but
-   * its text is the trigger's description (`aria-describedby`).
+   * The shown tooltip of this trigger. The tooltip is not linked to its trigger in the DOM (no id
+   * or `aria-*` points to it), so it is matched by text: its text is the trigger's description
+   * (`aria-describedby`). Limitation: while two triggers with the same text both show their
+   * tooltips, each harness may resolve the other's tooltip.
    */
   private async tooltip(): Promise<TestElement | null> {
     const ids =
