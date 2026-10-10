@@ -23,12 +23,12 @@
   display: block;
   inline-size: 100%;
   block-size: 100%;
-  animation: ui-spinner-rotate calc(var(--ui-motion-duration-slow) * 3) linear infinite;
+  animation: ui-spinner-rotate var(--ui-spinner-duration) linear infinite;
 }
 
 circle {
   fill: none;
-  stroke-width: calc(var(--ui-spinner-stroke-width) * 1.25);
+  stroke-width: var(--ui-spinner-stroke-width);
 }
 
 .ui-spinner__track {
@@ -49,6 +49,6 @@ circle {
 
 @media (prefers-reduced-motion: reduce) {
   .ui-spinner__svg {
-    animation-duration: calc(var(--ui-motion-duration-slow) * 8);
+    animation-duration: var(--ui-spinner-duration-reduced-motion);
   }
 }

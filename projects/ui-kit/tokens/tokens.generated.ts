@@ -2078,6 +2078,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-icon-size-md)"
   },
   {
+    "name": "--ui-switch-track-scale-sm",
+    "layer": "component",
+    "light": "0.8",
+    "dark": "0.8"
+  },
+  {
+    "name": "--ui-switch-track-scale-lg",
+    "layer": "component",
+    "light": "1.2",
+    "dark": "1.2"
+  },
+  {
     "name": "--ui-switch-track-bg",
     "layer": "component",
     "light": "var(--ui-color-border-control)",
@@ -2338,8 +2350,20 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-spinner-stroke-width",
     "layer": "component",
-    "light": "var(--ui-border-width-strong)",
-    "dark": "var(--ui-border-width-strong)"
+    "light": "calc(var(--ui-border-width-strong) * 1.25)",
+    "dark": "calc(var(--ui-border-width-strong) * 1.25)"
+  },
+  {
+    "name": "--ui-spinner-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 3)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 3)"
+  },
+  {
+    "name": "--ui-spinner-duration-reduced-motion",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 8)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 8)"
   },
   {
     "name": "--ui-divider-color",
@@ -2810,6 +2834,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-danger)"
   },
   {
+    "name": "--ui-progress-indeterminate-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 5)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 5)"
+  },
+  {
     "name": "--ui-avatar-radius-square",
     "layer": "component",
     "light": "var(--ui-radius-control)",
@@ -2862,6 +2892,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-font-size-lg)",
     "dark": "var(--ui-font-size-lg)"
+  },
+  {
+    "name": "--ui-avatar-icon-size-ratio",
+    "layer": "component",
+    "light": "0.6",
+    "dark": "0.6"
   },
   {
     "name": "--ui-avatar-font-weight",
@@ -3344,6 +3380,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-weight-semibold)"
   },
   {
+    "name": "--ui-dialog-enter-scale",
+    "layer": "component",
+    "light": "0.96",
+    "dark": "0.96"
+  },
+  {
     "name": "--ui-drawer-bg",
     "layer": "component",
     "light": "var(--ui-color-surface-raised)",
@@ -3546,6 +3588,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-em-2-5)",
     "dark": "var(--ui-em-2-5)"
+  },
+  {
+    "name": "--ui-skeleton-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 5)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 5)"
   },
   {
     "name": "--ui-accordion-bg",
@@ -3918,6 +3966,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-primary-text)",
     "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-table-busy-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 2)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 2)"
   },
   {
     "name": "--ui-chip-text",

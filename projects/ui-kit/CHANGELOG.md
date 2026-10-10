@@ -32,6 +32,12 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **tokens:** size and duration multipliers that sat in component styles are component tokens,
+  defaulting to the old values: `--ui-switch-track-scale-sm/lg`, `--ui-avatar-icon-size-ratio`,
+  `--ui-dialog-enter-scale`, `--ui-spinner-duration`, `--ui-spinner-duration-reduced-motion`,
+  `--ui-skeleton-duration`, `--ui-progress-indeterminate-duration`, `--ui-table-busy-duration`.
+  `--ui-spinner-stroke-width` is now the final stroke width (its default includes the former
+  `* 1.25`), so an override of it gives exactly that width.
 
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 

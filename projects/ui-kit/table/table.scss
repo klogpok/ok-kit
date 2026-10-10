@@ -86,8 +86,8 @@
   // Busy: the header's bottom edge becomes a pulsing primary line. The rows keep full contrast.
   &.ui-table--loading > thead > tr:last-child > th {
     box-shadow: inset 0 calc(var(--ui-border-width-strong) * -1) 0 var(--ui-color-primary);
-    animation: ui-table-busy calc(var(--ui-motion-duration-slow) * 2)
-      var(--ui-motion-easing-standard) infinite alternate;
+    animation: ui-table-busy var(--ui-table-busy-duration) var(--ui-motion-easing-standard) infinite
+      alternate;
 
     @media (prefers-reduced-motion: reduce) {
       animation: none;

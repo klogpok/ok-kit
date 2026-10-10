@@ -42,7 +42,7 @@
 }
 
 .ui-avatar__icon {
-  font-size: calc(var(--_size) * 0.6);
+  font-size: calc(var(--_size) * var(--ui-avatar-icon-size-ratio));
 }
 
 @media (forced-colors: active) {

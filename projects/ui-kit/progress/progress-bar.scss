@@ -40,7 +40,7 @@
   inset-block: 0;
   inset-inline-start: 0;
   inline-size: 40%;
-  animation: ui-progress-slide calc(var(--ui-motion-duration-slow) * 5)
+  animation: ui-progress-slide var(--ui-progress-indeterminate-duration)
     var(--ui-motion-easing-standard) infinite;
 }
 
