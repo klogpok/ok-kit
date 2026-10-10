@@ -487,6 +487,50 @@ Use the mixins in application SCSS:
 Typography classes: `ui-display`, `ui-heading-1..4`, `ui-body-lg`, `ui-body`, `ui-body-sm`,
 `ui-label`, `ui-caption`, `ui-code`, `ui-text-muted`, `ui-visually-hidden`.
 
+### Breakpoints
+
+The kit has four named viewport widths: `sm` 40rem, `md` 52rem, `lg` 64rem, `xl` 80rem. They
+live in `tokens/tokens.json` and `pnpm tokens` generates them for SCSS and TypeScript. They are
+not custom properties, because media queries cannot read those.
+
+- `ui.up($name)` wraps styles in a media query from the width up (`width >= 52rem` for `md`).
+- `ui.down($name)` wraps them below the width (`width < 52rem`), so `up(md)` and `down(md)`
+  never both apply.
+- `ui.$breakpoints` is the map of names to widths, smallest first.
+- `UI_BREAKPOINTS` from `@vplans/ui-kit/core` holds a `(min-width: …)` query per name for the CDK
+  `BreakpointObserver`; `UiBreakpoint` is the union of the names.
+
+```scss
+@use 'ui-kit/styles' as ui;
+
+.filters {
+  display: grid;
+
+  @include ui.up(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@each $name, $width in ui.$breakpoints {
+  .hide-from-#{$name} {
+    @include ui.up($name) {
+      display: none;
+    }
+  }
+}
+```
+
+```ts
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { UI_BREAKPOINTS } from '@vplans/ui-kit/core';
+
+const wide = toSignal(
+  inject(BreakpointObserver)
+    .observe(UI_BREAKPOINTS.md)
+    .pipe(map((state) => state.matches)),
+);
+```
+
 ## RTL
 
 Components use only logical properties (`margin-inline-start`, `inset-inline-end`, ...).
@@ -1123,7 +1167,7 @@ Harnesses for the other components follow in roadmap phase 9.
 | `@vplans/ui-kit/icon`         | `UiIcon`, `provideUiIcons`, `UiIconRegistry`, `UiIconDefinition`, `uiIcon*` icons, `UI_ICONS_ALL`, `UiIconName`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `@vplans/ui-kit/theme`        | `ThemeService`, `provideUiTheme`, `UI_THEME_OPTIONS`, `UiThemeMode`, `UiResolvedTheme`, `UiThemeOptions`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `@vplans/ui-kit/testing`      | `UiHarness`, `UiButtonHarness`, `UiInputHarness`, `UiCheckboxHarness`, `UiSelectHarness`, `UiOptionHarness`, `UiDialogHarness`, `UiNumberInputHarness`, `UiChipHarness`, `UiChipInputHarness`, `UiAutocompleteHarness`, `UiFileUploadHarness` (+ `UiFileUploadItem`), `UiSliderHarness` (+ `UiSliderThumb`), `UiDateRangePickerHarness` (+ `UiDateRangeEdge`), `UiTimeInputHarness`, `UiStepperHarness` (+ `UiStepHarness`), `UiSegmentedHarness` (+ `UiSegmentHarness`), `UiButtonToggleGroupHarness` (+ `UiButtonToggleHarness`), `UiTreeHarness` (+ `UiTreeNodeHarness`, `UiTreeNodeCheckState`), their `*HarnessFilters` |
-| `@vplans/ui-kit/core`         | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`, overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`, `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `UiOverlaySide`, `sideOverlayPositions`, `syncOverlayDirection`                                                                                                                                                                                              |
+| `@vplans/ui-kit/core`         | shared types, `UiFormControlBase`, `UiCheckableBase`, `injectControlState`, `provideUiCheckedValidator`, form-field contract, `provideUiLabels`, `UI_LABELS_HE`/`UI_LABELS_EN`, `resolveDirection`, `provideUiLiveDirectionality`, overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`, `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `UiOverlaySide`, `sideOverlayPositions`, `syncOverlayDirection`, breakpoints `UI_BREAKPOINTS`, `UiBreakpoint`                                                                                                                                                |
 
 ## Tokens
 

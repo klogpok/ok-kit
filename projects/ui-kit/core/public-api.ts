@@ -8,3 +8,4 @@ export * from './overlay';
 export * from './labels';
 export * from './live-directionality';
 export * from './checked-validator';
+export * from './breakpoints.generated';

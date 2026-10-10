@@ -57,6 +57,11 @@ so versions mark review points rather than releases.
 - **tooltip:** `provideUiTooltip({ position, showDelay, hideDelay })` sets app-wide tooltip
   defaults over the built-in `top` / 300 / 100; an input on the tooltip wins. Also exported:
   `UI_TOOLTIP_DEFAULT_OPTIONS` and `UiTooltipDefaults`.
+- **tokens:** named breakpoints sm 40rem, md 52rem, lg 64rem, xl 80rem in `tokens.json`. The
+  generator emits the SCSS map `ui.$breakpoints` with the mixins `ui.up($name)` and
+  `ui.down($name)`, and `UI_BREAKPOINTS` / `UiBreakpoint` in core for the CDK
+  `BreakpointObserver`. No custom properties. The date-range-picker shows two months from
+  `UI_BREAKPOINTS.md`, the same 52rem as before.
 
 ### Fixed
 
