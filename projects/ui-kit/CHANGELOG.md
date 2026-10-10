@@ -83,6 +83,9 @@ so versions mark review points rather than releases.
   `UiBreadcrumbsHarness` (+ `UiBreadcrumbHarness`, which reads collapsed links too),
   `UiPaginationHarness` (current page, page size, moving between pages), `UiTabGroupHarness`
   (+ `UiTabHarness`) and `UiTabNavHarness` (+ `UiTabLinkHarness`).
+- **testing:** harnesses for the status components: `UiAlertHarness`, `UiAvatarHarness`,
+  `UiAvatarGroupHarness`, `UiBadgeHarness`, `UiEmptyStateHarness`,
+  `UiProgressBarHarness`.
 
 ### Fixed
 
