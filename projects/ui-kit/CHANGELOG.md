@@ -26,6 +26,10 @@ so versions mark review points rather than releases.
   former `* 1.25`), so an override of it gives exactly that width instead of being multiplied by
   1.25. An app that overrides it gets a thinner stroke; multiply the override by 1.25 to keep the
   old look.
+- **table:** `density` defaults to `undefined` instead of `'default'`: a table without the input
+  follows its region and gets compact rows inside `data-density="compact"`. The
+  `ui-table--default` class is set only for an explicit `density="default"`; bind it to keep a
+  table at default density inside a compact region.
 
 ### Added
 

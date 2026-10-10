@@ -545,7 +545,8 @@ its values:
 
 Component tokens that alias a control height (select options, menu items, tree nodes, calendar
 cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not
-change, so a compact region does not reflow the layout around its controls.
+change, so a compact region does not reflow the layout around its controls. Table cells use the
+compact block padding (`--ui-table-cell-padding-block-compact`) unless the table sets `density`.
 
 ```html
 <aside class="filters" data-density="compact">…</aside>
@@ -557,7 +558,7 @@ on `<html>`: `<html data-density="compact">`.
 
 Density is a property of a region; `size` is a property of one control and works inside either
 density (a `size="sm"` button in a compact region is 1.75rem tall). In Storybook, switch it with
-**Density** in the toolbar; **Foundations/Density** shows the controls in both densities.
+**Density** in the toolbar; **Foundations/Density** shows the controls and a table in both densities.
 
 ## RTL
 
@@ -885,6 +886,10 @@ provideUiChip({ appearance: 'soft' });
 Sort the rows yourself (`uiSortData(rows, sort)`) or on the server. A click on a sort header
 announces the new order with the header text (the `sortedAscending`, `sortedDescending` and
 `sortedNone` labels), because screen readers do not read a changed `aria-sort`.
+
+Row density follows the region (see [Density](#density)): a table without `density` is compact
+inside `data-density="compact"`. Set `density="default"` or `density="compact"` to override the
+region either way.
 
 ```html
 <!-- Row selection: the value is an array of rows; Shift+click selects a range -->

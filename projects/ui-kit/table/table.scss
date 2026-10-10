@@ -14,6 +14,16 @@
   font-size: var(--ui-table-font-size);
   line-height: var(--ui-line-height-snug);
 
+  // Without a density input the table follows its region; an explicit density wins either way.
+  // The class rules have the same specificity as the region rule, so they must stay after it.
+  [data-density='compact'] & {
+    --_pad-block: var(--ui-table-cell-padding-block-compact);
+  }
+
+  &.ui-table--default {
+    --_pad-block: var(--ui-table-cell-padding-block);
+  }
+
   &.ui-table--compact {
     --_pad-block: var(--ui-table-cell-padding-block-compact);
   }
