@@ -95,6 +95,7 @@
   --ui-ref-size-4: 1rem;
   --ui-ref-size-5: 1.25rem;
   --ui-ref-size-6: 1.5rem;
+  --ui-ref-size-7: 1.75rem;
   --ui-ref-size-8: 2rem;
   --ui-ref-size-9: 2.25rem;
   --ui-ref-size-10: 2.5rem;
@@ -432,12 +433,14 @@
 }
 
 /*
- * Component tokens are re-declared on every themed scope so they follow nested themes, and on
- * .ui-theme-scope so they follow semantic tokens overridden on that element. Override component
+ * Component tokens are re-declared on every themed scope so they follow nested themes, on every
+ * density region so they follow its control tokens, and on .ui-theme-scope so they follow
+ * semantic tokens overridden on that element. Override component
  * tokens on the same selectors (ui.$theme-scopes) or nested scopes reset them.
  */
 :root,
 [data-theme],
+[data-density],
 .ui-theme-scope {
   --ui-button-radius: var(--ui-radius-control);
   --ui-button-circle-radius: var(--ui-radius-full);
@@ -911,4 +914,16 @@
   --ui-tree-selected-bg: var(--ui-color-primary-subtle);
   --ui-tree-selected-text: var(--ui-color-primary-text);
   --ui-tree-error-text: var(--ui-color-danger-text);
+}
+
+[data-density='compact'] {
+  --ui-control-height-sm: var(--ui-ref-size-7);
+  --ui-control-height-md: var(--ui-ref-size-8);
+  --ui-control-height-lg: var(--ui-ref-size-10);
+  --ui-control-padding-inline-sm: var(--ui-ref-space-2);
+  --ui-control-padding-inline-md: var(--ui-ref-space-2-5);
+  --ui-control-padding-inline-lg: var(--ui-ref-space-3);
+  --ui-control-gap-sm: var(--ui-ref-space-1);
+  --ui-control-gap-md: var(--ui-ref-space-1-5);
+  --ui-control-gap-lg: var(--ui-ref-space-2);
 }

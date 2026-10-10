@@ -443,8 +443,8 @@ with an inline script in `index.html` (use your `storageKey`):
 ```
 
 Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
-`:root`, on every `[data-theme]` element and on `.ui-theme-scope`, so they follow the theme of
-the nearest scope:
+`:root`, on every `[data-theme]` and `[data-density]` element and on `.ui-theme-scope`, so they
+follow the theme and density of the nearest scope:
 
 - **Component tokens**: override them on all of these selectors (`ui.$theme-scopes`). An
   override on `:root` alone is reset inside a nested `[data-theme]`.
@@ -530,6 +530,34 @@ const wide = toSignal(
     .pipe(map((state) => state.matches)),
 );
 ```
+
+### Density
+
+Mark a page region `data-density="compact"` to pack its controls tighter, for filter panels and
+other dense screens. Inside it the control tokens take their compact values; everything else keeps
+its values:
+
+| Token                           | sm                     | md                     | lg                    |
+| ------------------------------- | ---------------------- | ---------------------- | --------------------- |
+| `--ui-control-height-*`         | 2rem → **1.75rem**     | 2.5rem → **2rem**      | 2.75rem → **2.5rem**  |
+| `--ui-control-padding-inline-*` | 0.625rem → **0.5rem**  | 0.75rem → **0.625rem** | 1rem → **0.75rem**    |
+| `--ui-control-gap-*`            | 0.375rem → **0.25rem** | 0.5rem → **0.375rem**  | 0.625rem → **0.5rem** |
+
+Component tokens that alias a control height (select options, menu items, tree nodes, calendar
+cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not
+change, so a compact region does not reflow the layout around its controls.
+
+```html
+<aside class="filters" data-density="compact">…</aside>
+```
+
+Overlays (select lists, menus, dialogs) render in the overlay container at the end of `<body>`,
+outside every region, so only density on the root element reaches them. For a compact app, put it
+on `<html>`: `<html data-density="compact">`.
+
+Density is a property of a region; `size` is a property of one control and works inside either
+density (a `size="sm"` button in a compact region is 1.75rem tall). In Storybook, switch it with
+**Density** in the toolbar; **Foundations/Density** shows the controls in both densities.
 
 ## RTL
 

@@ -62,6 +62,10 @@ so versions mark review points rather than releases.
   `ui.down($name)`, and `UI_BREAKPOINTS` / `UiBreakpoint` in core for the CDK
   `BreakpointObserver`. No custom properties. The date-range-picker shows two months from
   `UI_BREAKPOINTS.md`, the same 52rem as before.
+- **tokens:** compact density. `data-density="compact"` on any element makes its controls shorter
+  (sm/md/lg 1.75/2/2.5rem) with one step less inline padding and gap; options, menu items and
+  tree nodes follow. On `<html>` it also reaches overlays. `[data-density]` joins
+  `ui.$theme-scopes`. Storybook has a Density toolbar switch and a Foundations/Density story.
 
 ### Fixed
 

@@ -6,13 +6,13 @@
 
 **Blocked by:** 07 (Phase 9.1 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The compact values of the semantic control tokens are generated for `[data-density="compact"]`, also on the root element
-- [ ] The Storybook toolbar has a Density switch next to theme and direction
-- [ ] "Foundations/Density" shows input, select, button, checkbox, segmented and an open select list in both densities, has baselines and passes axe
-- [ ] Existing baselines do not change
-- [ ] README and CHANGELOG document density
+- [x] The compact values of the semantic control tokens are generated for `[data-density="compact"]`, also on the root element
+- [x] The Storybook toolbar has a Density switch next to theme and direction
+- [x] "Foundations/Density" shows input, select, button, checkbox, segmented and an open select list in both densities, has baselines and passes axe
+- [x] Existing baselines do not change
+- [x] README and CHANGELOG document density
 
 ## Русский перевод
 
@@ -24,10 +24,10 @@
 
 **Заблокировано:** 07 (Отчёт подфазы 9.1)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Компактные значения семантических токенов контролов генерируются для `[data-density="compact"]`, в том числе на корневом элементе
-- [ ] В тулбаре Storybook есть переключатель Density рядом с темой и направлением
-- [ ] «Foundations/Density» показывает input, select, button, checkbox, segmented и открытый список select в обеих плотностях, имеет снимки и проходит axe
-- [ ] Существующие снимки не меняются
-- [ ] README и CHANGELOG описывают плотность
+- [x] Компактные значения семантических токенов контролов генерируются для `[data-density="compact"]`, в том числе на корневом элементе
+- [x] В тулбаре Storybook есть переключатель Density рядом с темой и направлением
+- [x] «Foundations/Density» показывает input, select, button, checkbox, segmented и открытый список select в обеих плотностях, имеет снимки и проходит axe
+- [x] Существующие снимки не меняются
+- [x] README и CHANGELOG описывают плотность
