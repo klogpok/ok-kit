@@ -6,12 +6,12 @@
 
 **Blocked by:** 01 (Tooltip defaults provider), 02 (Pagination defaults provider), 03 (Overlays fit the viewport without the scrollbar), 04 (Size and duration multipliers become component tokens), 05 (UiOption exposes only its inputs), 06 (Shared overlay presets and direction sync in core)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `/phase-check` passes, or every failure is named in the report
 - [x] The phase 9.1 section of the roadmap records the status, the commits and the deviations from the spec
 - [x] Every question for the user is a `needs-info` ticket with the facts and the options
-- [ ] The user approved the sub-phase, and the approval is recorded in the decisions log
+- [x] The user approved the sub-phase, and the approval is recorded in the decisions log
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 01 (Defaults-провайдер tooltip), 02 (Defaults-провайдер pagination), 03 (Оверлеи помещаются во viewport без полосы прокрутки), 04 (Множители размеров и длительностей становятся component-токенами), 05 (UiOption открывает наружу только свои входы), 06 (Общие пресеты оверлеев и синхронизация направления в core)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
 - [x] `/phase-check` проходит, или каждая ошибка названа в отчёте
 - [x] Раздел подфазы 9.1 в роадмапе фиксирует статус, коммиты и отклонения от спеки
 - [x] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
-- [ ] Пользователь одобрил подфазу, одобрение записано в журнал решений
+- [x] Пользователь одобрил подфазу, одобрение записано в журнал решений

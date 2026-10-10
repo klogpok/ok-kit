@@ -434,3 +434,16 @@ The user asked for a round icon-only button. Chosen:
   do not change. A boolean `rounded` was rejected: every button already has rounded corners.
 - `circle` uses the new token `--ui-button-circle-radius` (`var(--ui-radius-full)`).
 - `ui-button` gets no pill shape for now; if it is needed, the same `shape` input can add it.
+
+## Phase 9.1: P3 leftovers (approved 2026-10-10)
+
+Tickets 01–06 in `.scratch/phase-9/issues/`; the report is ticket 07 and the roadmap status.
+The deviations listed in the roadmap are accepted. Review answers:
+
+- **`UiOption.getLabel` stays public** (ticket 25): the CDK `ListKeyManager` typeahead calls it by
+  that name. The other members the option panel reads carry the `ɵ` prefix (`ɵid`, `ɵdisabled`,
+  `ɵfilteredOut()`).
+- **`--ui-spinner-stroke-width` is the real stroke width** (ticket 26): the `* 1.25` moved into its
+  default, so an override sets the width directly. Listed as breaking in the CHANGELOG.
+- **A pushed popover under the left scrollbar of an RTL iframe is fixed in the kit** (ticket 27):
+  the fix is ticket 28.
