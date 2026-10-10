@@ -259,6 +259,19 @@
 > - Генерируемый `_breakpoints.scss` исключён из stylelint, как `_tokens.scss`.
 >
 > Вопросы для решения: тикеты 29 (сброс переопределений внутри области density), 30 (возврат к обычной плотности внутри compact), 31 (собственный сдвиг только у popover или и у tooltip).
+>
+> **Статус (2026-10-10): 9.3 (layout-утилиты) сделана, ждёт одобрения.** Тикеты 12 и 13. Коммиты: `feat(styles)` (`.ui-stack`, `.ui-cluster`, `.ui-grid`, `.ui-container`, `.ui-gap-3xs` … `.ui-gap-3xl` и миксины `stack`, `cluster`, `grid`, `container`), `refactor(playground)` (playground без своих `.row`, `.toolbar`, `.stack`, `.grid`; скриншоты до и после совпадают попиксельно), `chore(visual)` ×2; по код-ревью: `fix(styles)` (`--ui-grid-min` не протекает во вложенные grid) + история `NestedGrid`, `feat(tokens)` (семантические токены `--ui-layout-grid-min` = 20rem и `--ui-layout-container-max-width` = 80rem), генерируемый `styles/_spacing.scss` со списком шагов отступа, `docs`, `refactor(playground)` (локальный класс вместо `.form .ui-cluster > *`).
+>
+> Проверки: полный чеклист зелёный. 845 unit-тестов, playground 7; coverage 98.32/81.49/93.31/98.32; 306 stories × 3 режима без нарушений axe (+6); 918 снимков (+18); ngc без ошибок; бюджеты playground без предупреждений (initial 705.11 kB). Браузер (Edge, light/dark, RTL/LTR, 360–1600 px): отступы 2…48 px по шкале, cluster переносится и зеркалится, grid перестраивается 1→2→4 колонки, вложенный grid держит свой минимум, container по центру с отступами; playground без наложений и горизонтального скролла.
+>
+> Отклонения от спеки:
+> - Каждый layout-класс сам задаёт `--ui-gap` и `--ui-grid-min`, а не читает их с fallback: так вложенный layout не наследует значения родителя. Модификатор `.ui-gap-*` и `--ui-grid-min` действуют на том же элементе, не на предке (записано в README).
+> - 20rem и 80rem — семантические токены `--ui-layout-grid-min` и `--ui-layout-container-max-width`: stylelint запрещает литералы `rem`, а так значения можно переопределить в рантайме.
+> - `container()` ещё задаёт `box-sizing: border-box` и `inline-size: 100%`, чтобы работать внутри flex-строки; миксины принимают и имя шага, и любую длину.
+> - `.ui-stack` — flex-колонка (не grid).
+> - Play-проверки Grid и NestedGrid рассчитаны на ширину снимков (1024 px); на 360 px колонок меньше, и они падают — вёрстка при этом правильная.
+>
+> Вопрос для решения: тикет 32 (секции phase 8 в playground без стиля карточки и JSON в RTL; было и в `master`).
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**
