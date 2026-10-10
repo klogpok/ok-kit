@@ -8,9 +8,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] `/phase-check` passes, or every failure is named in the report
-- [ ] The phase 9.1 section of the roadmap records the status, the commits and the deviations from the spec
-- [ ] Every question for the user is a `needs-info` ticket with the facts and the options
+- [x] `/phase-check` passes, or every failure is named in the report
+- [x] The phase 9.1 section of the roadmap records the status, the commits and the deviations from the spec
+- [x] Every question for the user is a `needs-info` ticket with the facts and the options
 - [ ] The user approved the sub-phase, and the approval is recorded in the decisions log
 
 ## Русский перевод
@@ -25,7 +25,7 @@
 
 **Статус:** ready-for-agent
 
-- [ ] `/phase-check` проходит, или каждая ошибка названа в отчёте
-- [ ] Раздел подфазы 9.1 в роадмапе фиксирует статус, коммиты и отклонения от спеки
-- [ ] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
+- [x] `/phase-check` проходит, или каждая ошибка названа в отчёте
+- [x] Раздел подфазы 9.1 в роадмапе фиксирует статус, коммиты и отклонения от спеки
+- [x] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
 - [ ] Пользователь одобрил подфазу, одобрение записано в журнал решений

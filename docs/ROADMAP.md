@@ -230,6 +230,20 @@
 ## Фаза 9 — инфраструктура для команд
 
 > **Статус (2026-10-10): спека и тикеты готовы, работа не начата.** Решения опроса — в [спеке](../.scratch/phase-9/spec.md): пять подфаз 9.1 P3 → 9.2 брейкпоинты и density → 9.3 layout → 9.4 harnesses → 9.5 MDX, у каждой отчёт и одобрение. Тикеты 01–24 — в `.scratch/phase-9/issues/`. Пункты ниже — исходный план; где он расходится со спекой, действует спека.
+>
+> **Статус (2026-10-10): 9.1 (хвосты P3) сделана, ждёт одобрения.** Ветка `phase-9`, тикеты 01–06. Коммиты: `feat(tooltip)` (`provideUiTooltip`), `feat(pagination)` (`provideUiPagination`), `fix(overlays)` (ширина dialog, drawer, toast и popover считается от контейнера оверлея, `100vw` убран), `feat(tokens)` + `chore(visual)` (множители в component-токены), `refactor(select)` (внутренности `UiOption`), `refactor(core)` (`core/overlay.ts`: пресеты позиций и `syncOverlayDirection`), `docs(rules)`, правки по код-ревью: `fix(time)`, `refactor(select)`, `refactor(tooltip)`, `docs(readme)`, `docs(changelog)`.
+>
+> Проверки: полный чеклист зелёный. 834 unit-теста (+14), coverage 98.29/81.42/93.27/98.29; 294 stories × 3 режима без нарушений axe; 882 снимка без изменений; ngc без ошибок; бюджеты playground без предупреждений. Браузер (Edge, видимая полоса прокрутки 15px, light/dark, RTL/LTR, 360 и 1024px): dialog, drawer, toast и popover не заходят под полосу; select, autocomplete, datepicker, date-range-picker, time input, tooltip и popover открываются там же, где раньше; значения новых токенов совпадают со старыми.
+>
+> Отклонения от спеки:
+> - Изменились три снимка `foundations-tokens--component-tokens`: галерея показывает новые токены (этого требует тикет 04). Остальные снимки не изменились.
+> - Аватар: множитель `0.6` задаёт размер иконки-заглушки, а не инициалов, поэтому токен называется `--ui-avatar-icon-size-ratio`.
+> - Скаляры (`0.8`, `1.2`, `0.6`, `0.96`) — литералы: семантического токена для безразмерного множителя нет (записано в README).
+> - `UiOption`: `filteredOut` читают панель и группа, поэтому наружу вышел `ɵfilteredOut()`; защищённый `computed` остался для шаблона (шаблон Angular не принимает имя с `ɵ`). `getLabel` остался публичным — тикет 25.
+> - Toast тоже синхронизирует направление через `syncOverlayDirection`.
+> - `time-input` получил `skipPredicate` по `ɵdisabled`: стандартный предикат CDK читает `disabled`.
+>
+> Вопросы для решения: тикеты 25 (`getLabel`), 26 (смысл `--ui-spinner-stroke-width`), 27 (сдвинутый popover под левой полосой в RTL-iframe).
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**
