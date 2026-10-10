@@ -257,7 +257,9 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     this.injector,
   )
     .withVerticalOrientation()
-    .withPageUpDown();
+    .withPageUpDown()
+    // UiOption has no public `disabled` getter, which the CDK default skip reads.
+    .skipPredicate((option) => option.ɵdisabled);
 
   constructor() {
     super();
