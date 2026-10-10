@@ -6,12 +6,12 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] A pushed popover keeps its edge gap and stays clear of the scrollbar in LTR, RTL and an RTL iframe, checked in the browser with a visible scrollbar
-- [ ] A play story opens a popover at the edge; it has baselines in three modes and passes axe
-- [ ] Existing popover baselines do not change, and the popover spec passes
-- [ ] The CHANGELOG lists the fix
+- [x] A pushed popover keeps its edge gap and stays clear of the scrollbar in LTR, RTL and an RTL iframe, checked in the browser with a visible scrollbar
+- [x] A play story opens a popover at the edge; it has baselines in three modes and passes axe
+- [x] Existing popover baselines do not change, and the popover spec passes
+- [x] The CHANGELOG lists the fix
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Сдвинутый popover сохраняет отступ от края и не заходит под полосу прокрутки в LTR, RTL и RTL-iframe; проверено в браузере с видимой полосой
-- [ ] Play story открывает popover у края; у неё есть снимки в трёх режимах, и она проходит axe
-- [ ] Существующие снимки popover не меняются, spec popover проходит
-- [ ] CHANGELOG описывает исправление
+- [x] Сдвинутый popover сохраняет отступ от края и не заходит под полосу прокрутки в LTR, RTL и RTL-iframe; проверено в браузере с видимой полосой
+- [x] Play story открывает popover у края; у неё есть снимки в трёх режимах, и она проходит axe
+- [x] Существующие снимки popover не меняются, spec popover проходит
+- [x] CHANGELOG описывает исправление

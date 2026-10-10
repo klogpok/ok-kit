@@ -62,6 +62,9 @@ so versions mark review points rather than releases.
 
 - **dialog, drawer, toast, popover:** the maximum width is measured against the overlay
   container instead of `100vw`, so on a page with a scrollbar they no longer run under it.
+- **popover:** a popover pushed back on screen at a viewport edge keeps the viewport margin on
+  every side and no longer runs under a page scrollbar on the left (an RTL page in an iframe).
+  Popovers that fit open where they did before.
 
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 
