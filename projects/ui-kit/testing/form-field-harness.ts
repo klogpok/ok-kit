@@ -11,7 +11,7 @@ import { UiChipInputHarness } from './chip-harness';
 import { UiDateRangePickerHarness } from './date-range-picker-harness';
 import { UiDatepickerHarness } from './datepicker-harness';
 import { UiFileUploadHarness } from './file-upload-harness';
-import { UiHarness } from './harness';
+import { REQUIRED_MARKERS, UiHarness } from './harness';
 import { UiInputHarness } from './input-harness';
 import { UiNumberInputHarness } from './number-input-harness';
 import { UiRadioGroupHarness } from './radio-harness';
@@ -40,9 +40,6 @@ export type UiFormFieldControlHarness =
   | UiSwitchHarness
   | UiTimeInputHarness
   | UiTreeHarness;
-
-/** Required markers of `ui-form-field` inside its label. */
-const REQUIRED_MARKERS = '.ui-form-field__required, .ui-form-field__required-text';
 
 export interface UiFormFieldHarnessFilters extends BaseHarnessFilters {
   /** The label text, without the required marker. */
@@ -77,7 +74,7 @@ export class UiFormFieldHarness extends UiHarness {
   /** The label text without the required marker, or `null` for a field without a label. */
   async getLabel(): Promise<string | null> {
     const label = await this.label();
-    return label ? (await label.text({ exclude: REQUIRED_MARKERS })).trim() : null;
+    return label ? label.text({ exclude: REQUIRED_MARKERS }) : null;
   }
 
   /** The label shows the required marker. */

@@ -1,4 +1,4 @@
-export * from './harness';
+export { UiHarness } from './harness';
 export * from './alert-harness';
 export * from './avatar-harness';
 export * from './badge-harness';
