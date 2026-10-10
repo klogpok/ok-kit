@@ -1,32 +1,3 @@
-:host {
-  display: grid;
-  gap: var(--ui-space-xl);
-  margin-block-start: var(--ui-space-2xl);
-}
-
 .scroll {
   overflow-x: auto;
-}
-
-section {
-  display: grid;
-  gap: var(--ui-space-lg);
-  align-content: start;
-  min-inline-size: 0;
-  padding: var(--ui-space-xl);
-  border: var(--ui-border-width-default) solid var(--ui-color-border);
-  border-radius: var(--ui-radius-container);
-  background: var(--ui-color-surface);
-}
-
-pre {
-  margin: 0;
-  overflow: auto;
-  font-size: var(--ui-font-size-xs);
-}
-
-.popover {
-  display: grid;
-  gap: var(--ui-space-md);
-  justify-items: start;
 }

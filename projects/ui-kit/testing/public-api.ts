@@ -19,3 +19,7 @@ export * from './time-input-harness';
 export * from './stepper-harness';
 export * from './segmented-harness';
 export * from './tree-harness';
+export * from './accordion-harness';
+export * from './breadcrumbs-harness';
+export * from './pagination-harness';
+export * from './tabs-harness';

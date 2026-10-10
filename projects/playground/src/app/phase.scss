@@ -1,0 +1,6 @@
+// The layout every phase component shares: its heading, then its sections.
+:host {
+  display: grid;
+  gap: var(--ui-space-xl);
+  margin-block-start: var(--ui-space-2xl);
+}
