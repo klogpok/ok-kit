@@ -6,6 +6,7 @@ import { Router, RouterLink, provideRouter } from '@angular/router';
 import { UiBreadcrumb, UiBreadcrumbs } from '@vplans/ui-kit/breadcrumbs';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiBreadcrumbHarness, UiBreadcrumbsHarness } from './breadcrumbs-harness';
+import { UiMenuHarness } from './menu-harness';
 
 @Component({ template: '' })
 class Page {}
@@ -84,6 +85,8 @@ describe('UiBreadcrumbsHarness', () => {
     await trail.followCollapsed('Tower B');
     expect(router.url).toBe('/projects/tower-b');
     await expect(trail.followCollapsed('Floor 4')).rejects.toThrow('No collapsed link matches');
+    const more = await loader.getHarness(UiMenuHarness.with({ label: 'Show more' }));
+    expect(await more.isOpen()).toBe(false);
 
     const named = await loader.getHarness(UiBreadcrumbsHarness.with({ label: 'Plan path' }));
     await expect(named.followCollapsed('Top')).rejects.toThrow('No collapsed link matches');

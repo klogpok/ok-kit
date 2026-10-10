@@ -4,6 +4,7 @@ import {
   HarnessPredicate,
 } from '@angular/cdk/testing';
 import { UiHarness } from './harness';
+import { UiMenuHarness } from './menu-harness';
 
 export interface UiBreadcrumbHarnessFilters extends BaseHarnessFilters {
   /** The text of the link. */
@@ -115,21 +116,17 @@ export class UiBreadcrumbsHarness extends UiHarness {
 
   /** Opens the "…" menu and chooses the collapsed link with this text, as the user does. */
   async followCollapsed(text: string | RegExp): Promise<void> {
-    const button = await this.moreButton();
-    if (!button) throw Error(`No collapsed link matches ${String(text)}.`);
-    if ((await button.getAttribute('aria-expanded')) !== 'true') await button.click();
-    const menuId = await button.getAttribute('aria-controls');
-    const items = menuId
-      ? await this.documentRootLocatorFactory().locatorForAll(`[id="${menuId}"] .ui-menu-item`)()
-      : [];
-    for (const item of items) {
-      if (await HarnessPredicate.stringMatches((await item.text()).trim(), text)) {
-        await item.click();
-        return;
-      }
+    const menu = await this.locatorForOptional(
+      UiMenuHarness.with({ selector: '.ui-breadcrumbs__more-button' }),
+    )();
+    const missing = Error(`No collapsed link matches ${String(text)}.`);
+    if (!menu) throw missing;
+    await menu.open();
+    if (!(await menu.getItems({ text })).length) {
+      await menu.close();
+      throw missing;
     }
-    await button.click();
-    throw Error(`No collapsed link matches ${String(text)}.`);
+    await menu.clickItem({ text });
   }
 
   private async textsOf(filters: UiBreadcrumbHarnessFilters): Promise<string[]> {
