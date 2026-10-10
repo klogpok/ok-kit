@@ -561,6 +561,10 @@ Overlays (select lists, menus, dialogs) render in the overlay container at the e
 outside every region, so only density on the root element reaches them. For a compact app, put it
 on `<html>`: `<html data-density="compact">`.
 
+`compact` is the only density; any other value of `data-density` does nothing. A region inside a
+compact one cannot return to the default density: there is no `data-density="default"`. Only a
+table can, with `density="default"`.
+
 Density is a property of a region; `size` is a property of one control and works inside either
 density (a `size="sm"` button in a compact region is 1.75rem tall). In Storybook, switch it with
 **Density** in the toolbar; **Foundations/Density** shows the controls and a table in both densities.
