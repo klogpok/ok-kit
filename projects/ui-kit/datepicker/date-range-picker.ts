@@ -31,6 +31,7 @@ import {
   overlayOffsetX,
   syncOverlayDirection,
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
+  UI_BREAKPOINTS,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
@@ -54,8 +55,8 @@ export interface UiDateRangePreset {
   range: UiDateRange | (() => UiDateRange);
 }
 
-/** From this viewport width the calendar shows two months. */
-const TWO_MONTHS_QUERY = '(min-width: 52rem)';
+/** From the md breakpoint up the calendar shows two months. */
+const TWO_MONTHS_QUERY = UI_BREAKPOINTS.md;
 
 type Edge = 'start' | 'end';
 
