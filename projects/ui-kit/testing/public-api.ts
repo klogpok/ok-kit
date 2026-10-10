@@ -17,3 +17,4 @@ export * from './tree-harness';
 export * from './menu-harness';
 export * from './popover-harness';
 export * from './tooltip-harness';
+export * from './toast-harness';
