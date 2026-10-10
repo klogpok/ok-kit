@@ -32,6 +32,9 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **pagination:** `provideUiPagination()` (with `UI_PAGINATION_DEFAULT_OPTIONS` and
+  `UiPaginationDefaults`) sets the page size, page size options, sibling count and first/last
+  buttons of every paginator; an input bound on a paginator wins.
 
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 
