@@ -1,9 +1,10 @@
 // Layout mixins. The global `.ui-stack`, `.ui-cluster`, `.ui-grid` and `.ui-container` classes are
 // built from them in `_layout-classes.scss`, so a mixin and its class produce the same rules.
 @use 'sass:list';
+@use 'spacing';
 
 /// Names of the spacing scale that a gap can take: `.ui-gap-<name>` or `stack(<name>)`.
-$gaps: 3xs, 2xs, xs, sm, md, lg, xl, 2xl, 3xl;
+$gaps: spacing.$space-names;
 
 /// A spacing name becomes its token; any other value (`1.5rem`, `var(--my-gap)`) is used as is.
 @function -space($gap) {

@@ -6,6 +6,7 @@ export default {
     '**/tokens.css',
     '**/_tokens.scss',
     '**/_breakpoints.scss',
+    '**/_spacing.scss',
     'node_modules/**',
   ],
   rules: {
