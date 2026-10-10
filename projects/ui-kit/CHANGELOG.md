@@ -73,7 +73,8 @@ so versions mark review points rather than releases.
   tree nodes follow. On `<html>` it also reaches overlays. `[data-density]` joins
   `ui.$theme-scopes`. Storybook has a Density toolbar switch and a Foundations/Density story.
 - **styles:** layout classes `ui-stack`, `ui-cluster`, `ui-grid` (columns at least
-  `--ui-grid-min`, 20rem by default) and `ui-container` (up to 80rem, centered), with gap
+  `--ui-grid-min` on the grid, 20rem by default from the token `--ui-layout-grid-min`) and
+  `ui-container` (centered, up to `--ui-layout-container-max-width`, 80rem), with gap
   modifiers `ui-gap-3xs` … `ui-gap-3xl` (md by default), and the mixins `ui.stack($gap)`,
   `ui.cluster($gap)`, `ui.grid($min, $gap)` and `ui.container()`. Story Foundations/Layout.
 - **playground:** lays out its sections with these classes instead of its own `.row`, `.toolbar`,

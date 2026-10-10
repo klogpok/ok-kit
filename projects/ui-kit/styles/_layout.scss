@@ -1,8 +1,6 @@
 // Layout mixins. The global `.ui-stack`, `.ui-cluster`, `.ui-grid` and `.ui-container` classes are
 // built from them in `_layout-classes.scss`, so a mixin and its class produce the same rules.
 @use 'sass:list';
-@use 'sass:map';
-@use 'breakpoints';
 
 /// Names of the spacing scale that a gap can take: `.ui-gap-<name>` or `stack(<name>)`.
 $gaps: 3xs, 2xs, xs, sm, md, lg, xl, 2xl, 3xl;
@@ -42,10 +40,10 @@ $gaps: 3xs, 2xs, xs, sm, md, lg, xl, 2xl, 3xl;
 }
 
 /// As many columns as fit, each at least `--ui-grid-min` and never wider than the grid itself.
-/// Like the gap, the grid sets `--ui-grid-min` to `$min` (20rem, the md container width) on its
-/// own element, so neither a parent grid nor an ancestor's value reaches a nested grid; set the
-/// property on the grid element to change it.
-@mixin grid($min: var(--ui-container-width-md), $gap: md) {
+/// Like the gap, the grid sets `--ui-grid-min` to `$min` (the `--ui-layout-grid-min` token, 20rem)
+/// on its own element, so neither a parent grid nor an ancestor's value reaches a nested grid; set
+/// the property on the grid element to change it.
+@mixin grid($min: var(--ui-layout-grid-min), $gap: md) {
   @include _gap($gap);
 
   --ui-grid-min: #{$min};
@@ -54,11 +52,12 @@ $gaps: 3xs, 2xs, xs, sm, md, lg, xl, 2xl, 3xl;
   grid-template-columns: repeat(auto-fit, minmax(min(var(--ui-grid-min), 100%), 1fr));
 }
 
-/// Page content centered up to the xl breakpoint (80rem) wide, with lg inline padding.
+/// Page content centered up to `--ui-layout-container-max-width` (80rem) wide, with lg inline
+/// padding.
 @mixin container() {
   box-sizing: border-box;
   inline-size: 100%;
-  max-inline-size: map.get(breakpoints.$breakpoints, xl);
+  max-inline-size: var(--ui-layout-container-max-width);
   margin-inline: auto;
   padding-inline: var(--ui-space-lg);
 }

@@ -109,6 +109,7 @@
   --ui-ref-size-100: 25rem;
   --ui-ref-size-140: 35rem;
   --ui-ref-size-200: 50rem;
+  --ui-ref-size-320: 80rem;
   --ui-ref-size-px: 1px;
   --ui-ref-size-2px: 2px;
   --ui-ref-size-3-5: 0.875rem;
@@ -212,6 +213,8 @@
   --ui-container-width-xl: var(--ui-ref-size-100);
   --ui-container-width-2xl: var(--ui-ref-size-140);
   --ui-container-width-3xl: var(--ui-ref-size-200);
+  --ui-layout-grid-min: var(--ui-ref-size-80);
+  --ui-layout-container-max-width: var(--ui-ref-size-320);
   --ui-media-size-sm: var(--ui-ref-size-6);
   --ui-media-size-md: var(--ui-ref-size-8);
   --ui-media-size-lg: var(--ui-ref-size-10);

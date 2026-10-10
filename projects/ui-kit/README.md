@@ -535,12 +535,15 @@ const wide = toSignal(
 
 `ui-kit.scss` has four layout classes. They use only logical properties, so they mirror in RTL.
 
-| Class          | Layout                                                                                        |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| `ui-stack`     | children in a column                                                                          |
-| `ui-cluster`   | children in a row from the inline start, centered on the cross axis, wrapping                 |
-| `ui-grid`      | as many equal columns as fit, each at least `--ui-grid-min` (20rem); one column when narrower |
-| `ui-container` | content centered up to 80rem (the `xl` breakpoint) wide, with `--ui-space-lg` inline padding  |
+| Class          | Layout                                                                                                |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| `ui-stack`     | children in a column                                                                                  |
+| `ui-cluster`   | children in a row from the inline start, centered on the cross axis, wrapping                         |
+| `ui-grid`      | as many equal columns as fit, each at least `--ui-grid-min` (20rem); one column when narrower         |
+| `ui-container` | content centered up to `--ui-layout-container-max-width` (80rem), with `--ui-space-lg` inline padding |
+
+The defaults are the tokens `--ui-layout-grid-min` (20rem) and `--ui-layout-container-max-width`
+(80rem); override them on `:root` to change every grid and container of the app.
 
 The gap of `ui-stack`, `ui-cluster` and `ui-grid` is `--ui-space-md`. A modifier on the same
 element changes it: `ui-gap-3xs`, `ui-gap-2xs`, `ui-gap-xs`, `ui-gap-sm`, `ui-gap-md`, `ui-gap-lg`,
@@ -1326,6 +1329,8 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-container-width-xl`                  | semantic  | `25rem`                                                                      | `25rem`                                                                |
 | `--ui-container-width-2xl`                 | semantic  | `35rem`                                                                      | `35rem`                                                                |
 | `--ui-container-width-3xl`                 | semantic  | `50rem`                                                                      | `50rem`                                                                |
+| `--ui-layout-grid-min`                     | semantic  | `20rem`                                                                      | `20rem`                                                                |
+| `--ui-layout-container-max-width`          | semantic  | `80rem`                                                                      | `80rem`                                                                |
 | `--ui-media-size-sm`                       | semantic  | `1.5rem`                                                                     | `1.5rem`                                                               |
 | `--ui-media-size-md`                       | semantic  | `2rem`                                                                       | `2rem`                                                                 |
 | `--ui-media-size-lg`                       | semantic  | `2.5rem`                                                                     | `2.5rem`                                                               |
