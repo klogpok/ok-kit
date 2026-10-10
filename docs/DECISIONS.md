@@ -403,3 +403,25 @@ This replaces "A selected value is still active on any open" above. Opened with 
 the background and focus ring of the active option. ArrowDown or ArrowUp then activates that
 selected option; without a value they start from the first or the last option as before. Opening
 with the keyboard or `open()` still activates the selected option.
+
+## Chips: outline by default, soft on request (decided 2026-10-10)
+
+The user did not like the gray pill chips. Chosen from a prototype (ticket
+`.scratch/chip-appearance/issues/01-chip-appearance.md`):
+
+- **`appearance: 'outline' | 'soft'`** on `ui-chip` and `button[ui-filter-chip]`, default
+  `outline`: a rectangle with the control radius and a border on the surface; a selected filter
+  chip is filled with the text color (dark in light mode, light in dark mode). `soft` is the
+  previous look, pixel for pixel.
+- **Resolution order:** the chip input, then the `ui-chip-set` input, then
+  `provideUiChip({ appearance, size })`, then `outline` / `md`. The set passes its values to the
+  chips through the internal `UiChipSetParent`.
+- **`size: 'sm' | 'md'`**, resolved the same way. `sm` (about 22px, 26px for a filter chip, font
+  size xs) is the compact chip for tables and cards; it is a property of the control and does not
+  follow `data-density`.
+- **`tone`** on `ui-chip` only, with the names of `ui-badge`: a tinted background and the tone
+  text, no border, in either appearance. A disabled toned chip keeps its tone text.
+- **Filter chip icons** (`uiChipIcon`) are documented: the icon takes the primary color and the
+  check mark takes its place while the chip is selected.
+- `ui-chip-input` and the chips of `ui-multi-select` follow the app default like any other chip.
+- Every chip in the app changes look; the CHANGELOG lists it as a visual breaking change.

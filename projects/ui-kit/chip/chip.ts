@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  EnvironmentProviders,
   Injectable,
   InjectionToken,
   Injector,
@@ -16,6 +17,7 @@ import {
   forwardRef,
   inject,
   input,
+  makeEnvironmentProviders,
   model,
   output,
   signal,
@@ -57,6 +59,40 @@ function chipOption(item: UiChipItem): UiChipOption {
 
 const UI_CHIP_ITEM = new InjectionToken<UiChipItem>('UiChipItem');
 
+/** `outline` (default): a bordered chip on the surface. `soft`: a gray pill. */
+export type UiChipAppearance = 'outline' | 'soft';
+/** `sm` is the compact chip for tables and cards. */
+export type UiChipSize = 'sm' | 'md';
+export type UiChipTone = 'neutral' | 'primary' | 'info' | 'success' | 'warning' | 'danger';
+
+/** Options that `provideUiChip()` can set for every chip. */
+export interface UiChipDefaults {
+  appearance?: UiChipAppearance;
+  size?: UiChipSize;
+}
+
+export const UI_CHIP_DEFAULT_OPTIONS = new InjectionToken<UiChipDefaults>('UiChipDefaultOptions', {
+  providedIn: 'root',
+  factory: () => ({}),
+});
+
+/**
+ * Sets the appearance and size of every chip in the app. An input on the chip or on its
+ * `ui-chip-set` wins.
+ *
+ * @example provideUiChip({ appearance: 'soft' })
+ */
+export function provideUiChip(defaults: UiChipDefaults): EnvironmentProviders {
+  return makeEnvironmentProviders([{ provide: UI_CHIP_DEFAULT_OPTIONS, useValue: defaults }]);
+}
+
+/** What a chip reads from the set around it. Internal. */
+interface UiChipSetHandle {
+  readonly appearance: Signal<UiChipAppearance | undefined>;
+  readonly size: Signal<UiChipSize | undefined>;
+  itemRemoving(item: UiChipItem): void;
+}
+
 /**
  * Where focus goes when the last chip of a set is removed, or on ArrowEnd from the last chip.
  * Provided by `ui-chip-input` (its text field). Internal.
@@ -69,15 +105,32 @@ export class UiChipSetFallback {
 /** Calls from a chip to the set around it. Provided by `ui-chip-set`. Internal. */
 @Injectable()
 class UiChipSetParent {
-  private set: { itemRemoving(item: UiChipItem): void } | null = null;
+  private readonly set = signal<UiChipSetHandle | null>(null);
+  readonly appearance = computed(() => this.set()?.appearance());
+  readonly size = computed(() => this.set()?.size());
 
-  connect(set: { itemRemoving(item: UiChipItem): void }): void {
-    this.set = set;
+  connect(set: UiChipSetHandle): void {
+    this.set.set(set);
   }
 
   itemRemoving(item: UiChipItem): void {
-    this.set?.itemRemoving(item);
+    this.set()?.itemRemoving(item);
   }
+}
+
+/** The appearance and size of a chip: its input, then the set's, then the app default. */
+function injectChipLook(
+  appearance: Signal<UiChipAppearance | undefined>,
+  size: Signal<UiChipSize | undefined>,
+): Signal<string> {
+  const parent = inject(UiChipSetParent, { optional: true });
+  const defaults = inject(UI_CHIP_DEFAULT_OPTIONS);
+  return computed(() => {
+    const resolvedAppearance =
+      appearance() ?? parent?.appearance() ?? defaults.appearance ?? 'outline';
+    const resolvedSize = size() ?? parent?.size() ?? defaults.size ?? 'md';
+    return `ui-chip--${resolvedAppearance} ui-chip--${resolvedSize}`;
+  });
 }
 
 /** Text of a chip label, tracked when it changes. */
@@ -100,6 +153,10 @@ function injectLabelText(label: Signal<ElementRef<HTMLElement>>): Signal<string>
  *
  * Put chips in a `ui-chip-set`: it makes them a list and moves focus between the remove buttons
  * with the arrow keys. Mark an icon or avatar with `uiChipIcon`.
+ *
+ * `appearance` and `size` come from the chip, else from its `ui-chip-set`, else from
+ * `provideUiChip()`; the defaults are `outline` and `md`. A `tone` tints a tag or a status in
+ * either appearance.
  *
  * @example
  * <ui-chip-set aria-label="Recipients">
@@ -134,6 +191,7 @@ function injectLabelText(label: Signal<ElementRef<HTMLElement>>): Signal<string>
   providers: [{ provide: UI_CHIP_ITEM, useExisting: forwardRef(() => UiChip) }],
   host: {
     class: 'ui-chip',
+    '[class]': 'classes()',
     '[attr.role]': 'inSet ? "listitem" : null',
     '[class.ui-chip--removable]': 'removable()',
     '[class.ui-chip--disabled]': 'disabled()',
@@ -151,12 +209,23 @@ export class UiChip implements UiChipItem {
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Text for the remove button and the announcement. Defaults to the content text. */
   readonly label = input('');
+  /** Defaults to the set's appearance, then to `provideUiChip()`, then to `outline`. */
+  readonly appearance = input<UiChipAppearance>();
+  /** Defaults to the set's size, then to `provideUiChip()`, then to `md`. */
+  readonly size = input<UiChipSize>();
+  /** Tints the chip for a tag or a status. Without a tone the chip follows its appearance. */
+  readonly tone = input<UiChipTone>();
   /** The user asked to remove the chip. */
   readonly removed = output();
 
   private readonly labelRef = viewChild.required<ElementRef<HTMLElement>>('labelText');
   private readonly removeButton = viewChild<ElementRef<HTMLButtonElement>>('removeButton');
   protected readonly text = injectLabelText(this.labelRef);
+  private readonly look = injectChipLook(this.appearance, this.size);
+  protected readonly classes = computed(() => {
+    const tone = this.tone();
+    return tone ? `${this.look()} ui-chip--toned ui-chip--${tone}` : this.look();
+  });
 
   readonly listItem = true;
   readonly tabIndex = signal(0);
@@ -188,6 +257,9 @@ export class UiChip implements UiChipItem {
  * supports two-way binding. Several filter chips go into a `ui-chip-set`, which is then a group
  * with one tab stop and arrow keys.
  *
+ * An icon marked with `uiChipIcon` takes the primary color; while the chip is selected the
+ * check mark takes its place. `appearance` and `size` resolve as on `ui-chip`.
+ *
  * @example
  * <ui-chip-set aria-label="Status">
  *   <button ui-filter-chip [(selected)]="onlyOpen">Open</button>
@@ -201,7 +273,7 @@ export class UiChip implements UiChipItem {
     @if (isSelected()) {
       <ui-icon class="ui-chip__check" [icon]="checkIcon" />
     }
-    <span class="ui-chip__icon"><ng-content select="[uiChipIcon]" /></span>
+    <span class="ui-chip__icon" [hidden]="isSelected()"><ng-content select="[uiChipIcon]" /></span>
     <span class="ui-chip__label"><ng-content /></span>
   `,
   styleUrl: './chip.scss',
@@ -209,6 +281,7 @@ export class UiChip implements UiChipItem {
   providers: [{ provide: UI_CHIP_ITEM, useExisting: forwardRef(() => UiFilterChip) }],
   host: {
     class: 'ui-chip ui-filter-chip',
+    '[class]': 'look()',
     type: 'button',
     '[tabIndex]': 'tabIndex()',
     '[disabled]': 'disabled()',
@@ -224,7 +297,12 @@ export class UiFilterChip implements UiChipItem {
 
   readonly selected = model(false);
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Defaults to the set's appearance, then to `provideUiChip()`, then to `outline`. */
+  readonly appearance = input<UiChipAppearance>();
+  /** Defaults to the set's size, then to `provideUiChip()`, then to `md`. */
+  readonly size = input<UiChipSize>();
 
+  protected readonly look = injectChipLook(this.appearance, this.size);
   readonly listItem = false;
   readonly tabIndex = signal(0);
   // model() has no transform, so a static `selected` attribute arrives as '': coerce on read.
@@ -247,7 +325,9 @@ export class UiFilterChip implements UiChipItem {
  * of filter chips; name it with `aria-label`. When a focused chip is removed, focus moves to
  * the next one.
  *
- * @example <ui-chip-set aria-label="Tags">...</ui-chip-set>
+ * `appearance` and `size` apply to the chips in the set that do not set their own.
+ *
+ * @example <ui-chip-set aria-label="Tags" appearance="soft">...</ui-chip-set>
  */
 @Component({
   selector: 'ui-chip-set',
@@ -267,6 +347,11 @@ export class UiChipSet {
   private readonly injector = inject(Injector);
   private readonly fallback = inject(UiChipSetFallback, { optional: true });
 
+  /** The appearance of the chips that do not set their own. */
+  readonly appearance = input<UiChipAppearance>();
+  /** The size of the chips that do not set their own. */
+  readonly size = input<UiChipSize>();
+
   private readonly items = contentChildren(UI_CHIP_ITEM, { descendants: true });
   private readonly options = computed(() => this.items().map((item) => item.option));
   private readonly active = signal<UiChipItem | null>(null);
@@ -280,7 +365,11 @@ export class UiChipSet {
     .skipPredicate((option) => !option.item.focusable());
 
   constructor() {
-    inject(UiChipSetParent).connect({ itemRemoving: (item) => this.itemRemoving(item) });
+    inject(UiChipSetParent).connect({
+      appearance: this.appearance,
+      size: this.size,
+      itemRemoving: (item) => this.itemRemoving(item),
+    });
     this.keyManager.change.subscribe(() =>
       this.active.set(this.keyManager.activeItem?.item ?? null),
     );

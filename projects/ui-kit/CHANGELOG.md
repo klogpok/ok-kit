@@ -3,6 +3,34 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (chip appearance)
+
+### Breaking
+
+- **chip:** chips look different by default (a visual change, no API removed). `ui-chip` and
+  `button[ui-filter-chip]` are now `outline`: rectangular with the control radius and a border on
+  the surface, and a selected filter chip is filled with the text color. The previous gray pills
+  and blue-tinted filter chips are `appearance="soft"`; restore them app-wide with
+  `provideUiChip({ appearance: 'soft' })`. This also changes the chips of `ui-chip-input` and of
+  `ui-multi-select`.
+- **tokens:** the chip tokens are split into shared ones and per-appearance groups.
+  `--ui-chip-bg`, `--ui-chip-radius` and `--ui-chip-filter-*` are replaced by
+  `--ui-chip-outline-*` and `--ui-chip-soft-*` (`radius`, `bg`, `border`, `filter-bg`,
+  `filter-border`, `filter-hover-bg`, `filter-selected-bg/border/text`).
+
+### Added
+
+- **chip:** `appearance` (`outline` | `soft`) and `size` (`sm` | `md`) on `ui-chip`,
+  `button[ui-filter-chip]` and `ui-chip-set`, resolved chip → set → `provideUiChip()` → the
+  built-in `outline` / `md`. `sm` is the compact chip for tables and cards.
+- **chip:** `tone` on `ui-chip` (`neutral`, `primary`, `info`, `success`, `warning`, `danger`):
+  a tinted background with the tone text and no border. Tokens `--ui-chip-<tone>-bg/text`.
+- **chip:** an icon in a filter chip (`uiChipIcon`) takes the primary color
+  (`--ui-chip-filter-icon`), and the check mark takes its place while the chip is selected.
+- **chip:** `provideUiChip()`, `UI_CHIP_DEFAULT_OPTIONS` and the types `UiChipAppearance`,
+  `UiChipSize`, `UiChipTone`, `UiChipDefaults`. Tokens `--ui-chip-font-size-sm` and
+  `--ui-chip-padding-inline-sm`.
+
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 
 The library targets Angular 20 and Signal Forms is gone. Both are breaking: the package no longer

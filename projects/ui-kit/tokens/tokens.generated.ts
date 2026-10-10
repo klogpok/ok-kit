@@ -3914,12 +3914,6 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-primary-text)"
   },
   {
-    "name": "--ui-chip-bg",
-    "layer": "component",
-    "light": "var(--ui-color-surface-muted)",
-    "dark": "var(--ui-color-surface-muted)"
-  },
-  {
     "name": "--ui-chip-text",
     "layer": "component",
     "light": "var(--ui-color-text)",
@@ -3932,10 +3926,10 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-text-muted)"
   },
   {
-    "name": "--ui-chip-radius",
+    "name": "--ui-chip-filter-icon",
     "layer": "component",
-    "light": "var(--ui-radius-full)",
-    "dark": "var(--ui-radius-full)"
+    "light": "var(--ui-color-primary)",
+    "dark": "var(--ui-color-primary)"
   },
   {
     "name": "--ui-chip-font-size",
@@ -3944,10 +3938,22 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-size-sm)"
   },
   {
+    "name": "--ui-chip-font-size-sm",
+    "layer": "component",
+    "light": "var(--ui-font-size-xs)",
+    "dark": "var(--ui-font-size-xs)"
+  },
+  {
     "name": "--ui-chip-padding-inline",
     "layer": "component",
     "light": "var(--ui-space-sm)",
     "dark": "var(--ui-space-sm)"
+  },
+  {
+    "name": "--ui-chip-padding-inline-sm",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
   },
   {
     "name": "--ui-chip-gap",
@@ -3962,46 +3968,190 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-surface-active)"
   },
   {
-    "name": "--ui-chip-filter-bg",
+    "name": "--ui-chip-set-gap",
+    "layer": "component",
+    "light": "var(--ui-space-xs)",
+    "dark": "var(--ui-space-xs)"
+  },
+  {
+    "name": "--ui-chip-outline-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-control)",
+    "dark": "var(--ui-radius-control)"
+  },
+  {
+    "name": "--ui-chip-outline-bg",
     "layer": "component",
     "light": "var(--ui-color-surface)",
     "dark": "var(--ui-color-surface)"
   },
   {
-    "name": "--ui-chip-filter-border",
+    "name": "--ui-chip-outline-border",
     "layer": "component",
     "light": "var(--ui-color-border-control)",
     "dark": "var(--ui-color-border-control)"
   },
   {
-    "name": "--ui-chip-filter-hover-bg",
+    "name": "--ui-chip-outline-filter-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-chip-outline-filter-border",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-chip-outline-filter-hover-bg",
     "layer": "component",
     "light": "var(--ui-color-surface-hover)",
     "dark": "var(--ui-color-surface-hover)"
   },
   {
-    "name": "--ui-chip-filter-selected-bg",
+    "name": "--ui-chip-outline-filter-selected-bg",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-chip-outline-filter-selected-border",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-chip-outline-filter-selected-text",
+    "layer": "component",
+    "light": "var(--ui-color-text-inverse)",
+    "dark": "var(--ui-color-text-inverse)"
+  },
+  {
+    "name": "--ui-chip-soft-radius",
+    "layer": "component",
+    "light": "var(--ui-radius-full)",
+    "dark": "var(--ui-radius-full)"
+  },
+  {
+    "name": "--ui-chip-soft-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-chip-soft-border",
+    "layer": "component",
+    "light": "transparent",
+    "dark": "transparent"
+  },
+  {
+    "name": "--ui-chip-soft-filter-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface)",
+    "dark": "var(--ui-color-surface)"
+  },
+  {
+    "name": "--ui-chip-soft-filter-border",
+    "layer": "component",
+    "light": "var(--ui-color-border-control)",
+    "dark": "var(--ui-color-border-control)"
+  },
+  {
+    "name": "--ui-chip-soft-filter-hover-bg",
+    "layer": "component",
+    "light": "var(--ui-color-surface-hover)",
+    "dark": "var(--ui-color-surface-hover)"
+  },
+  {
+    "name": "--ui-chip-soft-filter-selected-bg",
     "layer": "component",
     "light": "var(--ui-color-primary-subtle)",
     "dark": "var(--ui-color-primary-subtle)"
   },
   {
-    "name": "--ui-chip-filter-selected-border",
+    "name": "--ui-chip-soft-filter-selected-border",
     "layer": "component",
     "light": "var(--ui-color-primary)",
     "dark": "var(--ui-color-primary)"
   },
   {
-    "name": "--ui-chip-filter-selected-text",
+    "name": "--ui-chip-soft-filter-selected-text",
     "layer": "component",
     "light": "var(--ui-color-primary-text)",
     "dark": "var(--ui-color-primary-text)"
   },
   {
-    "name": "--ui-chip-set-gap",
+    "name": "--ui-chip-neutral-bg",
     "layer": "component",
-    "light": "var(--ui-space-xs)",
-    "dark": "var(--ui-space-xs)"
+    "light": "var(--ui-color-surface-muted)",
+    "dark": "var(--ui-color-surface-muted)"
+  },
+  {
+    "name": "--ui-chip-neutral-text",
+    "layer": "component",
+    "light": "var(--ui-color-text)",
+    "dark": "var(--ui-color-text)"
+  },
+  {
+    "name": "--ui-chip-primary-bg",
+    "layer": "component",
+    "light": "var(--ui-color-primary-subtle)",
+    "dark": "var(--ui-color-primary-subtle)"
+  },
+  {
+    "name": "--ui-chip-primary-text",
+    "layer": "component",
+    "light": "var(--ui-color-primary-text)",
+    "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-chip-info-bg",
+    "layer": "component",
+    "light": "var(--ui-color-info-subtle)",
+    "dark": "var(--ui-color-info-subtle)"
+  },
+  {
+    "name": "--ui-chip-info-text",
+    "layer": "component",
+    "light": "var(--ui-color-info-text)",
+    "dark": "var(--ui-color-info-text)"
+  },
+  {
+    "name": "--ui-chip-success-bg",
+    "layer": "component",
+    "light": "var(--ui-color-success-subtle)",
+    "dark": "var(--ui-color-success-subtle)"
+  },
+  {
+    "name": "--ui-chip-success-text",
+    "layer": "component",
+    "light": "var(--ui-color-success-text)",
+    "dark": "var(--ui-color-success-text)"
+  },
+  {
+    "name": "--ui-chip-warning-bg",
+    "layer": "component",
+    "light": "var(--ui-color-warning-subtle)",
+    "dark": "var(--ui-color-warning-subtle)"
+  },
+  {
+    "name": "--ui-chip-warning-text",
+    "layer": "component",
+    "light": "var(--ui-color-warning-text)",
+    "dark": "var(--ui-color-warning-text)"
+  },
+  {
+    "name": "--ui-chip-danger-bg",
+    "layer": "component",
+    "light": "var(--ui-color-danger-subtle)",
+    "dark": "var(--ui-color-danger-subtle)"
+  },
+  {
+    "name": "--ui-chip-danger-text",
+    "layer": "component",
+    "light": "var(--ui-color-danger-text)",
+    "dark": "var(--ui-color-danger-text)"
   },
   {
     "name": "--ui-file-upload-zone-bg",

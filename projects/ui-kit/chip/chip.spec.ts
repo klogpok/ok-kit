@@ -2,7 +2,15 @@ import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import type { MockInstance } from 'vitest';
-import { UiChip, UiChipSet, UiFilterChip } from './chip';
+import {
+  UiChip,
+  UiChipAppearance,
+  UiChipDefaults,
+  UiChipSet,
+  UiChipSize,
+  UiFilterChip,
+  provideUiChip,
+} from './chip';
 
 const KEY_CODES: Record<string, number> = {
   ArrowLeft: 37,
@@ -188,5 +196,108 @@ describe('UiFilterChip', () => {
     expect(fixture.componentInstance.open()).toBe(true);
     expect(open.getAttribute('aria-pressed')).toBe('true');
     expect(open.classList).toContain('ui-filter-chip--selected');
+  });
+
+  it('shows the check mark in place of its icon while selected', async () => {
+    const fixture = TestBed.createComponent(FilterIconHost);
+    const root = fixture.nativeElement as HTMLElement;
+    await settle(fixture);
+    const chip = root.querySelector<HTMLButtonElement>('button')!;
+    const icon = chip.querySelector<HTMLElement>('.ui-chip__icon')!;
+    expect(icon.querySelector('[uiChipIcon]')).not.toBeNull();
+    expect(icon.hidden).toBe(false);
+    expect(chip.querySelector('.ui-chip__check')).toBeNull();
+
+    chip.click();
+    await settle(fixture);
+    expect(icon.hidden).toBe(true);
+    expect(chip.querySelector('.ui-chip__check')).not.toBeNull();
+  });
+});
+
+@Component({
+  imports: [UiFilterChip],
+  template: `<button ui-filter-chip><span uiChipIcon>★</span>Starred</button>`,
+})
+class FilterIconHost {}
+
+@Component({
+  imports: [UiChip, UiFilterChip, UiChipSet],
+  template: `
+    <ui-chip-set [appearance]="setAppearance()" [size]="setSize()">
+      <ui-chip id="own" [appearance]="chipAppearance()" [size]="chipSize()">Own</ui-chip>
+      <button ui-filter-chip id="filter" [appearance]="chipAppearance()" [size]="chipSize()">
+        Filter
+      </button>
+    </ui-chip-set>
+    <ui-chip id="alone">Alone</ui-chip>
+    <ui-chip id="toned" tone="success">Toned</ui-chip>
+  `,
+})
+class LookHost {
+  readonly setAppearance = signal<UiChipAppearance | undefined>(undefined);
+  readonly setSize = signal<UiChipSize | undefined>(undefined);
+  readonly chipAppearance = signal<UiChipAppearance | undefined>(undefined);
+  readonly chipSize = signal<UiChipSize | undefined>(undefined);
+}
+
+describe('chip appearance and size', () => {
+  async function render(defaults?: UiChipDefaults) {
+    if (defaults) TestBed.configureTestingModule({ providers: [provideUiChip(defaults)] });
+    const fixture = TestBed.createComponent(LookHost);
+    const root = fixture.nativeElement as HTMLElement;
+    await settle(fixture);
+    const classes = (id: string) => root.querySelector(`#${id}`)!.classList;
+    return { fixture, host: fixture.componentInstance, classes };
+  }
+
+  it('defaults to outline and md', async () => {
+    const { classes } = await render();
+    for (const id of ['own', 'filter', 'alone']) {
+      expect(classes(id)).toContain('ui-chip--outline');
+      expect(classes(id)).toContain('ui-chip--md');
+    }
+  });
+
+  it('takes the app default from provideUiChip()', async () => {
+    const { classes } = await render({ appearance: 'soft', size: 'sm' });
+    expect(classes('own')).toContain('ui-chip--soft');
+    expect(classes('own')).toContain('ui-chip--sm');
+    expect(classes('alone')).toContain('ui-chip--soft');
+    expect(classes('alone')).toContain('ui-chip--sm');
+  });
+
+  it('prefers the set input over the provider, and the chip input over the set', async () => {
+    const { fixture, host, classes } = await render({ appearance: 'soft', size: 'sm' });
+    host.setAppearance.set('outline');
+    host.setSize.set('md');
+    await settle(fixture);
+    for (const id of ['own', 'filter']) {
+      expect(classes(id)).toContain('ui-chip--outline');
+      expect(classes(id)).toContain('ui-chip--md');
+    }
+    expect(classes('alone')).toContain('ui-chip--soft');
+
+    host.chipAppearance.set('soft');
+    host.chipSize.set('sm');
+    await settle(fixture);
+    for (const id of ['own', 'filter']) {
+      expect(classes(id)).toContain('ui-chip--soft');
+      expect(classes(id)).toContain('ui-chip--sm');
+      expect(classes(id)).not.toContain('ui-chip--outline');
+    }
+  });
+
+  it('keeps its base classes next to the appearance', async () => {
+    const { classes } = await render();
+    expect(classes('own')).toContain('ui-chip');
+    expect(classes('filter')).toContain('ui-filter-chip');
+  });
+
+  it('marks a toned chip with its tone', async () => {
+    const { classes } = await render();
+    expect(classes('toned')).toContain('ui-chip--toned');
+    expect(classes('toned')).toContain('ui-chip--success');
+    expect(classes('alone')).not.toContain('ui-chip--toned');
   });
 });

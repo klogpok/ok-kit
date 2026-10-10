@@ -1,6 +1,7 @@
 @use '../styles/mixins';
 
-// Shared by ui-chip and button[ui-filter-chip].
+// Shared by ui-chip and button[ui-filter-chip]. The appearance (outline, soft) sets the
+// private --_ properties; the size sets the font size and the inline padding.
 
 :host {
   display: inline-flex;
@@ -10,15 +11,63 @@
   max-inline-size: 100%;
   margin: 0;
   padding-block: var(--ui-space-3xs);
-  padding-inline: var(--ui-chip-padding-inline);
-  border: var(--ui-border-width-default) solid transparent;
-  border-radius: var(--ui-chip-radius);
-  background-color: var(--ui-chip-bg);
+  padding-inline: var(--_padding-inline);
+  border: var(--ui-border-width-default) solid var(--_border);
+  border-radius: var(--_radius);
+  background-color: var(--_bg);
   color: var(--ui-chip-text);
   font-family: var(--ui-font-family-sans);
-  font-size: var(--ui-chip-font-size);
+  font-size: var(--_font-size);
   line-height: var(--ui-line-height-snug);
   vertical-align: middle;
+}
+
+@each $appearance in outline, soft {
+  :host(.ui-chip--#{$appearance}) {
+    --_radius: var(--ui-chip-#{$appearance}-radius);
+    --_bg: var(--ui-chip-#{$appearance}-bg);
+    --_border: var(--ui-chip-#{$appearance}-border);
+    --_filter-bg: var(--ui-chip-#{$appearance}-filter-bg);
+    --_filter-border: var(--ui-chip-#{$appearance}-filter-border);
+    --_filter-hover-bg: var(--ui-chip-#{$appearance}-filter-hover-bg);
+    --_selected-bg: var(--ui-chip-#{$appearance}-filter-selected-bg);
+    --_selected-border: var(--ui-chip-#{$appearance}-filter-selected-border);
+    --_selected-text: var(--ui-chip-#{$appearance}-filter-selected-text);
+  }
+}
+
+:host(.ui-chip--md) {
+  --_font-size: var(--ui-chip-font-size);
+  --_padding-inline: var(--ui-chip-padding-inline);
+}
+
+// The compact chip for tables and cards; it does not follow data-density.
+:host(.ui-chip--sm) {
+  --_font-size: var(--ui-chip-font-size-sm);
+  --_padding-inline: var(--ui-chip-padding-inline-sm);
+
+  // A removable chip keeps the height of the others.
+  .ui-chip__remove {
+    padding: 0;
+  }
+}
+
+// A tone tints a tag or a status the same way in either appearance.
+@each $tone in neutral, primary, info, success, warning, danger {
+  :host(.ui-chip--#{$tone}) {
+    --_bg: var(--ui-chip-#{$tone}-bg);
+    --_border: transparent;
+    --_text: var(--ui-chip-#{$tone}-text);
+  }
+}
+
+:host(.ui-chip--toned) {
+  color: var(--_text);
+
+  .ui-chip__icon,
+  .ui-chip__remove {
+    color: inherit;
+  }
 }
 
 // The remove button sits close to the end edge.
@@ -39,7 +88,8 @@
   margin-inline-start: calc(var(--ui-space-2xs) * -1);
   color: var(--ui-chip-icon);
 
-  &:empty {
+  &:empty,
+  &[hidden] {
     display: none;
   }
 }
@@ -66,35 +116,42 @@
   }
 }
 
-// A display chip is text, not a control: it stays readable (AA) while disabled.
-:host(.ui-chip--disabled) {
+// A display chip is text, not a control: it stays readable (AA) while disabled. A toned chip
+// keeps its tone text, which is checked on its own background.
+:host(.ui-chip--disabled:not(.ui-chip--toned)) {
   color: var(--ui-color-text-muted);
+}
 
+:host(.ui-chip--disabled) {
   .ui-chip__remove {
     color: var(--ui-color-text-disabled);
     cursor: default;
   }
 }
 
-// Filter chips: outlined toggle buttons.
+// Filter chips: bordered toggle buttons.
 :host(.ui-filter-chip) {
   padding-block: var(--ui-space-2xs);
-  border-color: var(--ui-chip-filter-border);
-  background-color: var(--ui-chip-filter-bg);
+  border-color: var(--_filter-border);
+  background-color: var(--_filter-bg);
   cursor: pointer;
   @include mixins.transition(background-color, border-color, color);
   @include mixins.focus-visible;
+
+  .ui-chip__icon {
+    color: var(--ui-chip-filter-icon);
+  }
 }
 
 :host(.ui-filter-chip:hover:not(:disabled)) {
-  background-color: var(--ui-chip-filter-hover-bg);
+  background-color: var(--_filter-hover-bg);
 }
 
 :host(.ui-filter-chip--selected),
 :host(.ui-filter-chip--selected:hover:not(:disabled)) {
-  border-color: var(--ui-chip-filter-selected-border);
-  background-color: var(--ui-chip-filter-selected-bg);
-  color: var(--ui-chip-filter-selected-text);
+  border-color: var(--_selected-border);
+  background-color: var(--_selected-bg);
+  color: var(--_selected-text);
 }
 
 :host(.ui-filter-chip:disabled) {
@@ -102,6 +159,10 @@
   background-color: var(--ui-color-surface-subtle);
   color: var(--ui-color-text-disabled);
   cursor: not-allowed;
+
+  .ui-chip__icon {
+    color: inherit;
+  }
 }
 
 .ui-chip__check {

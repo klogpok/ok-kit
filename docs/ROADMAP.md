@@ -283,6 +283,10 @@
 playground, `lint` и `format:check` чисто, обе сборки и `build-storybook` успешны, 263 стори в
 3 режимах без нарушений axe и без визуальных изменений.
 
+## Вид чипсов (сделано 2026-10-10, ждёт ревью)
+
+> Отдельная задача вне фаз: тикет `.scratch/chip-appearance/issues/01-chip-appearance.md`. Новый вид по умолчанию `outline`, прежний — `appearance="soft"`; `size` (`sm`/`md`), `tone`, иконки в фильтрах, `provideUiChip()`. Решения — в [DECISIONS.md](DECISIONS.md) («Chips: outline by default, soft on request»).
+
 ## Критичные файлы и что переиспользовать
 
 - `select/select-base.ts`, `select/option.ts` — оверлей, `labelFor`, `matches` → общая панель (7.7), clearable и loading (6.8).
