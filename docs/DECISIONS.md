@@ -447,3 +447,16 @@ The deviations listed in the roadmap are accepted. Review answers:
   default, so an override sets the width directly. Listed as breaking in the CHANGELOG.
 - **A pushed popover under the left scrollbar of an RTL iframe is fixed in the kit** (ticket 27):
   the fix is ticket 28.
+
+## Phase 9.2: breakpoints and density (approved 2026-10-10)
+
+Tickets 08, 09, 10 and 28 in `.scratch/phase-9/issues/`; the report is ticket 11 and the roadmap
+status. The deviations listed in the roadmap are accepted. Changed default: the table `density`
+input is now `undefined` (follows the region) instead of `'default'`. Review answers:
+
+- **Density regions reset `:root` component token overrides** (ticket 29), the same way theme
+  scopes do; override through `ui.$theme-scopes`. No CHANGELOG change.
+- **Only `data-density="compact"` exists** (ticket 30): a region inside a compact one cannot return
+  to default; a table can, with `density="default"`. Add a `default` value when a screen needs it.
+- **The kit's own push stays on the popover only** (ticket 31): tooltip keeps the CDK push. Re-check
+  the copied fit test in `core/overlay.ts` on every CDK update.
