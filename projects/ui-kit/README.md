@@ -1323,6 +1323,8 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-radio-invalid-border`                | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
 | `--ui-switch-track-width`                  | component | `var(--ui-control-height-md)`                                                | `var(--ui-control-height-md)`                                          |
 | `--ui-switch-track-height`                 | component | `var(--ui-icon-size-md)`                                                     | `var(--ui-icon-size-md)`                                               |
+| `--ui-switch-track-scale-sm`               | component | `0.8`                                                                        | `0.8`                                                                  |
+| `--ui-switch-track-scale-lg`               | component | `1.2`                                                                        | `1.2`                                                                  |
 | `--ui-switch-track-bg`                     | component | `var(--ui-color-border-control)`                                             | `var(--ui-color-border-control)`                                       |
 | `--ui-switch-track-checked-bg`             | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |
 | `--ui-switch-thumb-bg`                     | component | `var(--ui-color-control-bg)`                                                 | `var(--ui-color-control-bg)`                                           |
@@ -1366,7 +1368,9 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-segmented-pressed-text`              | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
 | `--ui-segmented-disabled-selected-bg`      | component | `var(--ui-color-surface-active)`                                             | `var(--ui-color-surface-active)`                                       |
 | `--ui-spinner-track-color`                 | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
-| `--ui-spinner-stroke-width`                | component | `var(--ui-border-width-strong)`                                              | `var(--ui-border-width-strong)`                                        |
+| `--ui-spinner-stroke-width`                | component | `calc(var(--ui-border-width-strong) * 1.25)`                                 | `calc(var(--ui-border-width-strong) * 1.25)`                           |
+| `--ui-spinner-duration`                    | component | `calc(var(--ui-motion-duration-slow) * 3)`                                   | `calc(var(--ui-motion-duration-slow) * 3)`                             |
+| `--ui-spinner-duration-reduced-motion`     | component | `calc(var(--ui-motion-duration-slow) * 8)`                                   | `calc(var(--ui-motion-duration-slow) * 8)`                             |
 | `--ui-divider-color`                       | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-divider-thickness`                   | component | `var(--ui-border-width-default)`                                             | `var(--ui-border-width-default)`                                       |
 | `--ui-divider-label-color`                 | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
@@ -1445,6 +1449,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-progress-success`                    | component | `var(--ui-color-success)`                                                    | `var(--ui-color-success)`                                              |
 | `--ui-progress-warning`                    | component | `var(--ui-color-warning)`                                                    | `var(--ui-color-warning)`                                              |
 | `--ui-progress-danger`                     | component | `var(--ui-color-danger)`                                                     | `var(--ui-color-danger)`                                               |
+| `--ui-progress-indeterminate-duration`     | component | `calc(var(--ui-motion-duration-slow) * 5)`                                   | `calc(var(--ui-motion-duration-slow) * 5)`                             |
 | `--ui-avatar-radius-square`                | component | `var(--ui-radius-control)`                                                   | `var(--ui-radius-control)`                                             |
 | `--ui-avatar-size-sm`                      | component | `var(--ui-media-size-sm)`                                                    | `var(--ui-media-size-sm)`                                              |
 | `--ui-avatar-size-md`                      | component | `var(--ui-media-size-md)`                                                    | `var(--ui-media-size-md)`                                              |
@@ -1454,6 +1459,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-avatar-font-size-md`                 | component | `var(--ui-font-size-sm)`                                                     | `var(--ui-font-size-sm)`                                               |
 | `--ui-avatar-font-size-lg`                 | component | `var(--ui-font-size-md)`                                                     | `var(--ui-font-size-md)`                                               |
 | `--ui-avatar-font-size-xl`                 | component | `var(--ui-font-size-lg)`                                                     | `var(--ui-font-size-lg)`                                               |
+| `--ui-avatar-icon-size-ratio`              | component | `0.6`                                                                        | `0.6`                                                                  |
 | `--ui-avatar-font-weight`                  | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
 | `--ui-avatar-fallback-bg`                  | component | `var(--ui-color-surface-muted)`                                              | `var(--ui-color-surface-muted)`                                        |
 | `--ui-avatar-fallback-text`                | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
@@ -1534,6 +1540,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-dialog-width-lg`                     | component | `var(--ui-container-width-3xl)`                                              | `var(--ui-container-width-3xl)`                                        |
 | `--ui-dialog-title-font-size`              | component | `var(--ui-font-size-xl)`                                                     | `var(--ui-font-size-xl)`                                               |
 | `--ui-dialog-title-font-weight`            | component | `var(--ui-font-weight-semibold)`                                             | `var(--ui-font-weight-semibold)`                                       |
+| `--ui-dialog-enter-scale`                  | component | `0.96`                                                                       | `0.96`                                                                 |
 | `--ui-drawer-bg`                           | component | `var(--ui-color-surface-raised)`                                             | `var(--ui-color-surface-raised)`                                       |
 | `--ui-drawer-shadow`                       | component | `var(--ui-shadow-lg)`                                                        | `var(--ui-shadow-lg)`                                                  |
 | `--ui-drawer-width-sm`                     | component | `var(--ui-container-width-md)`                                               | `var(--ui-container-width-md)`                                         |
@@ -1568,6 +1575,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-skeleton-text-height`                | component | `var(--ui-em-0-8)`                                                           | `var(--ui-em-0-8)`                                                     |
 | `--ui-skeleton-rect-height`                | component | `var(--ui-em-6)`                                                             | `var(--ui-em-6)`                                                       |
 | `--ui-skeleton-circle-size`                | component | `var(--ui-em-2-5)`                                                           | `var(--ui-em-2-5)`                                                     |
+| `--ui-skeleton-duration`                   | component | `calc(var(--ui-motion-duration-slow) * 5)`                                   | `calc(var(--ui-motion-duration-slow) * 5)`                             |
 | `--ui-accordion-bg`                        | component | `var(--ui-color-surface)`                                                    | `var(--ui-color-surface)`                                              |
 | `--ui-accordion-border`                    | component | `var(--ui-color-border)`                                                     | `var(--ui-color-border)`                                               |
 | `--ui-accordion-radius`                    | component | `var(--ui-radius-container)`                                                 | `var(--ui-radius-container)`                                           |
@@ -1630,6 +1638,7 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 | `--ui-table-message-text`                  | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-sort-icon`                     | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-table-sort-icon-active`              | component | `var(--ui-color-primary-text)`                                               | `var(--ui-color-primary-text)`                                         |
+| `--ui-table-busy-duration`                 | component | `calc(var(--ui-motion-duration-slow) * 2)`                                   | `calc(var(--ui-motion-duration-slow) * 2)`                             |
 | `--ui-chip-text`                           | component | `var(--ui-color-text)`                                                       | `var(--ui-color-text)`                                                 |
 | `--ui-chip-icon`                           | component | `var(--ui-color-text-muted)`                                                 | `var(--ui-color-text-muted)`                                           |
 | `--ui-chip-filter-icon`                    | component | `var(--ui-color-primary)`                                                    | `var(--ui-color-primary)`                                              |

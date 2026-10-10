@@ -493,6 +493,8 @@
   --ui-radio-invalid-border: var(--ui-color-danger);
   --ui-switch-track-width: var(--ui-control-height-md);
   --ui-switch-track-height: var(--ui-icon-size-md);
+  --ui-switch-track-scale-sm: 0.8;
+  --ui-switch-track-scale-lg: 1.2;
   --ui-switch-track-bg: var(--ui-color-border-control);
   --ui-switch-track-checked-bg: var(--ui-color-primary);
   --ui-switch-thumb-bg: var(--ui-color-control-bg);
@@ -536,7 +538,9 @@
   --ui-segmented-pressed-text: var(--ui-color-primary-text);
   --ui-segmented-disabled-selected-bg: var(--ui-color-surface-active);
   --ui-spinner-track-color: var(--ui-color-border);
-  --ui-spinner-stroke-width: var(--ui-border-width-strong);
+  --ui-spinner-stroke-width: calc(var(--ui-border-width-strong) * 1.25);
+  --ui-spinner-duration: calc(var(--ui-motion-duration-slow) * 3);
+  --ui-spinner-duration-reduced-motion: calc(var(--ui-motion-duration-slow) * 8);
   --ui-divider-color: var(--ui-color-border);
   --ui-divider-thickness: var(--ui-border-width-default);
   --ui-divider-label-color: var(--ui-color-text-muted);
@@ -615,6 +619,7 @@
   --ui-progress-success: var(--ui-color-success);
   --ui-progress-warning: var(--ui-color-warning);
   --ui-progress-danger: var(--ui-color-danger);
+  --ui-progress-indeterminate-duration: calc(var(--ui-motion-duration-slow) * 5);
   --ui-avatar-radius-square: var(--ui-radius-control);
   --ui-avatar-size-sm: var(--ui-media-size-sm);
   --ui-avatar-size-md: var(--ui-media-size-md);
@@ -624,6 +629,7 @@
   --ui-avatar-font-size-md: var(--ui-font-size-sm);
   --ui-avatar-font-size-lg: var(--ui-font-size-md);
   --ui-avatar-font-size-xl: var(--ui-font-size-lg);
+  --ui-avatar-icon-size-ratio: 0.6;
   --ui-avatar-font-weight: var(--ui-font-weight-semibold);
   --ui-avatar-fallback-bg: var(--ui-color-surface-muted);
   --ui-avatar-fallback-text: var(--ui-color-text-muted);
@@ -704,6 +710,7 @@
   --ui-dialog-width-lg: var(--ui-container-width-3xl);
   --ui-dialog-title-font-size: var(--ui-font-size-xl);
   --ui-dialog-title-font-weight: var(--ui-font-weight-semibold);
+  --ui-dialog-enter-scale: 0.96;
   --ui-drawer-bg: var(--ui-color-surface-raised);
   --ui-drawer-shadow: var(--ui-shadow-lg);
   --ui-drawer-width-sm: var(--ui-container-width-md);
@@ -738,6 +745,7 @@
   --ui-skeleton-text-height: var(--ui-em-0-8);
   --ui-skeleton-rect-height: var(--ui-em-6);
   --ui-skeleton-circle-size: var(--ui-em-2-5);
+  --ui-skeleton-duration: calc(var(--ui-motion-duration-slow) * 5);
   --ui-accordion-bg: var(--ui-color-surface);
   --ui-accordion-border: var(--ui-color-border);
   --ui-accordion-radius: var(--ui-radius-container);
@@ -800,6 +808,7 @@
   --ui-table-message-text: var(--ui-color-text-muted);
   --ui-table-sort-icon: var(--ui-color-text-muted);
   --ui-table-sort-icon-active: var(--ui-color-primary-text);
+  --ui-table-busy-duration: calc(var(--ui-motion-duration-slow) * 2);
   --ui-chip-text: var(--ui-color-text);
   --ui-chip-icon: var(--ui-color-text-muted);
   --ui-chip-filter-icon: var(--ui-color-primary);
