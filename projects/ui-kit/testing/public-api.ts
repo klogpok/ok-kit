@@ -1,5 +1,6 @@
 export * from './harness';
 export * from './alert-harness';
+export * from './avatar-harness';
 export * from './button-harness';
 export * from './input-harness';
 export * from './checkbox-harness';
