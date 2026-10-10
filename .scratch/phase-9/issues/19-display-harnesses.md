@@ -6,11 +6,11 @@
 
 **Blocked by:** 14 (Phase 9.3 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Five harnesses on the `UiHarness` base, one commit each, each with its own spec
-- [ ] Exported from the testing entry point; README table and CHANGELOG updated
-- [ ] The README harness rule is reworded with the exempt list
+- [x] Five harnesses on the `UiHarness` base, one commit each, each with its own spec
+- [x] Exported from the testing entry point; README table and CHANGELOG updated
+- [x] The README harness rule is reworded with the exempt list
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** 14 (Отчёт подфазы 9.3)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Пять harnesses на базе `UiHarness`, по коммиту на каждый, у каждого свой спек
-- [ ] Экспортируются из entry point testing; таблица README и CHANGELOG обновлены
-- [ ] Правило harnesses в README переформулировано со списком исключений
+- [x] Пять harnesses на базе `UiHarness`, по коммиту на каждый, у каждого свой спек
+- [x] Экспортируются из entry point testing; таблица README и CHANGELOG обновлены
+- [x] Правило harnesses в README переформулировано со списком исключений

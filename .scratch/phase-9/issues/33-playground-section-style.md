@@ -6,11 +6,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Every playground section has the card frame, checked in the browser in light, dark and RTL
-- [ ] Every JSON `<pre>` has `dir="ltr"` and reads in order in RTL
-- [ ] Sections that already had the frame look the same; the playground builds within its budgets and its tests pass
+- [x] Every playground section has the card frame, checked in the browser in light, dark and RTL
+- [x] Every JSON `<pre>` has `dir="ltr"` and reads in order in RTL
+- [x] Sections that already had the frame look the same; the playground builds within its budgets and its tests pass
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] У каждой секции playground есть рамка карточки; проверено в браузере в light, dark и RTL
-- [ ] У каждого `<pre>` с JSON есть `dir="ltr"`, и в RTL он читается по порядку
-- [ ] Секции, у которых рамка уже была, выглядят так же; playground собирается в рамках бюджетов, его тесты проходят
+- [x] У каждой секции playground есть рамка карточки; проверено в браузере в light, dark и RTL
+- [x] У каждого `<pre>` с JSON есть `dir="ltr"`, и в RTL он читается по порядку
+- [x] Секции, у которых рамка уже была, выглядят так же; playground собирается в рамках бюджетов, его тесты проходят

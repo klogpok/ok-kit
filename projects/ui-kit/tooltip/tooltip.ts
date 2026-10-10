@@ -106,6 +106,7 @@ export function provideUiTooltip(defaults: UiTooltipDefaults): EnvironmentProvid
   selector: '[uiTooltip]',
   exportAs: 'uiTooltip',
   host: {
+    class: 'ui-tooltip-trigger',
     '(pointerenter)': 'onPointerEnter($event)',
     '(pointerleave)': 'onPointerLeave($event)',
     '(keydown.escape)': 'onEscape($event)',
