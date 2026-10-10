@@ -39,7 +39,9 @@
     </ui-form-field>
   </div>
   <pre dir="ltr">{{ model() | json }}</pre>
-  <p>Last committed rent: {{ committedPrice() | json }}</p>
+  <p>
+    Last committed rent: <bdi dir="ltr">{{ committedPrice() | json }}</bdi>
+  </p>
 </section>
 
 <section aria-labelledby="scope-title">

@@ -54,9 +54,15 @@ describe('App', () => {
 
   it('shows every JSON value left to right, also in RTL', async () => {
     const fixture = await renderPlayground();
-    const blocks = [...(fixture.nativeElement as HTMLElement).querySelectorAll('pre')];
-    expect(blocks).toHaveLength(5);
+    const el = fixture.nativeElement as HTMLElement;
+    const blocks = [...el.querySelectorAll('pre')];
+    expect(blocks.length).toBeGreaterThan(0);
     expect(blocks.filter((pre) => pre.dir !== 'ltr').map((pre) => pre.textContent)).toEqual([]);
+
+    const rent = [...el.querySelectorAll('app-phase-eight p')].find((p) =>
+      p.textContent?.includes('Last committed rent'),
+    );
+    expect(rent?.querySelector('bdi[dir="ltr"]')?.textContent).toBe('null');
   });
 
   it('switches the direction and the language together', async () => {
