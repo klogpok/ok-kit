@@ -460,3 +460,14 @@ input is now `undefined` (follows the region) instead of `'default'`. Review ans
   to default; a table can, with `density="default"`. Add a `default` value when a screen needs it.
 - **The kit's own push stays on the popover only** (ticket 31): tooltip keeps the CDK push. Re-check
   the copied fit test in `core/overlay.ts` on every CDK update.
+
+## Phase 9.3: layout utilities (approved 2026-10-10)
+
+Tickets 12 and 13 in `.scratch/phase-9/issues/`; the report is ticket 14 and the roadmap status.
+The deviations listed in the roadmap are accepted: each layout element sets its own `--ui-gap` and
+`--ui-grid-min` (modifiers work on the same element, nothing leaks into nested layouts), and the
+20rem / 80rem defaults are the semantic tokens `--ui-layout-grid-min` and
+`--ui-layout-container-max-width`. Review answer:
+
+- **Playground sections get one shared card style, and JSON blocks read left to right** (ticket 32):
+  the fix is ticket 33.

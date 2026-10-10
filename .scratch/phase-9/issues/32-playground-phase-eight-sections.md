@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → 9.3 (found by the browser check; it also exists on `master`)
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** the `section` card style of the playground lives in `app.scss`, the styles of the `App` component, so it does not reach the sections inside `<app-phase-eight>`: those sections render without the card frame. Their `<pre>` blocks with JSON values have no `dir="ltr"`, so in RTL the braces and quotes read out of order. The kit itself is not affected, and ticket 13 did not change this (its screenshots are pixel-identical to before).
 
@@ -11,13 +11,17 @@
 1. Fix it in the playground now: a shared section style that reaches every phase component, and `dir="ltr"` on the JSON `<pre>` blocks (recommended; small, playground only).
 2. Leave it: the playground is a demo, not part of the package.
 
+## Answer
+
+Fix it now: ticket [33](33-playground-section-style.md). Recorded in docs/DECISIONS.md (2026-10-10).
+
 ## Русский перевод
 
 # 32: Секции phase 8 в playground без стиля карточки, а JSON в RTL перемешан
 
 **Спека:** [../spec.md](../spec.md) → 9.3 (найдено при проверке в браузере; есть и в `master`)
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** стиль карточки `section` в playground лежит в `app.scss`, то есть в стилях компонента `App`, поэтому он не доходит до секций внутри `<app-phase-eight>`: эти секции рисуются без рамки карточки. Их блоки `<pre>` со значениями JSON не помечены `dir="ltr"`, поэтому в RTL скобки и кавычки стоят не по порядку. Сам кит это не затрагивает, и тикет 13 этого не менял (его скриншоты попиксельно совпадают с прежними).
 
@@ -25,3 +29,7 @@
 
 1. Исправить в playground сейчас: общий стиль секции, который доходит до всех компонентов фаз, и `dir="ltr"` на блоках `<pre>` с JSON (рекомендую; мелкая правка, только playground).
 2. Оставить: playground — демо, он не входит в пакет.
+
+## Ответ
+
+Исправить сейчас: тикет [33](33-playground-section-style.md). Записано в docs/DECISIONS.md (2026-10-10).
