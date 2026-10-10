@@ -1,7 +1,8 @@
 :host {
   display: block;
   box-sizing: border-box;
-  max-inline-size: min(var(--ui-popover-max-width), 100vw - var(--ui-popover-viewport-margin) * 2);
+  // The pane keeps the viewport margins (see `UiPopoverTrigger.open`); the panel shrinks to it.
+  max-inline-size: var(--ui-popover-max-width);
   padding: var(--ui-popover-padding);
   border: var(--ui-border-width-default) solid var(--ui-popover-border);
   border-radius: var(--ui-popover-radius);

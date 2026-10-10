@@ -154,7 +154,11 @@ export class UiPopoverTrigger {
     // The CDK reads the direction once; follow runtime `dir` changes.
     overlayRef.setDirection(resolveDirection(this.host));
     this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
-    this.positionStrategy!.withViewportMargin(this.viewportMargin());
+    const margin = this.viewportMargin();
+    this.positionStrategy!.withViewportMargin(margin);
+    // The pane spans the overlay container, which ends at the page scrollbar (viewport units run
+    // under it). A percentage on the panel would be resolved against a pane sized by its content.
+    overlayRef.updateSize({ maxWidth: `calc(100% - ${margin * 2}px)` });
     this.positionStrategy!.withPositions([
       { ...POSITIONS[preferred], panelClass: `ui-popover-pane--${preferred}` },
       {

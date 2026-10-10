@@ -6,11 +6,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] No `100vw` remains in the dialog, drawer, toast and popover styles
-- [ ] Checked in the browser with a visible scrollbar, in LTR and RTL, for a full-width dialog, an end drawer, a toast and a popover at the edge
-- [ ] Visual baselines do not change
+- [x] No `100vw` remains in the dialog, drawer, toast and popover styles
+- [x] Checked in the browser with a visible scrollbar, in LTR and RTL, for a full-width dialog, an end drawer, a toast and a popover at the edge
+- [x] Visual baselines do not change
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** Нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] В стилях dialog, drawer, toast и popover не осталось `100vw`
-- [ ] Проверено в браузере с видимой полосой прокрутки, в LTR и RTL: диалог на всю ширину, drawer с конца, toast и popover у края
-- [ ] Визуальные снимки не меняются
+- [x] В стилях dialog, drawer, toast и popover не осталось `100vw`
+- [x] Проверено в браузере с видимой полосой прокрутки, в LTR и RTL: диалог на всю ширину, drawer с конца, toast и popover у края
+- [x] Визуальные снимки не меняются
