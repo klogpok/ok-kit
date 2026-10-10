@@ -2,7 +2,7 @@ import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import { UiIconButton } from '@vplans/ui-kit/button';
-import { UiTooltip } from './tooltip';
+import { UiTooltip, UiTooltipDefaults, provideUiTooltip } from './tooltip';
 
 @Component({
   imports: [UiTooltip],
@@ -250,5 +250,94 @@ describe('UiTooltip native title', () => {
     fixture.componentInstance.message.set('');
     await fixture.whenStable();
     expect(span.getAttribute('title')).toBe('Signed');
+  });
+});
+
+@Component({
+  imports: [UiTooltip],
+  template: `
+    <button type="button" id="plain" uiTooltip="Plain">Plain</button>
+    <button
+      type="button"
+      id="bound"
+      uiTooltip="Bound"
+      uiTooltipPosition="end"
+      uiTooltipShowDelay="20"
+      uiTooltipHideDelay="10"
+    >
+      Bound
+    </button>
+  `,
+})
+class DefaultsHost {}
+
+describe('UiTooltip defaults', () => {
+  let fixture: ComponentFixture<DefaultsHost>;
+  const panel = () => document.querySelector<HTMLElement>('ui-tooltip-panel');
+  const pointer = (type: string) => Object.assign(new MouseEvent(type), { pointerType: 'mouse' });
+
+  async function render(defaults?: UiTooltipDefaults) {
+    if (defaults) TestBed.configureTestingModule({ providers: [provideUiTooltip(defaults)] });
+    vi.useFakeTimers();
+    fixture = TestBed.createComponent(DefaultsHost);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  const button = (id: string) =>
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(`#${id}`)!;
+
+  afterEach(() => {
+    vi.useRealTimers();
+    (fixture.nativeElement as HTMLElement).remove();
+  });
+
+  it('keeps the built-in defaults without the provider', async () => {
+    await render();
+    button('plain').dispatchEvent(pointer('pointerenter'));
+    vi.advanceTimersByTime(290);
+    expect(panel()).toBeNull();
+    vi.advanceTimersByTime(20);
+    expect(panel()?.classList).toContain('ui-tooltip--top');
+
+    button('plain').dispatchEvent(pointer('pointerleave'));
+    vi.advanceTimersByTime(90);
+    expect(panel()).not.toBeNull();
+    vi.advanceTimersByTime(20);
+    expect(panel()).toBeNull();
+  });
+
+  it('takes the app defaults from provideUiTooltip()', async () => {
+    await render({ position: 'bottom', showDelay: 600, hideDelay: 400 });
+    button('plain').dispatchEvent(pointer('pointerenter'));
+    vi.advanceTimersByTime(590);
+    expect(panel()).toBeNull();
+    vi.advanceTimersByTime(20);
+    expect(panel()?.classList).toContain('ui-tooltip--bottom');
+
+    button('plain').dispatchEvent(pointer('pointerleave'));
+    vi.advanceTimersByTime(390);
+    expect(panel()).not.toBeNull();
+    vi.advanceTimersByTime(20);
+    expect(panel()).toBeNull();
+  });
+
+  it('keeps the built-in values the provider leaves out', async () => {
+    await render({ position: 'bottom' });
+    button('plain').dispatchEvent(pointer('pointerenter'));
+    vi.advanceTimersByTime(310);
+    expect(panel()?.classList).toContain('ui-tooltip--bottom');
+  });
+
+  it('lets an input on the tooltip win over the provider', async () => {
+    await render({ position: 'bottom', showDelay: 600, hideDelay: 400 });
+    button('bound').dispatchEvent(pointer('pointerenter'));
+    vi.advanceTimersByTime(30);
+    expect(panel()?.classList).toContain('ui-tooltip--end');
+
+    button('bound').dispatchEvent(pointer('pointerleave'));
+    vi.advanceTimersByTime(20);
+    expect(panel()).toBeNull();
   });
 });
