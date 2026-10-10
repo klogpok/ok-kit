@@ -78,8 +78,8 @@ so versions mark review points rather than releases.
   modifiers `ui-gap-3xs` … `ui-gap-3xl` (md by default), and the mixins `ui.stack($gap)`,
   `ui.cluster($gap)`, `ui.grid($min, $gap)` and `ui.container()`. Story Foundations/Layout.
 - **testing:** overlay harnesses, found from the document root: `UiMenuHarness` (+
-  `UiMenuItemHarness`), `UiPopoverHarness`. The popover trigger gets the class
-  `ui-popover-trigger`.
+  `UiMenuItemHarness`), `UiPopoverHarness`, `UiTooltipHarness`. The popover and tooltip triggers get the classes
+  `ui-popover-trigger` and `ui-tooltip-trigger`.
 
 ### Fixed
 

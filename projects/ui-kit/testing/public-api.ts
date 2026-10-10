@@ -16,3 +16,4 @@ export * from './segmented-harness';
 export * from './tree-harness';
 export * from './menu-harness';
 export * from './popover-harness';
+export * from './tooltip-harness';
