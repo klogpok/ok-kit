@@ -178,10 +178,7 @@ export const WithError: Story = {
   }),
 };
 
-// The export name is the story id, and the visual baseline is keyed by it. It stays as it is
-// so that this ticket removes no baseline; the display name carries the story's current subject.
-export const SignalForms: Story = {
-  name: 'Account form',
+export const AccountForm: Story = {
   decorators: [moduleMetadata({ imports: [AccountFormStory] })],
   render: () => ({ template: '<ui-story-account-form />' }),
 };
