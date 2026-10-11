@@ -16,7 +16,9 @@ so versions mark review points rather than releases.
 - **select:** the internal exports `ɵUiOptionPanel`, `ɵUiOptionParent` and
   `ɵprovideUiOptionParent` are removed (`ɵUiItemOption` moved to `@vplans/ui-kit/listbox`):
   `ui-select`, `ui-multi-select`, `ui-autocomplete` and `ui-time-input` no longer share an
-  option panel; they extend `UiFormControlBase` and create the listbox controller. `UiOption`,
+  option panel; each creates the listbox controller (`ui-select` and `ui-multi-select` through
+  their shared internal `UiSelectBase`, `ui-autocomplete` and `ui-time-input` directly on
+  `UiFormControlBase`). `UiOption`,
   `UiOptionGroup` and `UiOptionItem` are still exported from `@vplans/ui-kit/select`.
 - **select, autocomplete, time, datepicker:** the field panels open through one internal
   directive, `ɵUiDropdownPanel` in `@vplans/ui-kit/core`, instead of their own
