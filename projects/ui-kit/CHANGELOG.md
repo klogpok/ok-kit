@@ -5,6 +5,12 @@ so versions mark review points rather than releases.
 
 ## Unreleased (popup listbox)
 
+### Added
+
+- **testing:** `getActiveOption()` on `UiSelectHarness`, `UiAutocompleteHarness` and
+  `UiTimeInputHarness`: the option the keyboard is on (named by `aria-activedescendant` of the
+  field), or `null` when there is none or the list is closed.
+
 ### Changed
 
 - **select, autocomplete, time:** the popup list is the `ui-listbox` element of the new

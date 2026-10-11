@@ -82,6 +82,11 @@ export class UiAutocompleteHarness extends UiHarness {
     return this.listbox.getOptions(filters);
   }
 
+  /** The suggestion the keyboard is on; `null` when there is none or the list is closed. */
+  async getActiveOption(): Promise<UiOptionHarness | null> {
+    return this.listbox.getActiveOption();
+  }
+
   /** Opens the list and clicks the first matching suggestion. Throws when none matches. */
   async selectOption(filters: UiOptionHarnessFilters = {}): Promise<void> {
     await this.open();

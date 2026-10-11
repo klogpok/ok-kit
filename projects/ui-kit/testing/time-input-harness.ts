@@ -82,6 +82,11 @@ export class UiTimeInputHarness extends UiHarness {
     return this.listbox.getOptions(filters);
   }
 
+  /** The time the keyboard is on; `null` when there is none or the list is closed. */
+  async getActiveOption(): Promise<UiOptionHarness | null> {
+    return this.listbox.getActiveOption();
+  }
+
   /** Clicks the first time in the list that matches the filters, e.g. `{ text: '14:30' }`. */
   async selectOption(filters: UiOptionHarnessFilters): Promise<void> {
     await this.open();

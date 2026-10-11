@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { UiAutocomplete } from '@vplans/ui-kit/autocomplete';
@@ -27,9 +27,10 @@ class Host {
 describe('UiAutocompleteHarness', () => {
   let loader: HarnessLoader;
   let host: Host;
+  let fixture: ComponentFixture<Host>;
 
   beforeEach(() => {
-    const fixture = TestBed.createComponent(Host);
+    fixture = TestBed.createComponent(Host);
     host = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
   });
@@ -39,6 +40,22 @@ describe('UiAutocompleteHarness', () => {
     const locked = await loader.getHarness(UiAutocompleteHarness.with({ disabled: true }));
     expect(await locked.getLabel()).toBe('Locked');
     expect(await locked.isLoading()).toBe(true);
+  });
+
+  it('reads the active suggestion', async () => {
+    const city = await loader.getHarness(UiAutocompleteHarness.with({ label: 'City' }));
+    expect(await city.getActiveOption()).toBeNull();
+    // No suggestion is active until the user moves to one.
+    await city.enterText('ha');
+    expect(await city.getActiveOption()).toBeNull();
+    const root = fixture.nativeElement as HTMLElement;
+    const input = root.querySelector<HTMLInputElement>('ui-autocomplete input')!;
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', keyCode: 40, bubbles: true }),
+    );
+    expect(await (await city.getActiveOption())?.getText()).toBe('Haifa');
+    await city.close();
+    expect(await city.getActiveOption()).toBeNull();
   });
 
   it('types, reads the suggestions and picks one', async () => {

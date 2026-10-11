@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -39,9 +39,10 @@ class Host {
 describe('UiSelectHarness', () => {
   let loader: HarnessLoader;
   let host: Host;
+  let fixture: ComponentFixture<Host>;
 
   beforeEach(() => {
-    const fixture = TestBed.createComponent(Host);
+    fixture = TestBed.createComponent(Host);
     host = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
   });
@@ -96,6 +97,23 @@ describe('UiSelectHarness', () => {
     expect(host.city.value).toBeNull();
     await expect(city.clear()).rejects.toThrow(/no clear button/);
     await expect(city.clickOptions({ text: 'Jerusalem' })).rejects.toThrow(/No option matches/);
+  });
+
+  it('reads the active option', async () => {
+    const city = await loader.getHarness(UiSelectHarness.with({ label: 'City' }));
+    expect(await city.getActiveOption()).toBeNull();
+    await city.clickOptions({ text: 'Tel Aviv' });
+    // A click opens the list without an active option; the first arrow key goes to the selected one.
+    await city.open();
+    expect(await city.getActiveOption()).toBeNull();
+    const root = fixture.nativeElement as HTMLElement;
+    const control = root.querySelector<HTMLElement>('.ui-select__control')!;
+    control.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', keyCode: 40, bubbles: true }),
+    );
+    expect(await (await city.getActiveOption())?.getText()).toBe('Tel Aviv');
+    await city.close();
+    expect(await city.getActiveOption()).toBeNull();
   });
 
   it('clicks every matching option of a multi-select', async () => {

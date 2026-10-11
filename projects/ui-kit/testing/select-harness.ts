@@ -97,6 +97,11 @@ export class UiSelectHarness extends UiHarness {
     return this.listbox.getOptions(filters);
   }
 
+  /** The option the keyboard is on; `null` when there is none or the list is closed. */
+  async getActiveOption(): Promise<UiOptionHarness | null> {
+    return this.listbox.getActiveOption();
+  }
+
   /**
    * Opens the list and clicks the matching options: the first one in a `ui-select`, all of them
    * in a `ui-multi-select`. Throws when no option matches.

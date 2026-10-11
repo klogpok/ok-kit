@@ -805,17 +805,17 @@ so they keep working when that DOM changes.
 | `UiButtonHarness`            | `ui-button`, `ui-icon-button` (`<button>` and `<a>`)        | `text`, `label`, `variant`, `disabled`                            |
 | `UiInputHarness`             | `input[ui-input]`, `textarea[ui-textarea]`                  | `label`, `value`, `placeholder`                                   |
 | `UiCheckboxHarness`          | `ui-checkbox`                                               | `label`, `name`, `checked`, `disabled`                            |
-| `UiSelectHarness`            | `ui-select`, `ui-multi-select`                              | `label`, `value`, `disabled`, `multiple`                          |
+| `UiSelectHarness`            | `ui-select`, `ui-multi-select`; `getActiveOption()`         | `label`, `value`, `disabled`, `multiple`                          |
 | `UiOptionHarness`            | `ui-option` (from `UiSelectHarness.getOptions()`)           | `text`, `selected`, `disabled`                                    |
 | `UiDialogHarness`            | dialogs and drawers opened with `UiDialog`                  | `title`, `drawer`                                                 |
 | `UiEmptyStateHarness`        | `ui-empty-state` (actions: `UiButtonHarness`)               | `title`, `description`                                            |
 | `UiChipHarness`              | `ui-chip`, `button[ui-filter-chip]`                         | `text`, `selected`, `disabled`                                    |
 | `UiChipInputHarness`         | `ui-chip-input`                                             | `label`, `disabled`                                               |
-| `UiAutocompleteHarness`      | `ui-autocomplete`                                           | `label`, `value` (text), `disabled`                               |
+| `UiAutocompleteHarness`      | `ui-autocomplete`; `getActiveOption()`                      | `label`, `value` (text), `disabled`                               |
 | `UiNumberInputHarness`       | `ui-number-input`                                           | `label`, `value` (text), `disabled`                               |
 | `UiProgressBarHarness`       | `ui-progress-bar`                                           | `label`                                                           |
 | `UiSliderHarness`            | `ui-slider`, `ui-range-slider`                              | `label`, `range`, `disabled`                                      |
-| `UiTimeInputHarness`         | `ui-time-input` (and its list of times)                     | `label`, `value` (text), `disabled`                               |
+| `UiTimeInputHarness`         | `ui-time-input` (list of times; `getActiveOption()`)        | `label`, `value` (text), `disabled`                               |
 | `UiStepperHarness`           | `ui-stepper` (steps: `UiStepHarness`)                       | `orientation`                                                     |
 | `UiStepHarness`              | a step (from `UiStepperHarness.getSteps()`)                 | `label`, `selected`, `done`, `error`                              |
 | `UiDateRangePickerHarness`   | `ui-date-range-picker` (fields, calendar, presets)          | `label`, `disabled`                                               |
