@@ -1,0 +1,19 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Docs/Contributing" />
+
+# Contributing
+
+The rules for changing the kit live in one place: the **Contributing** section of
+`projects/ui-kit/README.md`. This page is a map of it, not a copy.
+
+- **Scripts** — every `pnpm` command of the workspace: dev servers, token generation, unit and
+  playground tests, lint and format, the library and Storybook builds, the axe and visual checks.
+- **Adding a component** — the step-by-step recipe: one secondary entry point per component, file
+  and class naming, the component rules (standalone, `OnPush`, signal APIs, `host` metadata, CDK
+  primitives), styles from semantic or component tokens only, how a form control plugs into
+  Reactive and template forms, harnesses, required tests and stories, visual baselines and the
+  commit format.
+
+Before you open a change, read those two subsections. The workspace-wide decisions behind the
+rules are in `CLAUDE.md` and `docs/DECISIONS.md` at the repository root.

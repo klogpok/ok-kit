@@ -20,4 +20,6 @@ pnpm build            # regenerate tokens and build dist/ui-kit
 pnpm build-storybook  # static Storybook in dist/storybook/ui-kit
 ```
 
-See [projects/ui-kit/README.md](projects/ui-kit/README.md) for usage, theming, tokens and contribution rules.
+To start using the kit, open the **Docs** section at the top of the Storybook sidebar (sources in
+[projects/ui-kit/docs/](projects/ui-kit/docs/)). See [projects/ui-kit/README.md](projects/ui-kit/README.md)
+for the component reference, exports, tokens and contribution rules.

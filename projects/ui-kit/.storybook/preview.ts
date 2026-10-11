@@ -65,6 +65,23 @@ const preview: Preview = {
     a11y: { test: 'error' },
     backgrounds: { disable: true },
     layout: 'padded',
+    options: {
+      storySort: {
+        order: [
+          'Docs',
+          ['Getting started', 'Theming', 'RTL', 'Forms', 'Tokens', 'Contributing'],
+          'Foundations',
+          ['Tokens', 'Density', 'Layout', 'Icon'],
+          'Actions',
+          'Forms',
+          'Layout',
+          'Navigation',
+          'Overlays',
+          'Feedback',
+          'Data display',
+        ],
+      },
+    },
   },
   tags: ['autodocs'],
 };

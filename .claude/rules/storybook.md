@@ -2,6 +2,7 @@
 paths:
   - "projects/**/*.stories.ts"
   - "projects/ui-kit/.storybook/**"
+  - "projects/ui-kit/docs/**"
 ---
 
 # Storybook
@@ -16,3 +17,9 @@ paths:
 - Storybook dev runs components in JIT, which has declaration-order traps in component files. See `.claude/rules/components.md` ("Storybook JIT").
 - Open states are play stories (`play`): `openStory()` in `scripts/storybook-pages.mjs` waits for the preview's `storyFinished` event, so `test-storybook` runs axe and `test-visual` takes the snapshot after the play function, and a play function that throws fails both. Use `press()` and `until()` from `.storybook/play.ts`: `userEvent` sends `keyCode` 0, which the CDK key managers ignore, and the `waitFor` of `storybook/test` logs every failed attempt as a console error. Call `expect` once, after the wait. See `select/select.stories.ts` (`ManyOptionsAtEnd`).
 - New or intentionally changed stories need new visual baselines (`pnpm test-visual:update`); see `.claude/rules/visual.md`.
+- Docs pages are MDX files in `projects/ui-kit/docs/`, one unattached page each: `<Meta title="Docs/<Page>" />`, never `<Meta of={...}>` (every CSF file already has an autodocs Docs entry through the global `autodocs` tag). Their order is `parameters.options.storySort` in `.storybook/preview.ts`; a new page goes into the `Docs` list there.
+  - Import blocks from `@storybook/addon-docs/blocks` (`@storybook/blocks` is not installed).
+  - `remark-gfm` is not installed, so a Markdown table renders as plain text. Write tables as ``<Markdown>{`...`}</Markdown>`` (also from the blocks) or as JSX tables; do not add the dependency without the user.
+  - MDX 3 rejects HTML comments (`<!-- -->`); use `{/* */}`. A bare `{` or `<` in prose must be in backticks or escaped.
+  - All canvases of a docs page share one document, and the preview decorator writes `dir`, `data-theme` and `data-density` onto `<html>`: a story with story-level `globals` (`input` `Hebrew`, icon `RtlFlip`, density `OpenListCompact`) can flip the whole page. Prefer stories whose RTL comes from a `dir="rtl"` wrapper in the template, and check the page in the browser. Play functions do not run in docs, so open-state stories show closed.
+  - MDX is not in the `format`/`lint` globs, and the story scripts skip docs entries: `pnpm build-storybook` is the check. A text lives either in a docs page or in `projects/ui-kit/README.md`, never in both: move it, and link to the README instead of copying.

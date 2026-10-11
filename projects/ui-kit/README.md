@@ -7,10 +7,19 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - **Storybook:** `pnpm storybook` (http://localhost:6006). It has a theme and direction switcher in the toolbar and an a11y panel.
 - **Playground app:** `pnpm start`
 
+The consumer guides are MDX pages in the **Docs** section at the top of the Storybook sidebar
+(sources in `projects/ui-kit/docs/`):
+
+- **Getting started** — install the kit in an app, add the font and styles, register icons and the
+  theme, import from the entry points and build a first screen.
+- **Contributing** — a map of the [Contributing](#contributing) rules below.
+
+This README holds the component reference, the exports table, the test harnesses, the token table
+and the contribution rules.
+
 ## Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
+- [Actions](#actions)
 - [Forms](#forms)
 - [Theming](#theming)
 - [RTL](#rtl)
@@ -23,80 +32,9 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - [Tokens](#tokens)
 - [Contributing](#contributing)
 
-## Installation
+## Actions
 
-The kit is not published. Apps in this monorepo use it from source:
-
-- **TypeScript**: the root `tsconfig.json` maps the package to the sources, so
-  `import { UiButton } from '@vplans/ui-kit/button'` works in every project:
-
-  ```jsonc
-  "paths": {
-    "@vplans/ui-kit": ["./projects/ui-kit/src/public-api.ts"],
-    "@vplans/ui-kit/*": ["./projects/ui-kit/*/public-api.ts"]
-  }
-  ```
-
-- **Dependencies**: the app needs the peer dependencies of `projects/ui-kit/package.json`
-  (`@angular/cdk`, `@angular/forms`, …) in the same major version. The kit targets **Angular 20**
-  (`@angular/cdk` 20.2 — the CDK's v20 line stops there). `@angular/router` is optional: only
-  `ui-tab-nav` (`@vplans/ui-kit/tabs`) needs it.
-
-The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
-Hebrew and Latin. If the app does not load the font already, add it together with the global
-stylesheet (tokens, document defaults, typography) to the app's build options in
-`angular.json`. `includePaths` lets app SCSS use the mixins with `@use 'ui-kit/styles' as ui`:
-
-```bash
-pnpm add @fontsource/assistant
-```
-
-```jsonc
-"styles": [
-  "node_modules/@fontsource/assistant/400.css",
-  "node_modules/@fontsource/assistant/500.css",
-  "node_modules/@fontsource/assistant/600.css",
-  "node_modules/@fontsource/assistant/700.css",
-  "projects/ui-kit/styles/ui-kit.scss",
-  "src/styles.scss"
-],
-"stylePreprocessorOptions": { "includePaths": ["projects"] }
-```
-
-If you only need the CSS variables and not the document defaults, use
-`projects/ui-kit/styles/tokens.css`.
-
-Register the icons you use and (optionally) configure the theme:
-
-```ts
-import { provideUiIcons, uiIconCheck, uiIconX, uiIconSearch } from '@vplans/ui-kit/icon';
-import { provideUiTheme } from '@vplans/ui-kit/theme';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideUiIcons([uiIconCheck, uiIconX, uiIconSearch]),
-    provideUiTheme({ defaultMode: 'system', storageKey: 'app-theme' }),
-  ],
-};
-```
-
-## Usage
-
-Every component has its own secondary entry point for tree-shaking. Import from it, not from the root:
-
-```ts
-import { UiButton } from '@vplans/ui-kit/button';
-import { UiFormField } from '@vplans/ui-kit/form-field';
-import { UiInput } from '@vplans/ui-kit/input';
-```
-
-```html
-<button ui-button variant="secondary" size="sm" (click)="cancel()">Cancel</button>
-<button ui-button [loading]="saving()">Save</button>
-<a ui-button routerLink="/orders">Orders</a>
-<button ui-icon-button label="Close" (click)="close()"><ui-icon icon="x" /></button>
-```
-
+`ui-button` (`button[ui-button]`, `a[ui-button]`) and `ui-icon-button` from `@vplans/ui-kit/button`.
 Common inputs:
 
 | Input                 | Values                                     | Default                                  |
@@ -117,9 +55,6 @@ label. A disabled or loading `a[ui-button]` has no `href`, so it cannot be opene
 `disabledInteractive` keeps a `disabled` button focusable and hoverable (`aria-disabled` instead of the
 native `disabled`); clicks stay blocked. Use it when a `uiTooltip` explains why the button is disabled,
 instead of wrapping the button in an element with `uiTooltip`.
-
-With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
-A bare `checked` attribute is a compile error.
 
 ## Forms
 

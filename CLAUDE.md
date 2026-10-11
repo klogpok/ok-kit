@@ -1,7 +1,7 @@
 # @vplans/ui-kit workspace
 
 This repo holds an in-house Angular design system. The full brief is in [docs/SPEC.md](docs/SPEC.md).
-Usage and contribution rules are in [projects/ui-kit/README.md](projects/ui-kit/README.md); follow them.
+Contribution rules and the component reference are in [projects/ui-kit/README.md](projects/ui-kit/README.md); follow them. Consumer guides are Storybook MDX pages in `projects/ui-kit/docs/`.
 
 ## Decisions (these override the brief)
 
