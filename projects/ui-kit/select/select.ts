@@ -7,8 +7,8 @@ import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import {
   UiOption,
-  type ɵUiListbox as UiListbox,
-  ɵUiListboxPanel as UiListboxPanel,
+  type ɵUiListboxController as UiListboxController,
+  ɵUiListbox as UiListbox,
   ɵinjectListbox as injectListbox,
   ɵprovideUiListbox as provideUiListbox,
 } from '@vplans/ui-kit/listbox';
@@ -36,7 +36,7 @@ import { UiSelectBase } from './select-base';
  */
 @Component({
   selector: 'ui-select',
-  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListboxPanel, UiOption, UiSpinner],
+  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiOption, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,7 +50,7 @@ import { UiSelectBase } from './select-base';
 export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
   readonly value = model<T | null>(null);
 
-  protected readonly listbox: UiListbox<T> = injectListbox<T>({
+  protected readonly listbox: UiListboxController<T> = injectListbox<T>({
     ...this.listboxConfig(),
     isSelected: (value) => this.listbox.matches(value, this.value()),
     select: (value) => {

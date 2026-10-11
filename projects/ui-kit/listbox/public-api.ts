@@ -5,10 +5,10 @@ export { UiOption, UiOptionGroup } from './option';
 export type { UiOptionItem } from './option-items';
 // Internal: shared with the fields of the kit. Not a public API.
 export {
-  UiListbox as ɵUiListbox,
+  UiListboxController as ɵUiListboxController,
   injectListbox as ɵinjectListbox,
   provideUiListbox as ɵprovideUiListbox,
   type UiListboxConfig as ɵUiListboxConfig,
-} from './listbox';
-export { UiListboxPanel as ɵUiListboxPanel } from './listbox-panel';
+} from './listbox-controller';
+export { UiListbox as ɵUiListbox } from './listbox';
 export type { UiOptionHandle as ɵUiOptionHandle } from './option';

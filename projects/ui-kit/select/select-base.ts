@@ -22,7 +22,7 @@ import { uiIconChevronDown, uiIconX } from '@vplans/ui-kit/icon';
 import {
   UiOption,
   type UiOptionItem,
-  type ɵUiListbox as UiListbox,
+  type ɵUiListboxController as UiListboxController,
   type ɵUiListboxConfig as UiListboxConfig,
 } from '@vplans/ui-kit/listbox';
 
@@ -55,7 +55,7 @@ export abstract class UiSelectBase<T, V>
 
   abstract readonly value: WritableSignal<V>;
   /** The popup listbox; the subclass creates it with `injectListbox()`. */
-  protected abstract readonly listbox: UiListbox<T>;
+  protected abstract readonly listbox: UiListboxController<T>;
 
   readonly size = input<UiSize>('md');
   /** Host id; the control gets `${id}-control`. */

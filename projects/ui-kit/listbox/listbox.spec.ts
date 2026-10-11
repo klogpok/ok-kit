@@ -11,8 +11,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
-import { UiListboxMode, injectListbox, provideUiListbox } from './listbox';
-import { UiListboxPanel } from './listbox-panel';
+import { UiListboxMode, injectListbox, provideUiListbox } from './listbox-controller';
+import { UiListbox } from './listbox';
 import { UiOption } from './option';
 import { UiOptionItem } from './option-items';
 
@@ -54,7 +54,7 @@ const SELECT_ALL = 'all';
 /** A field on the listbox controller, as the kit's fields use it. */
 @Component({
   selector: 'ui-test-field',
-  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListboxPanel, UiOption],
+  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListbox, UiOption],
   providers: [provideUiListbox()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -155,7 +155,7 @@ class Host {
   readonly value = signal<readonly string[]>([]);
 }
 
-describe('UiListbox', () => {
+describe('UiListboxController', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
   let field: TestField;

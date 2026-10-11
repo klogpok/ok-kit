@@ -27,9 +27,9 @@ import {
 } from '@vplans/ui-kit/core';
 import {
   UiOption,
-  type ɵUiListbox as UiListbox,
+  type ɵUiListboxController as UiListboxController,
   type UiOptionItem,
-  ɵUiListboxPanel as UiListboxPanel,
+  ɵUiListbox as UiListbox,
   ɵinjectListbox as injectListbox,
   ɵprovideUiListbox as provideUiListbox,
 } from '@vplans/ui-kit/listbox';
@@ -68,7 +68,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
  */
 @Component({
   selector: 'ui-autocomplete',
-  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListboxPanel, UiSpinner],
+  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListbox, UiSpinner],
   template: `
     <div class="ui-autocomplete__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
       <input
@@ -193,7 +193,7 @@ export class UiAutocomplete<T = string>
    * The suggestions. The list shows while it has options, a message after a search in a
    * pick-only field, or a spinner; no option is active until the user moves to one.
    */
-  protected readonly listbox: UiListbox<T> = injectListbox<T>({
+  protected readonly listbox: UiListboxController<T> = injectListbox<T>({
     mode: () => 'freeText',
     id: this.id,
     contentOptions: this.contentOptions,

@@ -533,12 +533,13 @@ Delivered (what the implementation settled where the plan was silent):
   width = origin width), `returnFocusTo`; outputs `closed` (Escape, outside click) and `attached`.
   The datepickers pass `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK` and `[matchWidth]="false"`, return
   focus to the toggle and focus the calendar on `attached`.
-- **Listbox controller** `listbox/listbox.ts`: the field lists `ɵprovideUiListbox()` and calls
-  `ɵinjectListbox({ mode, isSelected, select, … })` in a field initializer; `handleKeydown()`
-  returns false when the field may act (Enter commits typed text, Escape clears it). Options are
-  passed as the field's `contentChildren`, not registered through DI (closed content options have
-  no DOM order). One DI token, `UiListboxHost`. The `ui-listbox` element renders the leading rows,
-  the options or the (virtual) items and the loading / "no options" rows, with its own styles.
+- **Listbox controller** `UiListboxController` in `listbox/listbox-controller.ts`: the field
+  lists `ɵprovideUiListbox()` and calls `ɵinjectListbox({ mode, isSelected, select, … })` in a
+  field initializer; `handleKeydown()` returns false when the field may act (Enter commits typed
+  text, Escape clears it). Options are passed as the field's `contentChildren`, not registered
+  through DI (closed content options have no DOM order). One DI token, `UiListboxHost`. The
+  `ui-listbox` element (`UiListbox` in `listbox/listbox.ts`) renders the leading rows, the options
+  or the (virtual) items and the loading / "no options" rows, with its own styles.
 - **Hooks beyond the plan**, internal: `isIndeterminate` ("select all" of multi-select),
   `showEmpty` (replaces autocomplete's `panelShown`), `openAt` (time-input opens at the nearest
   slot), `isBlocked` and `alwaysShown` (multi-select), `locked` (disabled or readonly).

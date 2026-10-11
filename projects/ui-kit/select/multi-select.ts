@@ -16,9 +16,9 @@ import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import {
   UiOption,
-  type ɵUiListbox as UiListbox,
+  type ɵUiListboxController as UiListboxController,
   type ɵUiOptionHandle as UiOptionHandle,
-  ɵUiListboxPanel as UiListboxPanel,
+  ɵUiListbox as UiListbox,
   ɵinjectListbox as injectListbox,
   ɵprovideUiListbox as provideUiListbox,
 } from '@vplans/ui-kit/listbox';
@@ -54,7 +54,7 @@ const SELECT_ALL = Symbol('ui-select-all');
  */
 @Component({
   selector: 'ui-multi-select',
-  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListboxPanel, UiOption, UiSpinner],
+  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiOption, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,7 +77,7 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   /** Shows the selected values as chips in the trigger. */
   readonly chips = input(false, { transform: booleanAttribute });
 
-  protected readonly listbox: UiListbox<T> = injectListbox<T>({
+  protected readonly listbox: UiListboxController<T> = injectListbox<T>({
     ...this.listboxConfig(),
     multiple: true,
     isSelected: (value) => this.isSelected(value),

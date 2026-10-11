@@ -24,7 +24,7 @@ import {
   ɵUiDropdownPanel,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
-import { ɵUiListboxPanel, ɵinjectListbox, ɵprovideUiListbox } from '@vplans/ui-kit/listbox';
+import { ɵUiListbox, ɵinjectListbox, ɵprovideUiListbox } from '@vplans/ui-kit/listbox';
 import {
   formatTime,
   maskTime,
@@ -68,7 +68,7 @@ interface Draft {
  */
 @Component({
   selector: 'ui-time-input',
-  imports: [CdkOverlayOrigin, UiIcon, ɵUiDropdownPanel, ɵUiListboxPanel],
+  imports: [CdkOverlayOrigin, UiIcon, ɵUiDropdownPanel, ɵUiListbox],
   template: `
     <!-- A click anywhere in the field opens the list; the keyboard uses the arrows. -->
     <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
