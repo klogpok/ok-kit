@@ -260,15 +260,18 @@ export class UiAutocomplete<T = string> extends ɵUiOptionPanel<T, T | string | 
     const { key } = event;
     if (key === 'ArrowDown' || key === 'ArrowUp') {
       event.preventDefault();
-      if (!this.isOpen()) {
-        this.open();
-        if (event.altKey) return;
-        if (key === 'ArrowDown') this.keyManager.setFirstItemActive();
-        else this.keyManager.setLastItemActive();
+      const wasOpen = this.isOpen();
+      if (event.altKey) {
+        // Alt+ArrowDown opens without moving, Alt+ArrowUp closes.
+        if (!wasOpen) this.open();
+        else if (key === 'ArrowUp') this.close();
         return;
       }
-      if (key === 'ArrowUp' && event.altKey) {
-        this.close();
+      if (!wasOpen) this.open();
+      if (!wasOpen || !this.keyManager.activeItem) {
+        // Start at the end the key points to: the key manager would not move up from no option.
+        if (key === 'ArrowDown') this.keyManager.setFirstItemActive();
+        else this.keyManager.setLastItemActive();
         return;
       }
       this.keyManager.onKeydown(event);
