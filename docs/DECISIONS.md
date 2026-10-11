@@ -472,7 +472,7 @@ The deviations listed in the roadmap are accepted: each layout element sets its 
 - **Playground sections get one shared card style, and JSON blocks read left to right** (ticket 32):
   the fix is ticket 33.
 
-## Phase 9.4: harnesses (review questions answered 2026-10-11)
+## Phase 9.4: harnesses (approved 2026-10-11)
 
 Tickets 15–19 and 33 in `.scratch/phase-9/issues/`; the report is ticket 20 and the roadmap status.
 Review answers:

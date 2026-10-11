@@ -6,12 +6,12 @@
 
 **Blocked by:** 15 (Harnesses for radio, switch, datepicker and form-field), 16 (Harnesses for accordion, tabs, breadcrumbs and pagination), 17 (Harnesses for menu, popover, tooltip and toast), 18 (Table harness), 19 (Harnesses for alert, avatar, badge, empty-state and progress, and the harness rule)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `/phase-check` passes, or every failure is named in the report
 - [x] The phase 9.4 section of the roadmap records the status, the commits and the deviations from the spec
 - [x] Every question for the user is a `needs-info` ticket with the facts and the options
-- [ ] The user approved the sub-phase, and the approval is recorded in the decisions log
+- [x] The user approved the sub-phase, and the approval is recorded in the decisions log
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 15 (Harnesses для radio, switch, datepicker и form-field), 16 (Harnesses для accordion, tabs, breadcrumbs и pagination), 17 (Harnesses для menu, popover, tooltip и toast), 18 (Harness таблицы), 19 (Harnesses для alert, avatar, badge, empty-state и progress и правило harnesses)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
 - [x] `/phase-check` проходит, или каждая ошибка названа в отчёте
 - [x] Раздел подфазы 9.4 в роадмапе фиксирует статус, коммиты и отклонения от спеки
 - [x] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
-- [ ] Пользователь одобрил подфазу, одобрение записано в журнал решений
+- [x] Пользователь одобрил подфазу, одобрение записано в журнал решений
