@@ -1,19 +1,33 @@
 import { applicationConfig, type Decorator, type Preview } from '@storybook/angular';
 import { UI_ICONS_ALL, provideUiIcons } from '@vplans/ui-kit/icon';
+import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
+import { addons } from 'storybook/preview-api';
 
 /** Applies the toolbar theme, direction and density to <html>, exactly like an application would. */
-const withThemeAndDirection: Decorator = (story, context) => {
+function applyGlobals(globals: Record<string, unknown>): void {
   const root = document.documentElement;
-  const theme = context.globals['theme'] as string;
-  const dir = context.globals['dir'] as string;
+  const theme = globals['theme'] as string;
+  const dir = globals['dir'] as string;
   if (theme === 'system') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme', theme);
   root.setAttribute('dir', dir);
   root.setAttribute('lang', dir === 'rtl' ? 'he' : 'en');
-  if (context.globals['density'] === 'compact') root.setAttribute('data-density', 'compact');
+  if (globals['density'] === 'compact') root.setAttribute('data-density', 'compact');
   else root.removeAttribute('data-density');
+}
+
+const withThemeAndDirection: Decorator = (story, context) => {
+  applyGlobals(context.globals);
   return story();
 };
+
+// Docs pages without a story never run the decorator; the toolbar reaches them as channel events.
+const channel = addons.getChannel();
+const onGlobals = ({ globals }: { globals: Record<string, unknown> }): void => {
+  applyGlobals(globals);
+};
+channel.on(SET_GLOBALS, onGlobals);
+channel.on(GLOBALS_UPDATED, onGlobals);
 
 const preview: Preview = {
   decorators: [
