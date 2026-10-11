@@ -272,6 +272,18 @@
 > - Play-проверки Grid и NestedGrid рассчитаны на ширину снимков (1024 px); на 360 px колонок меньше, и они падают — вёрстка при этом правильная.
 >
 > Вопрос для решения: тикет 32 (секции phase 8 в playground без стиля карточки и JSON в RTL; было и в `master`).
+>
+> **Статус (2026-10-11): 9.4 (harnesses) сделана, ждёт одобрения.** Тикеты 15–19 и 33 (ответ на тикет 32). 18 новых harnesses в `@vplans/ui-kit/testing`, по коммиту `feat` и spec на каждый: accordion, alert, avatar (+ группа), badge, breadcrumbs, datepicker, empty-state, form-field, menu, pagination, popover, progress, radio, switch, table (+ строка и ячейка), tabs (+ tab nav), toast, tooltip. Правило README: harness обязателен для компонента с состоянием или поведением; divider, skeleton, spinner, icon и card освобождены. Playground: общий стиль карточки для всех секций, JSON читается слева направо в RTL. По код-ревью: breadcrumbs, tab link и step наследуют `UiHarness`; datepicker ищет только свою панель (id + `aria-controls`); стрелки пагинации найдены по классам; breadcrumbs открывают «…» через `UiMenuHarness`; таблица отмечает строки через `UiCheckboxHarness`; `getTone()` у alert и toast без `!`.
+>
+> Проверки: полный чеклист зелёный. 925 unit-тестов (+80), playground 8 (+1); coverage 98.34/83.14/94.49/98.34 (без testing ветки были бы 79.96 — ниже порога 80); 306 stories × 3 режима без нарушений axe; 918 снимков без изменений; ngc без ошибок; бюджеты playground без предупреждений. Браузер (Edge, light/dark, RTL/LTR): datepicker, пагинация, popover и tooltip с новой разметкой выглядят и работают как раньше; в playground у всех 16 секций рамка карточки, JSON читается по порядку.
+>
+> Отклонения от спеки:
+> - API сверх спеки (группа аватаров, tab nav, `clickToday`/`clickClear`, `getControl()` без запроса) и разметка для harnesses — тикет 35.
+> - Tooltip не связан с триггером в DOM: harness находит подсказку по тексту из `aria-describedby`; два триггера с одинаковым текстом неразличимы (записано в README).
+> - `UiPaginationHarness.getPageSize()` возвращает `null` без выбора размера страницы: на последней странице текст диапазона не равен размеру.
+> - Коммиты harnesses названы то `feat(testing)`, то `feat(<компонент>)`.
+>
+> Вопросы для решения: тикеты 34 (toast через `documentRootLoader`), 35 (API сверх спеки), 36 (harness date-range-picker ищет панель глобально), 37 (Shift-диапазон в harness таблицы).
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**
