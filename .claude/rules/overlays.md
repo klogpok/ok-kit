@@ -1,11 +1,12 @@
 ---
 paths:
-  - "projects/ui-kit/{menu,dialog,popover,tooltip,select,datepicker,autocomplete,toast,breadcrumbs}/**/*.ts"
+  - "projects/ui-kit/{core,menu,dialog,popover,tooltip,select,datepicker,autocomplete,toast,breadcrumbs}/**/*.ts"
 ---
 
 # Overlays, CDK Menu and direction
 
 - The CDK `Directionality` reads `dir` once at startup. Every overlay must resolve the direction when it opens (`syncOverlayDirection()` from core, or `direction` for CDK Dialog), otherwise it renders LTR after a runtime switch to RTL. Position presets also live in core (`core/overlay.ts`); do not copy them into a component.
+- A field that opens a panel below itself uses `<ng-template [uiDropdownPanel]="origin" [open]="isOpen()" (closed)="close()">` (`core/dropdown-panel.ts`, exported as `ɵUiDropdownPanel`), not its own `cdkConnectedOverlay`: it reads the direction, the offset and the origin width when it opens, closes on Escape and outside clicks, and returns focus to `returnFocusTo`. `CdkConnectedOverlay` is its host directive, driven through the instance: assigning `open` does nothing (call `attachOverlay()`/`detachOverlay()`), and only the `offsetX` setter pushes a new `origin` and `positions` into an existing overlay, so assign those first; `minWidth` needs `overlayRef.updateSize()` on a reopen. That setter behavior is CDK 20 internals, not a contract; `core/dropdown-panel.spec.ts` guards it (reopen with a new offset and width).
 - CDK overlays use the Popover API (top layer) by default, so `z-index` does not order them. Opening order does.
 - CDK Menu only calls `preventDefault()` on Escape and closes the menu synchronously, so a host binding on `ui-menu` never runs and the overlay keyboard dispatcher also closes a surrounding dialog. `UiMenu` stops propagation from a listener registered in its constructor (before CDK Menu's).
 - CDK Menu closes the menu synchronously inside the item click handler, and a link that is no longer in the page does not follow its `href`. `a[ui-menu-item]` wraps `CdkMenuItem.trigger` to keep the menu open during the click and closes it in a `setTimeout`.
