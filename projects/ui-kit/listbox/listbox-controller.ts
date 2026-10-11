@@ -138,9 +138,17 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   private readonly injector = inject(Injector);
   private readonly document = inject(DOCUMENT);
   private readonly formField = inject(UI_FORM_FIELD, { optional: true });
-  /** A signal: computeds read before the field configures the listbox must update. */
+  /**
+   * The field's configuration, set by `injectListbox()` in the field initializer. One rule reads
+   * it: optional members through `config()?.`, falling back to their default; required members
+   * (`mode`, `id`, `isSelected`, `select`) through `cfg`, which throws before configuration. The
+   * key manager reads the options while the controller is constructed, before the field
+   * configures it, so the option computeds must take the defaults then and update after: hence
+   * a signal.
+   */
   private readonly config = signal<UiListboxConfig<T> | null>(null);
 
+  /** The configuration, for a required member. */
   private get cfg(): UiListboxConfig<T> {
     const config = this.config();
     if (!config) throw new Error('UiListboxController: call injectListbox() in the field.');
