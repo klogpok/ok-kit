@@ -6,7 +6,7 @@ import {
   TestKey,
 } from '@angular/cdk/testing';
 import { UiHarness } from './harness';
-import { UiOptionHarness, UiOptionHarnessFilters } from './select-harness';
+import { UiOptionHarness, UiOptionHarnessFilters, UiPopupListbox } from './listbox-harness';
 
 export interface UiAutocompleteHarnessFilters extends BaseHarnessFilters {
   /** `aria-label` or the text of the `label[for]` (e.g. from `ui-form-field`). */
@@ -24,6 +24,7 @@ export class UiAutocompleteHarness extends UiHarness {
   static hostSelector = '.ui-autocomplete';
 
   private readonly input = this.locatorFor('.ui-autocomplete__input');
+  private readonly listbox = new UiPopupListbox(this.input, this.documentRootLocatorFactory());
 
   static with<T extends UiAutocompleteHarness>(
     this: ComponentHarnessConstructor<T>,
@@ -78,25 +79,13 @@ export class UiAutocompleteHarness extends UiHarness {
 
   /** Suggestions of the open list; `[]` while it is closed. */
   async getOptions(filters: UiOptionHarnessFilters = {}): Promise<UiOptionHarness[]> {
-    const panelId = await (await this.input()).getAttribute('aria-controls');
-    if (!panelId) return [];
-    return this.documentRootLocatorFactory().locatorForAll(
-      UiOptionHarness.with({
-        ...filters,
-        ancestor: `#${panelId}`,
-        selector: `${filters.selector ?? ''}:not([hidden])`,
-      }),
-    )();
+    return this.listbox.getOptions(filters);
   }
 
   /** Opens the list and clicks the first matching suggestion. Throws when none matches. */
   async selectOption(filters: UiOptionHarnessFilters = {}): Promise<void> {
     await this.open();
-    const [option] = await this.getOptions(filters);
-    if (!(option as UiOptionHarness | undefined)) {
-      throw Error(`No option matches ${JSON.stringify(filters)}.`);
-    }
-    await option.click();
+    await this.listbox.clickOptions(filters);
   }
 
   async isDisabled(): Promise<boolean> {
