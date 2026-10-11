@@ -124,6 +124,17 @@ describe('UiAutocomplete (free text)', () => {
     expect(listbox()).toBeNull();
   });
 
+  it('moves from no active option to the end the arrow key points to', async () => {
+    const activeLabel = () =>
+      document.getElementById(input().getAttribute('aria-activedescendant')!)!.textContent?.trim();
+    await type('ha');
+    await press('ArrowUp');
+    expect(activeLabel()).toBe('Hadera');
+    await type('ha');
+    await press('ArrowDown');
+    expect(activeLabel()).toBe('Haifa');
+  });
+
   it('lets Enter submit the form without an active option', async () => {
     await type('ha');
     expect((await press('Enter')).defaultPrevented).toBe(false);

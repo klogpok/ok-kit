@@ -7,14 +7,11 @@ import {
 } from '@angular/cdk/testing';
 import type { UiSize } from '@vplans/ui-kit/core';
 import { UiHarness } from './harness';
+import { UiOptionHarness, UiOptionHarnessFilters, UiPopupListbox } from './listbox-harness';
 import { uiModifier } from './modifier';
 
-export interface UiOptionHarnessFilters extends BaseHarnessFilters {
-  /** The label text (without the description). */
-  text?: string | RegExp;
-  selected?: boolean;
-  disabled?: boolean;
-}
+export { UiOptionHarness } from './listbox-harness';
+export type { UiOptionHarnessFilters } from './listbox-harness';
 
 export interface UiSelectHarnessFilters extends BaseHarnessFilters {
   /** `aria-label` or the text of the `label[for]` (e.g. from `ui-form-field`). */
@@ -28,58 +25,6 @@ export interface UiSelectHarnessFilters extends BaseHarnessFilters {
 
 const SIZES: readonly UiSize[] = ['sm', 'md', 'lg'];
 
-/** Harness for `ui-option` in the list of a `ui-select` or `ui-multi-select`. */
-export class UiOptionHarness extends UiHarness {
-  static hostSelector = '.ui-option';
-
-  static with<T extends UiOptionHarness>(
-    this: ComponentHarnessConstructor<T>,
-    options: UiOptionHarnessFilters = {},
-  ): HarnessPredicate<T> {
-    return new HarnessPredicate(this, options)
-      .addOption('text', options.text, (harness, text) =>
-        HarnessPredicate.stringMatches(harness.getText(), text),
-      )
-      .addOption(
-        'selected',
-        options.selected,
-        async (harness, selected) => (await harness.isSelected()) === selected,
-      )
-      .addOption(
-        'disabled',
-        options.disabled,
-        async (harness, disabled) => (await harness.isDisabled()) === disabled,
-      );
-  }
-
-  /** Clicks the option like a user; a disabled option ignores it. */
-  async click(): Promise<void> {
-    await (await this.host()).click();
-  }
-
-  async getText(): Promise<string> {
-    return (await this.locatorFor('.ui-option__label')()).text();
-  }
-
-  /** Text of the `uiOptionDescription` slot. */
-  async getDescription(): Promise<string> {
-    return (await this.locatorFor('.ui-option__description')()).text();
-  }
-
-  async isSelected(): Promise<boolean> {
-    return (await (await this.host()).getAttribute('aria-selected')) === 'true';
-  }
-
-  async isDisabled(): Promise<boolean> {
-    return (await (await this.host()).getAttribute('aria-disabled')) === 'true';
-  }
-
-  /** The option highlighted by the keyboard (`aria-activedescendant` of the trigger). */
-  async isActive(): Promise<boolean> {
-    return (await this.host()).hasClass('ui-option--active');
-  }
-}
-
 /**
  * Harness for `ui-select` and `ui-multi-select`. The options live in an overlay; open the list
  * before reading them.
@@ -89,6 +34,7 @@ export class UiSelectHarness extends UiHarness {
 
   private readonly trigger = this.locatorFor('.ui-select__trigger');
   private readonly control = this.locatorFor('.ui-select__control');
+  private readonly listbox = new UiPopupListbox(this.control, this.documentRootLocatorFactory());
 
   static with<T extends UiSelectHarness>(
     this: ComponentHarnessConstructor<T>,
@@ -148,15 +94,12 @@ export class UiSelectHarness extends UiHarness {
 
   /** Options of the open list; `[]` while it is closed. Options hidden by the search are skipped. */
   async getOptions(filters: UiOptionHarnessFilters = {}): Promise<UiOptionHarness[]> {
-    const panelId = await (await this.control()).getAttribute('aria-controls');
-    if (!panelId) return [];
-    return this.documentRootLocatorFactory().locatorForAll(
-      UiOptionHarness.with({
-        ...filters,
-        ancestor: `#${panelId}`,
-        selector: `${filters.selector ?? ''}:not([hidden])`,
-      }),
-    )();
+    return this.listbox.getOptions(filters);
+  }
+
+  /** The option the keyboard is on; `null` when there is none or the list is closed. */
+  async getActiveOption(): Promise<UiOptionHarness | null> {
+    return this.listbox.getActiveOption();
   }
 
   /**
@@ -165,13 +108,7 @@ export class UiSelectHarness extends UiHarness {
    */
   async clickOptions(filters: UiOptionHarnessFilters = {}): Promise<void> {
     await this.open();
-    const options = await this.getOptions(filters);
-    if (!options.length) throw Error(`No option matches ${JSON.stringify(filters)}.`);
-    if (await this.isMultiple()) {
-      for (const option of options) await option.click();
-    } else {
-      await options[0].click();
-    }
+    await this.listbox.clickOptions(filters, { all: await this.isMultiple() });
   }
 
   /** Types into the field of a `searchable` select, replacing the search text. */

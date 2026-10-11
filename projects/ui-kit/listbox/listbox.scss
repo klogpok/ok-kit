@@ -1,0 +1,41 @@
+// The popup listbox of ui-select, ui-multi-select, ui-autocomplete and ui-time-input.
+:host {
+  display: block;
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-block-size: var(--ui-select-panel-max-height);
+  margin-block: var(--ui-space-2xs);
+  padding-block: var(--ui-space-2xs);
+  border: var(--ui-border-width-default) solid var(--ui-select-panel-border);
+  border-radius: var(--ui-select-panel-radius);
+  background-color: var(--ui-select-panel-bg);
+  box-shadow: var(--ui-select-panel-shadow);
+  font-family: var(--ui-font-family-sans);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+// The listbox is the scrolling element of a virtual list (`cdkVirtualScrollingElement`). The
+// CDK gives that element `contain: strict`, which would size it to nothing.
+:host(.cdk-virtual-scrollable) {
+  contain: layout paint;
+}
+
+.ui-listbox__loading {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-sm);
+}
+
+.ui-listbox__empty {
+  padding-block: var(--ui-space-xs);
+  padding-inline: var(--ui-control-padding-inline-md);
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-control-font-size-md);
+}
+
+@media (forced-colors: active) {
+  :host {
+    border-color: CanvasText;
+  }
+}

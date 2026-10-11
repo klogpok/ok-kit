@@ -3,7 +3,6 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  Injectable,
   booleanAttribute,
   computed,
   contentChildren,
@@ -19,67 +18,30 @@ export interface UiOptionHandle {
   value(): unknown;
 }
 
-/** What an option needs from the list that owns it. */
-export interface UiOptionOwner {
-  /** Multiple selection: options show a checkbox. */
-  multiple(): boolean;
-  isSelected(value: unknown): boolean;
+/**
+ * What an option asks of the listbox it is in, and the one DI token through which options reach
+ * it. The field provides the listbox controller as this token (`provideUiListbox()`). Internal.
+ */
+export abstract class UiListboxHost {
+  /** Multiple selection: options show a checkbox. Read once, when an option is created. */
+  abstract readonly multiple: boolean;
+  abstract isSelected(value: unknown): boolean;
   /** Mixed state of the "select all" option. */
-  isIndeterminate(option: UiOptionHandle): boolean;
-  isFilteredOut(label: string, option: UiOptionHandle): boolean;
+  abstract isIndeterminate(option: UiOptionHandle): boolean;
+  abstract isFilteredOut(label: string, option: UiOptionHandle): boolean;
   /**
    * The option cannot be selected now, e.g. `maxSelections` is reached. Options are passed
    * whole: their required `value` may not be set yet when this runs.
    */
-  isBlocked(option: UiOptionHandle): boolean;
+  abstract isBlocked(option: UiOptionHandle): boolean;
   /** The option renders an item that the key manager made active (`items` of the list). */
-  isActive?(option: UiOptionHandle): boolean;
-  selectOption(value: unknown): void;
+  abstract isActive(option: UiOptionHandle): boolean;
+  /** The user clicked the option. */
+  abstract selectOption(value: unknown): void;
 }
 
 /**
- * Connects options to the select that owns them without making these calls part of the
- * select's public API. Provided by `ui-select` / `ui-multi-select`. Internal.
- */
-@Injectable()
-export class UiOptionParent {
-  private owner: UiOptionOwner | null = null;
-
-  connect(owner: UiOptionOwner): void {
-    this.owner = owner;
-  }
-
-  get multiple(): boolean {
-    return this.owner?.multiple() ?? false;
-  }
-
-  isSelected(value: unknown): boolean {
-    return this.owner?.isSelected(value) ?? false;
-  }
-
-  isIndeterminate(option: UiOptionHandle): boolean {
-    return this.owner?.isIndeterminate(option) ?? false;
-  }
-
-  isFilteredOut(label: string, option: UiOptionHandle): boolean {
-    return this.owner?.isFilteredOut(label, option) ?? false;
-  }
-
-  isBlocked(option: UiOptionHandle): boolean {
-    return this.owner?.isBlocked(option) ?? false;
-  }
-
-  isActive(option: UiOptionHandle): boolean {
-    return this.owner?.isActive?.(option) ?? false;
-  }
-
-  selectOption(value: unknown): void {
-    this.owner?.selectOption(value);
-  }
-}
-
-/**
- * Option of a `ui-select` or `ui-multi-select`. The projected text is the label; pass `label` when the content is
+ * Option of a `ui-select`, `ui-multi-select` or `ui-autocomplete`. The projected text is the label; pass `label` when the content is
  * richer than the text that should appear in the trigger.
  *
  * Mark an icon or avatar with `uiOptionIcon` to show it before the label, and a second line with
@@ -135,7 +97,7 @@ export class UiOptionParent {
 })
 export class UiOption<T = unknown> implements Highlightable {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly parent = inject(UiOptionParent);
+  private readonly parent = inject(UiListboxHost);
 
   readonly value = input.required<T>();
   readonly isDisabled = input(false, { alias: 'disabled', transform: booleanAttribute });

@@ -6,7 +6,7 @@ import {
   TestKey,
 } from '@angular/cdk/testing';
 import { UiHarness } from './harness';
-import { UiOptionHarness, UiOptionHarnessFilters } from './select-harness';
+import { UiOptionHarness, UiOptionHarnessFilters, UiPopupListbox } from './listbox-harness';
 
 export interface UiTimeInputHarnessFilters extends BaseHarnessFilters {
   /** `aria-label` or the text of the `label[for]` (e.g. from `ui-form-field`). */
@@ -21,6 +21,7 @@ export class UiTimeInputHarness extends UiHarness {
   static hostSelector = '.ui-time-input';
 
   private readonly input = this.locatorFor('.ui-time-input__input');
+  private readonly listbox = new UiPopupListbox(this.input, this.documentRootLocatorFactory());
 
   static with<T extends UiTimeInputHarness>(
     this: ComponentHarnessConstructor<T>,
@@ -78,17 +79,18 @@ export class UiTimeInputHarness extends UiHarness {
   /** The times in the list. Opens it. */
   async getOptions(filters: UiOptionHarnessFilters = {}): Promise<UiOptionHarness[]> {
     await this.open();
-    const id = await (await this.input()).getAttribute('aria-controls');
-    return this.documentRootLocatorFactory().locatorForAll(
-      UiOptionHarness.with({ ...filters, ancestor: `[id="${id}"]` }),
-    )();
+    return this.listbox.getOptions(filters);
+  }
+
+  /** The time the keyboard is on; `null` when there is none or the list is closed. */
+  async getActiveOption(): Promise<UiOptionHarness | null> {
+    return this.listbox.getActiveOption();
   }
 
   /** Clicks the first time in the list that matches the filters, e.g. `{ text: '14:30' }`. */
   async selectOption(filters: UiOptionHarnessFilters): Promise<void> {
-    const option = (await this.getOptions(filters)).at(0);
-    if (!option) throw Error(`No time matches ${JSON.stringify(filters)}.`);
-    await option.click();
+    await this.open();
+    await this.listbox.clickOptions(filters, { noun: 'time' });
   }
 
   async isDisabled(): Promise<boolean> {

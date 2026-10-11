@@ -502,3 +502,76 @@ and its spec are closed. The visual baselines were re-taken after Edge moved fro
 - **The changes beyond the spec stay** (ticket 41): `storySort` orders every group, the form-field
   story export is `AccountForm`, and docs pages follow the toolbar theme and direction with the
   English prose kept LTR.
+
+## Popup listbox: plan (decided 2026-10-11)
+
+Chosen in the architecture review; spec and tickets 01–09 in `.scratch/listbox/`, terms in
+`GLOSSARY.md` → "Dropdowns". Delivered 2026-10-11 (tickets 01–09); review questions are tickets
+10–14 in `.scratch/listbox/issues/`, answered in "Popup listbox: review answers" below.
+
+- **Two modules**: a dropdown panel in `core` (overlay lifecycle, direction and offset on open,
+  outside click, optional focus return) for the date pickers and the listbox; a popup listbox on top
+  of it for `select`, `multi-select`, `autocomplete` and `time-input`.
+- **The listbox is an internal entry point `@vplans/ui-kit/listbox`** with `UiOption` and
+  `UiOptionGroup`; `select` re-exports them and drops its `ɵ` exports.
+- **The dropdown panel is a directive on `<ng-template>`** with `CdkConnectedOverlay` as a host
+  directive (prototype works under CDK 20.2). It relies on the `offsetX` setter re-applying the
+  position strategy; accepted because CDK stays on 20, guarded by the panel spec.
+- **Focus return lives in the panel**; `notifyTouched` stays in the field.
+- **Fields compose the listbox controller** instead of inheriting `UiOptionPanel`; one keyboard
+  handler with a mode (trigger / searchable / free text).
+- **The autocomplete ArrowUp bug is fixed first**, test-first, in its own commit.
+- **`ui-select__panel` becomes `ui-listbox`**, noted in the CHANGELOG.
+- **Entries are matched by value**: a recomputed `items` array keeps the active option.
+- **One internal listbox harness** under the select, autocomplete and time harnesses; their public
+  interface does not change.
+
+Delivered (what the implementation settled where the plan was silent):
+
+- **Dropdown panel** `core/dropdown-panel.ts` (`ɵUiDropdownPanel`): inputs `uiDropdownPanel`
+  (origin), `open`, `positions` (default `UI_DROPDOWN_POSITIONS`), `matchWidth` (default true: min
+  width = origin width), `returnFocusTo`; outputs `closed` (Escape, outside click) and `attached`.
+  The datepickers pass `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK` and `[matchWidth]="false"`, return
+  focus to the toggle and focus the calendar on `attached`.
+- **Listbox controller** `UiListboxController` in `listbox/listbox-controller.ts`: the field
+  lists `ɵprovideUiListbox()` and calls `ɵinjectListbox({ mode, isSelected, select, … })` in a
+  field initializer; `handleKeydown()` returns false when the field may act (Enter commits typed
+  text, Escape clears it). Options are passed as the field's `contentChildren`, not registered
+  through DI (closed content options have no DOM order). One DI token, `UiListboxHost`. The
+  `ui-listbox` element (`UiListbox` in `listbox/listbox.ts`) renders the leading rows, the options
+  or the (virtual) items and the loading / "no options" rows, with its own styles.
+- **Hooks beyond the plan**, internal: `isIndeterminate` ("select all" of multi-select),
+  `showEmpty` (replaces autocomplete's `panelShown`), `openAt` (time-input opens at the nearest
+  slot), `isBlocked` and `alwaysShown` (multi-select), `locked` (disabled or readonly).
+- **time-input** passes `virtualThreshold: () => Infinity`: its slots never use the virtual
+  viewport (an interval of 5 gives 288 rendered options), so every slot stays rendered: the list
+  opens scrolled to the nearest slot and keeps its layout.
+- **Items keep their entries** through a `linkedSignal` matched by `compareWith`; repeated values
+  pair in order; a kept entry takes the new item's label, description and disabled state.
+- **Removed:** `select/option-panel.ts`, `UiOptionParent`, `select/_panel.scss`, the `ɵ` exports of
+  `select`. `select/public-api.ts` exports `UiSelect`, `UiMultiSelect`, `UiOption`, `UiOptionGroup`,
+  `UiOptionItem`.
+- **Harness:** `testing/listbox-harness.ts` (internal) holds `UiOptionHarness`, re-exported from
+  `select-harness.ts`; `isActive()` reads `aria-activedescendant`.
+- **Rules:** `overlays.md` and `forms.md` cover `listbox` and `time`; the direction and offset
+  bullets point to `uiDropdownPanel`.
+
+## Popup listbox: review answers (decided 2026-10-11)
+
+Tickets 10–14 in `.scratch/listbox/issues/` and the code review. The work is approved.
+
+- **`UiSelectBase` stays** (ticket 10): `ui-select` and `ui-multi-select` keep their shared
+  abstract base between `UiFormControlBase` and the fields, because they share one template and
+  its inputs. Decision 6 of the plan holds for the option panel level only.
+- **A time-input with no slots shows the "no options" row** (ticket 11), like every popup listbox.
+- **ArrowUp without an active option goes to the last option in every field** (ticket 12),
+  time-input included; no per-field mode.
+- **The select, autocomplete and time harnesses expose `getActiveOption()`** (ticket 13): the
+  option named by the field's `aria-activedescendant`, or `null`; it delegates to the internal
+  listbox harness. `UiOptionHarness.isActive()` stays on `aria-activedescendant`.
+- **An open panel does not follow a live direction switch** (ticket 14): the direction, offset and
+  width are read when the panel opens.
+- **The names `injectListbox` / `provideUiListbox` stay** (code review).
+- **An internal entry point has no stories of its own** (code review): `listbox` is covered by
+  its consumers' stories and its own spec. The exception is in `projects/ui-kit/README.md` →
+  "Adding a component".

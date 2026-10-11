@@ -9,20 +9,19 @@ import {
   numberAttribute,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { NgTemplateOutlet } from '@angular/common';
-import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
-import {
-  CdkFixedSizeVirtualScroll,
-  CdkVirtualForOf,
-  CdkVirtualScrollableElement,
-  CdkVirtualScrollViewport,
-} from '@angular/cdk/scrolling';
-import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { UI_FORM_FIELD_CONTROL, ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
-import { UiOption, UiOptionHandle, UiOptionParent } from './option';
-import { UiItemOption } from './option-items';
+import {
+  UiOption,
+  type ɵUiListboxController as UiListboxController,
+  type ɵUiOptionHandle as UiOptionHandle,
+  ɵUiListbox as UiListbox,
+  ɵinjectListbox as injectListbox,
+  ɵprovideUiListbox as provideUiListbox,
+} from '@vplans/ui-kit/listbox';
 import { UiSelectBase } from './select-base';
 
 /** Value of the "select all" option; never part of the value. */
@@ -55,33 +54,19 @@ const SELECT_ALL = Symbol('ui-select-all');
  */
 @Component({
   selector: 'ui-multi-select',
-  imports: [
-    CdkConnectedOverlay,
-    CdkOverlayOrigin,
-    CdkFixedSizeVirtualScroll,
-    CdkVirtualForOf,
-    CdkVirtualScrollableElement,
-    CdkVirtualScrollViewport,
-    NgTemplateOutlet,
-    UiChip,
-    UiIcon,
-    UiItemOption,
-    UiOption,
-    UiSpinner,
-  ],
+  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiOption, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiMultiSelect) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiMultiSelect), multi: true },
-    UiOptionParent,
+    provideUiListbox(),
   ],
   host: { class: 'ui-select ui-multi-select' },
 })
 export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   readonly value = model<readonly T[]>([]);
-  readonly multiple = true;
 
   /** Adds a "select all" option at the top of the list. */
   readonly selectAll = input(false, { transform: booleanAttribute });
@@ -92,10 +77,26 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   /** Shows the selected values as chips in the trigger. */
   readonly chips = input(false, { transform: booleanAttribute });
 
+  protected readonly listbox: UiListboxController<T> = injectListbox<T>({
+    ...this.listboxConfig(),
+    multiple: true,
+    isSelected: (value) => this.isSelected(value),
+    select: (value) => this.toggleValue(value),
+    isIndeterminate: (option) =>
+      option === this.selectAllOption() &&
+      !this.allSelected() &&
+      this.selectable().some((item) => this.isSelected(item.value())),
+    isBlocked: (option: UiOptionHandle) =>
+      this.limitReached() && option !== this.selectAllOption() && !this.isSelected(option.value()),
+    alwaysShown: (option) => option === this.selectAllOption(),
+  });
+
   protected override readonly selectAllValue = SELECT_ALL;
   /** Options "select all" acts on: enabled and shown by the search. */
   private readonly selectable = computed(() =>
-    this.options().filter((option) => !option.isDisabled() && !this.isHidden(option)),
+    this.listbox
+      .options()
+      .filter((option) => !option.isDisabled() && !this.listbox.isHidden(option)),
   );
   private readonly allSelected = computed(() => {
     const options = this.selectable();
@@ -110,48 +111,45 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
     () => this.selectAll() && this.maxSelections() === null && this.selectable().length > 0,
   );
   protected override readonly chipList = computed(() =>
-    this.chips() ? this.value().map((value) => ({ value, label: this.labelFor(value) })) : [],
+    this.chips()
+      ? this.value().map((value) => ({ value, label: this.listbox.labelFor(value) }))
+      : [],
   );
-  protected override readonly isIndeterminate = (option: UiOptionHandle): boolean =>
-    option === this.selectAllOption() &&
-    !this.allSelected() &&
-    this.selectable().some((item) => this.isSelected(item.value()));
-  protected override readonly isBlocked = (option: UiOptionHandle): boolean =>
-    this.limitReached() && option !== this.selectAllOption() && !this.isSelected(option.value());
-  protected override readonly alwaysShown = (option: UiOptionHandle): boolean =>
-    option === this.selectAllOption();
   protected override readonly removeChip = (value: unknown): void => {
     if (this.readonly() || this.isDisabled() || !this.isSelected(value)) return;
-    this.setValue(this.value().filter((selected) => !this.matches(value, selected)));
+    this.setValue(this.value().filter((selected) => !this.listbox.matches(value, selected)));
   };
 
   /** Labels in list order, then the selected values that are not in the list. */
   protected readonly displayLabel = computed(() => {
-    const listed = this.selectedOptions();
+    const listed = this.listbox.selectedOptions();
     const missing = this.value().filter(
-      (value) => !listed.some((option) => this.matches(option.value(), value)),
+      (value) => !listed.some((option) => this.listbox.matches(option.value(), value)),
     );
-    return [...listed.map((option) => option.getLabel()), ...missing.map((v) => this.labelFor(v))]
+    return [
+      ...listed.map((option) => option.getLabel()),
+      ...missing.map((v) => this.listbox.labelFor(v)),
+    ]
       .filter(Boolean)
       .join(', ');
   });
 
   protected readonly hasValue = computed(() => this.value().length > 0);
 
-  protected isSelected(value: unknown): boolean {
+  private isSelected(value: unknown): boolean {
     if (value === SELECT_ALL) return this.allSelected();
-    return this.value().some((selected) => this.matches(value, selected));
+    return this.value().some((selected) => this.listbox.matches(value, selected));
   }
 
   /** Adds the value, or removes it when it is already selected. */
-  protected selectOption(value: unknown): void {
+  private toggleValue(value: unknown): void {
     if (value === SELECT_ALL) {
       this.toggleAll();
       return;
     }
     const current = this.value();
     if (this.isSelected(value)) {
-      this.setValue(current.filter((selected) => !this.matches(value, selected)));
+      this.setValue(current.filter((selected) => !this.listbox.matches(value, selected)));
     } else if (!this.limitReached()) {
       this.setValue([...current, value as T]);
     }
@@ -162,7 +160,9 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
     const values = this.selectable().map((option) => option.value());
     const current = this.value();
     if (this.allSelected()) {
-      this.setValue(current.filter((selected) => !values.some((v) => this.matches(v, selected))));
+      this.setValue(
+        current.filter((selected) => !values.some((v) => this.listbox.matches(v, selected))),
+      );
     } else {
       this.setValue([...current, ...values.filter((v) => !this.isSelected(v))]);
     }

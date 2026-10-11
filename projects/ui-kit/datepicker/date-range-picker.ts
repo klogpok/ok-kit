@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DOCUMENT,
   ElementRef,
   Injector,
   afterNextRender,
@@ -19,7 +18,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { map } from 'rxjs';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -28,9 +27,8 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
-  overlayOffsetX,
-  syncOverlayDirection,
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
+  ɵUiDropdownPanel,
   UI_BREAKPOINTS,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
@@ -114,11 +112,11 @@ const hasErrors = (parsed: ParsedRange): boolean =>
 @Component({
   selector: 'ui-date-range-picker',
   imports: [
-    CdkConnectedOverlay,
     CdkOverlayOrigin,
     CdkTrapFocus,
     UiButton,
     UiCalendar,
+    ɵUiDropdownPanel,
     UiIcon,
     UiIconButton,
   ],
@@ -169,14 +167,13 @@ const hasErrors = (parsed: ParsedRange): boolean =>
     }
 
     <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="origin"
-      [cdkConnectedOverlayOpen]="isOpen()"
-      [cdkConnectedOverlayPositions]="positions"
-      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
-      (attach)="onAttach()"
-      (detach)="close()"
-      (overlayOutsideClick)="onOutsideClick($event)"
+      [uiDropdownPanel]="origin"
+      [open]="isOpen()"
+      [positions]="positions"
+      [matchWidth]="false"
+      [returnFocusTo]="toggleElement()"
+      (attached)="onAttach()"
+      (closed)="close()"
     >
       <div
         #panel
@@ -258,7 +255,6 @@ export class UiDateRangePicker
   protected readonly labels = inject(UI_LABELS);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
-  private readonly document = inject(DOCUMENT);
 
   readonly value = model<UiDateRange | null>(null);
   /** First day that can be picked or typed. */
@@ -282,18 +278,16 @@ export class UiDateRangePicker
   readonly opened = output();
   readonly closed = output();
 
-  private readonly toggleButton = viewChild.required<string, ElementRef<HTMLButtonElement>>(
+  protected readonly toggleElement = viewChild.required<string, ElementRef<HTMLButtonElement>>(
     'toggleButton',
     { read: ElementRef },
   );
-  private readonly overlay = viewChild(CdkConnectedOverlay);
   private readonly calendar = viewChild(UiCalendar);
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
   protected readonly edges: readonly Edge[] = ['start', 'end'];
   protected readonly isOpen = signal(false);
   protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
-  protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
   private readonly breakpoints = inject(BreakpointObserver);
@@ -389,7 +383,6 @@ export class UiDateRangePicker
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.commitDraft();
     this.isOpen.set(true);
     this.opened.emit();
@@ -397,13 +390,9 @@ export class UiDateRangePicker
 
   close(): void {
     if (!this.isOpen()) return;
-    // Focus inside the panel (or lost with it, after Escape) returns to the button.
-    const active = this.document.activeElement;
-    const focusInPanel =
-      !active || active === this.document.body || !!this.panel()?.nativeElement.contains(active);
+    // The panel returns focus that was inside it (or lost with it, after Escape) to the button.
     this.isOpen.set(false);
     this.closed.emit();
-    if (focusInPanel) this.toggleButton().nativeElement.focus();
     // The user has dealt with the field, even when nothing was picked.
     this.notifyTouched();
   }
@@ -424,15 +413,10 @@ export class UiDateRangePicker
   }
 
   protected onAttach(): void {
-    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
     afterNextRender(
       { write: () => this.calendar()?.focusActiveCell() },
       { injector: this.injector },
     );
-  }
-
-  protected onOutsideClick(event: MouseEvent): void {
-    if (!this.host.contains(event.target as Node)) this.close();
   }
 
   /** The first pick sets the start; the second sets the end and closes the dialog. */

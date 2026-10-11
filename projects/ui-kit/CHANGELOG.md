@@ -3,6 +3,48 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (popup listbox)
+
+### Added
+
+- **testing:** `getActiveOption()` on `UiSelectHarness`, `UiAutocompleteHarness` and
+  `UiTimeInputHarness`: the option the keyboard is on (named by `aria-activedescendant` of the
+  field), or `null` when there is none or the list is closed.
+
+### Changed
+
+- **select, autocomplete, time:** the popup list is the `ui-listbox` element of the new
+  internal entry point `@vplans/ui-kit/listbox` instead of a `div.ui-select__panel`. The
+  internal classes `ui-select__panel`, `ui-select__panel--virtual`, `ui-select__empty` and
+  `ui-select__loading` become `ui-listbox`, `ui-listbox--virtual`, `ui-listbox__empty` and
+  `ui-listbox__loading`; the `--ui-select-panel-*` tokens stay. Nothing outside the kit used
+  these classes, and the harnesses do not read them.
+- **select:** the internal exports `ɵUiOptionPanel`, `ɵUiOptionParent` and
+  `ɵprovideUiOptionParent` are removed, and so is `ɵUiItemOption` (now internal to
+  `@vplans/ui-kit/listbox`):
+  `ui-select`, `ui-multi-select`, `ui-autocomplete` and `ui-time-input` no longer share an
+  option panel; each creates the listbox controller (`ui-select` and `ui-multi-select` through
+  their shared internal `UiSelectBase`, `ui-autocomplete` and `ui-time-input` directly on
+  `UiFormControlBase`). `UiOption`,
+  `UiOptionGroup` and `UiOptionItem` are still exported from `@vplans/ui-kit/select`.
+- **select, autocomplete, time, datepicker:** the field panels open through one internal
+  directive, `ɵUiDropdownPanel` in `@vplans/ui-kit/core`, instead of their own
+  `cdkConnectedOverlay`. It reads the direction, the scrollbar offset and the field width when the
+  panel opens, closes on Escape and outside clicks and returns focus. No API change.
+- **time:** ArrowUp in an open list without an active slot goes to the last slot (it did
+  nothing), as in the other fields. A list with no slots (`minTime` after `maxTime`) shows the
+  "no options" row instead of an empty panel.
+- **testing:** `UiOptionHarness.isActive()` reads `aria-activedescendant` of the field instead of
+  the `ui-option--active` class. The result is the same.
+
+### Fixed
+
+- **autocomplete:** ArrowUp in an open list without an active option goes to the last option
+  (it left no active option); ArrowDown goes to the first.
+- **select, autocomplete, time:** the active option stays active when the `items` (the time
+  slots) are recomputed as new objects with the same values, and its label, description and disabled state follow the new
+  item.
+
 ## Unreleased (chip appearance)
 
 ### Breaking

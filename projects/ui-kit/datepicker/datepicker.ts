@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DOCUMENT,
   ElementRef,
   Injector,
   afterNextRender,
@@ -17,7 +16,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
-import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
   UI_FORM_FIELD_CONTROL,
@@ -25,9 +24,8 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
-  overlayOffsetX,
-  syncOverlayDirection,
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
+  ɵUiDropdownPanel,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
@@ -73,11 +71,11 @@ interface Draft {
 @Component({
   selector: 'ui-datepicker',
   imports: [
-    CdkConnectedOverlay,
     CdkOverlayOrigin,
     CdkTrapFocus,
     UiButton,
     UiCalendar,
+    ɵUiDropdownPanel,
     UiIcon,
     UiIconButton,
   ],
@@ -121,14 +119,13 @@ interface Draft {
     </div>
 
     <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="origin"
-      [cdkConnectedOverlayOpen]="isOpen()"
-      [cdkConnectedOverlayPositions]="positions"
-      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
-      (attach)="onAttach()"
-      (detach)="close()"
-      (overlayOutsideClick)="onOutsideClick($event)"
+      [uiDropdownPanel]="origin"
+      [open]="isOpen()"
+      [positions]="positions"
+      [matchWidth]="false"
+      [returnFocusTo]="toggleElement()"
+      (attached)="onAttach()"
+      (closed)="close()"
     >
       <div
         #panel
@@ -197,7 +194,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly labels = inject(UI_LABELS);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
-  private readonly document = inject(DOCUMENT);
 
   readonly value = model<Date | null>(null);
   readonly min = input<Date | null | undefined>(null);
@@ -218,17 +214,15 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   readonly closed = output();
 
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
-  private readonly toggleButton = viewChild.required<string, ElementRef<HTMLButtonElement>>(
+  protected readonly toggleElement = viewChild.required<string, ElementRef<HTMLButtonElement>>(
     'toggleButton',
     { read: ElementRef },
   );
-  private readonly overlay = viewChild(CdkConnectedOverlay);
   private readonly calendar = viewChild(UiCalendar);
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
   protected readonly isOpen = signal(false);
   protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
-  protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
   /** Dropped when the value changes elsewhere, so old text does not come back. */
@@ -294,7 +288,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
     this.commitDraft();
     this.isOpen.set(true);
     this.opened.emit();
@@ -302,13 +295,9 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   close(): void {
     if (!this.isOpen()) return;
-    // Focus inside the panel (or lost with it, after Escape) returns to the button.
-    const active = this.document.activeElement;
-    const focusInPanel =
-      !active || active === this.document.body || !!this.panel()?.nativeElement.contains(active);
+    // The panel returns focus that was inside it (or lost with it, after Escape) to the button.
     this.isOpen.set(false);
     this.closed.emit();
-    if (focusInPanel) this.toggleButton().nativeElement.focus();
     // The user has dealt with the field, even when no day was picked.
     this.notifyTouched();
   }
@@ -319,15 +308,10 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   }
 
   protected onAttach(): void {
-    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
     afterNextRender(
       { write: () => this.calendar()?.focusActiveCell() },
       { injector: this.injector },
     );
-  }
-
-  protected onOutsideClick(event: MouseEvent): void {
-    if (!this.host.contains(event.target as Node)) this.close();
   }
 
   protected onPick(date: Date): void {

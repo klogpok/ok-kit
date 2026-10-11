@@ -1,6 +1,6 @@
 ---
 paths:
-  - "projects/ui-kit/{core,input,select,datepicker,number-input,chip,autocomplete,file-upload,checkbox,radio,switch,slider,form-field}/**/*.ts"
+  - "projects/ui-kit/{core,input,select,listbox,time,datepicker,number-input,chip,autocomplete,file-upload,checkbox,radio,switch,slider,segmented,tree,form-field}/**/*.ts"
   - "projects/playground/**/*.ts"
 ---
 

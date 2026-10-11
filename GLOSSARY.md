@@ -32,6 +32,24 @@ _Avoid_: indeterminate (except for the native checkbox property), mixed
 The one node chosen in single selection.
 _Avoid_: active node, current node
 
+## Dropdowns
+
+**Dropdown panel**:
+A surface that a field opens next to itself and closes on an outside click, Escape or a choice; it follows the field's direction and width.
+_Avoid_: popup, dropdown (for the surface), overlay (for this role)
+
+**Popup listbox**:
+A dropdown panel that holds a list of options the user moves through with the keyboard while focus stays in the field.
+_Avoid_: option panel, select panel, menu (a menu holds commands, not values)
+
+**Option**:
+One value the user can choose in a popup listbox.
+_Avoid_: item, entry
+
+**Active option**:
+The option the keyboard currently points to; Enter chooses it. It is not necessarily chosen.
+_Avoid_: highlighted option, focused option, selected option
+
 ## Layout
 
 **Density**:

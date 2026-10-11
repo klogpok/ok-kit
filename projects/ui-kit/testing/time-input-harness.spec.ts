@@ -54,6 +54,16 @@ describe('UiTimeInputHarness', () => {
     expect(await start.isInvalid()).toBe(true);
   });
 
+  it('reads the active time', async () => {
+    const start = await loader.getHarness(UiTimeInputHarness.with({ label: 'Start' }));
+    expect(await start.getActiveOption()).toBeNull();
+    // The list opens on the slot of the value.
+    await start.open();
+    expect(await (await start.getActiveOption())?.getText()).toBe('09:00');
+    await start.close();
+    expect(await start.getActiveOption()).toBeNull();
+  });
+
   it('opens the list, reads it and picks a time', async () => {
     const start = await loader.getHarness(UiTimeInputHarness.with({ label: 'Start' }));
     const options = await start.getOptions();
