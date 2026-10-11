@@ -351,9 +351,19 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 > Отдельная задача вне фаз: тикет `.scratch/chip-appearance/issues/01-chip-appearance.md`. Новый вид по умолчанию `outline`, прежний — `appearance="soft"`; `size` (`sm`/`md`), `tone`, иконки в фильтрах, `provideUiChip()`. Решения — в [DECISIONS.md](DECISIONS.md) («Chips: outline by default, soft on request»).
 
-## Popup listbox (запланировано 2026-10-11)
+## Popup listbox (сделано 2026-10-11, ждёт ревью)
 
-> Архитектурная работа вне фаз по итогам архитектурного обзора. Спека и тикеты 01–09 — в `.scratch/listbox/`; решения — в [DECISIONS.md](DECISIONS.md) («Popup listbox: plan»). Код ещё не менялся; работа начинается после одобрения плана.
+> Архитектурная работа вне фаз по итогам архитектурного обзора. Спека и тикеты 01–09 — в `.scratch/listbox/`; решения и что поставлено — в [DECISIONS.md](DECISIONS.md) («Popup listbox: plan»).
+>
+> **Статус (2026-10-11): сделано, ждёт ревью.** Ветка `listbox`, тикеты 01–09. Коммиты: `fix(autocomplete)` (ArrowUp/ArrowDown без активной опции, тест сначала), `feat(core)` (`ɵUiDropdownPanel`), `refactor(datepicker)` (оба датапикера на dropdown panel), `feat(listbox)` (internal entry point `@vplans/ui-kit/listbox`: контроллер `ɵinjectListbox`, элемент `ui-listbox`), `refactor(time)`, `refactor(autocomplete)`, `refactor(select)` ×2 (поля на контроллере, удалены `option-panel.ts`, `UiOptionParent`, `select/_panel.scss` и `ɵ`-экспорты `select`), `fix(listbox)` (active option сохраняется при пересчёте `items`), `refactor(testing)` (общий внутренний listbox-harness), `docs(listbox)` (правила, CHANGELOG, README).
+>
+> Проверки: полный чеклист зелёный. 967 unit-тестов, coverage 98.67/83.39/94.43/98.67; playground 8; 306 stories × 3 режима без нарушений axe и ошибок консоли; 918 снимков без изменений; ngc без ошибок; бюджеты playground без предупреждений. В логе `test:playground` — `IntersectionObserver is not defined` от `@defer (on viewport)` в jsdom, было и раньше.
+>
+> Браузер (собранный Storybook manager, Edge, видимая полоса прокрутки 15 px): select, multi-select, autocomplete и time-input в light/dark RTL и light LTR — панель начинается у начального края поля и равна ему по ширине (разница 0 px), Escape возвращает фокус в поле, тёмная тема даёт тёмную поверхность. Клик по триггеру select закрывает список, по полю autocomplete/time — оставляет открытым; клик снаружи закрывает. Датапикеры: клик по toggle и снаружи закрывает, фокус остаётся на toggle; в dark RTL панель выровнена по полю; range picker на ширине 360 и 480 px показывает один месяц и не выходит за экран. Переключение направления при открытой панели: панель остаётся на старом месте до повторного открытия — тикет 14.
+>
+> Отклонения от спеки: у select/multi-select остался общий абстрактный `UiSelectBase` (решение 6 обещало убрать иерархию) — тикет 10. Поведенческие изменения: time-input без слотов показывает «нет вариантов» (тикет 11), ArrowUp без активной опции ведёт к последней опции во всех полях (тикет 12). `UiOptionHarness.isActive()` читает ARIA; `getActiveOption()` есть только во внутреннем harness (тикет 13).
+>
+> Вопросы для решения: тикеты 10–14 в `.scratch/listbox/issues/`.
 
 **Зачем.** Четыре поля повторяют жизненный цикл выпадающей панели, три — политику клавиатуры, а `time-input` и `autocomplete` опираются на внутренности `select`. Итог: dropdown panel в `core` (директива на `ng-template`) и internal entry point `@vplans/ui-kit/listbox`, на которых стоят `select`, `multi-select`, `autocomplete`, `time-input` и оба датапикера.
 
