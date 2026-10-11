@@ -94,6 +94,8 @@ so versions mark review points rather than releases.
   cells by column, sorting, row selection and select all, row expansion.
 - **datepicker:** the calendar button names the open dialog in `aria-controls` (the dialog gets
   the id `${id}-panel`), and "Clear" gets the class `ui-datepicker__clear`.
+- **date-range-picker:** the calendar button names the open dialog in `aria-controls` (the dialog
+  gets the id `${id}-panel`), so `UiDateRangePickerHarness` acts on its own dialog only.
 - **pagination:** the arrow buttons get the classes `ui-pagination__first`, `__previous`,
   `__next` and `__last`, and the host `ui-pagination--disabled` while disabled (no visual change).
 

@@ -158,6 +158,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
         [label]="labels().chooseDateRange"
         [disabled]="isDisabled() || readonly()"
         [attr.aria-expanded]="isOpen()"
+        [attr.aria-controls]="isOpen() ? panelId() : null"
         (click)="toggle()"
       >
         <ui-icon [icon]="calendarIcon" />
@@ -181,6 +182,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
         #panel
         class="ui-date-range-picker__panel"
         role="dialog"
+        [id]="panelId()"
         aria-modal="true"
         cdkTrapFocus
         [class.ui-date-range-picker__panel--wide]="monthsShown() > 1"
@@ -328,6 +330,8 @@ export class UiDateRangePicker
 
   readonly labelStrategy = 'labelledby' as const;
   readonly controlId = computed(() => `${this.id()}-start`);
+  /** The calendar dialog, named by `aria-controls` of the button while it is open. */
+  protected readonly panelId = computed(() => `${this.id()}-panel`);
 
   /** The typed texts while they belong to the current value, otherwise the formatted value. */
   protected readonly texts = computed<Record<Edge, string>>(() => {

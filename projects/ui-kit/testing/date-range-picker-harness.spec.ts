@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, viewChildren } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -22,6 +22,28 @@ class Host {
     Validators.required,
   );
   readonly max = new Date(2027, 0, 31);
+  readonly presets: UiDateRangePreset[] = [
+    { label: 'Next week', range: { start: new Date(2026, 8, 27), end: new Date(2026, 9, 3) } },
+  ];
+}
+
+@Component({
+  imports: [ReactiveFormsModule, UiDateRangePicker],
+  template: `
+    <ui-date-range-picker aria-label="Stay" [formControl]="stay" [presets]="presets" />
+    <ui-date-range-picker aria-label="Trip" [formControl]="trip" [presets]="presets" />
+  `,
+})
+class TwoPickers {
+  readonly pickers = viewChildren(UiDateRangePicker);
+  readonly stay = new FormControl<UiDateRange | null>({
+    start: new Date(2026, 8, 1),
+    end: new Date(2026, 8, 3),
+  });
+  readonly trip = new FormControl<UiDateRange | null>({
+    start: new Date(2026, 8, 5),
+    end: new Date(2026, 8, 7),
+  });
   readonly presets: UiDateRangePreset[] = [
     { label: 'Next week', range: { start: new Date(2026, 8, 27), end: new Date(2026, 9, 3) } },
   ];
@@ -84,5 +106,34 @@ describe('UiDateRangePickerHarness', () => {
     await stay.clickPreset('Next week');
     expect(host.stay.value).toEqual({ start: new Date(2026, 8, 27), end: new Date(2026, 9, 3) });
     await expect(stay.clickPreset('Tomorrow')).rejects.toThrow('No preset matches Tomorrow.');
+  });
+
+  it('acts on its own calendar while another picker is open', async () => {
+    TestBed.resetTestingModule();
+    const fixture = TestBed.createComponent(TwoPickers);
+    const pickers = fixture.componentInstance;
+    const two = TestbedHarnessEnvironment.loader(fixture);
+    const [stay, trip] = pickers.pickers();
+    stay.open();
+    trip.open();
+    fixture.detectChanges();
+    const kept = { start: new Date(2026, 8, 1), end: new Date(2026, 8, 3) };
+
+    const tripHarness = await two.getHarness(UiDateRangePickerHarness.with({ label: 'Trip' }));
+    await tripHarness.clickPreset('Next week');
+    expect(pickers.trip.value).toEqual({
+      start: new Date(2026, 8, 27),
+      end: new Date(2026, 9, 3),
+    });
+    expect(pickers.stay.value).toEqual(kept);
+
+    stay.open();
+    fixture.detectChanges();
+    await tripHarness.pick(new Date(2026, 8, 10), new Date(2026, 8, 12));
+    expect(pickers.trip.value).toEqual({
+      start: new Date(2026, 8, 10),
+      end: new Date(2026, 8, 12),
+    });
+    expect(pickers.stay.value).toEqual(kept);
   });
 });
