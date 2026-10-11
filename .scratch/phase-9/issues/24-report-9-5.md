@@ -6,12 +6,12 @@
 
 **Blocked by:** 22 (Docs: Theming and Tokens), 23 (Docs: RTL and Forms)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `/phase-check` passes, or every failure is named in the report
 - [x] The phase 9.5 section of the roadmap records the status, the commits and the deviations from the spec
 - [x] Every question for the user is a `needs-info` ticket with the facts and the options
-- [ ] The user approved the sub-phase, and the approval is recorded in the decisions log
+- [x] The user approved the sub-phase, and the approval is recorded in the decisions log
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 22 (Документация: Theming и Tokens), 23 (Документация: RTL и Forms)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
 - [x] `/phase-check` проходит, или каждая ошибка названа в отчёте
 - [x] Раздел подфазы 9.5 в роадмапе фиксирует статус, коммиты и отклонения от спеки
 - [x] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
-- [ ] Пользователь одобрил подфазу, одобрение записано в журнал решений
+- [x] Пользователь одобрил подфазу, одобрение записано в журнал решений

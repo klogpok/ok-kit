@@ -487,3 +487,18 @@ Review answers:
   scoped lookup as the datepicker (ticket 38).
 - **The table harness does not select Shift ranges** (ticket 37); documented, added when a screen test
   needs it.
+
+## Phase 9.5: documentation (approved 2026-10-11)
+
+Tickets 21–23 in `.scratch/phase-9/issues/`; the report is ticket 24 and the roadmap status. Phase 9
+and its spec are closed. The visual baselines were re-taken after Edge moved from 153 to 155 (763 of
+918 changed in text rendering only). Review answers:
+
+- **The component reference stays in `projects/ui-kit/README.md`** (ticket 39): Actions, the
+  per-control part of Forms, Overlays, Feedback, Data display and Navigation, next to the exports
+  table; the docs pages link to it.
+- **Docs tables are JSX, and MDX stays outside Prettier** (ticket 40): no `remark-gfm`; revisit if
+  the pages grow.
+- **The changes beyond the spec stay** (ticket 41): `storySort` orders every group, the form-field
+  story export is `AccountForm`, and docs pages follow the toolbar theme and direction with the
+  English prose kept LTR.

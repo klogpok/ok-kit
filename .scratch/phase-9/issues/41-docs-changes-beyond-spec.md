@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → 9.5
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** phase 9.5 made changes the spec did not ask for:
 
@@ -16,13 +16,17 @@
 1. Keep all of it (recommended).
 2. Revert some of it: name which.
 
+## Answer
+
+Keep all of it (option 1). Recorded in docs/DECISIONS.md (2026-10-11).
+
 ## Русский перевод
 
 # 41: Изменения docs сверх спеки
 
 **Спека:** [../spec.md](../spec.md) → 9.5
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** фаза 9.5 сделала изменения, которых спека не просила:
 
@@ -35,3 +39,7 @@
 
 1. Оставить всё (рекомендую).
 2. Откатить часть: назовите что.
+
+## Ответ
+
+Оставить всё (вариант 1). Записано в docs/DECISIONS.md (2026-10-11).
