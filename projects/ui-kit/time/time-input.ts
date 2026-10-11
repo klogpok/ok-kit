@@ -216,7 +216,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   protected readonly listbox = ɵinjectListbox<string>({
     ...ɵfieldListboxConfig(this),
     mode: () => 'freeText',
-    id: () => this.id(),
+    id: this.id,
     items: this.slots,
     // Every time stays rendered (1440 at an interval of 1): the harness reads the whole list.
     virtualThreshold: () => Infinity,

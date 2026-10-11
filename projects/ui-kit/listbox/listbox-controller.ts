@@ -585,7 +585,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     return this.config()?.activateOnOpen?.() ?? true;
   }
 
-  private activateEnd(key: string): void {
+  private activateEnd(key: 'ArrowDown' | 'ArrowUp'): void {
     if (key === 'ArrowDown') this.activateFirst();
     else this.activateLast();
   }
