@@ -1,8 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component, EnvironmentProviders, Provider, Type, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { UiSelectHarness } from '@vplans/ui-kit/testing';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
-import { UiPageEvent, UiPageItem, UiPagination, uiPageItems } from './pagination';
+import {
+  UiPageEvent,
+  UiPageItem,
+  UiPagination,
+  provideUiPagination,
+  uiPageItems,
+} from './pagination';
 
 const describeItems = (items: UiPageItem[]) =>
   items.map((item) => (item.kind === 'page' ? item.index + 1 : '…')).join(' ');
@@ -210,5 +218,109 @@ describe('UiPagination', () => {
     await settle();
     const buttons = [...root().querySelectorAll('button')];
     expect(buttons.every((b) => b.disabled)).toBe(true);
+  });
+});
+
+@Component({
+  imports: [UiPagination],
+  template: `<ui-pagination [length]="200" />`,
+})
+class DefaultsHost {}
+
+@Component({
+  imports: [UiPagination],
+  template: `
+    <ui-pagination
+      [length]="200"
+      [(pageSize)]="pageSize"
+      [pageSizeOptions]="[10, 50]"
+      [siblingCount]="1"
+      [showFirstLast]="true"
+    />
+  `,
+})
+class BoundHost {
+  readonly pageSize = signal(50);
+}
+
+describe('provideUiPagination', () => {
+  const view = async (fixture: ComponentFixture<unknown>) => {
+    const root = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(
+      'ui-pagination',
+    )!;
+    const select = (
+      await TestbedHarnessEnvironment.loader(fixture).getAllHarnesses(UiSelectHarness)
+    ).at(0);
+    let options: string[] = [];
+    if (select) {
+      await select.open();
+      options = await Promise.all((await select.getOptions()).map((o) => o.getText()));
+      await select.close();
+    }
+    return {
+      pages: [...root.querySelectorAll('.ui-pagination__page, .ui-pagination__gap')]
+        .map((el) => (el.textContent ?? '').trim())
+        .join(' '),
+      range: (root.querySelector('.ui-pagination__range')?.textContent ?? '').trim(),
+      options,
+      select,
+      arrows: root.querySelectorAll('button[ui-icon-button]').length,
+    };
+  };
+  const render = async <T>(host: Type<T>, providers: (Provider | EnvironmentProviders)[]) => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideUiLabels(UI_LABELS_EN),
+        { provide: LiveAnnouncer, useValue: { announce: () => Promise.resolve() } },
+        ...providers,
+      ],
+    });
+    const fixture = TestBed.createComponent(host);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    return fixture;
+  };
+  const defaults = provideUiPagination({
+    pageSize: 25,
+    pageSizeOptions: [25, 100],
+    siblingCount: 0,
+    showFirstLast: false,
+  });
+
+  it('keeps the built-in defaults without the provider', async () => {
+    const page = await view(await render(DefaultsHost, []));
+    expect(page.pages).toBe('1 2 3 4 5 … 20');
+    expect(page.range).toBe('1–10 of 200');
+    expect(page.options).toEqual([]);
+    expect(page.arrows).toBe(4);
+  });
+
+  it('changes every default', async () => {
+    const page = await view(await render(DefaultsHost, [defaults]));
+    expect(page.pages).toBe('1 2 3 … 8');
+    expect(page.range).toBe('1–25 of 200');
+    expect(page.options).toEqual(['25', '100']);
+    expect(page.arrows).toBe(2);
+  });
+
+  it('merges partial defaults over the built-in ones', async () => {
+    const page = await view(await render(DefaultsHost, [provideUiPagination({ pageSize: 50 })]));
+    expect(page.pages).toBe('1 2 3 4');
+    expect(page.range).toBe('1–50 of 200');
+    expect(page.arrows).toBe(4);
+  });
+
+  it('lets bound inputs win over the provider, including the two-way page size', async () => {
+    const fixture = await render(BoundHost, [defaults]);
+    const page = await view(fixture);
+    expect(page.pages).toBe('1 2 3 4');
+    expect(page.range).toBe('1–50 of 200');
+    expect(page.options).toEqual(['10', '50']);
+    expect(page.arrows).toBe(4);
+
+    await page.select!.clickOptions({ text: '10' });
+    expect(fixture.componentInstance.pageSize()).toBe(10);
+    expect((await view(fixture)).range).toBe('1–10 of 200');
   });
 });

@@ -17,6 +17,21 @@ so versions mark review points rather than releases.
   `--ui-chip-bg`, `--ui-chip-radius` and `--ui-chip-filter-*` are replaced by
   `--ui-chip-outline-*` and `--ui-chip-soft-*` (`radius`, `bg`, `border`, `filter-bg`,
   `filter-border`, `filter-hover-bg`, `filter-selected-bg/border/text`).
+- **select:** `UiOption` exposes only its inputs (`value`, `disabled`, `label`), `getLabel()`
+  (the CDK typeahead calls it) and the `Highlightable` methods. `active`, `selected`,
+  `indeterminate`, `filteredOut` and `unavailable` are protected; `id`, the `disabled` getter and
+  the filter state are the internal `ɵid`, `ɵdisabled` and `ɵfilteredOut()`. Read an option's state from the DOM or
+  `UiOptionHarness` instead.
+- **spinner:** `--ui-spinner-stroke-width` is now the final stroke width (its default includes the
+  former `* 1.25`), so an override of it gives exactly that width instead of being multiplied by
+  1.25. An app that overrides it gets a thinner stroke; multiply the override by 1.25 to keep the
+  old look.
+- **table:** `density` defaults to `undefined` instead of `'default'`: a table without the input
+  follows its region and gets compact rows inside `data-density="compact"`. The
+  `ui-table--default` class is set only for an explicit `density="default"`; bind it to keep a
+  table at default density inside a compact region. A `[data-density='compact']` region
+  re-declares `--ui-table-cell-padding-block` (new `--ui-table-cell-padding-block-default` holds
+  the default), and an explicit `density` re-declares it on the table.
 
 ### Added
 
@@ -32,6 +47,65 @@ so versions mark review points rather than releases.
   `--ui-chip-padding-inline-sm`.
 - **button:** `shape` (`square` | `circle`) on `ui-icon-button`, default `square`. Token
   `--ui-button-circle-radius`.
+- **tokens:** size and duration multipliers that sat in component styles are component tokens,
+  defaulting to the old values: `--ui-switch-track-scale-sm/lg`, `--ui-avatar-icon-size-ratio`,
+  `--ui-dialog-enter-scale`, `--ui-spinner-duration`, `--ui-spinner-duration-reduced-motion`,
+  `--ui-skeleton-duration`, `--ui-progress-indeterminate-duration`, `--ui-table-busy-duration`.
+- **core:** overlay helpers `UI_DROPDOWN_POSITIONS`, `UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK`,
+  `UI_SIDE_POSITIONS`, `UI_OPPOSITE_SIDE`, `UiOverlaySide`, `sideOverlayPositions()` and
+  `syncOverlayDirection()`. `UiTooltipPosition` and `UiPopoverPosition` are aliases of
+  `UiOverlaySide`.
+  Select, time input, datepicker, date-range-picker, tooltip, popover and toast use them; they
+  open where they did before.
+- **pagination:** `provideUiPagination()` (with `UI_PAGINATION_DEFAULT_OPTIONS` and
+  `UiPaginationDefaults`) sets the page size, page size options, sibling count and first/last
+  buttons of every paginator; an input bound on a paginator wins.
+- **tooltip:** `provideUiTooltip({ position, showDelay, hideDelay })` sets app-wide tooltip
+  defaults over the built-in `top` / 300 / 100; an input on the tooltip wins. Also exported:
+  `UI_TOOLTIP_DEFAULT_OPTIONS` and `UiTooltipDefaults`.
+- **tokens:** named breakpoints sm 40rem, md 52rem, lg 64rem, xl 80rem in `tokens.json`. The
+  generator emits the SCSS map `ui.$breakpoints` with the mixins `ui.up($name)` and
+  `ui.down($name)`, and `UI_BREAKPOINTS` / `UiBreakpoint` in core for the CDK
+  `BreakpointObserver`. No custom properties. The date-range-picker shows two months from
+  `UI_BREAKPOINTS.md`, the same 52rem as before.
+- **tokens:** compact density. `data-density="compact"` on any element makes its controls shorter
+  (sm/md/lg 1.75/2/2.5rem) with one step less inline padding and gap; options, menu items and
+  tree nodes follow. On `<html>` it also reaches overlays. `[data-density]` joins
+  `ui.$theme-scopes`. Storybook has a Density toolbar switch and a Foundations/Density story.
+- **styles:** layout classes `ui-stack`, `ui-cluster`, `ui-grid` (columns at least
+  `--ui-grid-min` on the grid, 20rem by default from the token `--ui-layout-grid-min`) and
+  `ui-container` (centered, up to `--ui-layout-container-max-width`, 80rem), with gap
+  modifiers `ui-gap-3xs` … `ui-gap-3xl` (md by default), and the mixins `ui.stack($gap)`,
+  `ui.cluster($gap)`, `ui.grid($min, $gap)` and `ui.container()`. Story Foundations/Layout.
+- **testing:** control harnesses `UiDatepickerHarness`, `UiFormFieldHarness` (label, hint,
+  errors and `getControl()`), `UiRadioGroupHarness` (+ `UiRadioHarness`), `UiSwitchHarness`.
+- **testing:** navigation harnesses `UiAccordionHarness` (+ `UiAccordionItemHarness`),
+  `UiBreadcrumbsHarness` (+ `UiBreadcrumbHarness`, which reads collapsed links too),
+  `UiPaginationHarness` (current page, page size, moving between pages), `UiTabGroupHarness`
+  (+ `UiTabHarness`) and `UiTabNavHarness` (+ `UiTabLinkHarness`).
+- **testing:** harnesses for the status components: `UiAlertHarness`, `UiAvatarHarness`,
+  `UiAvatarGroupHarness`, `UiBadgeHarness`, `UiEmptyStateHarness`,
+  `UiProgressBarHarness`.
+- **testing:** overlay harnesses that find their content from the document root:
+  `UiMenuHarness` (+ `UiMenuItemHarness`), `UiPopoverHarness`, `UiTooltipHarness` and
+  `UiToastHarness`. The popover and tooltip triggers get the classes `ui-popover-trigger` and
+  `ui-tooltip-trigger`.
+- **testing:** `UiTableHarness` with `UiTableRowHarness` and `UiTableCellHarness`: rows and
+  cells by column, sorting, row selection and select all, row expansion.
+- **datepicker:** the calendar button names the open dialog in `aria-controls` (the dialog gets
+  the id `${id}-panel`), and "Clear" gets the class `ui-datepicker__clear`.
+- **date-range-picker:** the calendar button names the open dialog in `aria-controls` (the dialog
+  gets the id `${id}-panel`), so `UiDateRangePickerHarness` acts on its own dialog only.
+- **pagination:** the arrow buttons get the classes `ui-pagination__first`, `__previous`,
+  `__next` and `__last`, and the host `ui-pagination--disabled` while disabled (no visual change).
+
+### Fixed
+
+- **dialog, drawer, toast, popover:** the maximum width is measured against the overlay
+  container instead of `100vw`, so on a page with a scrollbar they no longer run under it.
+- **popover:** a popover pushed back on screen at a viewport edge keeps the viewport margin on
+  every side and no longer runs under a page scrollbar on the left (an RTL page in an iframe).
+  Popovers that fit open where they did before.
 
 ## 0.2.0 - 2026-10-06 (Angular 20 migration)
 

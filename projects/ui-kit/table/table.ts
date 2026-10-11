@@ -11,7 +11,10 @@ import { UiSkeleton } from '@vplans/ui-kit/skeleton';
 import { UiTableColumns, injectColumnCount } from './columns';
 import { UiTableSticky } from './sticky';
 
-/** Row density of `table[ui-table]`. */
+/**
+ * Row density of `table[ui-table]`. Leave `density` unset to follow the `data-density` region the
+ * table is in; an explicit value overrides the region.
+ */
 export type UiTableDensity = 'default' | 'compact';
 
 /**
@@ -20,6 +23,8 @@ export type UiTableDensity = 'default' | 'compact';
  *
  * - `loading` sets `aria-busy` and pulses a line under the header. Show `tr[ui-table-skeleton]` rows for the
  *   first load and `tr[ui-table-message]` for empty and error states.
+ * - `density` is unset by default and follows the region (`data-density="compact"`); `default` or
+ *   `compact` overrides it.
  * - `stickyHeader` keeps the header visible while the page or a scrolling container scrolls.
  * - Sorting: `[uiSort]` on the table and `th[ui-sort-header]`.
  * - Selection: `[uiTableSelection]`; expandable rows: `tr[uiExpandableRow]`.
@@ -45,14 +50,14 @@ export type UiTableDensity = 'default' | 'compact';
   providers: [UiTableColumns, UiTableSticky],
   host: {
     class: 'ui-table',
-    '[class]': '"ui-table--" + density()',
+    '[class]': 'density() ? "ui-table--" + density() : null',
     '[class.ui-table--sticky-header]': 'stickyHeader()',
     '[class.ui-table--loading]': 'loading()',
     '[attr.aria-busy]': 'loading() ? "true" : null',
   },
 })
 export class UiTable {
-  readonly density = input<UiTableDensity>('default');
+  readonly density = input<UiTableDensity | undefined>(undefined);
   readonly stickyHeader = input(false, { transform: booleanAttribute });
   readonly loading = input(false, { transform: booleanAttribute });
 }

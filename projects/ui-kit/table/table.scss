@@ -2,9 +2,6 @@
 
 // Unencapsulated: styles projected rows and cells. Every selector is scoped under `.ui-table`.
 .ui-table {
-  --_pad-block: var(--ui-table-cell-padding-block);
-  --_pad-inline: var(--ui-table-cell-padding-inline);
-
   inline-size: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -14,8 +11,15 @@
   font-size: var(--ui-table-font-size);
   line-height: var(--ui-line-height-snug);
 
+  // Without a density input the table reads the token, which a [data-density='compact'] region
+  // re-declares. An explicit density re-declares it on the table itself, which beats the value
+  // inherited from the region (and, with two classes, a region attribute on the table itself).
+  &.ui-table--default {
+    --ui-table-cell-padding-block: var(--ui-table-cell-padding-block-default);
+  }
+
   &.ui-table--compact {
-    --_pad-block: var(--ui-table-cell-padding-block-compact);
+    --ui-table-cell-padding-block: var(--ui-table-cell-padding-block-compact);
   }
 
   > caption {
@@ -26,8 +30,8 @@
 
   th,
   td {
-    padding-block: var(--_pad-block);
-    padding-inline: var(--_pad-inline);
+    padding-block: var(--ui-table-cell-padding-block);
+    padding-inline: var(--ui-table-cell-padding-inline);
     border-block-end: var(--ui-border-width-default) solid var(--ui-table-border);
     text-align: start;
     vertical-align: middle;
@@ -86,8 +90,8 @@
   // Busy: the header's bottom edge becomes a pulsing primary line. The rows keep full contrast.
   &.ui-table--loading > thead > tr:last-child > th {
     box-shadow: inset 0 calc(var(--ui-border-width-strong) * -1) 0 var(--ui-color-primary);
-    animation: ui-table-busy calc(var(--ui-motion-duration-slow) * 2)
-      var(--ui-motion-easing-standard) infinite alternate;
+    animation: ui-table-busy var(--ui-table-busy-duration) var(--ui-motion-easing-standard) infinite
+      alternate;
 
     @media (prefers-reduced-motion: reduce) {
       animation: none;
@@ -145,8 +149,8 @@
   box-sizing: border-box;
   inline-size: 100%;
   margin: 0;
-  padding-block: var(--_pad-block);
-  padding-inline: var(--_pad-inline);
+  padding-block: var(--ui-table-cell-padding-block);
+  padding-inline: var(--ui-table-cell-padding-inline);
   border: 0;
   background: none;
   color: inherit;

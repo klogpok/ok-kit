@@ -6,11 +6,11 @@
 
 **Blocked by:** 14 (Phase 9.3 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Four harnesses on the `UiHarness` base, one commit each, each with its own spec
-- [ ] Filters by visible text where the component has it
-- [ ] Exported from the testing entry point; README table and CHANGELOG updated
+- [x] Four harnesses on the `UiHarness` base, one commit each, each with its own spec
+- [x] Filters by visible text where the component has it
+- [x] Exported from the testing entry point; README table and CHANGELOG updated
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** 14 (Отчёт подфазы 9.3)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Четыре harness на базе `UiHarness`, по коммиту на каждый, у каждого свой спек
-- [ ] Фильтры по видимому тексту там, где он есть у компонента
-- [ ] Экспортируются из entry point testing; таблица README и CHANGELOG обновлены
+- [x] Четыре harness на базе `UiHarness`, по коммиту на каждый, у каждого свой спек
+- [x] Фильтры по видимому тексту там, где он есть у компонента
+- [x] Экспортируются из entry point testing; таблица README и CHANGELOG обновлены

@@ -7,8 +7,8 @@
 }
 
 :host(.ui-switch--sm) {
-  --_track-w: calc(var(--ui-switch-track-width) * 0.8);
-  --_track-h: calc(var(--ui-switch-track-height) * 0.8);
+  --_track-w: calc(var(--ui-switch-track-width) * var(--ui-switch-track-scale-sm));
+  --_track-h: calc(var(--ui-switch-track-height) * var(--ui-switch-track-scale-sm));
   --_font-size: var(--ui-font-size-sm);
 }
 
@@ -19,8 +19,8 @@
 }
 
 :host(.ui-switch--lg) {
-  --_track-w: calc(var(--ui-switch-track-width) * 1.2);
-  --_track-h: calc(var(--ui-switch-track-height) * 1.2);
+  --_track-w: calc(var(--ui-switch-track-width) * var(--ui-switch-track-scale-lg));
+  --_track-h: calc(var(--ui-switch-track-height) * var(--ui-switch-track-scale-lg));
   --_font-size: var(--ui-font-size-md);
 }
 

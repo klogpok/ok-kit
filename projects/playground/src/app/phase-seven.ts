@@ -99,7 +99,7 @@ const UNITS: Unit[] = Array.from({ length: 12 }, (_, i) => ({
     UiRowDetail,
   ],
   templateUrl: './phase-seven.html',
-  styleUrls: ['./phase-three.scss', './phase-seven.scss'],
+  styleUrls: ['./phase.scss', './phase-seven.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhaseSeven {

@@ -14,41 +14,6 @@ header {
   margin-block-end: var(--ui-space-2xl);
 }
 
-.toolbar,
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-sm);
-  align-items: center;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: var(--ui-space-xl);
-}
-
-.stack {
-  display: grid;
-  gap: var(--ui-space-lg);
-}
-
-section {
-  display: grid;
-  gap: var(--ui-space-lg);
-  align-content: start;
-  padding: var(--ui-space-xl);
-  border: var(--ui-border-width-default) solid var(--ui-color-border);
-  border-radius: var(--ui-radius-container);
-  background: var(--ui-color-surface);
-}
-
-pre {
-  margin: 0;
-  overflow: auto;
-  font-size: var(--ui-font-size-xs);
-}
-
 // Keeps the deferred sections below the fold until they load.
 .phase-placeholder {
   min-block-size: var(--ui-space-3xl);

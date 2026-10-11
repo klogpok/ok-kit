@@ -6,11 +6,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `provideUiPagination` is exported from the pagination entry point and takes partial defaults over the built-in ones
-- [ ] A spec shows that the provider changes each default and that a bound input overrides it, including the two-way page size
-- [ ] README (pagination section) and CHANGELOG mention the provider
+- [x] `provideUiPagination` is exported from the pagination entry point and takes partial defaults over the built-in ones
+- [x] A spec shows that the provider changes each default and that a bound input overrides it, including the two-way page size
+- [x] README (pagination section) and CHANGELOG mention the provider
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** Нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] `provideUiPagination` экспортируется из entry point pagination и принимает частичные умолчания поверх встроенных
-- [ ] Спек показывает, что провайдер меняет каждое умолчание, а привязанный вход его перекрывает, включая двустороннюю привязку размера страницы
-- [ ] README (раздел pagination) и CHANGELOG упоминают провайдер
+- [x] `provideUiPagination` экспортируется из entry point pagination и принимает частичные умолчания поверх встроенных
+- [x] Спек показывает, что провайдер меняет каждое умолчание, а привязанный вход его перекрывает, включая двустороннюю привязку размера страницы
+- [x] README (раздел pagination) и CHANGELOG упоминают провайдер

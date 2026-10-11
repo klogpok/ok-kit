@@ -1,7 +1,7 @@
 import { ContentContainerComponentHarness, TestElement } from '@angular/cdk/testing';
 
-/** Required markers of `ui-form-field` inside its label. */
-const REQUIRED_MARKERS = '.ui-form-field__required, .ui-form-field__required-text';
+/** Required markers of `ui-form-field` inside its label. Internal: not in the public API. */
+export const REQUIRED_MARKERS = '.ui-form-field__required, .ui-form-field__required-text';
 
 /**
  * Base of the kit's component harnesses. It adds focus helpers that act on the element that
@@ -56,7 +56,7 @@ export abstract class UiHarness<
     const texts = await Promise.all(
       ids.map(async (id) => {
         const label = await root.locatorForOptional(`[id="${id}"]`)();
-        return label ? (await label.text({ exclude: REQUIRED_MARKERS })).trim() : '';
+        return label ? label.text({ exclude: REQUIRED_MARKERS }) : '';
       }),
     );
     return texts.filter(Boolean).join(' ') || null;

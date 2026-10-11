@@ -6,12 +6,12 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Each listed value is a component token in the token source, and the generated files are rebuilt
-- [ ] The component styles read the tokens; no listed magic multiplier remains
-- [ ] Visual baselines do not change
-- [ ] The component tokens story shows the new tokens
+- [x] Each listed value is a component token in the token source, and the generated files are rebuilt
+- [x] The component styles read the tokens; no listed magic multiplier remains
+- [x] Visual baselines do not change
+- [x] The component tokens story shows the new tokens
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** Нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Каждое перечисленное значение — component-токен в источнике токенов, сгенерированные файлы пересобраны
-- [ ] Стили компонентов читают токены; ни одного перечисленного магического множителя не осталось
-- [ ] Визуальные снимки не меняются
-- [ ] Story component-токенов показывает новые токены
+- [x] Каждое перечисленное значение — component-токен в источнике токенов, сгенерированные файлы пересобраны
+- [x] Стили компонентов читают токены; ни одного перечисленного магического множителя не осталось
+- [x] Визуальные снимки не меняются
+- [x] Story component-токенов показывает новые токены

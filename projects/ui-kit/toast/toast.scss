@@ -5,7 +5,9 @@
   flex-direction: column;
   gap: var(--ui-toast-gap);
   box-sizing: border-box;
-  inline-size: min(var(--ui-toast-width), 100vw);
+  // The pane is at most as wide as the overlay container, which ends at the page scrollbar.
+  inline-size: var(--ui-toast-width);
+  max-inline-size: 100%;
   padding: var(--ui-toast-offset);
   font-family: var(--ui-font-family-sans);
   // The offset and the gaps between toasts let clicks through to the page.

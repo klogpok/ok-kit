@@ -33,9 +33,6 @@ export class UiDateRangePickerHarness extends UiHarness {
 
   private readonly inputs = this.locatorForAll('.ui-date-range-picker__input');
   private readonly toggle = this.locatorFor('.ui-date-range-picker__toggle');
-  private readonly panel = this.documentRootLocatorFactory().locatorForOptional(
-    '.ui-date-range-picker__panel',
-  );
 
   static with<T extends UiDateRangePickerHarness>(
     this: ComponentHarnessConstructor<T>,
@@ -98,23 +95,22 @@ export class UiDateRangePickerHarness extends UiHarness {
     await this.setText('start', '');
     await this.setText('end', '');
     await this.open();
-    await this.clickDay(start);
-    if (end) await this.clickDay(end);
+    const panel = await this.requirePanel();
+    await this.clickDay(panel, start);
+    if (end) await this.clickDay(panel, end);
   }
 
   /** Labels of the preset buttons. Opens the dialog. */
   async getPresets(): Promise<string[]> {
     await this.open();
-    await this.requirePanel();
-    const buttons = await this.presetButtons();
+    const buttons = await this.presetButtons(await this.requirePanel());
     return Promise.all(buttons.map(async (button) => (await button.text()).trim()));
   }
 
   /** Clicks the preset with this label. Opens the dialog. */
   async clickPreset(label: string | RegExp): Promise<void> {
     await this.open();
-    await this.requirePanel();
-    for (const button of await this.presetButtons()) {
+    for (const button of await this.presetButtons(await this.requirePanel())) {
       if (await HarnessPredicate.stringMatches(button.text(), label)) {
         await button.click();
         return;
@@ -148,34 +144,39 @@ export class UiDateRangePickerHarness extends UiHarness {
     return (await this.inputs())[edge === 'start' ? 0 : 1];
   }
 
-  private async requirePanel(): Promise<TestElement> {
-    const panel = await this.panel();
-    if (!panel) throw Error('The date range picker dialog is not open.');
-    return panel;
+  /**
+   * Selector of this picker's open dialog: the one that `aria-controls` of its button names
+   * (other pickers may have their dialogs open too).
+   */
+  private async requirePanel(): Promise<string> {
+    const id = await (await this.toggle()).getAttribute('aria-controls');
+    const selector = `[id="${id}"]`;
+    if (!id || !(await this.documentRootLocatorFactory().locatorForOptional(selector)())) {
+      throw Error('The date range picker dialog is not open.');
+    }
+    return selector;
   }
 
-  private presetButtons(): Promise<TestElement[]> {
+  private presetButtons(panel: string): Promise<TestElement[]> {
     return this.documentRootLocatorFactory().locatorForAll(
-      '.ui-date-range-picker__panel .ui-date-range-picker__preset',
+      `${panel} .ui-date-range-picker__preset`,
     )();
   }
 
-  private async clickDay(date: Date): Promise<void> {
+  private async clickDay(panel: string, date: Date): Promise<void> {
     const root = this.documentRootLocatorFactory();
     const key = dayKey(date);
     for (let page = 0; page < MAX_PAGES; page++) {
-      const cell = await root.locatorForOptional(
-        `.ui-date-range-picker__panel td[data-date="${key}"]`,
-      )();
+      const cell = await root.locatorForOptional(`${panel} td[data-date="${key}"]`)();
       if (cell) {
         await cell.click();
         return;
       }
-      const shown = await root.locatorFor('.ui-date-range-picker__panel td[data-date]')();
+      const shown = await root.locatorFor(`${panel} td[data-date]`)();
       const first = (await shown.getAttribute('data-date')) ?? key;
       const label = key < first ? 'previousMonth' : 'nextMonth';
       const button = await root.locatorForOptional(
-        `.ui-date-range-picker__panel .ui-calendar__header button[data-nav="${label}"]`,
+        `${panel} .ui-calendar__header button[data-nav="${label}"]`,
       )();
       if (!button || (await button.getAttribute('aria-disabled')) === 'true') break;
       await button.click();

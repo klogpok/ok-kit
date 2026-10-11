@@ -71,4 +71,14 @@ describe('UiStepperHarness', () => {
     expect(await stepper.getSteps({ done: true })).toHaveLength(1);
     await expect(stepper.selectStep({ label: 'Payment' })).rejects.toThrow('No step matches');
   });
+
+  it('focuses the button of a step', async () => {
+    const stepper = await loader.getHarness(UiStepperHarness.with({ orientation: 'horizontal' }));
+    const [details] = await stepper.getSteps();
+    await details.focus();
+    expect(await details.isFocused()).toBe(true);
+    expect(document.activeElement?.classList).toContain('ui-stepper__header');
+    await details.blur();
+    expect(await details.isFocused()).toBe(false);
+  });
 });

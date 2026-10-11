@@ -230,6 +230,60 @@
 ## Фаза 9 — инфраструктура для команд
 
 > **Статус (2026-10-10): спека и тикеты готовы, работа не начата.** Решения опроса — в [спеке](../.scratch/phase-9/spec.md): пять подфаз 9.1 P3 → 9.2 брейкпоинты и density → 9.3 layout → 9.4 harnesses → 9.5 MDX, у каждой отчёт и одобрение. Тикеты 01–24 — в `.scratch/phase-9/issues/`. Пункты ниже — исходный план; где он расходится со спекой, действует спека.
+>
+> **Статус (2026-10-10): 9.1 (хвосты P3) сделана и одобрена.** Ответы на тикеты 25–27 — в [DECISIONS.md](DECISIONS.md); исправление сдвига popover — тикет 28. Ветка `phase-9`, тикеты 01–06. Коммиты: `feat(tooltip)` (`provideUiTooltip`), `feat(pagination)` (`provideUiPagination`), `fix(overlays)` (ширина dialog, drawer, toast и popover считается от контейнера оверлея, `100vw` убран), `feat(tokens)` + `chore(visual)` (множители в component-токены), `refactor(select)` (внутренности `UiOption`), `refactor(core)` (`core/overlay.ts`: пресеты позиций и `syncOverlayDirection`), `docs(rules)`, правки по код-ревью: `fix(time)`, `refactor(select)`, `refactor(tooltip)`, `docs(readme)`, `docs(changelog)`.
+>
+> Проверки: полный чеклист зелёный. 834 unit-теста (+14), coverage 98.29/81.42/93.27/98.29; 294 stories × 3 режима без нарушений axe; 882 снимка без изменений; ngc без ошибок; бюджеты playground без предупреждений. Браузер (Edge, видимая полоса прокрутки 15px, light/dark, RTL/LTR, 360 и 1024px): dialog, drawer, toast и popover не заходят под полосу; select, autocomplete, datepicker, date-range-picker, time input, tooltip и popover открываются там же, где раньше; значения новых токенов совпадают со старыми.
+>
+> Отклонения от спеки:
+> - Изменились три снимка `foundations-tokens--component-tokens`: галерея показывает новые токены (этого требует тикет 04). Остальные снимки не изменились.
+> - Аватар: множитель `0.6` задаёт размер иконки-заглушки, а не инициалов, поэтому токен называется `--ui-avatar-icon-size-ratio`.
+> - Скаляры (`0.8`, `1.2`, `0.6`, `0.96`) — литералы: семантического токена для безразмерного множителя нет (записано в README).
+> - `UiOption`: `filteredOut` читают панель и группа, поэтому наружу вышел `ɵfilteredOut()`; защищённый `computed` остался для шаблона (шаблон Angular не принимает имя с `ɵ`). `getLabel` остался публичным — тикет 25.
+> - Toast тоже синхронизирует направление через `syncOverlayDirection`.
+> - `time-input` получил `skipPredicate` по `ɵdisabled`: стандартный предикат CDK читает `disabled`.
+>
+> Вопросы для решения: тикеты 25 (`getLabel`), 26 (смысл `--ui-spinner-stroke-width`), 27 (сдвинутый popover под левой полосой в RTL-iframe).
+>
+> **Статус (2026-10-10): 9.2 (брейкпоинты и density) сделана и одобрена.** Ответы на тикеты 29–31 — в [DECISIONS.md](DECISIONS.md). Тикеты 08, 09, 10 и 28 (ответ на тикет 27). Коммиты: `feat(tokens)` (брейкпоинты: `$breakpoints`, `ui.up()`/`ui.down()`, `UI_BREAKPOINTS` в core), `feat(datepicker)` (два месяца от md), `feat(tokens)` + `feat(storybook)` (compact density, переключатель Density в тулбаре, «Foundations/Density»), `feat(table)` (`density` по умолчанию `undefined`, таблица следует области), `fix(popover)` (сдвиг у края держит отступ 8 px), `chore(visual)` ×5; по код-ревью: `chore(lint)`, `feat(tokens)` (compact-область заново объявляет `--ui-table-cell-padding-block`), `refactor(popover)` (обёртка над стратегией CDK вместо подкласса, геометрия в `core/overlay.ts`), `feat(tokens)` (таблица density в README и compact-значения в `UI_TOKENS` из генератора), `docs(readme)`; по проверке в браузере: `fix(storybook)` (истории Density не зависят от density в тулбаре).
+>
+> Значения compact: высота контролов sm/md/lg 1.75/2/2.5rem; padding-inline 0.5/0.625/0.75rem; gap 0.25/0.375/0.5rem; отступ ячейки таблицы по блоку — compact-значение таблицы. Шрифты и `--ui-space-*` не меняются.
+>
+> Проверки: полный чеклист зелёный. 845 unit-тестов (+11), coverage 98.32/81.48/93.31/98.32; 300 stories × 3 режима без нарушений axe (+6); 900 снимков (+18; изменён `foundations-tokens--component-tokens` — новая строка токена); ngc без ошибок; бюджеты playground без предупреждений. Браузер (Edge, light/dark, RTL/LTR, density из тулбара): контролы, option, menu, tree, segmented, календарь, tabs, pagination и таблица уменьшаются, шрифты прежние, обрезаний и наложений нет; date-range-picker: один месяц до 831px, два от 832px; popover у начального и конечного края держит 8 px, в том числе в RTL-iframe с левой полосой.
+>
+> Отклонения от спеки:
+> - «Foundations/Density» — четыре истории (`Controls`, `Table`, `OpenListDefault`, `OpenListCompact`), а не одна: overlay получает compact только через корень, поэтому открытый список в compact — отдельная история; таблица отдельно, чтобы не менять снимки контролов. Истории закрепляют density сами и не следуют тулбару.
+> - Таблица: новый токен `--ui-table-cell-padding-block-default`; генератор теперь разрешает ссылку component-токена на токен того же компонента (правило в README).
+> - `table.spec.ts` проверяет классы `ui-table--*`: Vitest не загружает CSS. Поведение в области проверяет play-функция истории `Table` (отступы 12/6/12/6 px).
+> - Popover сдвигается своей обёрткой над стратегией CDK (тикет 28), а не отступом стратегии, как предлагал тикет: отступ стратегии CDK не учитывает левую полосу.
+> - Генерируемый `_breakpoints.scss` исключён из stylelint, как `_tokens.scss`.
+>
+> Вопросы для решения: тикеты 29 (сброс переопределений внутри области density), 30 (возврат к обычной плотности внутри compact), 31 (собственный сдвиг только у popover или и у tooltip).
+>
+> **Статус (2026-10-10): 9.3 (layout-утилиты) сделана и одобрена.** Ответ на тикет 32 — в [DECISIONS.md](DECISIONS.md); исправление playground — тикет 33. Тикеты 12 и 13. Коммиты: `feat(styles)` (`.ui-stack`, `.ui-cluster`, `.ui-grid`, `.ui-container`, `.ui-gap-3xs` … `.ui-gap-3xl` и миксины `stack`, `cluster`, `grid`, `container`), `refactor(playground)` (playground без своих `.row`, `.toolbar`, `.stack`, `.grid`; скриншоты до и после совпадают попиксельно), `chore(visual)` ×2; по код-ревью: `fix(styles)` (`--ui-grid-min` не протекает во вложенные grid) + история `NestedGrid`, `feat(tokens)` (семантические токены `--ui-layout-grid-min` = 20rem и `--ui-layout-container-max-width` = 80rem), генерируемый `styles/_spacing.scss` со списком шагов отступа, `docs`, `refactor(playground)` (локальный класс вместо `.form .ui-cluster > *`).
+>
+> Проверки: полный чеклист зелёный. 845 unit-тестов, playground 7; coverage 98.32/81.49/93.31/98.32; 306 stories × 3 режима без нарушений axe (+6); 918 снимков (+18); ngc без ошибок; бюджеты playground без предупреждений (initial 705.11 kB). Браузер (Edge, light/dark, RTL/LTR, 360–1600 px): отступы 2…48 px по шкале, cluster переносится и зеркалится, grid перестраивается 1→2→4 колонки, вложенный grid держит свой минимум, container по центру с отступами; playground без наложений и горизонтального скролла.
+>
+> Отклонения от спеки:
+> - Каждый layout-класс сам задаёт `--ui-gap` и `--ui-grid-min`, а не читает их с fallback: так вложенный layout не наследует значения родителя. Модификатор `.ui-gap-*` и `--ui-grid-min` действуют на том же элементе, не на предке (записано в README).
+> - 20rem и 80rem — семантические токены `--ui-layout-grid-min` и `--ui-layout-container-max-width`: stylelint запрещает литералы `rem`, а так значения можно переопределить в рантайме.
+> - `container()` ещё задаёт `box-sizing: border-box` и `inline-size: 100%`, чтобы работать внутри flex-строки; миксины принимают и имя шага, и любую длину.
+> - `.ui-stack` — flex-колонка (не grid).
+> - Play-проверки Grid и NestedGrid рассчитаны на ширину снимков (1024 px); на 360 px колонок меньше, и они падают — вёрстка при этом правильная.
+>
+> Вопрос для решения: тикет 32 (секции phase 8 в playground без стиля карточки и JSON в RTL; было и в `master`).
+>
+> **Статус (2026-10-11): 9.4 (harnesses) сделана и одобрена.** 9.5 не начата: пользователь попросил остановиться. Тикеты 15–19 и 33 (ответ на тикет 32). 18 новых harnesses в `@vplans/ui-kit/testing`, по коммиту `feat` и spec на каждый: accordion, alert, avatar (+ группа), badge, breadcrumbs, datepicker, empty-state, form-field, menu, pagination, popover, progress, radio, switch, table (+ строка и ячейка), tabs (+ tab nav), toast, tooltip. Правило README: harness обязателен для компонента с состоянием или поведением; divider, skeleton, spinner, icon и card освобождены. Playground: общий стиль карточки для всех секций, JSON читается слева направо в RTL. По код-ревью: breadcrumbs, tab link и step наследуют `UiHarness`; datepicker ищет только свою панель (id + `aria-controls`); стрелки пагинации найдены по классам; breadcrumbs открывают «…» через `UiMenuHarness`; таблица отмечает строки через `UiCheckboxHarness`; `getTone()` у alert и toast без `!`.
+>
+> Проверки: полный чеклист зелёный. 925 unit-тестов (+80), playground 8 (+1); coverage 98.34/83.14/94.49/98.34 (без testing ветки были бы 79.96 — ниже порога 80); 306 stories × 3 режима без нарушений axe; 918 снимков без изменений; ngc без ошибок; бюджеты playground без предупреждений. Браузер (Edge, light/dark, RTL/LTR): datepicker, пагинация, popover и tooltip с новой разметкой выглядят и работают как раньше; в playground у всех 16 секций рамка карточки, JSON читается по порядку.
+>
+> Отклонения от спеки:
+> - API сверх спеки (группа аватаров, tab nav, `clickToday`/`clickClear`, `getControl()` без запроса) и разметка для harnesses — тикет 35.
+> - Tooltip не связан с триггером в DOM: harness находит подсказку по тексту из `aria-describedby`; два триггера с одинаковым текстом неразличимы (записано в README).
+> - `UiPaginationHarness.getPageSize()` возвращает `null` без выбора размера страницы: на последней странице текст диапазона не равен размеру.
+> - Коммиты harnesses названы то `feat(testing)`, то `feat(<компонент>)`.
+>
+> Вопросы для решения: тикеты 34 (toast через `documentRootLoader`), 35 (API сверх спеки), 36 (harness date-range-picker ищет панель глобально), 37 (Shift-диапазон в harness таблицы). **Ответы (2026-10-11)** — в [DECISIONS.md](DECISIONS.md); тикет 36 исправлен тикетом 38.
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**

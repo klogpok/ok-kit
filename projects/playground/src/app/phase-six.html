@@ -26,7 +26,7 @@
     </div>
   }
 
-  <div class="row">
+  <div class="ui-cluster">
     <span id="upload-caption">Uploading plan.pdf: {{ uploaded() }} of 8 MB</span>
     <button ui-button size="sm" variant="secondary" (click)="upload()">Next MB</button>
   </div>
@@ -34,10 +34,10 @@
   <ui-progress-bar size="sm" label="Loading plans" />
 </section>
 
-<div class="grid">
+<div class="ui-grid ui-gap-xl">
   <section aria-labelledby="people-title">
     <h3 id="people-title" class="ui-heading-4">People</h3>
-    <div class="row">
+    <div class="ui-cluster">
       <ui-avatar-group max="3" aria-label="Coordinators">
         @for (person of people; track person.id) {
           <ui-avatar [name]="person.name" />
@@ -45,7 +45,7 @@
       </ui-avatar-group>
       <ui-badge tone="danger" [count]="120">unread messages</ui-badge>
       <ui-badge tone="info" size="lg">Shared</ui-badge>
-      <span class="row"><ui-badge tone="success" dot>Online</ui-badge> Dana Levi</span>
+      <span class="ui-cluster"><ui-badge tone="success" dot>Online</ui-badge> Dana Levi</span>
     </div>
     <ui-form-field label="Coordinator">
       <ui-select placeholder="Choose" clearable [(value)]="coordinator">
@@ -62,7 +62,7 @@
 
   <section aria-labelledby="overlays-title">
     <h3 id="overlays-title" class="ui-heading-4">Overlays</h3>
-    <div class="row">
+    <div class="ui-cluster">
       <button ui-button variant="secondary" [uiPopoverTriggerFor]="filters">
         <ui-icon icon="filter" /> Filters
       </button>

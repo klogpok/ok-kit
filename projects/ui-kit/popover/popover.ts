@@ -21,14 +21,23 @@ import {
   ConnectedPosition,
   FlexibleConnectedPositionStrategy,
   OverlayRef,
+  PositionStrategy,
   createFlexibleConnectedPositionStrategy,
   createOverlayRef,
   createRepositionScrollStrategy,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { overlayOffsetX, resolveDirection } from '@vplans/ui-kit/core';
+import { ViewportRuler } from '@angular/cdk/scrolling';
+import { Subscription } from 'rxjs';
+import {
+  UiOverlaySide,
+  overlayOffsetX,
+  sideOverlayPositions,
+  syncOverlayDirection,
+  ɵpushOnScreen as pushOnScreen,
+} from '@vplans/ui-kit/core';
 
-export type UiPopoverPosition = 'top' | 'bottom' | 'start' | 'end';
+export type UiPopoverPosition = UiOverlaySide;
 
 /** Context of the popover template: `let-close="close"`. */
 export interface UiPopoverContext {
@@ -36,21 +45,93 @@ export interface UiPopoverContext {
   close: () => void;
 }
 
-const POSITIONS: Record<UiPopoverPosition, ConnectedPosition> = {
-  top: { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom' },
-  bottom: { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top' },
-  start: { originX: 'start', originY: 'center', overlayX: 'end', overlayY: 'center' },
-  end: { originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center' },
-};
-
-const OPPOSITE: Record<UiPopoverPosition, UiPopoverPosition> = {
-  top: 'bottom',
-  bottom: 'top',
-  start: 'end',
-  end: 'start',
-};
-
 const TABBABLE = 'button, [href], input, select, textarea, [tabindex]';
+
+/**
+ * The CDK pushes an overlay back on screen against the viewport from x=0 and against its width
+ * without the start margin, so a pushed popover sits under a left page scrollbar (an RTL document
+ * in an iframe) or touches an edge. This strategy wraps the CDK one with its push off, delegates
+ * to it, and pushes the applied position itself, measured from where the visible viewport starts.
+ */
+class UiPopoverPositionStrategy implements PositionStrategy {
+  /** The wrapped CDK strategy, for its `positionChanges`. Configure it through `configure()`. */
+  readonly connected: FlexibleConnectedPositionStrategy;
+  private overlayRef: OverlayRef | null = null;
+  private margin = 0;
+  private offsetX = 0;
+  private resize = Subscription.EMPTY;
+
+  constructor(
+    origin: HTMLElement,
+    private readonly injector: Injector,
+  ) {
+    this.connected = createFlexibleConnectedPositionStrategy(injector, origin)
+      .withFlexibleDimensions(false)
+      .withPush(false);
+  }
+
+  /**
+   * Sets the positions, the viewport margin and `overlayOffsetX()` (the visible viewport starts
+   * after a page scrollbar on the left). Read them each time the popover opens.
+   */
+  configure(positions: ConnectedPosition[], margin: number, offsetX: number): void {
+    this.margin = margin;
+    this.offsetX = offsetX;
+    this.connected.withPositions(positions).withViewportMargin(margin).withDefaultOffsetX(offsetX);
+  }
+
+  attach(overlayRef: OverlayRef): void {
+    this.connected.attach(overlayRef);
+    this.overlayRef = overlayRef;
+    // On a window resize the CDK strategy applies itself, not through apply() here. Subscribed
+    // after it, so the push runs after its position.
+    this.resize.unsubscribe();
+    this.resize = this.injector
+      .get(ViewportRuler)
+      .change()
+      .subscribe(() => this.push());
+  }
+
+  apply(): void {
+    this.connected.apply();
+    this.push();
+  }
+
+  detach(): void {
+    this.resize.unsubscribe();
+    this.connected.detach();
+  }
+
+  dispose(): void {
+    this.resize.unsubscribe();
+    this.connected.dispose();
+    this.overlayRef = null;
+  }
+
+  private push(): void {
+    const pane = this.overlayRef?.overlayElement;
+    if (!this.overlayRef || !pane?.isConnected) return;
+    const start = -this.offsetX;
+    const root = pane.ownerDocument.documentElement;
+    // Like the CDK's fit test: the size rounded down (the viewport size is whole), the position
+    // as it is, so a pushed edge lands exactly on the margin.
+    const rect = pane.getBoundingClientRect();
+    const left = rect.left - start;
+    const { x, y } = pushOnScreen(
+      {
+        left,
+        top: rect.top,
+        right: left + Math.floor(rect.width),
+        bottom: rect.top + Math.floor(rect.height),
+      },
+      { width: root.clientWidth, height: root.clientHeight },
+      this.margin,
+      this.overlayRef.getDirection(),
+    );
+    // The CDK resets the transform (it holds the offsets) on every apply.
+    if (x || y) pane.style.transform = `${pane.style.transform} translate(${x}px, ${y}px)`.trim();
+  }
+}
 
 /** Popover surface. Internal: rendered by `[uiPopoverTriggerFor]` in an overlay. */
 @Component({
@@ -104,6 +185,7 @@ export class UiPopoverPanel {
   selector: '[uiPopoverTriggerFor]',
   exportAs: 'uiPopoverTrigger',
   host: {
+    class: 'ui-popover-trigger',
     'aria-haspopup': 'dialog',
     '[attr.aria-expanded]': 'isOpen()',
     '[attr.aria-controls]': 'isOpen() ? panelId : null',
@@ -133,7 +215,7 @@ export class UiPopoverTrigger {
   protected readonly panelId = this.ids.getId('ui-popover-');
 
   private overlayRef: OverlayRef | null = null;
-  private positionStrategy: FlexibleConnectedPositionStrategy | null = null;
+  private positionStrategy: UiPopoverPositionStrategy | null = null;
   private panel: ComponentRef<UiPopoverPanel> | null = null;
 
   constructor() {
@@ -151,17 +233,16 @@ export class UiPopoverTrigger {
     if (this.isOpen() || this.disabled()) return;
     const overlayRef = this.overlayRef ?? this.createOverlay();
     const preferred = this.position();
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    overlayRef.setDirection(resolveDirection(this.host));
-    this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
-    this.positionStrategy!.withViewportMargin(this.viewportMargin());
-    this.positionStrategy!.withPositions([
-      { ...POSITIONS[preferred], panelClass: `ui-popover-pane--${preferred}` },
-      {
-        ...POSITIONS[OPPOSITE[preferred]],
-        panelClass: `ui-popover-pane--${OPPOSITE[preferred]}`,
-      },
-    ]);
+    syncOverlayDirection(overlayRef, this.host);
+    const margin = this.viewportMargin();
+    this.positionStrategy!.configure(
+      sideOverlayPositions(preferred, 'ui-popover-pane'),
+      margin,
+      overlayOffsetX(this.host.ownerDocument),
+    );
+    // The pane spans the overlay container, which ends at the page scrollbar (viewport units run
+    // under it). A percentage on the panel would be resolved against a pane sized by its content.
+    overlayRef.updateSize({ maxWidth: `calc(100% - ${margin * 2}px)` });
 
     const panel = overlayRef.attach(new ComponentPortal(UiPopoverPanel, null, this.injector));
     const instance = panel.instance;
@@ -234,17 +315,14 @@ export class UiPopoverTrigger {
   }
 
   private createOverlay(): OverlayRef {
-    const strategy = createFlexibleConnectedPositionStrategy(this.injector, this.host)
-      .withFlexibleDimensions(false)
-      .withPush(true)
-      .withViewportMargin(this.viewportMargin());
+    const strategy = new UiPopoverPositionStrategy(this.host, this.injector);
     const overlayRef = createOverlayRef(this.injector, {
       positionStrategy: strategy,
       scrollStrategy: createRepositionScrollStrategy(this.injector),
       panelClass: 'ui-popover-pane',
     });
 
-    strategy.positionChanges.subscribe(({ connectionPair }) => {
+    strategy.connected.positionChanges.subscribe(({ connectionPair }) => {
       const placement = String(connectionPair.panelClass).replace('ui-popover-pane--', '');
       this.panel?.instance.position.set(placement as UiPopoverPosition);
       this.panel?.changeDetectorRef.markForCheck();

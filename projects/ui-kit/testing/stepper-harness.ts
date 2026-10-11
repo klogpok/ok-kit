@@ -1,8 +1,8 @@
 import {
   BaseHarnessFilters,
-  ComponentHarness,
   ComponentHarnessConstructor,
   HarnessPredicate,
+  TestElement,
 } from '@angular/cdk/testing';
 import { UiHarness } from './harness';
 
@@ -15,10 +15,15 @@ export interface UiStepHarnessFilters extends BaseHarnessFilters {
 }
 
 /** A step of `ui-stepper`, as its button shows it. Get it from `UiStepperHarness.getSteps()`. */
-export class UiStepHarness extends ComponentHarness {
+export class UiStepHarness extends UiHarness {
   static hostSelector = '.ui-stepper__step';
 
   private readonly header = this.locatorFor('.ui-stepper__header');
+
+  /** The step button takes focus, not the list item. */
+  protected override focusTarget(): Promise<TestElement> {
+    return this.header();
+  }
 
   static with<T extends UiStepHarness>(
     this: ComponentHarnessConstructor<T>,

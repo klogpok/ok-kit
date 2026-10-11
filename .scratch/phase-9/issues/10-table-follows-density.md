@@ -6,12 +6,12 @@
 
 **Blocked by:** 09 (Compact density for controls)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `density` accepts `undefined` and defaults to it
-- [ ] A spec covers: no input follows the region, explicit default inside a compact region, explicit compact inside a default region
-- [ ] "Foundations/Density" includes a table; existing table baselines do not change
-- [ ] The CHANGELOG lists the new default as a breaking change
+- [x] `density` accepts `undefined` and defaults to it
+- [x] A spec covers: no input follows the region, explicit default inside a compact region, explicit compact inside a default region
+- [x] "Foundations/Density" includes a table; existing table baselines do not change
+- [x] The CHANGELOG lists the new default as a breaking change
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 09 (Компактная плотность контролов)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] `density` принимает `undefined` и по умолчанию равен ему
-- [ ] Спек покрывает: без входа — следует участку, явный default внутри компактного участка, явный compact внутри обычного
-- [ ] «Foundations/Density» включает таблицу; существующие снимки таблицы не меняются
-- [ ] CHANGELOG указывает новое умолчание как ломающее изменение
+- [x] `density` принимает `undefined` и по умолчанию равен ему
+- [x] Спек покрывает: без входа — следует участку, явный default внутри компактного участка, явный compact внутри обычного
+- [x] «Foundations/Density» включает таблицу; существующие снимки таблицы не меняются
+- [x] CHANGELOG указывает новое умолчание как ломающее изменение

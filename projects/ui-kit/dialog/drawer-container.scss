@@ -7,8 +7,10 @@
   flex-direction: column;
   gap: var(--ui-dialog-gap);
   box-sizing: border-box;
-  // Full width on phones.
-  inline-size: min(var(--_width), 100vw);
+  // Full width on phones. The pane is at most as wide as the overlay container, which ends at the
+  // page scrollbar (viewport units run under it).
+  inline-size: var(--_width);
+  max-inline-size: 100%;
   block-size: 100%;
   padding-block: var(--ui-dialog-padding);
   background-color: var(--ui-drawer-bg);

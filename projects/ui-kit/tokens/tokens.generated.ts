@@ -4,6 +4,8 @@ export interface UiTokenDoc {
   layer: 'primitive' | 'semantic' | 'component';
   light: string;
   dark: string;
+  /** The value inside `[data-density='compact']`, for the tokens density changes. */
+  compact?: string;
 }
 
 export const UI_TOKENS: readonly UiTokenDoc[] = [
@@ -578,6 +580,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "1.5rem"
   },
   {
+    "name": "--ui-ref-size-7",
+    "layer": "primitive",
+    "light": "1.75rem",
+    "dark": "1.75rem"
+  },
+  {
     "name": "--ui-ref-size-8",
     "layer": "primitive",
     "light": "2rem",
@@ -654,6 +662,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "primitive",
     "light": "50rem",
     "dark": "50rem"
+  },
+  {
+    "name": "--ui-ref-size-320",
+    "layer": "primitive",
+    "light": "80rem",
+    "dark": "80rem"
   },
   {
     "name": "--ui-ref-size-px",
@@ -1145,37 +1159,43 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-control-height-sm",
     "layer": "semantic",
     "light": "2rem",
-    "dark": "2rem"
+    "dark": "2rem",
+    "compact": "1.75rem"
   },
   {
     "name": "--ui-control-height-md",
     "layer": "semantic",
     "light": "2.5rem",
-    "dark": "2.5rem"
+    "dark": "2.5rem",
+    "compact": "2rem"
   },
   {
     "name": "--ui-control-height-lg",
     "layer": "semantic",
     "light": "2.75rem",
-    "dark": "2.75rem"
+    "dark": "2.75rem",
+    "compact": "2.5rem"
   },
   {
     "name": "--ui-control-padding-inline-sm",
     "layer": "semantic",
     "light": "0.625rem",
-    "dark": "0.625rem"
+    "dark": "0.625rem",
+    "compact": "0.5rem"
   },
   {
     "name": "--ui-control-padding-inline-md",
     "layer": "semantic",
     "light": "0.75rem",
-    "dark": "0.75rem"
+    "dark": "0.75rem",
+    "compact": "0.625rem"
   },
   {
     "name": "--ui-control-padding-inline-lg",
     "layer": "semantic",
     "light": "1rem",
-    "dark": "1rem"
+    "dark": "1rem",
+    "compact": "0.75rem"
   },
   {
     "name": "--ui-control-font-size-sm",
@@ -1199,19 +1219,22 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "name": "--ui-control-gap-sm",
     "layer": "semantic",
     "light": "0.375rem",
-    "dark": "0.375rem"
+    "dark": "0.375rem",
+    "compact": "0.25rem"
   },
   {
     "name": "--ui-control-gap-md",
     "layer": "semantic",
     "light": "0.5rem",
-    "dark": "0.5rem"
+    "dark": "0.5rem",
+    "compact": "0.375rem"
   },
   {
     "name": "--ui-control-gap-lg",
     "layer": "semantic",
     "light": "0.625rem",
-    "dark": "0.625rem"
+    "dark": "0.625rem",
+    "compact": "0.5rem"
   },
   {
     "name": "--ui-icon-size-sm",
@@ -1272,6 +1295,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "semantic",
     "light": "50rem",
     "dark": "50rem"
+  },
+  {
+    "name": "--ui-layout-grid-min",
+    "layer": "semantic",
+    "light": "20rem",
+    "dark": "20rem"
+  },
+  {
+    "name": "--ui-layout-container-max-width",
+    "layer": "semantic",
+    "light": "80rem",
+    "dark": "80rem"
   },
   {
     "name": "--ui-media-size-sm",
@@ -2078,6 +2113,18 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-icon-size-md)"
   },
   {
+    "name": "--ui-switch-track-scale-sm",
+    "layer": "component",
+    "light": "0.8",
+    "dark": "0.8"
+  },
+  {
+    "name": "--ui-switch-track-scale-lg",
+    "layer": "component",
+    "light": "1.2",
+    "dark": "1.2"
+  },
+  {
     "name": "--ui-switch-track-bg",
     "layer": "component",
     "light": "var(--ui-color-border-control)",
@@ -2338,8 +2385,20 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-spinner-stroke-width",
     "layer": "component",
-    "light": "var(--ui-border-width-strong)",
-    "dark": "var(--ui-border-width-strong)"
+    "light": "calc(var(--ui-border-width-strong) * 1.25)",
+    "dark": "calc(var(--ui-border-width-strong) * 1.25)"
+  },
+  {
+    "name": "--ui-spinner-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 3)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 3)"
+  },
+  {
+    "name": "--ui-spinner-duration-reduced-motion",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 8)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 8)"
   },
   {
     "name": "--ui-divider-color",
@@ -2810,6 +2869,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-color-danger)"
   },
   {
+    "name": "--ui-progress-indeterminate-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 5)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 5)"
+  },
+  {
     "name": "--ui-avatar-radius-square",
     "layer": "component",
     "light": "var(--ui-radius-control)",
@@ -2862,6 +2927,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-font-size-lg)",
     "dark": "var(--ui-font-size-lg)"
+  },
+  {
+    "name": "--ui-avatar-icon-size-ratio",
+    "layer": "component",
+    "light": "0.6",
+    "dark": "0.6"
   },
   {
     "name": "--ui-avatar-font-weight",
@@ -3344,6 +3415,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "dark": "var(--ui-font-weight-semibold)"
   },
   {
+    "name": "--ui-dialog-enter-scale",
+    "layer": "component",
+    "light": "0.96",
+    "dark": "0.96"
+  },
+  {
     "name": "--ui-drawer-bg",
     "layer": "component",
     "light": "var(--ui-color-surface-raised)",
@@ -3546,6 +3623,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-em-2-5)",
     "dark": "var(--ui-em-2-5)"
+  },
+  {
+    "name": "--ui-skeleton-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 5)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 5)"
   },
   {
     "name": "--ui-accordion-bg",
@@ -3886,6 +3969,13 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
   {
     "name": "--ui-table-cell-padding-block",
     "layer": "component",
+    "light": "var(--ui-table-cell-padding-block-default)",
+    "dark": "var(--ui-table-cell-padding-block-default)",
+    "compact": "var(--ui-table-cell-padding-block-compact)"
+  },
+  {
+    "name": "--ui-table-cell-padding-block-default",
+    "layer": "component",
     "light": "var(--ui-space-md)",
     "dark": "var(--ui-space-md)"
   },
@@ -3918,6 +4008,12 @@ export const UI_TOKENS: readonly UiTokenDoc[] = [
     "layer": "component",
     "light": "var(--ui-color-primary-text)",
     "dark": "var(--ui-color-primary-text)"
+  },
+  {
+    "name": "--ui-table-busy-duration",
+    "layer": "component",
+    "light": "calc(var(--ui-motion-duration-slow) * 2)",
+    "dark": "calc(var(--ui-motion-duration-slow) * 2)"
   },
   {
     "name": "--ui-chip-text",

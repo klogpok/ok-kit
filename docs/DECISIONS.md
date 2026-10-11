@@ -434,3 +434,56 @@ The user asked for a round icon-only button. Chosen:
   do not change. A boolean `rounded` was rejected: every button already has rounded corners.
 - `circle` uses the new token `--ui-button-circle-radius` (`var(--ui-radius-full)`).
 - `ui-button` gets no pill shape for now; if it is needed, the same `shape` input can add it.
+
+## Phase 9.1: P3 leftovers (approved 2026-10-10)
+
+Tickets 01–06 in `.scratch/phase-9/issues/`; the report is ticket 07 and the roadmap status.
+The deviations listed in the roadmap are accepted. Review answers:
+
+- **`UiOption.getLabel` stays public** (ticket 25): the CDK `ListKeyManager` typeahead calls it by
+  that name. The other members the option panel reads carry the `ɵ` prefix (`ɵid`, `ɵdisabled`,
+  `ɵfilteredOut()`).
+- **`--ui-spinner-stroke-width` is the real stroke width** (ticket 26): the `* 1.25` moved into its
+  default, so an override sets the width directly. Listed as breaking in the CHANGELOG.
+- **A pushed popover under the left scrollbar of an RTL iframe is fixed in the kit** (ticket 27):
+  the fix is ticket 28.
+
+## Phase 9.2: breakpoints and density (approved 2026-10-10)
+
+Tickets 08, 09, 10 and 28 in `.scratch/phase-9/issues/`; the report is ticket 11 and the roadmap
+status. The deviations listed in the roadmap are accepted. Changed default: the table `density`
+input is now `undefined` (follows the region) instead of `'default'`. Review answers:
+
+- **Density regions reset `:root` component token overrides** (ticket 29), the same way theme
+  scopes do; override through `ui.$theme-scopes`. No CHANGELOG change.
+- **Only `data-density="compact"` exists** (ticket 30): a region inside a compact one cannot return
+  to default; a table can, with `density="default"`. Add a `default` value when a screen needs it.
+- **The kit's own push stays on the popover only** (ticket 31): tooltip keeps the CDK push. Re-check
+  the copied fit test in `core/overlay.ts` on every CDK update.
+
+## Phase 9.3: layout utilities (approved 2026-10-10)
+
+Tickets 12 and 13 in `.scratch/phase-9/issues/`; the report is ticket 14 and the roadmap status.
+The deviations listed in the roadmap are accepted: each layout element sets its own `--ui-gap` and
+`--ui-grid-min` (modifiers work on the same element, nothing leaks into nested layouts), and the
+20rem / 80rem defaults are the semantic tokens `--ui-layout-grid-min` and
+`--ui-layout-container-max-width`. Review answer:
+
+- **Playground sections get one shared card style, and JSON blocks read left to right** (ticket 32):
+  the fix is ticket 33.
+
+## Phase 9.4: harnesses (approved 2026-10-11)
+
+Tickets 15–19 and 33 in `.scratch/phase-9/issues/`; the report is ticket 20 and the roadmap status.
+Review answers:
+
+- **Toast and dialog harnesses load through `documentRootLoader(fixture)`** (ticket 34); trigger
+  harnesses (menu, popover, tooltip) find their panel from the document root themselves.
+- **The API beyond the spec stays** (ticket 35): `UiAvatarGroupHarness`, `UiTabNavHarness` /
+  `UiTabLinkHarness`, `UiDatepickerHarness.clickToday()` / `clickClear()`,
+  `UiFormFieldHarness.getControl()` without a query, and the markup the harnesses need (trigger host
+  classes, panel ids with `aria-controls`, pagination arrow classes).
+- **Date pickers act on their own panel only** (ticket 36): the range picker got the same panel id and
+  scoped lookup as the datepicker (ticket 38).
+- **The table harness does not select Shift ranges** (ticket 37); documented, added when a screen test
+  needs it.

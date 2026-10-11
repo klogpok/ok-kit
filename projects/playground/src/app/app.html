@@ -1,6 +1,6 @@
 <header>
   <h1 class="ui-heading-2">@vplans/ui-kit playground</h1>
-  <div class="toolbar">
+  <div class="ui-cluster ui-gap-sm">
     <button ui-button variant="secondary" (click)="theme.toggle()">
       {{ theme.theme() === 'dark' ? 'Light theme' : 'Dark theme' }}
     </button>
@@ -18,10 +18,10 @@
   </div>
 </header>
 
-<div class="grid">
+<div class="ui-grid ui-gap-xl">
   <section aria-labelledby="profile-title">
     <h2 id="profile-title" class="ui-heading-4">Profile (Reactive Forms)</h2>
-    <form class="stack" novalidate [formGroup]="profile" (submit)="save($event)">
+    <form class="ui-stack ui-gap-lg" novalidate [formGroup]="profile" (submit)="save($event)">
       <ui-form-field label="Full name">
         <input ui-input autocomplete="name" formControlName="name" />
         @if (profile.controls.name.hasError('required')) {
@@ -60,7 +60,7 @@
           <ui-error>Accept the terms to continue</ui-error>
         }
       </ui-form-field>
-      <div class="row">
+      <div class="ui-cluster ui-gap-sm">
         <button ui-button type="submit" [loading]="saving()">Save profile</button>
         <button ui-button variant="ghost" (click)="reset()">Reset</button>
       </div>
@@ -75,7 +75,7 @@
           <ng-template uiTabLabel>
             {{ group.label }} <ui-badge size="sm">{{ group.plans.length }}</ui-badge>
           </ng-template>
-          <div class="stack">
+          <div class="ui-stack ui-gap-lg">
             @for (plan of group.plans; track plan.name) {
               <ui-card>
                 <ui-card-header>
@@ -127,19 +127,19 @@
 
   <section aria-labelledby="actions-title">
     <h2 id="actions-title" class="ui-heading-4">Actions</h2>
-    <div class="row">
+    <div class="ui-cluster ui-gap-sm">
       <button ui-button>Primary</button>
       <button ui-button variant="secondary">Secondary</button>
       <button ui-button variant="ghost">Ghost</button>
       <button ui-button variant="danger"><ui-icon icon="trash" /> Delete</button>
     </div>
-    <div class="row">
+    <div class="ui-cluster ui-gap-sm">
       <button ui-button size="sm">Small</button>
       <button ui-button size="lg">Large</button>
       <button ui-button disabled>Disabled</button>
       <button ui-button loading>Loading</button>
     </div>
-    <div class="row">
+    <div class="ui-cluster ui-gap-sm">
       <button ui-icon-button label="Search"><ui-icon icon="search" /></button>
       <button ui-icon-button label="Edit"><ui-icon icon="edit" /></button>
       <button ui-icon-button label="Next" variant="secondary">

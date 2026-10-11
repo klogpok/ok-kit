@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  EnvironmentProviders,
+  InjectionToken,
   Injector,
   afterNextRender,
   booleanAttribute,
@@ -9,6 +11,7 @@ import {
   effect,
   inject,
   input,
+  makeEnvironmentProviders,
   model,
   numberAttribute,
   output,
@@ -32,6 +35,32 @@ export interface UiPageEvent {
   previousPageIndex: number;
   pageSize: number;
   length: number;
+}
+
+/** Options that `provideUiPagination()` can set for every paginator. */
+export interface UiPaginationDefaults {
+  /** Default 10. */
+  pageSize?: number;
+  /** Default `[]` (no page size select). */
+  pageSizeOptions?: readonly number[];
+  /** Default 1. */
+  siblingCount?: number;
+  /** Default `true`. */
+  showFirstLast?: boolean;
+}
+
+export const UI_PAGINATION_DEFAULT_OPTIONS = new InjectionToken<UiPaginationDefaults>(
+  'UiPaginationDefaultOptions',
+  { providedIn: 'root', factory: () => ({}) },
+);
+
+/**
+ * Sets the defaults of every `ui-pagination` in the app. An input bound on a paginator wins.
+ *
+ * @example provideUiPagination({ pageSize: 25, pageSizeOptions: [25, 50, 100] })
+ */
+export function provideUiPagination(defaults: UiPaginationDefaults): EnvironmentProviders {
+  return makeEnvironmentProviders([{ provide: UI_PAGINATION_DEFAULT_OPTIONS, useValue: defaults }]);
 }
 
 /** A page button or a gap ("…") in `ui-pagination`. */
@@ -98,6 +127,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
       @if (showFirstLast()) {
         <button
           ui-icon-button
+          class="ui-pagination__first"
           size="sm"
           [label]="labels().firstPage"
           [disabled]="disabled() || isFirst()"
@@ -108,6 +138,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
       }
       <button
         ui-icon-button
+        class="ui-pagination__previous"
         size="sm"
         [label]="labels().previousPage"
         [disabled]="disabled() || isFirst()"
@@ -136,6 +167,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
 
       <button
         ui-icon-button
+        class="ui-pagination__next"
         size="sm"
         [label]="labels().nextPage"
         [disabled]="disabled() || isLast()"
@@ -146,6 +178,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
       @if (showFirstLast()) {
         <button
           ui-icon-button
+          class="ui-pagination__last"
           size="sm"
           [label]="labels().lastPage"
           [disabled]="disabled() || isLast()"
@@ -160,6 +193,7 @@ export function uiPageItems(pageCount: number, current: number, siblings: number
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'ui-pagination',
+    '[class.ui-pagination--disabled]': 'disabled()',
     role: 'navigation',
     '[attr.aria-label]': 'ariaLabel() || labels().pagination',
   },
@@ -169,6 +203,7 @@ export class UiPagination {
   private readonly announcer = inject(LiveAnnouncer);
   private readonly injector = inject(Injector);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly defaults = inject(UI_PAGINATION_DEFAULT_OPTIONS);
   protected readonly icons = {
     first: uiIconChevronsLeft,
     previous: uiIconChevronLeft,
@@ -180,12 +215,15 @@ export class UiPagination {
   readonly length = input(0, { transform: numberAttribute });
   /** 0-based index of the current page. */
   readonly pageIndex = model(0);
-  readonly pageSize = model(10);
+  /** Defaults to `provideUiPagination()`, then 10. */
+  readonly pageSize = model(this.defaults.pageSize ?? 10);
   /** Choices for the page size select. Empty hides the select. */
-  readonly pageSizeOptions = input<readonly number[]>([]);
+  readonly pageSizeOptions = input<readonly number[]>(this.defaults.pageSizeOptions ?? []);
   /** Pages shown on each side of the current page. */
-  readonly siblingCount = input(1, { transform: numberAttribute });
-  readonly showFirstLast = input(true, { transform: booleanAttribute });
+  readonly siblingCount = input(this.defaults.siblingCount ?? 1, { transform: numberAttribute });
+  readonly showFirstLast = input(this.defaults.showFirstLast ?? true, {
+    transform: booleanAttribute,
+  });
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Name of the navigation landmark. Defaults to the `pagination` label. */
   readonly ariaLabel = input('', { alias: 'aria-label' });

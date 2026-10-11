@@ -19,7 +19,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { map } from 'rxjs';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
@@ -29,7 +29,9 @@ import {
   UiFormFieldControl,
   UiSize,
   overlayOffsetX,
-  resolveDirection,
+  syncOverlayDirection,
+  UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
+  UI_BREAKPOINTS,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
@@ -53,14 +55,8 @@ export interface UiDateRangePreset {
   range: UiDateRange | (() => UiDateRange);
 }
 
-const POSITIONS: ConnectedPosition[] = [
-  { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
-  { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
-  { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
-];
-
-/** From this viewport width the calendar shows two months. */
-const TWO_MONTHS_QUERY = '(min-width: 52rem)';
+/** From the md breakpoint up the calendar shows two months. */
+const TWO_MONTHS_QUERY = UI_BREAKPOINTS.md;
 
 type Edge = 'start' | 'end';
 
@@ -162,6 +158,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
         [label]="labels().chooseDateRange"
         [disabled]="isDisabled() || readonly()"
         [attr.aria-expanded]="isOpen()"
+        [attr.aria-controls]="isOpen() ? panelId() : null"
         (click)="toggle()"
       >
         <ui-icon [icon]="calendarIcon" />
@@ -185,6 +182,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
         #panel
         class="ui-date-range-picker__panel"
         role="dialog"
+        [id]="panelId()"
         aria-modal="true"
         cdkTrapFocus
         [class.ui-date-range-picker__panel--wide]="monthsShown() > 1"
@@ -294,7 +292,7 @@ export class UiDateRangePicker
 
   protected readonly edges: readonly Edge[] = ['start', 'end'];
   protected readonly isOpen = signal(false);
-  protected readonly positions = POSITIONS;
+  protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
   protected readonly panelOffsetX = signal(0);
   protected readonly calendarIcon = uiIconCalendar;
 
@@ -332,6 +330,8 @@ export class UiDateRangePicker
 
   readonly labelStrategy = 'labelledby' as const;
   readonly controlId = computed(() => `${this.id()}-start`);
+  /** The calendar dialog, named by `aria-controls` of the button while it is open. */
+  protected readonly panelId = computed(() => `${this.id()}-panel`);
 
   /** The typed texts while they belong to the current value, otherwise the formatted value. */
   protected readonly texts = computed<Record<Edge, string>>(() => {
@@ -424,8 +424,7 @@ export class UiDateRangePicker
   }
 
   protected onAttach(): void {
-    // The CDK reads the direction once; follow runtime `dir` changes.
-    this.overlay()?.overlayRef.setDirection(resolveDirection(this.host));
+    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
     afterNextRender(
       { write: () => this.calendar()?.focusActiveCell() },
       { injector: this.injector },

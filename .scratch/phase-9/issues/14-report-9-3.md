@@ -6,12 +6,12 @@
 
 **Blocked by:** 12 (Layout utilities), 13 (Playground uses the kit layout classes)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `/phase-check` passes, or every failure is named in the report
-- [ ] The phase 9.3 section of the roadmap records the status, the commits and the deviations from the spec
-- [ ] Every question for the user is a `needs-info` ticket with the facts and the options
-- [ ] The user approved the sub-phase, and the approval is recorded in the decisions log
+- [x] `/phase-check` passes, or every failure is named in the report
+- [x] The phase 9.3 section of the roadmap records the status, the commits and the deviations from the spec
+- [x] Every question for the user is a `needs-info` ticket with the facts and the options
+- [x] The user approved the sub-phase, and the approval is recorded in the decisions log
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 12 (Layout-утилиты), 13 (Playground использует layout-классы кита)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] `/phase-check` проходит, или каждая ошибка названа в отчёте
-- [ ] Раздел подфазы 9.3 в роадмапе фиксирует статус, коммиты и отклонения от спеки
-- [ ] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
-- [ ] Пользователь одобрил подфазу, одобрение записано в журнал решений
+- [x] `/phase-check` проходит, или каждая ошибка названа в отчёте
+- [x] Раздел подфазы 9.3 в роадмапе фиксирует статус, коммиты и отклонения от спеки
+- [x] Каждый вопрос пользователю — тикет `needs-info` с фактами и вариантами
+- [x] Пользователь одобрил подфазу, одобрение записано в журнал решений

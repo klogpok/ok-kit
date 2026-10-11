@@ -38,8 +38,10 @@
       <ui-range-slider formControlName="floors" [limits]="[1, 12]" [marks]="floorMarks" />
     </ui-form-field>
   </div>
-  <pre>{{ model() | json }}</pre>
-  <p>Last committed rent: {{ committedPrice() | json }}</p>
+  <pre dir="ltr">{{ model() | json }}</pre>
+  <p>
+    Last committed rent: <bdi dir="ltr">{{ committedPrice() | json }}</bdi>
+  </p>
 </section>
 
 <section aria-labelledby="scope-title">
@@ -60,7 +62,7 @@
       }
     </ui-form-field>
   </div>
-  <pre>{{ scopeValue() | json }}</pre>
+  <pre dir="ltr">{{ scopeValue() | json }}</pre>
   <p>Dirty: {{ scope.dirty }}</p>
 </section>
 

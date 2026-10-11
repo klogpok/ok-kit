@@ -6,11 +6,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] No position preset is defined twice across the six components
-- [ ] Every direction sync goes through the shared function
-- [ ] The specs of the six components pass, and visual baselines (including the open-state play stories) do not change
+- [x] No position preset is defined twice across the six components
+- [x] Every direction sync goes through the shared function
+- [x] The specs of the six components pass, and visual baselines (including the open-state play stories) do not change
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** Нет (можно начинать сразу)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Ни один пресет позиций не определён дважды в шести компонентах
-- [ ] Каждая синхронизация направления идёт через общую функцию
-- [ ] Спеки шести компонентов проходят, визуальные снимки (включая play-stories открытых состояний) не меняются
+- [x] Ни один пресет позиций не определён дважды в шести компонентах
+- [x] Каждая синхронизация направления идёт через общую функцию
+- [x] Спеки шести компонентов проходят, визуальные снимки (включая play-stories открытых состояний) не меняются
