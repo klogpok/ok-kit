@@ -1,0 +1,81 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as PopoverStories from '../popover/popover.stories';
+import * as SelectStories from '../select/select.stories';
+import * as MenuStories from '../menu/menu.stories';
+import * as TooltipStories from '../tooltip/tooltip.stories';
+
+<Meta title="Docs/RTL" />
+
+# RTL
+
+Our app is Hebrew and right-to-left. The kit is built for that: one `dir` attribute mirrors every
+component, overlays follow the direction they open in, and the built-in texts default to Hebrew.
+
+## Direction comes from `dir`
+
+Components use only logical properties (`margin-inline-start`, `inset-inline-end`, ...).
+Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Directional icons flip with
+`<ui-icon icon="arrow-right" flipRtl />`.
+
+```html
+<html dir="rtl" lang="he">
+  ...
+  <ui-icon icon="arrow-right" flipRtl />
+</html>
+```
+
+Stylelint keeps the kit's styles logical: physical properties (`margin-left`, `padding-right`,
+`left`, `border-left`, ...) and physical `text-align`/`float` values (`left`, `right`) are
+rejected; use the `inline-start`/`inline-end` properties and `start`/`end` values. Follow the same rule in app styles that sit next to the kit.
+
+In Storybook, **Direction** in the toolbar switches `dir` on the preview document.
+
+## Overlays follow the direction on open
+
+Select panels, menus, tooltips, popovers, dialogs and toasts render in CDK overlays. The CDK
+`Directionality` service reads the direction once, at startup; the kit's overlays instead read the
+closest `dir` attribute of their trigger **each time they open** (`resolveDirection`,
+`syncOverlayDirection` and `provideUiLiveDirectionality()` in `@vplans/ui-kit/core`). Switching `dir` on `<html>` at runtime is enough,
+and an overlay opened inside a `dir="rtl"` container mirrors even on an LTR page. `dir="auto"` (an
+input with mixed Hebrew and English) is skipped, so its overlay takes the direction of the page
+around it.
+
+The examples below are inside a `dir="rtl"` container. Open them: the panel aligns to the
+trigger's inline-start edge (the right one) and "start" and "end" placements mirror.
+
+<Canvas of={SelectStories.Hebrew} />
+
+<Canvas of={MenuStories.Hebrew} />
+
+<Canvas of={PopoverStories.Hebrew} />
+
+<Canvas of={TooltipStories.Hebrew} />
+
+## Built-in texts and i18n
+
+Built-in texts (close buttons, confirm dialogs, empty lists, the spinner name) default to Hebrew
+(`UI_LABELS_HE`). Keys you do not set keep the Hebrew default. `provideUiLabels()` accepts fixed
+values, a signal, or a factory, so it works with any i18n library:
+
+```ts
+import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
+
+// English app
+provideUiLabels(UI_LABELS_EN);
+
+// @angular/localize (build-time translation)
+provideUiLabels({ close: $localize`:@@ui.close:Close`, cancel: $localize`:@@ui.cancel:Cancel` });
+
+// Transloco or ngx-translate (runtime switch): the factory runs in an injection context,
+// and the kit follows the signal when the language changes.
+provideUiLabels(() =>
+  toSignal(inject(TranslocoService).selectTranslateObject('uiKit'), { initialValue: {} }),
+);
+```
+
+Texts with numbers are functions, e.g. `pageLabel: (page) => ...` and
+`pageRange: (start, end, length) => ...` for `ui-pagination`. When the source only gives strings,
+build them in the factory.
+
+Texts that belong to a specific use (a button label, a tooltip, a dialog title) are plain inputs:
+translate them in your templates as usual.

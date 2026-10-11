@@ -1,0 +1,172 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as FormFieldStories from '../form-field/form-field.stories';
+
+<Meta title="Docs/Forms" />
+
+# Forms
+
+All form controls work with **Reactive Forms** and **template-driven forms** through
+`ControlValueAccessor`: bind them with `formControl`, `formControlName` or `ngModel`.
+
+## Controls and how they register
+
+<table>
+  <thead>
+    <tr>
+      <th>Control</th>
+      <th>Value</th>
+      <th>How it registers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>input[ui-input]</code></td><td>the native value</td><td>Angular's <code>DefaultValueAccessor</code></td></tr>
+    <tr><td><code>textarea[ui-textarea]</code></td><td>the native value</td><td>Angular's <code>DefaultValueAccessor</code></td></tr>
+    <tr><td><code>ui-checkbox</code>, <code>ui-switch</code></td><td><code>checked</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiCheckableBase</code>)</td></tr>
+    <tr><td><code>ui-radio-group</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-select</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-multi-select</code></td><td><code>value</code> (array)</td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-datepicker</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-date-range-picker</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-time-input</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-number-input</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-chip-input</code></td><td><code>value</code> (array)</td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-autocomplete</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-file-upload</code></td><td><code>value</code> (array)</td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-slider</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-range-slider</code></td><td><code>value</code> (tuple)</td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-segmented</code></td><td><code>value</code></td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-button-toggle-group</code></td><td><code>value</code> (array)</td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+    <tr><td><code>ui-tree</code></td><td><code>value</code> (key or array)</td><td><code>NG_VALUE_ACCESSOR</code> (<code>UiFormControlBase</code>)</td></tr>
+  </tbody>
+</table>
+
+## Disabled, readonly and required
+
+Every control supports `disabled`, `readonly`, `required` and `aria-describedby`. `disabled` and
+`required` are also read from the bound control (`control.disable()`, `Validators.required`). A
+readonly control stays focusable and reports `aria-readonly`. A `required` checkbox or switch is
+invalid until checked.
+
+## `valueChange` or `valueChanges`
+
+The model outputs (`valueChange`, `checkedChange`) also fire when a forms directive writes a value
+(`setValue()`, `reset()`), not only for user input. With a forms directive bound, react to the
+form (`valueChanges`) instead of these outputs.
+
+## Form field and errors
+
+`ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
+`aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
+once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `submit()`).
+
+<Canvas of={FormFieldStories.Default} />
+
+<Canvas of={FormFieldStories.WithError} />
+
+An error comes from a projected `<ui-error>`, or, when none is projected, from the validators
+themselves: a validator that returns a string-valued error or an error with a `message` shows that
+text.
+
+```html
+<ui-form-field label="Email" hint="We never share it">
+  <input ui-input type="email" formControlName="email" />
+</ui-form-field>
+
+<ui-form-field label="Username">
+  <input ui-input formControlName="username" />
+  @if (username.hasError('required')) {
+    <ui-error>Username is required</ui-error>
+  }
+</ui-form-field>
+
+<ui-form-field label="Delivery">
+  <ui-radio-group formControlName="delivery">
+    <ui-radio value="pickup">Pickup</ui-radio>
+    <ui-radio value="courier">Courier</ui-radio>
+  </ui-radio-group>
+</ui-form-field>
+```
+
+```ts
+// A message straight from the validator: no <ui-error> needed for it.
+function withMessage(validator: ValidatorFn, message: string): ValidatorFn {
+  return (control) => (validator(control) ? { uiMessage: message } : null);
+}
+
+readonly form = new FormGroup({
+  // Keep Validators.required itself in the list: the required marker reads that exact validator.
+  name: new FormControl('', [Validators.required, withMessage(Validators.required, 'Enter your name')]),
+});
+```
+
+Without a forms directive, use the `invalid` input to show the error state manually.
+
+## Reactive forms
+
+A reactive form with projected errors; **Sign in** marks every field touched, **Disable** calls
+`group.disable()`:
+
+<Canvas of={FormFieldStories.ReactiveForms} />
+
+A whole form whose messages come from the validators (submit it empty):
+
+<Canvas of={FormFieldStories.SignalForms} />
+
+## Template-driven forms
+
+The same controls bind with `ngModel`; import `FormsModule` instead of `ReactiveFormsModule`.
+
+```ts
+import { Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { UiButton } from '@vplans/ui-kit/button';
+import { UiCheckbox } from '@vplans/ui-kit/checkbox';
+import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
+import { UiInput } from '@vplans/ui-kit/input';
+import { UiSelect, UiOption } from '@vplans/ui-kit/select';
+
+@Component({
+  selector: 'app-profile',
+  imports: [FormsModule, UiButton, UiFormField, UiError, UiInput, UiSelect, UiOption, UiCheckbox],
+  templateUrl: './profile.html',
+})
+export class Profile {
+  readonly name = signal('');
+  readonly city = signal<string | null>(null);
+  readonly terms = signal(false);
+}
+```
+
+```html
+<form #f="ngForm" (ngSubmit)="f.form.markAllAsTouched()">
+  <ui-form-field label="Name">
+    <input ui-input name="name" [(ngModel)]="name" required #nameModel="ngModel" />
+    @if (nameModel.hasError('required')) {
+      <ui-error>Enter your name</ui-error>
+    }
+  </ui-form-field>
+
+  <ui-form-field label="City">
+    <ui-select name="city" [(ngModel)]="city" required>
+      <ui-option value="tlv">Tel Aviv</ui-option>
+      <ui-option value="jlm">Jerusalem</ui-option>
+    </ui-select>
+  </ui-form-field>
+
+  <ui-checkbox name="terms" [(ngModel)]="terms" required>I accept the terms</ui-checkbox>
+
+  <button ui-button type="submit">Save</button>
+</form>
+```
+
+## Object values: `compareWith`
+
+`ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values, e.g.
+`(option: City, selected: City) => option.id === selected.id`. It is called as
+`compareWith(option, selected)` and never with `null`; a `null` value matches only `null`.
+
+## Per-control details
+
+What a single control adds on top of this (the datepicker's and number input's own invalid-text
+messages, chips, file upload, sliders, segmented, time and date ranges, prefix and suffix) is in
+the **Forms** section of `projects/ui-kit/README.md` and in each component's Docs tab.
