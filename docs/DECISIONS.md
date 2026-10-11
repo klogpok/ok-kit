@@ -502,3 +502,25 @@ and its spec are closed. The visual baselines were re-taken after Edge moved fro
 - **The changes beyond the spec stay** (ticket 41): `storySort` orders every group, the form-field
   story export is `AccountForm`, and docs pages follow the toolbar theme and direction with the
   English prose kept LTR.
+
+## Popup listbox: plan (decided 2026-10-11)
+
+Chosen in the architecture review; spec and tickets 01–09 in `.scratch/listbox/`, terms in
+`GLOSSARY.md` → "Dropdowns". Not started.
+
+- **Two modules**: a dropdown panel in `core` (overlay lifecycle, direction and offset on open,
+  outside click, optional focus return) for the date pickers and the listbox; a popup listbox on top
+  of it for `select`, `multi-select`, `autocomplete` and `time-input`.
+- **The listbox is an internal entry point `@vplans/ui-kit/listbox`** with `UiOption` and
+  `UiOptionGroup`; `select` re-exports them and drops its `ɵ` exports.
+- **The dropdown panel is a directive on `<ng-template>`** with `CdkConnectedOverlay` as a host
+  directive (prototype works under CDK 20.2). It relies on the `offsetX` setter re-applying the
+  position strategy; accepted because CDK stays on 20, guarded by the panel spec.
+- **Focus return lives in the panel**; `notifyTouched` stays in the field.
+- **Fields compose the listbox controller** instead of inheriting `UiOptionPanel`; one keyboard
+  handler with a mode (trigger / searchable / free text).
+- **The autocomplete ArrowUp bug is fixed first**, test-first, in its own commit.
+- **`ui-select__panel` becomes `ui-listbox`**, noted in the CHANGELOG.
+- **Entries are matched by value**: a recomputed `items` array keeps the active option.
+- **One internal listbox harness** under the select, autocomplete and time harnesses; their public
+  interface does not change.

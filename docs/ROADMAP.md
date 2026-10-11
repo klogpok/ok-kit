@@ -351,6 +351,12 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 > Отдельная задача вне фаз: тикет `.scratch/chip-appearance/issues/01-chip-appearance.md`. Новый вид по умолчанию `outline`, прежний — `appearance="soft"`; `size` (`sm`/`md`), `tone`, иконки в фильтрах, `provideUiChip()`. Решения — в [DECISIONS.md](DECISIONS.md) («Chips: outline by default, soft on request»).
 
+## Popup listbox (запланировано 2026-10-11)
+
+> Архитектурная работа вне фаз по итогам архитектурного обзора. Спека и тикеты 01–09 — в `.scratch/listbox/`; решения — в [DECISIONS.md](DECISIONS.md) («Popup listbox: plan»). Код ещё не менялся; работа начинается после одобрения плана.
+
+**Зачем.** Четыре поля повторяют жизненный цикл выпадающей панели, три — политику клавиатуры, а `time-input` и `autocomplete` опираются на внутренности `select`. Итог: dropdown panel в `core` (директива на `ng-template`) и internal entry point `@vplans/ui-kit/listbox`, на которых стоят `select`, `multi-select`, `autocomplete`, `time-input` и оба датапикера.
+
 ## Критичные файлы и что переиспользовать
 
 - `select/select-base.ts`, `select/option.ts` — оверлей, `labelFor`, `matches` → общая панель (7.7), clearable и loading (6.8).
