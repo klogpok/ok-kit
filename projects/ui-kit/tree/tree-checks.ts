@@ -76,6 +76,7 @@ export function reconcileChecks<T, K>(tree: UiTreeCheckSource<T, K>, keys: reado
     children.forEach(visit);
   };
   tree.roots.forEach(visit);
+  tree.roots.forEach(visit);
   return inTreeOrder(tree, keys, settleBranches(tree, checked));
 }
 
