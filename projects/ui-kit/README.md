@@ -12,6 +12,9 @@ The consumer guides are MDX pages in the **Docs** section at the top of the Stor
 
 - **Getting started** — install the kit in an app, add the font and styles, register icons and the
   theme, import from the entry points and build a first screen.
+- **Theming** — token layers, light and dark (`data-theme`, `ThemeService`, `provideUiTheme`, the
+  no-flash script), overriding tokens with theme scopes, mixins and typography classes.
+- **Tokens** — live token galleries, breakpoints, layout classes and density.
 - **Contributing** — a map of the [Contributing](#contributing) rules below.
 
 This README holds the component reference, the exports table, the test harnesses, the token table
@@ -21,7 +24,6 @@ and the contribution rules.
 
 - [Actions](#actions)
 - [Forms](#forms)
-- [Theming](#theming)
 - [RTL](#rtl)
 - [Overlays](#overlays)
 - [Feedback](#feedback)
@@ -336,228 +338,6 @@ Affixes are mirrored in RTL.
 ```
 
 Affixes are meant for `input[ui-input]`, `textarea[ui-textarea]` and `ui-number-input`.
-
-## Theming
-
-Tokens come in three layers. All of them are CSS custom properties generated from
-[`tokens/tokens.json`](tokens/tokens.json):
-
-1. **Primitive** (`--ui-ref-*`): the raw palette and scales. Never use these in components or apps.
-2. **Semantic** (`--ui-color-primary`, `--ui-space-md`, `--ui-radius-control`, ...): the public API. They differ per theme.
-3. **Component** (`--ui-button-primary-bg`, `--ui-input-radius`, ...): per-component overrides. They default to semantic tokens.
-
-Light and dark themes:
-
-- `<html data-theme="dark">` or `data-theme="light"` forces a theme.
-- With no attribute, the theme follows `prefers-color-scheme`.
-- A `data-theme` attribute on any element themes that subtree.
-
-```ts
-const theme = inject(ThemeService);
-theme.mode(); // 'light' | 'dark' | 'system'
-theme.theme(); // resolved: 'light' | 'dark'
-theme.setMode('dark'); // persisted in localStorage
-theme.toggle();
-```
-
-`provideUiTheme()` applies the stored mode when the app starts. Without it, the mode is applied only
-once something injects `ThemeService`.
-
-The app boots after the first paint, so a stored `dark` mode would flash light first. Apply it early
-with an inline script in `index.html` (use your `storageKey`):
-
-```html
-<script>
-  try {
-    var mode = localStorage.getItem('ui-theme');
-    if (mode === 'light' || mode === 'dark') {
-      document.documentElement.setAttribute('data-theme', mode);
-    }
-  } catch (e) {}
-</script>
-```
-
-Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
-`:root`, on every `[data-theme]` and `[data-density]` element and on `.ui-theme-scope`, so they
-follow the theme and density of the nearest scope:
-
-- **Component tokens**: override them on all of these selectors (`ui.$theme-scopes`). An
-  override on `:root` alone is reset inside a nested `[data-theme]`.
-- **Semantic tokens**: an override on `:root` or `[data-theme]` applies everywhere. For a local
-  re-brand, override them on an element with the `ui-theme-scope` class, so the component tokens
-  are recomputed there.
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-#{ui.$theme-scopes} {
-  --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
-}
-
-// Local re-brand: override the whole primary family, or hover and text colors stay blue.
-.checkout.ui-theme-scope {
-  --ui-color-primary: var(--ui-ref-color-green-700);
-  --ui-color-primary-hover: var(--ui-ref-color-green-800);
-  --ui-color-primary-active: var(--ui-ref-color-green-900);
-  --ui-color-primary-subtle: var(--ui-ref-color-green-50);
-  --ui-color-primary-text: var(--ui-ref-color-green-800);
-}
-```
-
-In the dark theme the primary family uses lighter shades; override it there too
-(`[data-theme='dark'] .checkout.ui-theme-scope { ... }`). Run the new pairs through a contrast
-checker: `pnpm tokens` only checks the built-in tokens.
-
-Use the mixins in application SCSS:
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-.card-link {
-  @include ui.focus-visible;
-  @include ui.transition(background-color);
-}
-```
-
-Typography classes: `ui-display`, `ui-heading-1..4`, `ui-body-lg`, `ui-body`, `ui-body-sm`,
-`ui-label`, `ui-caption`, `ui-code`, `ui-text-muted`, `ui-visually-hidden`.
-
-### Breakpoints
-
-The kit has four named viewport widths: `sm` 40rem, `md` 52rem, `lg` 64rem, `xl` 80rem. They
-live in `tokens/tokens.json` and `pnpm tokens` generates them for SCSS and TypeScript. They are
-not custom properties, because media queries cannot read those.
-
-- `ui.up($name)` wraps styles in a media query from the width up (`width >= 52rem` for `md`).
-- `ui.down($name)` wraps them below the width (`width < 52rem`), so `up(md)` and `down(md)`
-  never both apply.
-- `ui.$breakpoints` is the map of names to widths, smallest first.
-- `UI_BREAKPOINTS` from `@vplans/ui-kit/core` holds a `(min-width: …)` query per name for the CDK
-  `BreakpointObserver`; `UiBreakpoint` is the union of the names.
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-.filters {
-  display: grid;
-
-  @include ui.up(md) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@each $name, $width in ui.$breakpoints {
-  .hide-from-#{$name} {
-    @include ui.up($name) {
-      display: none;
-    }
-  }
-}
-```
-
-```ts
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { UI_BREAKPOINTS } from '@vplans/ui-kit/core';
-
-const wide = toSignal(
-  inject(BreakpointObserver)
-    .observe(UI_BREAKPOINTS.md)
-    .pipe(map((state) => state.matches)),
-);
-```
-
-### Layout
-
-`ui-kit.scss` has four layout classes. They use only logical properties, so they mirror in RTL.
-
-| Class          | Layout                                                                                                |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `ui-stack`     | children in a column                                                                                  |
-| `ui-cluster`   | children in a row from the inline start, centered on the cross axis, wrapping                         |
-| `ui-grid`      | as many equal columns as fit, each at least `--ui-grid-min` (20rem); one column when narrower         |
-| `ui-container` | content centered up to `--ui-layout-container-max-width` (80rem), with `--ui-space-lg` inline padding |
-
-The defaults are the tokens `--ui-layout-grid-min` (20rem) and `--ui-layout-container-max-width`
-(80rem); override them on `:root` to change every grid and container of the app.
-
-The gap of `ui-stack`, `ui-cluster` and `ui-grid` is `--ui-space-md`. A modifier on the same
-element changes it: `ui-gap-3xs`, `ui-gap-2xs`, `ui-gap-xs`, `ui-gap-sm`, `ui-gap-md`, `ui-gap-lg`,
-`ui-gap-xl`, `ui-gap-2xl`, `ui-gap-3xl` (the `--ui-space-*` scale). Each layout element sets its own
-gap, so a nested layout does not inherit the modifier of its parent.
-
-```html
-<form class="ui-stack ui-gap-lg">
-  …
-  <div class="ui-cluster ui-gap-sm"><button ui-button>Save</button>…</div>
-</form>
-
-<ul class="ui-grid" style="--ui-grid-min: 15rem">
-  …
-</ul>
-```
-
-Set `--ui-grid-min` on the grid element itself: each grid sets its own minimum, so a value on an
-ancestor or a parent grid does not reach it. `--ui-gap` and `--ui-grid-min` are layout knobs that
-each layout element sets on itself, not generated tokens: they are not in `tokens.css` or the
-token table below. In component styles, use the mixins of the same names. The gap takes a spacing name or any length:
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-.filters {
-  @include ui.cluster(sm);
-}
-
-.cards {
-  @include ui.grid(15rem, lg); // ui.grid() alone gives 20rem and md
-}
-
-.page {
-  @include ui.container;
-}
-```
-
-The mixins set `--ui-gap` in the component's selector, so pass the gap as the argument; a
-`ui-gap-*` class on the same element may lose to the component selector. **Foundations/Layout**
-in Storybook shows each class and gap.
-
-### Density
-
-Mark a page region `data-density="compact"` to pack its controls tighter, for filter panels and
-other dense screens. Inside it the control tokens take their compact values; everything else keeps
-its values (generated from `tokens.json`):
-
-<!-- density:start -->
-
-| Token                           | sm                     | md                     | lg                    |
-| ------------------------------- | ---------------------- | ---------------------- | --------------------- |
-| `--ui-control-height-*`         | 2rem → **1.75rem**     | 2.5rem → **2rem**      | 2.75rem → **2.5rem**  |
-| `--ui-control-padding-inline-*` | 0.625rem → **0.5rem**  | 0.75rem → **0.625rem** | 1rem → **0.75rem**    |
-| `--ui-control-gap-*`            | 0.375rem → **0.25rem** | 0.5rem → **0.375rem**  | 0.625rem → **0.5rem** |
-
-<!-- density:end -->
-
-Component tokens that alias a control height (select options, menu items, tree nodes, calendar
-cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not
-change, so a compact region does not reflow the layout around its controls. The region also
-re-declares `--ui-table-cell-padding-block` with the compact table padding
-(`--ui-table-cell-padding-block-compact`), so table cells follow unless the table sets `density`.
-
-```html
-<aside class="filters" data-density="compact">…</aside>
-```
-
-Overlays (select lists, menus, dialogs) render in the overlay container at the end of `<body>`,
-outside every region, so only density on the root element reaches them. For a compact app, put it
-on `<html>`: `<html data-density="compact">`.
-
-`compact` is the only density; any other value of `data-density` does nothing. A region inside a
-compact one cannot return to the default density: there is no `data-density="default"`. Only a
-table can, with `density="default"`.
-
-Density is a property of a region; `size` is a property of one control and works inside either
-density (a `size="sm"` button in a compact region is 1.75rem tall). In Storybook, switch it with
-**Density** in the toolbar; **Foundations/Density** shows the controls and a table in both densities.
 
 ## RTL
 
@@ -886,7 +666,7 @@ Sort the rows yourself (`uiSortData(rows, sort)`) or on the server. A click on a
 announces the new order with the header text (the `sortedAscending`, `sortedDescending` and
 `sortedNone` labels), because screen readers do not read a changed `aria-sort`.
 
-Row density follows the region (see [Density](#density)): a table without `density` is compact
+Row density follows the region (see the **Tokens** docs page): a table without `density` is compact
 inside `data-density="compact"`. Set `density="default"` or `density="compact"` to override the
 region either way.
 
@@ -1246,7 +1026,9 @@ skeleton, spinner, icon, card) have none: query them in a test as plain markup.
 
 ## Tokens
 
-Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
+Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark. The token layers
+and overrides are on the **Theming** docs page; the galleries, breakpoints, layout and density on
+the **Tokens** docs page.
 
 <!-- tokens:start -->
 

@@ -6,11 +6,11 @@
 
 **Blocked by:** 21 (Docs section: Getting started, Contributing and the README split)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Theming and Tokens are MDX pages in the Docs section, in English
-- [ ] Examples embed existing stories; everything else is a code block
-- [ ] Storybook builds
+- [x] Theming and Tokens are MDX pages in the Docs section, in English
+- [x] Examples embed existing stories; everything else is a code block
+- [x] Storybook builds
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** 21 (Раздел документации: Getting started, Contributing и разделение README)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Theming и Tokens — MDX-страницы в разделе Docs, на английском
-- [ ] Примеры встраивают существующие stories; всё остальное — блоки кода
-- [ ] Storybook собирается
+- [x] Theming и Tokens — MDX-страницы в разделе Docs, на английском
+- [x] Примеры встраивают существующие stories; всё остальное — блоки кода
+- [x] Storybook собирается

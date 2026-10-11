@@ -1,0 +1,193 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as DensityStories from '../tokens/density.stories';
+import * as LayoutStories from '../tokens/layout.stories';
+import * as TokenStories from '../tokens/tokens.stories';
+
+<Meta title="Docs/Tokens" />
+
+# Tokens
+
+Which tokens the kit has, and the three systems built on them: breakpoints, layout classes and
+density. How the token layers work and how to override tokens is on the
+[Theming](?path=/docs/docs-theming--docs) page.
+
+The galleries below render the live tokens; switch the theme in the toolbar to see the dark values.
+The full table of every semantic and component token, light and dark, is the **Tokens** section
+of `projects/ui-kit/README.md`. It is generated from `tokens/tokens.json` by `pnpm tokens`.
+
+## Galleries
+
+Semantic colors:
+
+<Canvas of={TokenStories.SemanticColors} />
+
+Spacing, radius, font size, control height and shadow scales:
+
+<Canvas of={TokenStories.Scale} />
+
+The typography classes:
+
+<Canvas of={TokenStories.Typography} />
+
+Component tokens:
+
+<Canvas of={TokenStories.ComponentTokens} />
+
+## Breakpoints
+
+The kit has four named viewport widths: `sm` 40rem, `md` 52rem, `lg` 64rem, `xl` 80rem. They live
+in `tokens/tokens.json` and `pnpm tokens` generates them for SCSS and TypeScript. They are not
+custom properties, because media queries cannot read those.
+
+- `ui.up($name)` wraps styles in a media query from the width up (`width >= 52rem` for `md`).
+- `ui.down($name)` wraps them below the width (`width < 52rem`), so `up(md)` and `down(md)` never
+  both apply.
+- `ui.$breakpoints` is the map of names to widths, smallest first.
+- `UI_BREAKPOINTS` from `@vplans/ui-kit/core` holds a `(min-width: …)` query per name for the CDK
+  `BreakpointObserver`; `UiBreakpoint` is the union of the names.
+
+```scss
+@use 'ui-kit/styles' as ui;
+
+.filters {
+  display: grid;
+
+  @include ui.up(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@each $name, $width in ui.$breakpoints {
+  .hide-from-#{$name} {
+    @include ui.up($name) {
+      display: none;
+    }
+  }
+}
+```
+
+```ts
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { UI_BREAKPOINTS } from '@vplans/ui-kit/core';
+
+const wide = toSignal(
+  inject(BreakpointObserver)
+    .observe(UI_BREAKPOINTS.md)
+    .pipe(map((state) => state.matches)),
+);
+```
+
+## Layout
+
+`ui-kit.scss` has four layout classes. They use only logical properties, so they mirror in RTL.
+
+<table>
+  <thead>
+    <tr><th>Class</th><th>Layout</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>ui-stack</code></td><td>children in a column</td></tr>
+    <tr><td><code>ui-cluster</code></td><td>children in a row from the inline start, centered on the cross axis, wrapping</td></tr>
+    <tr><td><code>ui-grid</code></td><td>as many equal columns as fit, each at least <code>--ui-grid-min</code> (20rem); one column when narrower</td></tr>
+    <tr><td><code>ui-container</code></td><td>content centered up to <code>--ui-layout-container-max-width</code> (80rem), with <code>--ui-space-lg</code> inline padding</td></tr>
+  </tbody>
+</table>
+
+The defaults are the tokens `--ui-layout-grid-min` (20rem) and `--ui-layout-container-max-width`
+(80rem); override them on `:root` to change every grid and container of the app.
+
+The gap of `ui-stack`, `ui-cluster` and `ui-grid` is `--ui-space-md`. A modifier on the same
+element changes it: `ui-gap-3xs`, `ui-gap-2xs`, `ui-gap-xs`, `ui-gap-sm`, `ui-gap-md`, `ui-gap-lg`,
+`ui-gap-xl`, `ui-gap-2xl`, `ui-gap-3xl` (the `--ui-space-*` scale). Each layout element sets its own
+gap, so a nested layout does not inherit the modifier of its parent.
+
+```html
+<form class="ui-stack ui-gap-lg">
+  …
+  <div class="ui-cluster ui-gap-sm"><button ui-button>Save</button>…</div>
+</form>
+
+<ul class="ui-grid" style="--ui-grid-min: 15rem">
+  …
+</ul>
+```
+
+Set `--ui-grid-min` on the grid element itself: each grid sets its own minimum, so a value on an
+ancestor or a parent grid does not reach it. `--ui-gap` and `--ui-grid-min` are layout knobs that
+each layout element sets on itself, not generated tokens: they are not in `tokens.css` or the token
+table. In component styles, use the mixins of the same names. The gap takes a spacing name or any
+length:
+
+```scss
+@use 'ui-kit/styles' as ui;
+
+.filters {
+  @include ui.cluster(sm);
+}
+
+.cards {
+  @include ui.grid(15rem, lg); // ui.grid() alone gives 20rem and md
+}
+
+.page {
+  @include ui.container;
+}
+```
+
+The mixins set `--ui-gap` in the component's selector, so pass the gap as the argument; a
+`ui-gap-*` class on the same element may lose to the component selector.
+
+<Canvas of={LayoutStories.Stack} />
+
+<Canvas of={LayoutStories.Cluster} />
+
+<Canvas of={LayoutStories.Grid} />
+
+<Canvas of={LayoutStories.Container} />
+
+<Canvas of={LayoutStories.Gaps} />
+
+## Density
+
+Mark a page region `data-density="compact"` to pack its controls tighter, for filter panels and
+other dense screens. Inside it the control tokens take their compact values; everything else keeps
+its values (generated from `tokens.json` by `pnpm tokens`):
+
+{/* density:start */}
+<table>
+  <thead>
+    <tr><th>Token</th><th>sm</th><th>md</th><th>lg</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{'--ui-control-height-*'}</code></td><td>2rem → <strong>1.75rem</strong></td><td>2.5rem → <strong>2rem</strong></td><td>2.75rem → <strong>2.5rem</strong></td></tr>
+    <tr><td><code>{'--ui-control-padding-inline-*'}</code></td><td>0.625rem → <strong>0.5rem</strong></td><td>0.75rem → <strong>0.625rem</strong></td><td>1rem → <strong>0.75rem</strong></td></tr>
+    <tr><td><code>{'--ui-control-gap-*'}</code></td><td>0.375rem → <strong>0.25rem</strong></td><td>0.5rem → <strong>0.375rem</strong></td><td>0.625rem → <strong>0.5rem</strong></td></tr>
+  </tbody>
+</table>
+{/* density:end */}
+
+Component tokens that alias a control height (select options, menu items, tree nodes, calendar
+cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not
+change, so a compact region does not reflow the layout around its controls. The region also
+re-declares `--ui-table-cell-padding-block` with the compact table padding
+(`--ui-table-cell-padding-block-compact`), so table cells follow unless the table sets `density`.
+
+```html
+<aside class="filters" data-density="compact">…</aside>
+```
+
+<Canvas of={DensityStories.Controls} />
+
+Overlays (select lists, menus, dialogs) render in the overlay container at the end of `<body>`,
+outside every region, so only density on the root element reaches them. For a compact app, put it
+on `<html>`: `<html data-density="compact">`.
+
+`compact` is the only density; any other value of `data-density` does nothing. A region inside a
+compact one cannot return to the default density: there is no `data-density="default"`. Only a
+table can, with `density="default"`:
+
+<Canvas of={DensityStories.Table} />
+
+Density is a property of a region; `size` is a property of one control and works inside either
+density (a `size="sm"` button in a compact region is 1.75rem tall). In Storybook, switch the whole
+page with **Density** in the toolbar.
