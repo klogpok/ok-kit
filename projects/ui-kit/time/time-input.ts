@@ -24,7 +24,12 @@ import {
   ɵUiDropdownPanel,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
-import { ɵUiListbox, ɵinjectListbox, ɵprovideUiListbox } from '@vplans/ui-kit/listbox';
+import {
+  ɵUiListbox,
+  ɵfieldListboxConfig,
+  ɵinjectListbox,
+  ɵprovideUiListbox,
+} from '@vplans/ui-kit/listbox';
 import {
   formatTime,
   maskTime,
@@ -114,11 +119,7 @@ interface Draft {
 
     <!-- Focus stays in the field, so the panel returns it nowhere. -->
     <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
-      <ui-listbox
-        [size]="size()"
-        [attr.aria-label]="ariaLabel() || null"
-        [attr.aria-labelledby]="listLabelledBy()"
-      />
+      <ui-listbox [size]="size()" />
     </ng-template>
   `,
   styleUrl: './time-input.scss',
@@ -169,9 +170,6 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
-  protected readonly listLabelledBy = computed(() =>
-    this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
-  );
 
   protected readonly format = computed(() => timeFormat(this.labels().locale));
   protected readonly hint = computed(() => timeHint(this.format()));
@@ -216,18 +214,16 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
 
   /** The list of times. Typed text is a value too: Enter without an active time commits it. */
   protected readonly listbox = ɵinjectListbox<string>({
+    ...ɵfieldListboxConfig(this),
     mode: () => 'freeText',
     id: () => this.id(),
     items: this.slots,
     // Every time stays rendered (1440 at an interval of 1): the harness reads the whole list.
     virtualThreshold: () => Infinity,
-    locked: () => this.readonly() || this.isDisabled(),
     // The selected time, or the time now; the nearest slot at or after it.
     openAt: () => this.nearestSlot(this.time() ?? uiTimeOf(new Date())),
     isSelected: (value) => value === this.time(),
     select: (value) => this.pick(value as string),
-    opened: () => this.opened.emit(),
-    closed: () => this.closed.emit(),
   });
 
   /**

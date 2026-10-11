@@ -24,6 +24,7 @@ import {
   type UiOptionItem,
   type ɵUiListboxController as UiListboxController,
   type ɵUiListboxConfig as UiListboxConfig,
+  ɵfieldListboxConfig as fieldListboxConfig,
 } from '@vplans/ui-kit/listbox';
 
 /**
@@ -135,9 +136,6 @@ export abstract class UiSelectBase<T, V>
   protected readonly showClear = computed(
     () => this.clearable() && this.hasValue() && !this.isDisabled() && !this.readonly(),
   );
-  protected readonly listLabelledBy = computed(() =>
-    this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
-  );
 
   /** Sets the empty value (`null` or `[]`) and reports it to the form. */
   protected abstract clearValue(): void;
@@ -153,6 +151,7 @@ export abstract class UiSelectBase<T, V>
   /** What `ui-select` and `ui-multi-select` give their listbox alike. */
   protected listboxConfig(): Omit<UiListboxConfig<T>, 'isSelected' | 'select'> {
     return {
+      ...fieldListboxConfig(this),
       mode: () => (this.searchable() ? 'searchable' : 'trigger'),
       id: this.id,
       contentOptions: this.contentOptions,
@@ -164,8 +163,6 @@ export abstract class UiSelectBase<T, V>
       displayWith: this.displayWith,
       virtualThreshold: this.virtualThreshold,
       loading: this.loading,
-      locked: () => this.readonly() || this.isDisabled(),
-      opened: () => this.opened.emit(),
       closed: () => {
         // The search starts over next time; server-side results go back to the full list.
         if (this.query()) {

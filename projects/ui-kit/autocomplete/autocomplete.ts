@@ -30,6 +30,7 @@ import {
   type ɵUiListboxController as UiListboxController,
   type UiOptionItem,
   ɵUiListbox as UiListbox,
+  ɵfieldListboxConfig as fieldListboxConfig,
   ɵinjectListbox as injectListbox,
   ɵprovideUiListbox as provideUiListbox,
 } from '@vplans/ui-kit/listbox';
@@ -104,11 +105,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
     </div>
 
     <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
-      <ui-listbox
-        [size]="size()"
-        [attr.aria-label]="ariaLabel() || null"
-        [attr.aria-labelledby]="listLabelledBy()"
-      >
+      <ui-listbox [size]="size()">
         <ng-content />
       </ui-listbox>
     </ng-template>
@@ -194,6 +191,7 @@ export class UiAutocomplete<T = string>
    * pick-only field, or a spinner; no option is active until the user moves to one.
    */
   protected readonly listbox: UiListboxController<T> = injectListbox<T>({
+    ...fieldListboxConfig(this),
     mode: () => 'freeText',
     id: this.id,
     contentOptions: this.contentOptions,
@@ -204,20 +202,14 @@ export class UiAutocomplete<T = string>
     displayWith: this.displayWith,
     virtualThreshold: this.virtualThreshold,
     loading: this.loading,
-    locked: () => this.readonly() || this.isDisabled(),
     showEmpty: () => this.pickOnly() && this.query().trim() !== '',
     activateOnOpen: () => false,
     isSelected: (value) => this.listbox.matches(value, this.value()),
     select: (value) => this.pick(value as T),
-    opened: () => this.opened.emit(),
-    closed: () => this.closed.emit(),
   });
 
   /** The text in the field. Follows the value, and holds the typed text in between. */
   protected readonly text = linkedSignal(() => this.displayText(this.value()));
-  protected readonly listLabelledBy = computed(() =>
-    this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
-  );
 
   focus(options?: FocusOptions): void {
     this.control().nativeElement.focus(options);

@@ -26,12 +26,12 @@ import { UiItemOption } from './option-items';
  * once there are many), and a loading or "no options" row. Options of the field's own template
  * that come first ("select all") go in with the `uiListboxLeading` attribute.
  *
- * The field binds `aria-label` / `aria-labelledby`; the id, `aria-multiselectable` and
- * `aria-busy` come from the controller. Internal.
+ * The id, `aria-label` / `aria-labelledby`, `aria-multiselectable` and `aria-busy` come from the
+ * controller. Internal.
  *
  * @example
  * <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
- *   <ui-listbox [size]="size()" [attr.aria-labelledby]="labelledBy()"><ng-content /></ui-listbox>
+ *   <ui-listbox [size]="size()"><ng-content /></ui-listbox>
  * </ng-template>
  */
 @Component({
@@ -111,6 +111,8 @@ import { UiItemOption } from './option-items';
     class: 'ui-listbox',
     '[class.ui-listbox--virtual]': '!!listbox.items() && listbox.virtual()',
     '[attr.id]': 'listbox.panelId()',
+    '[attr.aria-label]': 'listbox.ariaLabel()',
+    '[attr.aria-labelledby]': 'listbox.labelledBy()',
     '[attr.aria-multiselectable]': 'listbox.multiple || null',
     '[attr.aria-busy]': 'listbox.loading() ? "true" : null',
     // The --_option-* variables give the options the size of the field.

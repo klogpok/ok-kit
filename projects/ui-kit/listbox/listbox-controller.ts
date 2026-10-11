@@ -3,6 +3,7 @@ import {
   DestroyRef,
   Injectable,
   Injector,
+  type OutputEmitterRef,
   type Provider,
   Signal,
   afterEveryRender,
@@ -17,6 +18,7 @@ import {
 } from '@angular/core';
 import { ActiveDescendantKeyManager, Highlightable } from '@angular/cdk/a11y';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { UI_FORM_FIELD } from '@vplans/ui-kit/core';
 import { UiListboxHost, UiOption, UiOptionHandle } from './option';
 import { UiItemEntry, UiItemEntryOwner, UiItemOption, UiOptionItem } from './option-items';
 
@@ -51,6 +53,8 @@ export interface UiListboxConfig<T> {
   readonly mode: () => UiListboxMode;
   /** Id of the field; the listbox gets `${id}-listbox`. */
   readonly id: () => string;
+  /** The field's `aria-label`. Without one the listbox is labelled by the form field's label. */
+  readonly ariaLabel?: () => string;
   /** Multiple selection: options show a checkbox and Enter keeps the list open. */
   readonly multiple?: boolean;
   /**
@@ -133,6 +137,7 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
 export class UiListboxController<T = unknown> extends UiListboxHost {
   private readonly injector = inject(Injector);
   private readonly document = inject(DOCUMENT);
+  private readonly formField = inject(UI_FORM_FIELD, { optional: true });
   /** A signal: computeds read before the field configures the listbox must update. */
   private readonly config = signal<UiListboxConfig<T> | null>(null);
 
@@ -153,6 +158,15 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   readonly items = computed(() => this.config()?.items?.() ?? null);
   readonly loading = computed(() => this.config()?.loading?.() ?? false);
   readonly panelId = computed(() => `${this.cfg.id()}-listbox`);
+  /** `aria-label` of the listbox: the field's. */
+  readonly ariaLabel = computed(() => {
+    const label = this.config()?.ariaLabel?.() ?? '';
+    return label === '' ? null : label;
+  });
+  /** `aria-labelledby` of the listbox: the form field's label, unless the field has `aria-label`. */
+  readonly labelledBy = computed(() =>
+    this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
+  );
   /** Options of the field's own template listed first ("select all"). */
   readonly leadingOptions = computed(() => this.config()?.leadingOptions?.() ?? []);
   private readonly contentOptions = computed(() => this.config()?.contentOptions?.() ?? []);
@@ -666,4 +680,28 @@ export function injectListbox<T>(config: UiListboxConfig<T>): UiListboxControlle
   const listbox = inject<UiListboxController<T>>(UiListboxController, { self: true });
   listbox.ɵconfigure(config);
   return listbox;
+}
+
+/** What a form field of the kit is to its listbox. */
+export interface UiListboxField {
+  readonly ariaLabel: () => string;
+  readonly readonly: () => boolean;
+  readonly isDisabled: () => boolean;
+  readonly opened: OutputEmitterRef<void>;
+  readonly closed: OutputEmitterRef<void>;
+}
+
+/**
+ * The configuration every form field gives its listbox alike: its `aria-label`, locked while
+ * readonly or disabled, and its `opened` / `closed` outputs. Spread it into `injectListbox()`.
+ */
+export function fieldListboxConfig(
+  field: UiListboxField,
+): Pick<UiListboxConfig<unknown>, 'ariaLabel' | 'locked' | 'opened' | 'closed'> {
+  return {
+    ariaLabel: () => field.ariaLabel(),
+    locked: () => field.readonly() || field.isDisabled(),
+    opened: () => field.opened.emit(),
+    closed: () => field.closed.emit(),
+  };
 }

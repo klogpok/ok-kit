@@ -97,11 +97,7 @@
 </div>
 
 <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
-  <ui-listbox
-    [size]="size()"
-    [attr.aria-label]="ariaLabel() || null"
-    [attr.aria-labelledby]="listLabelledBy()"
-  >
+  <ui-listbox [size]="size()">
     <!-- The row sticks over a virtual list. With items the option opens the set that their
          aria-posinset continues. -->
     @if (showSelectAll()) {

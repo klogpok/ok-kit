@@ -70,7 +70,7 @@ const SELECT_ALL = 'all';
       />
     </div>
     <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
-      <ui-listbox aria-label="Fruit">
+      <ui-listbox>
         @if (selectAll()) {
           <ui-option uiListboxLeading #leading [value]="selectAllValue">All</ui-option>
         }
@@ -102,6 +102,7 @@ class TestField {
   readonly listbox = injectListbox<string>({
     mode: this.mode,
     id: () => 'fruit',
+    ariaLabel: () => 'Fruit',
     contentOptions: this.content,
     leadingOptions: this.leading,
     items: this.items,
