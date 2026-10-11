@@ -7,96 +7,38 @@ is checked with axe in light, dark and RTL (`pnpm test-storybook`).
 - **Storybook:** `pnpm storybook` (http://localhost:6006). It has a theme and direction switcher in the toolbar and an a11y panel.
 - **Playground app:** `pnpm start`
 
+The consumer guides are MDX pages in the **Docs** section at the top of the Storybook sidebar
+(sources in `projects/ui-kit/docs/`):
+
+- **Getting started** — install the kit in an app, add the font and styles, register icons and the
+  theme, import from the entry points and build a first screen.
+- **Theming** — token layers, light and dark (`data-theme`, `ThemeService`, `provideUiTheme`, the
+  no-flash script), overriding tokens with theme scopes, mixins and typography classes.
+- **RTL** — direction and logical properties, overlays that follow `dir`, built-in texts and i18n.
+- **Forms** — Reactive and template forms through `ControlValueAccessor`, form-field and errors.
+- **Tokens** — live token galleries, breakpoints, layout classes and density.
+- **Contributing** — a map of the [Contributing](#contributing) rules below.
+
+This README holds the component reference, the exports table, the test harnesses, the token table
+and the contribution rules.
+
 ## Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Forms](#forms)
-- [Theming](#theming)
-- [RTL](#rtl)
+- [Actions](#actions)
+- [Forms](#forms) (guide: Docs/Forms in Storybook)
+- [RTL](#rtl) (guide: Docs/RTL in Storybook)
 - [Overlays](#overlays)
 - [Feedback](#feedback)
 - [Data display](#data-display)
 - [Navigation](#navigation)
 - [Testing](#testing)
 - [Components](#components)
-- [Tokens](#tokens)
+- [Tokens](#tokens) (guide: Docs/Tokens in Storybook)
 - [Contributing](#contributing)
 
-## Installation
+## Actions
 
-The kit is not published. Apps in this monorepo use it from source:
-
-- **TypeScript**: the root `tsconfig.json` maps the package to the sources, so
-  `import { UiButton } from '@vplans/ui-kit/button'` works in every project:
-
-  ```jsonc
-  "paths": {
-    "@vplans/ui-kit": ["./projects/ui-kit/src/public-api.ts"],
-    "@vplans/ui-kit/*": ["./projects/ui-kit/*/public-api.ts"]
-  }
-  ```
-
-- **Dependencies**: the app needs the peer dependencies of `projects/ui-kit/package.json`
-  (`@angular/cdk`, `@angular/forms`, …) in the same major version. The kit targets **Angular 20**
-  (`@angular/cdk` 20.2 — the CDK's v20 line stops there). `@angular/router` is optional: only
-  `ui-tab-nav` (`@vplans/ui-kit/tabs`) needs it.
-
-The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
-Hebrew and Latin. If the app does not load the font already, add it together with the global
-stylesheet (tokens, document defaults, typography) to the app's build options in
-`angular.json`. `includePaths` lets app SCSS use the mixins with `@use 'ui-kit/styles' as ui`:
-
-```bash
-pnpm add @fontsource/assistant
-```
-
-```jsonc
-"styles": [
-  "node_modules/@fontsource/assistant/400.css",
-  "node_modules/@fontsource/assistant/500.css",
-  "node_modules/@fontsource/assistant/600.css",
-  "node_modules/@fontsource/assistant/700.css",
-  "projects/ui-kit/styles/ui-kit.scss",
-  "src/styles.scss"
-],
-"stylePreprocessorOptions": { "includePaths": ["projects"] }
-```
-
-If you only need the CSS variables and not the document defaults, use
-`projects/ui-kit/styles/tokens.css`.
-
-Register the icons you use and (optionally) configure the theme:
-
-```ts
-import { provideUiIcons, uiIconCheck, uiIconX, uiIconSearch } from '@vplans/ui-kit/icon';
-import { provideUiTheme } from '@vplans/ui-kit/theme';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideUiIcons([uiIconCheck, uiIconX, uiIconSearch]),
-    provideUiTheme({ defaultMode: 'system', storageKey: 'app-theme' }),
-  ],
-};
-```
-
-## Usage
-
-Every component has its own secondary entry point for tree-shaking. Import from it, not from the root:
-
-```ts
-import { UiButton } from '@vplans/ui-kit/button';
-import { UiFormField } from '@vplans/ui-kit/form-field';
-import { UiInput } from '@vplans/ui-kit/input';
-```
-
-```html
-<button ui-button variant="secondary" size="sm" (click)="cancel()">Cancel</button>
-<button ui-button [loading]="saving()">Save</button>
-<a ui-button routerLink="/orders">Orders</a>
-<button ui-icon-button label="Close" (click)="close()"><ui-icon icon="x" /></button>
-```
-
+`ui-button` (`button[ui-button]`, `a[ui-button]`) and `ui-icon-button` from `@vplans/ui-kit/button`.
 Common inputs:
 
 | Input                 | Values                                     | Default                                  |
@@ -118,75 +60,12 @@ label. A disabled or loading `a[ui-button]` has no `href`, so it cannot be opene
 native `disabled`); clicks stay blocked. Use it when a `uiTooltip` explains why the button is disabled,
 instead of wrapping the button in an element with `uiTooltip`.
 
-With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
-A bare `checked` attribute is a compile error.
-
 ## Forms
 
-All form controls work with **Reactive Forms** and **template-driven forms** through
-`ControlValueAccessor`: bind them with `formControl`, `formControlName` or `ngModel`. Signal
-Forms is **not** supported — the kit targets Angular 20, where it does not exist.
-
-| Control                    | Value                  | How it registers                          |
-| -------------------------- | ---------------------- | ----------------------------------------- |
-| `input[ui-input]`          | the native value       | Angular's `DefaultValueAccessor`          |
-| `textarea[ui-textarea]`    | the native value       | Angular's `DefaultValueAccessor`          |
-| `ui-checkbox`, `ui-switch` | `checked`              | `NG_VALUE_ACCESSOR` (`UiCheckableBase`)   |
-| `ui-radio-group`           | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-select`                | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-multi-select`          | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-datepicker`            | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-date-range-picker`     | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-time-input`            | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-number-input`          | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-chip-input`            | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-autocomplete`          | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-file-upload`           | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-slider`                | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-range-slider`          | `value` (tuple)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-segmented`             | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-button-toggle-group`   | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-tree`                  | `value` (key or array) | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-
-Every control supports `disabled`, `readonly`, `required` and `aria-describedby`. `disabled` and
-`required` are also read from the bound control (`control.disable()`, `Validators.required`). A
-readonly control stays focusable and reports `aria-readonly`. A `required` checkbox or switch is
-invalid until checked.
-
-The model outputs (`valueChange`, `checkedChange`) also fire when a forms directive writes a value
-(`setValue()`, `reset()`), not only for user input. With a forms directive bound, react to the
-form (`valueChanges`) instead of these outputs.
-
-`ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
-`aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
-once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `submit()`).
-
-```html
-<!-- Project <ui-error>, or let your validators return string-valued errors / { message } -->
-<ui-form-field label="Email" hint="We never share it">
-  <input ui-input type="email" formControlName="email" />
-</ui-form-field>
-
-<ui-form-field label="Username">
-  <input ui-input formControlName="username" />
-  @if (username.hasError('required')) {
-  <ui-error>Username is required</ui-error>
-  }
-</ui-form-field>
-
-<ui-form-field label="Delivery">
-  <ui-radio-group formControlName="delivery">
-    <ui-radio value="pickup">Pickup</ui-radio>
-    <ui-radio value="courier">Courier</ui-radio>
-  </ui-radio-group>
-</ui-form-field>
-```
-
-Without a forms directive, use the `invalid` input to show the error state manually.
-
-`ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values, e.g.
-`(option: City, selected: City) => option.id === selected.id`. It is called as
-`compareWith(option, selected)` and never with `null`; a `null` value matches only `null`.
+How controls plug into Reactive and template forms (`ControlValueAccessor`, the control table,
+`disabled`/`readonly`/`required`, `valueChange` vs `valueChanges`, `ui-form-field` and errors,
+validator messages, `compareWith`) is on the **Docs/Forms** page in Storybook. This section is
+the per-control reference.
 
 `ui-datepicker` sets `null` for typed text that is not an allowed date and, once the user leaves
 the field, shows the `invalidDate` label. That message is the field's own: it never becomes an
@@ -402,268 +281,16 @@ Affixes are mirrored in RTL.
 
 Affixes are meant for `input[ui-input]`, `textarea[ui-textarea]` and `ui-number-input`.
 
-## Theming
-
-Tokens come in three layers. All of them are CSS custom properties generated from
-[`tokens/tokens.json`](tokens/tokens.json):
-
-1. **Primitive** (`--ui-ref-*`): the raw palette and scales. Never use these in components or apps.
-2. **Semantic** (`--ui-color-primary`, `--ui-space-md`, `--ui-radius-control`, ...): the public API. They differ per theme.
-3. **Component** (`--ui-button-primary-bg`, `--ui-input-radius`, ...): per-component overrides. They default to semantic tokens.
-
-Light and dark themes:
-
-- `<html data-theme="dark">` or `data-theme="light"` forces a theme.
-- With no attribute, the theme follows `prefers-color-scheme`.
-- A `data-theme` attribute on any element themes that subtree.
-
-```ts
-const theme = inject(ThemeService);
-theme.mode(); // 'light' | 'dark' | 'system'
-theme.theme(); // resolved: 'light' | 'dark'
-theme.setMode('dark'); // persisted in localStorage
-theme.toggle();
-```
-
-`provideUiTheme()` applies the stored mode when the app starts. Without it, the mode is applied only
-once something injects `ThemeService`.
-
-The app boots after the first paint, so a stored `dark` mode would flash light first. Apply it early
-with an inline script in `index.html` (use your `storageKey`):
-
-```html
-<script>
-  try {
-    var mode = localStorage.getItem('ui-theme');
-    if (mode === 'light' || mode === 'dark') {
-      document.documentElement.setAttribute('data-theme', mode);
-    }
-  } catch (e) {}
-</script>
-```
-
-Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
-`:root`, on every `[data-theme]` and `[data-density]` element and on `.ui-theme-scope`, so they
-follow the theme and density of the nearest scope:
-
-- **Component tokens**: override them on all of these selectors (`ui.$theme-scopes`). An
-  override on `:root` alone is reset inside a nested `[data-theme]`.
-- **Semantic tokens**: an override on `:root` or `[data-theme]` applies everywhere. For a local
-  re-brand, override them on an element with the `ui-theme-scope` class, so the component tokens
-  are recomputed there.
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-#{ui.$theme-scopes} {
-  --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
-}
-
-// Local re-brand: override the whole primary family, or hover and text colors stay blue.
-.checkout.ui-theme-scope {
-  --ui-color-primary: var(--ui-ref-color-green-700);
-  --ui-color-primary-hover: var(--ui-ref-color-green-800);
-  --ui-color-primary-active: var(--ui-ref-color-green-900);
-  --ui-color-primary-subtle: var(--ui-ref-color-green-50);
-  --ui-color-primary-text: var(--ui-ref-color-green-800);
-}
-```
-
-In the dark theme the primary family uses lighter shades; override it there too
-(`[data-theme='dark'] .checkout.ui-theme-scope { ... }`). Run the new pairs through a contrast
-checker: `pnpm tokens` only checks the built-in tokens.
-
-Use the mixins in application SCSS:
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-.card-link {
-  @include ui.focus-visible;
-  @include ui.transition(background-color);
-}
-```
-
-Typography classes: `ui-display`, `ui-heading-1..4`, `ui-body-lg`, `ui-body`, `ui-body-sm`,
-`ui-label`, `ui-caption`, `ui-code`, `ui-text-muted`, `ui-visually-hidden`.
-
-### Breakpoints
-
-The kit has four named viewport widths: `sm` 40rem, `md` 52rem, `lg` 64rem, `xl` 80rem. They
-live in `tokens/tokens.json` and `pnpm tokens` generates them for SCSS and TypeScript. They are
-not custom properties, because media queries cannot read those.
-
-- `ui.up($name)` wraps styles in a media query from the width up (`width >= 52rem` for `md`).
-- `ui.down($name)` wraps them below the width (`width < 52rem`), so `up(md)` and `down(md)`
-  never both apply.
-- `ui.$breakpoints` is the map of names to widths, smallest first.
-- `UI_BREAKPOINTS` from `@vplans/ui-kit/core` holds a `(min-width: …)` query per name for the CDK
-  `BreakpointObserver`; `UiBreakpoint` is the union of the names.
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-.filters {
-  display: grid;
-
-  @include ui.up(md) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@each $name, $width in ui.$breakpoints {
-  .hide-from-#{$name} {
-    @include ui.up($name) {
-      display: none;
-    }
-  }
-}
-```
-
-```ts
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { UI_BREAKPOINTS } from '@vplans/ui-kit/core';
-
-const wide = toSignal(
-  inject(BreakpointObserver)
-    .observe(UI_BREAKPOINTS.md)
-    .pipe(map((state) => state.matches)),
-);
-```
-
-### Layout
-
-`ui-kit.scss` has four layout classes. They use only logical properties, so they mirror in RTL.
-
-| Class          | Layout                                                                                                |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `ui-stack`     | children in a column                                                                                  |
-| `ui-cluster`   | children in a row from the inline start, centered on the cross axis, wrapping                         |
-| `ui-grid`      | as many equal columns as fit, each at least `--ui-grid-min` (20rem); one column when narrower         |
-| `ui-container` | content centered up to `--ui-layout-container-max-width` (80rem), with `--ui-space-lg` inline padding |
-
-The defaults are the tokens `--ui-layout-grid-min` (20rem) and `--ui-layout-container-max-width`
-(80rem); override them on `:root` to change every grid and container of the app.
-
-The gap of `ui-stack`, `ui-cluster` and `ui-grid` is `--ui-space-md`. A modifier on the same
-element changes it: `ui-gap-3xs`, `ui-gap-2xs`, `ui-gap-xs`, `ui-gap-sm`, `ui-gap-md`, `ui-gap-lg`,
-`ui-gap-xl`, `ui-gap-2xl`, `ui-gap-3xl` (the `--ui-space-*` scale). Each layout element sets its own
-gap, so a nested layout does not inherit the modifier of its parent.
-
-```html
-<form class="ui-stack ui-gap-lg">
-  …
-  <div class="ui-cluster ui-gap-sm"><button ui-button>Save</button>…</div>
-</form>
-
-<ul class="ui-grid" style="--ui-grid-min: 15rem">
-  …
-</ul>
-```
-
-Set `--ui-grid-min` on the grid element itself: each grid sets its own minimum, so a value on an
-ancestor or a parent grid does not reach it. `--ui-gap` and `--ui-grid-min` are layout knobs that
-each layout element sets on itself, not generated tokens: they are not in `tokens.css` or the
-token table below. In component styles, use the mixins of the same names. The gap takes a spacing name or any length:
-
-```scss
-@use 'ui-kit/styles' as ui;
-
-.filters {
-  @include ui.cluster(sm);
-}
-
-.cards {
-  @include ui.grid(15rem, lg); // ui.grid() alone gives 20rem and md
-}
-
-.page {
-  @include ui.container;
-}
-```
-
-The mixins set `--ui-gap` in the component's selector, so pass the gap as the argument; a
-`ui-gap-*` class on the same element may lose to the component selector. **Foundations/Layout**
-in Storybook shows each class and gap.
-
-### Density
-
-Mark a page region `data-density="compact"` to pack its controls tighter, for filter panels and
-other dense screens. Inside it the control tokens take their compact values; everything else keeps
-its values (generated from `tokens.json`):
-
-<!-- density:start -->
-
-| Token                           | sm                     | md                     | lg                    |
-| ------------------------------- | ---------------------- | ---------------------- | --------------------- |
-| `--ui-control-height-*`         | 2rem → **1.75rem**     | 2.5rem → **2rem**      | 2.75rem → **2.5rem**  |
-| `--ui-control-padding-inline-*` | 0.625rem → **0.5rem**  | 0.75rem → **0.625rem** | 1rem → **0.75rem**    |
-| `--ui-control-gap-*`            | 0.375rem → **0.25rem** | 0.5rem → **0.375rem**  | 0.625rem → **0.5rem** |
-
-<!-- density:end -->
-
-Component tokens that alias a control height (select options, menu items, tree nodes, calendar
-cells, pagination buttons, …) follow. Font sizes and the page spacing scale (`--ui-space-*`) do not
-change, so a compact region does not reflow the layout around its controls. The region also
-re-declares `--ui-table-cell-padding-block` with the compact table padding
-(`--ui-table-cell-padding-block-compact`), so table cells follow unless the table sets `density`.
-
-```html
-<aside class="filters" data-density="compact">…</aside>
-```
-
-Overlays (select lists, menus, dialogs) render in the overlay container at the end of `<body>`,
-outside every region, so only density on the root element reaches them. For a compact app, put it
-on `<html>`: `<html data-density="compact">`.
-
-`compact` is the only density; any other value of `data-density` does nothing. A region inside a
-compact one cannot return to the default density: there is no `data-density="default"`. Only a
-table can, with `density="default"`.
-
-Density is a property of a region; `size` is a property of one control and works inside either
-density (a `size="sm"` button in a compact region is 1.75rem tall). In Storybook, switch it with
-**Density** in the toolbar; **Foundations/Density** shows the controls and a table in both densities.
-
 ## RTL
 
-Components use only logical properties (`margin-inline-start`, `inset-inline-end`, ...).
-Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Directional icons flip with
-`<ui-icon icon="arrow-right" flipRtl />`.
-
-### Built-in texts and i18n
-
-Built-in texts (close buttons, confirm dialogs, empty lists, the spinner name) default to Hebrew
-(`UI_LABELS_HE`). Keys you do not set keep the Hebrew default. `provideUiLabels()` accepts fixed
-values, a signal, or a factory, so it works with any i18n library:
-
-```ts
-import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
-
-// English app
-provideUiLabels(UI_LABELS_EN);
-
-// @angular/localize (build-time translation)
-provideUiLabels({ close: $localize`:@@ui.close:Close`, cancel: $localize`:@@ui.cancel:Cancel` });
-
-// Transloco or ngx-translate (runtime switch): the factory runs in an injection context,
-// and the kit follows the signal when the language changes.
-provideUiLabels(() =>
-  toSignal(inject(TranslocoService).selectTranslateObject('uiKit'), { initialValue: {} }),
-);
-```
-
-Texts with numbers are functions, e.g. `pageLabel: (page) => ...` and
-`pageRange: (start, end, length) => ...` for `ui-pagination`. When the source only gives strings,
-build them in the factory.
-
-Texts that belong to a specific use (a button label, a tooltip, a dialog title) are plain inputs:
-translate them in your templates as usual.
+Direction, logical properties, `flipRtl`, how overlays follow `dir` and the built-in texts
+(`UI_LABELS_HE`, `provideUiLabels()`) are on the **Docs/RTL** page in Storybook.
 
 ## Overlays
 
 Select panels, tooltips, dialogs and toasts render in CDK overlays, which use the browser top layer
-(Popover API). They read the text direction when they open, so switching `dir` on `<html>` at
-runtime is enough.
+(Popover API). How they follow the text direction, and which side the drawer `start`/`end` and the
+toast positions take in LTR and RTL, is on the **Docs/RTL** page.
 
 ```ts
 // Dialog: focus trap, Escape/backdrop close and focus restore come from CDK Dialog.
@@ -681,7 +308,7 @@ this.toast.show({ message: 'Plan deleted', action: 'Undo' }).onAction.subscribe(
 
 ```ts
 // Drawer: a full-height modal panel with the same parts and behavior as a dialog.
-// `end` (default) is the right side in LTR and the left side in RTL; full width on phones.
+// `position`: 'end' (default) or 'start'; full width on phones.
 this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 ```
 
@@ -951,7 +578,7 @@ Sort the rows yourself (`uiSortData(rows, sort)`) or on the server. A click on a
 announces the new order with the header text (the `sortedAscending`, `sortedDescending` and
 `sortedNone` labels), because screen readers do not read a changed `aria-sort`.
 
-Row density follows the region (see [Density](#density)): a table without `density` is compact
+Row density follows the region (see the **Tokens** docs page): a table without `density` is compact
 inside `data-density="compact"`. Set `density="default"` or `density="compact"` to override the
 region either way.
 
@@ -1311,7 +938,9 @@ skeleton, spinner, icon, card) have none: query them in a test as plain markup.
 
 ## Tokens
 
-Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
+Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark. The token layers
+and overrides are on the **Theming** docs page; the galleries, breakpoints, layout and density on
+the **Tokens** docs page.
 
 <!-- tokens:start -->
 
@@ -1935,24 +1564,24 @@ Generated from `tokens.json` by `pnpm tokens`. Values are shown as light / dark.
 
 ### Scripts
 
-| Command                   | What it does                                                        |
-| ------------------------- | ------------------------------------------------------------------- |
-| `pnpm start`              | Playground dev server                                               |
-| `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and checks WCAG contrast      |
-| `pnpm test`               | Unit tests (Vitest)                                                 |
-| `pnpm test:watch`         | Unit tests in watch mode                                            |
-| `pnpm test:coverage`      | Unit tests with a coverage report; fails below the thresholds       |
-| `pnpm test:playground`    | Playground smoke tests                                              |
-| `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint           |
-| `pnpm format`             | Prettier (write)                                                    |
-| `pnpm format:check`       | Prettier (check only)                                               |
-| `pnpm build`              | Tokens and the library build into `dist/ui-kit`                     |
-| `pnpm build:playground`   | Playground build (checks the bundle budgets)                        |
-| `pnpm storybook`          | Storybook dev server                                                |
-| `pnpm build-storybook`    | Static Storybook in `dist/storybook/ui-kit`                         |
-| `pnpm test-storybook`     | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes |
-| `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`  |
-| `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                      |
+| Command                   | What it does                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `pnpm start`              | Playground dev server                                                                                  |
+| `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and the density table in `docs/tokens.mdx`; checks WCAG contrast |
+| `pnpm test`               | Unit tests (Vitest)                                                                                    |
+| `pnpm test:watch`         | Unit tests in watch mode                                                                               |
+| `pnpm test:coverage`      | Unit tests with a coverage report; fails below the thresholds                                          |
+| `pnpm test:playground`    | Playground smoke tests                                                                                 |
+| `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint                                              |
+| `pnpm format`             | Prettier (write)                                                                                       |
+| `pnpm format:check`       | Prettier (check only)                                                                                  |
+| `pnpm build`              | Tokens and the library build into `dist/ui-kit`                                                        |
+| `pnpm build:playground`   | Playground build (checks the bundle budgets)                                                           |
+| `pnpm storybook`          | Storybook dev server                                                                                   |
+| `pnpm build-storybook`    | Static Storybook in `dist/storybook/ui-kit`                                                            |
+| `pnpm test-storybook`     | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes                                    |
+| `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`                                     |
+| `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                                                         |
 
 ### Adding a component
 

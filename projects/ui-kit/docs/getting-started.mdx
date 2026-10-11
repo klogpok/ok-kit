@@ -1,0 +1,115 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from '../button/button.stories';
+import * as FormFieldStories from '../form-field/form-field.stories';
+
+<Meta title="Docs/Getting started" />
+
+# Getting started
+
+`@vplans/ui-kit` is our in-house Angular design system: standalone, `OnPush`, zoneless-ready
+components built on `@angular/cdk`, themed with CSS custom properties, RTL-aware and built for
+WCAG 2.1 AA. This page takes an app in this monorepo from no kit to a first screen.
+
+## 1. Point TypeScript at the sources
+
+The kit is not published. Apps in this monorepo use it from source: the root `tsconfig.json` maps
+the package to the sources, so `import { UiButton } from '@vplans/ui-kit/button'` works in every
+project.
+
+```jsonc
+"paths": {
+  "@vplans/ui-kit": ["./projects/ui-kit/src/public-api.ts"],
+  "@vplans/ui-kit/*": ["./projects/ui-kit/*/public-api.ts"]
+}
+```
+
+## 2. Check the dependencies
+
+The app needs the peer dependencies of `projects/ui-kit/package.json` (`@angular/cdk`,
+`@angular/forms`, …) in the same major version. The kit targets **Angular 20** (`@angular/cdk`
+20.2 — the CDK's v20 line stops there). `@angular/router` is optional: only `ui-tab-nav`
+(`@vplans/ui-kit/tabs`) needs it.
+
+## 3. Add the font and the global stylesheet
+
+The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
+Hebrew and Latin. `@fontsource/assistant` is already a dependency of the workspace (root
+`package.json`), so there is nothing to install: add its weights together with the global
+stylesheet (tokens, document defaults, typography) to the app's build options in `angular.json`.
+`includePaths` lets app SCSS use the mixins with `@use 'ui-kit/styles' as ui`.
+
+```jsonc
+"styles": [
+  "node_modules/@fontsource/assistant/400.css",
+  "node_modules/@fontsource/assistant/500.css",
+  "node_modules/@fontsource/assistant/600.css",
+  "node_modules/@fontsource/assistant/700.css",
+  "projects/ui-kit/styles/ui-kit.scss",
+  "src/styles.scss"
+],
+"stylePreprocessorOptions": { "includePaths": ["projects"] }
+```
+
+If you only need the CSS variables and not the document defaults, use
+`projects/ui-kit/styles/tokens.css`.
+
+## 4. Register icons and the theme
+
+Register the icons you use and apply the stored theme mode at startup. The theme options, the
+no-flash script and token overrides are on the [Theming](?path=/docs/docs-theming--docs) page.
+
+```ts
+import { provideUiIcons, uiIconCheck, uiIconX, uiIconSearch } from '@vplans/ui-kit/icon';
+import { provideUiTheme } from '@vplans/ui-kit/theme';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideUiIcons([uiIconCheck, uiIconX, uiIconSearch]),
+    provideUiTheme(),
+  ],
+};
+```
+
+## 5. Build the first screen
+
+Every component has its own secondary entry point for tree-shaking. Import from it, not from the
+root:
+
+```ts
+import { Component } from '@angular/core';
+import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
+import { UiFormField, UiHint } from '@vplans/ui-kit/form-field';
+import { UiIcon } from '@vplans/ui-kit/icon';
+import { UiInput } from '@vplans/ui-kit/input';
+```
+
+```html
+<ui-form-field label="Search">
+  <input ui-input type="search" />
+  <ui-hint>Order number or customer</ui-hint>
+</ui-form-field>
+
+<button ui-button variant="secondary" size="sm" (click)="cancel()">Cancel</button>
+<button ui-button [loading]="saving()">Save</button>
+<a ui-button routerLink="/orders">Orders</a>
+<button ui-icon-button label="Close" (click)="close()"><ui-icon icon="x" /></button>
+```
+
+The form field and the buttons, live (the toolbar switches theme, direction and density):
+
+<Canvas of={FormFieldStories.Default} />
+
+<Canvas of={ButtonStories.AllVariants} />
+
+With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
+A bare `checked` attribute is a compile error.
+
+## Next steps
+
+- The other pages of this Docs section cover [theming](?path=/docs/docs-theming--docs),
+  [RTL](?path=/docs/docs-rtl--docs), [forms](?path=/docs/docs-forms--docs) and
+  [tokens](?path=/docs/docs-tokens--docs).
+- Every component has a Docs tab with its inputs and live examples; the toolbar switches theme,
+  direction and density, and the Accessibility panel runs axe on the open story.
+- What each entry point exports, the test harnesses and the component reference are in
+  `projects/ui-kit/README.md`.

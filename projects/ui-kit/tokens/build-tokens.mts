@@ -364,14 +364,14 @@ writeFileSync(resolve(libRoot, 'styles/tokens.css'), css);
 writeFileSync(resolve(libRoot, 'styles/_tokens.scss'), css);
 writeFileSync(resolve(here, 'tokens.generated.ts'), ts);
 
-// ---- README tables -----------------------------------------------------------
+// ---- Docs tables -------------------------------------------------------------
 
-/** Replaces the text between `<!-- name:start -->` and `<!-- name:end -->`, when both exist. */
-function replaceSection(text: string, name: string, table: string): string {
-  const start = `<!-- ${name}:start -->`;
-  const end = `<!-- ${name}:end -->`;
-  if (!text.includes(start) || !text.includes(end)) return text;
-  return text.replace(new RegExp(`${start}[\\s\\S]*${end}`), () => `${start}\n${table}\n${end}`);
+/** Replaces the text between the `start` and `end` markers, when both exist. */
+function replaceSection(text: string, start: string, end: string, table: string): string {
+  const from = text.indexOf(start);
+  const to = text.indexOf(end);
+  if (from < 0 || to < from) return text;
+  return `${text.slice(0, from)}${start}\n${table}\n${text.slice(to)}`;
 }
 
 const tokenTable = [
@@ -383,8 +383,9 @@ const tokenTable = [
 ].join('\n');
 
 /**
- * Compact semantic tokens, one row per group and one column per size:
- * `control.height.sm` is row `--ui-control-height-*`, column sm, as "default → **compact**".
+ * Compact semantic tokens as a JSX table for the Tokens docs page (its MDX has no GFM tables),
+ * one row per group and one column per size: `control.height.sm` is row
+ * `--ui-control-height-*`, column sm, as "default → **compact**".
  */
 function densityTable(): string {
   const groups = new Map<string, Map<string, FlatToken>>();
@@ -395,29 +396,52 @@ function densityTable(): string {
   }
   const sizes = [...new Set([...groups.values()].flatMap((row) => [...row.keys()]))];
   const cell = (t: FlatToken | undefined): string =>
-    t ? `${themeValue(base, t.path)} → **${resolvePrimitives(t.value)}**` : '';
+    t
+      ? `<td>${themeValue(base, t.path)} → <strong>${resolvePrimitives(t.value)}</strong></td>`
+      : '<td />';
+  const head = sizes.map((size) => `<th>${size}</th>`).join('');
   return [
-    `| Token | ${sizes.join(' | ')} |`,
-    `| --- | ${sizes.map(() => '---').join(' | ')} |`,
-    ...[...groups].map(
-      ([group, row]) =>
-        `| \`${cssName('', group)}-*\` | ${sizes.map((size) => cell(row.get(size))).join(' | ')} |`,
-    ),
+    '<table>',
+    '  <thead>',
+    `    <tr><th>Token</th>${head}</tr>`,
+    '  </thead>',
+    '  <tbody>',
+    ...[...groups].map(([group, row]) => {
+      const cells = sizes.map((size) => cell(row.get(size))).join('');
+      // A string expression: MDX would read the bare `*` as the start of emphasis.
+      return `    <tr><td><code>{'${cssName('', group)}-*'}</code></td>${cells}</tr>`;
+    }),
+    '  </tbody>',
+    '</table>',
   ].join('\n');
 }
 
+const prettier = await import('prettier');
+
 const readmePath = resolve(libRoot, 'README.md');
 const readme = replaceSection(
-  replaceSection(readFileSync(readmePath, 'utf8'), 'tokens', tokenTable),
-  'density',
-  densityTable(),
+  readFileSync(readmePath, 'utf8'),
+  '<!-- tokens:start -->',
+  '<!-- tokens:end -->',
+  tokenTable,
 );
 // Keep the README stable under `pnpm format`.
-const prettier = await import('prettier');
 const readmeOptions = (await prettier.resolveConfig(readmePath)) ?? {};
 writeFileSync(
   readmePath,
   await prettier.format(readme, { ...readmeOptions, filepath: readmePath }),
+);
+
+// MDX is outside the format globs, so the page gets the table as generated.
+const tokensPagePath = resolve(libRoot, 'docs/tokens.mdx');
+writeFileSync(
+  tokensPagePath,
+  replaceSection(
+    readFileSync(tokensPagePath, 'utf8'),
+    '{/* density:start */}',
+    '{/* density:end */}',
+    densityTable(),
+  ),
 );
 
 console.log(

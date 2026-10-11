@@ -6,11 +6,11 @@
 
 **Blocked by:** 20 (Phase 9.4 report)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Getting started and Contributing are MDX pages in a Docs section at the top of the sidebar
-- [ ] Nothing is written both in the README and in the docs
-- [ ] Storybook builds, and the story checks and baselines are unaffected
+- [x] Getting started and Contributing are MDX pages in a Docs section at the top of the sidebar
+- [x] Nothing is written both in the README and in the docs
+- [x] Storybook builds, and the story checks and baselines are unaffected
 
 ## Русский перевод
 
@@ -22,8 +22,8 @@
 
 **Заблокировано:** 20 (Отчёт подфазы 9.4)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] Getting started и Contributing — MDX-страницы в разделе Docs вверху сайдбара
-- [ ] Ничего не написано и в README, и в документации одновременно
-- [ ] Storybook собирается, проверки stories и снимки не затронуты
+- [x] Getting started и Contributing — MDX-страницы в разделе Docs вверху сайдбара
+- [x] Ничего не написано и в README, и в документации одновременно
+- [x] Storybook собирается, проверки stories и снимки не затронуты

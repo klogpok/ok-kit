@@ -1,0 +1,121 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Docs/Theming" />
+
+# Theming
+
+The kit is themed with CSS custom properties. This page explains the token layers, light and dark
+mode, how to override tokens for the whole app or one region, and the SCSS mixins and typography
+classes. Which tokens exist, density and breakpoints are on the [Tokens](?path=/docs/docs-tokens--docs)
+page.
+
+## Token layers
+
+Tokens come in three layers. All of them are CSS custom properties generated from
+`projects/ui-kit/tokens/tokens.json` by `pnpm tokens`:
+
+1. **Primitive** (`--ui-ref-*`): the raw palette and scales. Never use these in components or apps.
+2. **Semantic** (`--ui-color-primary`, `--ui-space-md`, `--ui-radius-control`, …): the public API.
+   They differ per theme.
+3. **Component** (`--ui-button-primary-bg`, `--ui-input-radius`, …): per-component overrides. They
+   default to semantic tokens.
+
+## Light and dark
+
+- `<html data-theme="dark">` or `data-theme="light"` forces a theme.
+- With no attribute, the theme follows `prefers-color-scheme`.
+- A `data-theme` attribute on any element themes that subtree.
+
+`ThemeService` (`@vplans/ui-kit/theme`) reads and changes the mode:
+
+```ts
+const theme = inject(ThemeService);
+theme.mode(); // 'light' | 'dark' | 'system'
+theme.theme(); // resolved: 'light' | 'dark'
+theme.setMode('dark'); // persisted in localStorage
+theme.toggle();
+```
+
+`provideUiTheme()` applies the stored mode when the app starts. Without it, the mode is applied only
+once something injects `ThemeService`.
+
+```ts
+export const appConfig: ApplicationConfig = {
+  providers: [provideUiTheme({ defaultMode: 'system', storageKey: 'ui-theme' })],
+};
+```
+
+`storageKey` defaults to `'ui-theme'`; `null` turns persistence off.
+
+### No flash on reload
+
+The app boots after the first paint, so a stored `dark` mode would flash light first. Apply it early
+with an inline script in `index.html`. It must read the same key as `storageKey` (here the default
+`'ui-theme'`):
+
+```html
+<script>
+  try {
+    var mode = localStorage.getItem('ui-theme');
+    if (mode === 'light' || mode === 'dark') {
+      document.documentElement.setAttribute('data-theme', mode);
+    }
+  } catch (e) {}
+</script>
+```
+
+## Overriding tokens
+
+Override tokens in your global styles. Component tokens (`--ui-button-*`, …) are computed on
+`:root`, on every `[data-theme]` and `[data-density]` element and on `.ui-theme-scope`, so they
+follow the theme and density of the nearest scope:
+
+- **Component tokens**: override them on all of these selectors (`ui.$theme-scopes`). An override
+  on `:root` alone is reset inside a nested `[data-theme]`.
+- **Semantic tokens**: an override on `:root` or `[data-theme]` applies everywhere. For a local
+  re-brand, override them on an element with the `ui-theme-scope` class, so the component tokens
+  are recomputed there.
+
+```scss
+@use 'ui-kit/styles' as ui;
+
+#{ui.$theme-scopes} {
+  --ui-button-radius: var(--ui-radius-full); // pill buttons everywhere
+}
+
+// Local re-brand: override the whole primary family, or hover and text colors stay blue.
+.checkout.ui-theme-scope {
+  --ui-color-primary: var(--ui-ref-color-green-700);
+  --ui-color-primary-hover: var(--ui-ref-color-green-800);
+  --ui-color-primary-active: var(--ui-ref-color-green-900);
+  --ui-color-primary-subtle: var(--ui-ref-color-green-50);
+  --ui-color-primary-text: var(--ui-ref-color-green-800);
+}
+```
+
+In the dark theme the primary family uses lighter shades; override it there too
+(`[data-theme='dark'] .checkout.ui-theme-scope { ... }`). Run the new pairs through a contrast
+checker: `pnpm tokens` only checks the built-in tokens.
+
+## Mixins
+
+Use the mixins in application SCSS (the app's `includePaths` must contain `projects`, see
+[Getting started](?path=/docs/docs-getting-started--docs)):
+
+```scss
+@use 'ui-kit/styles' as ui;
+
+.card-link {
+  @include ui.focus-visible;
+  @include ui.transition(background-color);
+}
+```
+
+The breakpoint and layout mixins are described on the [Tokens](?path=/docs/docs-tokens--docs)
+page.
+
+## Typography
+
+Typography classes: `ui-display`, `ui-heading-1..4`, `ui-body-lg`, `ui-body`, `ui-body-sm`,
+`ui-label`, `ui-caption`, `ui-code`, `ui-text-muted`, `ui-visually-hidden`. The Tokens page shows
+them, with the font size scale.

@@ -6,12 +6,12 @@
 
 **Blocked by:** 21 (Docs section: Getting started, Contributing and the README split)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] RTL and Forms are MDX pages in the Docs section, in English
-- [ ] Examples embed existing stories; everything else is a code block
-- [ ] Forms mentions only Reactive and template forms
-- [ ] Storybook builds
+- [x] RTL and Forms are MDX pages in the Docs section, in English
+- [x] Examples embed existing stories; everything else is a code block
+- [x] Forms mentions only Reactive and template forms
+- [x] Storybook builds
 
 ## Русский перевод
 
@@ -23,9 +23,9 @@
 
 **Заблокировано:** 21 (Раздел документации: Getting started, Contributing и разделение README)
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
-- [ ] RTL и Forms — MDX-страницы в разделе Docs, на английском
-- [ ] Примеры встраивают существующие stories; всё остальное — блоки кода
-- [ ] Forms упоминает только реактивные и шаблонные формы
-- [ ] Storybook собирается
+- [x] RTL и Forms — MDX-страницы в разделе Docs, на английском
+- [x] Примеры встраивают существующие stories; всё остальное — блоки кода
+- [x] Forms упоминает только реактивные и шаблонные формы
+- [x] Storybook собирается

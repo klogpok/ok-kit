@@ -65,7 +65,8 @@
               "node_modules/@fontsource/assistant/500.css",
               "node_modules/@fontsource/assistant/600.css",
               "node_modules/@fontsource/assistant/700.css",
-              "projects/ui-kit/styles/ui-kit.scss"
+              "projects/ui-kit/styles/ui-kit.scss",
+              "projects/ui-kit/.storybook/preview.scss"
             ],
             "port": 6006,
             "compodoc": false,
@@ -82,7 +83,8 @@
               "node_modules/@fontsource/assistant/500.css",
               "node_modules/@fontsource/assistant/600.css",
               "node_modules/@fontsource/assistant/700.css",
-              "projects/ui-kit/styles/ui-kit.scss"
+              "projects/ui-kit/styles/ui-kit.scss",
+              "projects/ui-kit/.storybook/preview.scss"
             ],
             "outputDir": "dist/storybook/ui-kit",
             "compodoc": false,

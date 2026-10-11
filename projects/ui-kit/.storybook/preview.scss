@@ -1,0 +1,47 @@
+// Storybook only: docs pages follow the toolbar theme. Storybook paints the docs wrapper, each
+// canvas and the prose with its own light theme, while the kit's document defaults turn the text
+// light in dark mode. Only docs containers and prose are styled here, never the stories inside a
+// canvas (`.docs-story *`) or the story root, so story screenshots do not change.
+// Two classes, because Storybook's own (emotion) rules have one class and load later.
+.sbdocs.sbdocs-wrapper,
+.docs-story {
+  background: var(--ui-color-bg);
+  color: var(--ui-color-text);
+}
+
+// The docs prose is English: it stays LTR under the RTL toolbar, while the canvases follow it.
+.sbdocs.sbdocs-wrapper {
+  direction: ltr;
+}
+
+[dir='rtl'] .docs-story {
+  direction: rtl;
+}
+
+.sbdocs.sbdocs-wrapper {
+  :is(h1, h2, h3, h4, h5, h6, p, li, strong, em, blockquote, th, td):not(.docs-story *) {
+    color: inherit;
+  }
+
+  :is(tr, th, td):not(.docs-story *) {
+    border-color: var(--ui-color-border);
+    background: transparent;
+  }
+
+  a.sbdocs-a:not(.docs-story *) {
+    color: var(--ui-color-primary-text);
+  }
+
+  // Inline code; code blocks (`pre`) keep Storybook's own colors.
+  :not(pre) > code:not(.docs-story *) {
+    border-color: var(--ui-color-border);
+    background: var(--ui-color-surface-muted);
+    color: var(--ui-color-text);
+  }
+
+  // "Show code" under a canvas.
+  .docblock-code-toggle {
+    background: var(--ui-color-surface);
+    color: var(--ui-color-text);
+  }
+}

@@ -284,6 +284,16 @@
 > - Коммиты harnesses названы то `feat(testing)`, то `feat(<компонент>)`.
 >
 > Вопросы для решения: тикеты 34 (toast через `documentRootLoader`), 35 (API сверх спеки), 36 (harness date-range-picker ищет панель глобально), 37 (Shift-диапазон в harness таблицы). **Ответы (2026-10-11)** — в [DECISIONS.md](DECISIONS.md); тикет 36 исправлен тикетом 38.
+>
+> **Статус (2026-10-11): 9.5 (документация) сделана и одобрена; фаза 9 закрыта.** Ветка `phase-9.5`. Тикеты 21–23. Шесть MDX-страниц в Storybook, раздел Docs первым в sidebar (`storySort`): Getting started, Theming, RTL, Forms, Tokens, Contributing — `projects/ui-kit/docs/`, на английском, примеры — существующие stories через `<Canvas of>` (галереи токенов, Foundations/Density и Layout, form-field, кнопки, `Hebrew` у select/menu/popover/tooltip), остальное — блоки кода. Из README ушли Installation, Usage, Theming, Breakpoints, Layout, Density, RTL, i18n, общая часть Forms и направление оверлеев; README оставил таблицу exports, справку по компонентам, Testing, таблицу токенов и правила вклада, ссылается на страницы. `pnpm tokens` пишет таблицу density в `docs/tokens.mdx`. Коммиты: 72a5209, 6b1564a, 5fadb0d (+ merge d06d141), по код-ревью 6ada630, 1bddd2a, 73fd320, 555fac8; снимки — отдельный `chore(visual)`.
+>
+> По код-ревью: один ключ `'ui-theme'` в конфиге темы и no-flash скрипте; живые stories на Getting started; зеркалирование drawer и toast на странице RTL; export `SignalForms` → `AccountForm`; docs-страницы следуют теме и направлению toolbar (`.storybook/preview.scss`, слушатель канала в `preview.ts`), текст остаётся LTR, canvases — RTL.
+>
+> Проверки: полный чеклист зелёный. 926 unit-тестов, playground 8; coverage 98.33/83.14/94.49/98.33; 306 stories × 3 режима без нарушений axe; ngc без ошибок; бюджеты playground без предупреждений. Снимки: Edge обновился до 155 (153 → 155), текст рисуется иначе — 763 из 918 снимков пересозданы с одобрения пользователя (шрифт проверен: Assistant 500 из веб-шрифта). Браузер (Edge, light/dark, LTR/RTL): все шесть страниц отрисованы, canvases читаемы в тёмной теме.
+>
+> Отклонения от спеки: справка по компонентам осталась в README (тикет 39); таблицы на JSX, MDX вне Prettier (тикет 40); `storySort` задаёт порядок всех групп, переименование story, тема docs (тикет 41).
+>
+> Вопросы для решения: тикеты 39, 40, 41. **Ответы (2026-10-11)** — в [DECISIONS.md](DECISIONS.md): всё оставить как есть.
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**
