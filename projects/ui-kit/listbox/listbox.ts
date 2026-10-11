@@ -1,4 +1,5 @@
 import {
+  DOCUMENT,
   DestroyRef,
   Injectable,
   Injector,
@@ -131,6 +132,7 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
 @Injectable()
 export class UiListbox<T = unknown> extends UiListboxHost {
   private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
   /** A signal: computeds read before the field configures the listbox must update. */
   private readonly config = signal<UiListboxConfig<T> | null>(null);
 
@@ -616,7 +618,7 @@ export class UiListbox<T = unknown> extends UiListboxHost {
       afterNextRender(
         () => {
           const id = this.idOf(entry);
-          const element = id ? document.getElementById(id) : null;
+          const element = id ? this.document.getElementById(id) : null;
           // jsdom has no scrollIntoView.
           if (element && 'scrollIntoView' in element) element.scrollIntoView({ block: 'nearest' });
         },
