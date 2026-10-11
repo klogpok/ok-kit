@@ -33,8 +33,8 @@ export type UiDropdownOrigin = CdkOverlayOrigin | UiDropdownElement;
  * <ng-template [uiDropdownPanel]="origin" [open]="isOpen()" (closed)="close()">…</ng-template>
  * ```
  *
- * `closed` asks the field to close (Escape, a click outside); the panel stays open until `open`
- * turns false. With `returnFocusTo`, focus that is inside the panel when it closes (or was lost
+ * `closed` asks the field to close (Escape, a click outside): set `open` to false. After a click
+ * outside the panel stays open until it does; after Escape the CDK has already detached it. With `returnFocusTo`, focus that is inside the panel when it closes (or was lost
  * with it) moves to that element. A panel whose focus stays in the field leaves it unset.
  *
  * `CdkConnectedOverlay` is a host directive without exposed inputs, driven through its instance:
