@@ -297,6 +297,19 @@ describe('UiTimeInput', () => {
     ]);
     expect(active(input())).toBeTruthy();
   });
+
+  it('renders every time of a short interval, without a virtual scroll', async () => {
+    host.min.set(null);
+    host.max.set(null);
+    host.interval.set(5);
+    host.value.set('23:55');
+    await settle(fixture);
+    input().click();
+    await settle(fixture);
+    expect(listbox()!.querySelector('cdk-virtual-scroll-viewport')).toBeNull();
+    expect(options()).toHaveLength(288);
+    expect(active(input())).toBe('23:55');
+  });
 });
 
 @Component({
