@@ -218,7 +218,8 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     mode: () => 'freeText',
     id: this.id,
     items: this.slots,
-    // Every time stays rendered (1440 at an interval of 1): the harness reads the whole list.
+    // Every slot stays rendered (1440 at an interval of 1), so the list opens scrolled to the
+    // nearest slot and keeps its layout.
     virtualThreshold: () => Infinity,
     // The selected time, or the time now; the nearest slot at or after it.
     openAt: () => this.nearestSlot(this.time() ?? uiTimeOf(new Date())),

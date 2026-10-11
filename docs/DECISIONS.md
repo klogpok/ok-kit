@@ -544,7 +544,8 @@ Delivered (what the implementation settled where the plan was silent):
   `showEmpty` (replaces autocomplete's `panelShown`), `openAt` (time-input opens at the nearest
   slot), `isBlocked` and `alwaysShown` (multi-select), `locked` (disabled or readonly).
 - **time-input** passes `virtualThreshold: () => Infinity`: its slots never use the virtual
-  viewport (an interval of 5 gives 288 rendered options), so its harness reads the whole list.
+  viewport (an interval of 5 gives 288 rendered options), so every slot stays rendered: the list
+  opens scrolled to the nearest slot and keeps its layout.
 - **Items keep their entries** through a `linkedSignal` matched by `compareWith`; repeated values
   pair in order; a kept entry takes the new item's label, description and disabled state.
 - **Removed:** `select/option-panel.ts`, `UiOptionParent`, `select/_panel.scss`, the `ɵ` exports of
