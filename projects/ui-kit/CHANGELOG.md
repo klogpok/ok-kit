@@ -14,7 +14,8 @@ so versions mark review points rather than releases.
   `ui-listbox__loading`; the `--ui-select-panel-*` tokens stay. Nothing outside the kit used
   these classes, and the harnesses do not read them.
 - **select:** the internal exports `ɵUiOptionPanel`, `ɵUiOptionParent` and
-  `ɵprovideUiOptionParent` are removed (`ɵUiItemOption` moved to `@vplans/ui-kit/listbox`):
+  `ɵprovideUiOptionParent` are removed, and so is `ɵUiItemOption` (now internal to
+  `@vplans/ui-kit/listbox`):
   `ui-select`, `ui-multi-select`, `ui-autocomplete` and `ui-time-input` no longer share an
   option panel; each creates the listbox controller (`ui-select` and `ui-multi-select` through
   their shared internal `UiSelectBase`, `ui-autocomplete` and `ui-time-input` directly on

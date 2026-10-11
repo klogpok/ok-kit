@@ -9,13 +9,6 @@ export {
   injectListbox as ɵinjectListbox,
   provideUiListbox as ɵprovideUiListbox,
   type UiListboxConfig as ɵUiListboxConfig,
-  type UiListboxMode as ɵUiListboxMode,
-  type UiListEntry as ɵUiListEntry,
 } from './listbox';
 export { UiListboxPanel as ɵUiListboxPanel } from './listbox-panel';
-export { UiListboxHost as ɵUiListboxHost, type UiOptionHandle as ɵUiOptionHandle } from './option';
-export {
-  UiItemEntry as ɵUiItemEntry,
-  UiItemOption as ɵUiItemOption,
-  type UiItemEntryOwner as ɵUiItemEntryOwner,
-} from './option-items';
+export type { UiOptionHandle as ɵUiOptionHandle } from './option';
