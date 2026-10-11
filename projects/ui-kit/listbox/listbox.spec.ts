@@ -325,6 +325,16 @@ describe('UiListbox', () => {
       expect(activeLabel()).toBe('Date');
     });
 
+    it('makes no option active with ArrowDown or ArrowUp while locked', async () => {
+      host.locked.set(true);
+      await settle(fixture);
+      for (const key of ['ArrowDown', 'ArrowUp']) {
+        await press(key);
+        expect(panel()).toBeNull();
+        expect(field.listbox.active()).toBeNull();
+      }
+    });
+
     it('leaves Enter without an active option to the field', async () => {
       const closed = await press('Enter');
       expect(closed.defaultPrevented).toBe(false);

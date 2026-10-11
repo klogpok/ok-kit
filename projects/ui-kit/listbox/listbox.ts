@@ -451,6 +451,8 @@ export class UiListbox<T = unknown> extends UiListboxHost {
       event.preventDefault();
       if (!shown) {
         this.open();
+        // A locked field stays closed and gets no active option.
+        if (!this.isOpen()) return true;
         // Alt+ArrowDown only opens. Without activation on open, start at the end the key points to.
         if (!event.altKey && !this.activatesOnOpen()) this.activateEnd(key);
       } else if (key === 'ArrowUp' && event.altKey) {
