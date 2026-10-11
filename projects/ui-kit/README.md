@@ -1618,7 +1618,7 @@ the **Tokens** docs page.
    - keyboard interaction;
    - ARIA attributes;
    - for form controls, Reactive Forms (including `formControlName`) and `ngModel`: value both ways, disabled from the control, readonly, the required marker, touched on blur, and the error shown only when invalid and touched.
-9. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL.
+9. Required stories: one per variant and state (default, sizes, disabled, invalid, readonly, loading, ...). `pnpm build-storybook && pnpm test-storybook` must pass; also look at them in both themes and in RTL. An internal entry point (one that other entry points build on and consumers do not import, such as `@vplans/ui-kit/listbox`) has no stories of its own: its consumers' stories and its own spec cover it.
 10. Visual baselines: after `pnpm build-storybook`, run `pnpm test-visual:update` for new or intentionally changed stories and look at the new PNGs in `visual/` before you commit them. `pnpm test-visual` must pass. A failure writes the new screenshot and a diff to `dist/visual-diff/`. The baselines are taken in the installed Edge at 1024×768 with reduced motion and a fixed date (2026-09-25), so a new Edge version may need an update of all baselines.
 11. Keep commits small, one per component: `feat(<name>): ...`.
 
