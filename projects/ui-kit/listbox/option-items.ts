@@ -1,4 +1,4 @@
-import { Directive, computed, inject, input } from '@angular/core';
+import { Directive, computed, inject, input, signal, type WritableSignal } from '@angular/core';
 import { Highlightable } from '@angular/cdk/a11y';
 import { UiOption, UiOptionHandle } from './option';
 
@@ -25,13 +25,29 @@ export interface UiItemEntryOwner {
 
 /**
  * An item as the key manager sees it. It can be active, disabled or filtered out without being
- * rendered, so the keyboard reaches options outside the virtual scroll window. Internal.
+ * rendered, so the keyboard reaches options outside the virtual scroll window. A new `items`
+ * array reuses the entry of an item with the same value and hands it the new item, so the active
+ * option and its rendered option stay. Internal.
  */
 export class UiItemEntry<T = unknown> implements Highlightable {
+  private readonly current: WritableSignal<UiOptionItem<T>>;
+
   constructor(
-    readonly item: UiOptionItem<T>,
+    item: UiOptionItem<T>,
     private readonly owner: UiItemEntryOwner,
-  ) {}
+  ) {
+    this.current = signal(item);
+  }
+
+  /** The item the entry shows now. */
+  get item(): UiOptionItem<T> {
+    return this.current();
+  }
+
+  /** Internal: a new `items` array has an item with the entry's value. */
+  ɵupdate(item: UiOptionItem<T>): void {
+    this.current.set(item);
+  }
 
   value(): T {
     return this.item.value;

@@ -160,9 +160,19 @@ export class UiListbox<T = unknown> extends UiListboxHost {
     isBlocked: (option) => this.isBlocked(option),
     reveal: (entry) => this.reveal(entry as UiItemEntry<T>),
   };
-  private readonly itemEntries = computed(() =>
-    (this.items() ?? []).map((item) => new UiItemEntry<T>(item, this.entryOwner)),
-  );
+  /**
+   * An entry per item. A new array (recomputed by the app) keeps the entries of the values it
+   * still has, so the active option and the rendered options stay.
+   */
+  private readonly itemEntries = linkedSignal<
+    readonly UiOptionItem<T>[] | null,
+    readonly UiItemEntry<T>[]
+  >({
+    source: () => this.items(),
+    // Untracked: `compareWith` is read here, and the reused entries take their new items.
+    computation: (items, previous) =>
+      untracked(() => this.reuseEntries(items ?? [], previous?.value ?? [])),
+  });
   /** Every option of the list, shown or filtered out ("select all" is not one). */
   readonly options: Signal<readonly UiListEntry<T>[]> = computed(() =>
     this.items() ? this.itemEntries() : this.contentOptions(),
@@ -516,6 +526,30 @@ export class UiListbox<T = unknown> extends UiListboxHost {
   }
 
   // --- Internals ----------------------------------------------------------------------------
+
+  /**
+   * Entries for new items: an item takes the first unused entry with the same value (through
+   * `compareWith`), so the n-th of repeated values keeps the n-th entry. Items of new values get
+   * new entries.
+   */
+  private reuseEntries(
+    items: readonly UiOptionItem<T>[],
+    entries: readonly UiItemEntry<T>[],
+  ): UiItemEntry<T>[] {
+    const used = new Array<boolean>(entries.length).fill(false);
+    // Entries before it are used: in an unchanged order each item finds its entry at once.
+    let firstUnused = 0;
+    return items.map((item) => {
+      while (firstUnused < entries.length && used[firstUnused]) firstUnused++;
+      for (let i = firstUnused; i < entries.length; i++) {
+        if (used[i] || !this.matches(entries[i].value(), item.value)) continue;
+        used[i] = true;
+        entries[i].ɵupdate(item);
+        return entries[i];
+      }
+      return new UiItemEntry<T>(item, this.entryOwner);
+    });
+  }
 
   private locked(): boolean {
     return this.config()?.locked?.() ?? false;

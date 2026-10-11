@@ -340,11 +340,70 @@ describe('UiSelect with items', () => {
       expect(control().getAttribute('aria-activedescendant')).toBe(options()[1].id);
     });
 
-    it('drops the active option when the items change', async () => {
+    it('keeps the active option when the items are replaced by copies', async () => {
       keydown(control(), 'ArrowDown');
       await settle(fixture);
       fixture.componentInstance.items.set(apartments(200).map((item) => ({ ...item })));
       await settle(fixture);
+      keydown(control(), 'Enter');
+      await settle(fixture);
+      expect(fixture.componentInstance.control.value).toBe(1);
+    });
+
+    it('keeps the active option when the items are recomputed with the same values', async () => {
+      keydown(control(), 'ArrowDown');
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await frame(fixture);
+      fixture.componentInstance.items.set(apartments(1000).map((item) => ({ ...item })));
+      await frame(fixture);
+      keydown(control(), 'Enter');
+      await settle(fixture);
+      expect(fixture.componentInstance.control.value).toBe(2);
+    });
+
+    it('shows the new label and state of a kept option', async () => {
+      keydown(control(), 'ArrowDown');
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await frame(fixture);
+      fixture.componentInstance.items.set(
+        apartments(1000).map((item) =>
+          item.value === 2 ? { ...item, label: 'Apartment 2 (sold)' } : { ...item, disabled: true },
+        ),
+      );
+      await frame(fixture);
+      const active = document.getElementById(control().getAttribute('aria-activedescendant')!)!;
+      expect(active.querySelector('.ui-option__label')!.textContent!.trim()).toBe(
+        'Apartment 2 (sold)',
+      );
+      expect(options()[0].getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('keeps the active one of two items with the same value', async () => {
+      const items = (): UiOptionItem<number>[] => [
+        { value: 1, label: 'Apartment 1' },
+        { value: 1, label: 'Apartment 1 (copy)' },
+        ...apartments(200).slice(1),
+      ];
+      fixture.componentInstance.items.set(items());
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await frame(fixture);
+      fixture.componentInstance.items.set(items());
+      await frame(fixture);
+      expect(control().getAttribute('aria-activedescendant')).toBe(options()[1].id);
+    });
+
+    it('starts at the first option when the active value is gone', async () => {
+      keydown(control(), 'ArrowDown');
+      await settle(fixture);
+      keydown(control(), 'ArrowDown');
+      await frame(fixture);
+      fixture.componentInstance.items.set(apartments(1000).filter((item) => item.value !== 2));
+      await frame(fixture);
       keydown(control(), 'Enter');
       await settle(fixture);
       expect(fixture.componentInstance.control.value).toBe(1);
