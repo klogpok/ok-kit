@@ -1,12 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   ElementRef,
-  Injector,
-  afterNextRender,
   computed,
-  effect,
   forwardRef,
   inject,
   input,
@@ -14,27 +10,21 @@ import {
   model,
   numberAttribute,
   output,
-  signal,
-  untracked,
   viewChild,
-  viewChildren,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ActiveDescendantKeyManager, _IdGenerator } from '@angular/cdk/a11y';
-import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { _IdGenerator } from '@angular/cdk/a11y';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
   UI_FORM_FIELD_CONTROL,
   UI_LABELS,
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
-  overlayOffsetX,
-  syncOverlayDirection,
-  UI_DROPDOWN_POSITIONS,
+  ɵUiDropdownPanel,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
-import { UiOption } from '@vplans/ui-kit/listbox';
-import { ɵUiOptionParent, ɵprovideUiOptionParent } from '@vplans/ui-kit/select';
+import { ɵUiListboxPanel, ɵinjectListbox, ɵprovideUiListbox } from '@vplans/ui-kit/listbox';
 import {
   formatTime,
   maskTime,
@@ -78,7 +68,7 @@ interface Draft {
  */
 @Component({
   selector: 'ui-time-input',
-  imports: [CdkConnectedOverlay, CdkOverlayOrigin, UiIcon, UiOption],
+  imports: [CdkOverlayOrigin, UiIcon, ɵUiDropdownPanel, ɵUiListboxPanel],
   template: `
     <!-- A click anywhere in the field opens the list; the keyboard uses the arrows. -->
     <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
@@ -105,9 +95,9 @@ interface Draft {
         [readOnly]="readonly()"
         [attr.name]="name() || null"
         [attr.aria-label]="ariaLabel() || null"
-        [attr.aria-expanded]="isOpen()"
-        [attr.aria-controls]="isOpen() ? listId() : null"
-        [attr.aria-activedescendant]="isOpen() ? activeId() : null"
+        [attr.aria-expanded]="listbox.shown()"
+        [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
+        [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
         [attr.aria-required]="isRequired() ? 'true' : null"
         [attr.aria-invalid]="showError() ? 'true' : null"
         [attr.aria-describedby]="describedBy()"
@@ -122,32 +112,13 @@ interface Draft {
       />
     </div>
 
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="origin"
-      [cdkConnectedOverlayOpen]="isOpen()"
-      [cdkConnectedOverlayPositions]="positions"
-      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
-      [cdkConnectedOverlayMinWidth]="panelWidth()"
-      (attach)="onAttach()"
-      (detach)="close()"
-      (overlayOutsideClick)="onOutsideClick($event)"
-    >
-      <!-- Options keep focus in the field: mousedown must not move it. -->
-      <div
-        role="listbox"
-        class="ui-select__panel ui-time-input__panel"
-        [style.--_option-padding]="'var(--ui-control-padding-inline-' + size() + ')'"
-        [style.--_option-font-size]="'var(--ui-control-font-size-' + size() + ')'"
-        [id]="listId()"
+    <!-- Focus stays in the field, so the panel returns it nowhere. -->
+    <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
+      <ui-listbox
+        [size]="size()"
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-labelledby]="listLabelledBy()"
-        (mousedown)="$event.preventDefault()"
-      >
-        @for (slot of slots(); track slot.value) {
-          <ui-option [value]="slot.value">{{ slot.label }}</ui-option>
-        }
-      </div>
+      />
     </ng-template>
   `,
   styleUrl: './time-input.scss',
@@ -155,7 +126,7 @@ interface Draft {
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiTimeInput) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiTimeInput), multi: true },
-    ɵprovideUiOptionParent(),
+    ɵprovideUiListbox(),
   ],
   host: {
     class: 'ui-time-input',
@@ -171,8 +142,6 @@ interface Draft {
 })
 export class UiTimeInput extends UiFormControlBase<string | null> implements UiFormFieldControl {
   protected readonly labels = inject(UI_LABELS);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly injector = inject(Injector);
 
   readonly value = model<string | null>(null);
   /** Earliest time ("HH:mm") that can be picked or typed. */
@@ -195,19 +164,11 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   readonly closed = output();
 
   private readonly control = viewChild.required<ElementRef<HTMLInputElement>>('control');
-  private readonly overlay = viewChild(CdkConnectedOverlay);
-  private readonly options = viewChildren<UiOption<string>>(UiOption);
 
-  protected readonly isOpen = signal(false);
-  protected readonly activeId = signal<string | null>(null);
-  protected readonly panelWidth = signal(0);
-  protected readonly panelOffsetX = signal(0);
-  protected readonly positions = [...UI_DROPDOWN_POSITIONS];
   protected readonly clockIcon = uiIconClock;
 
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
-  protected readonly listId = computed(() => `${this.id()}-listbox`);
   protected readonly listLabelledBy = computed(() =>
     this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
   );
@@ -221,7 +182,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   }));
 
   /** Times of the list and their text in the locale format. */
-  protected readonly slots = computed(() => {
+  private readonly slots = computed(() => {
     const { min, max } = this.limits();
     return timeSlots(this.interval(), min, max).map((value) => ({
       value,
@@ -253,34 +214,21 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     return !!draft?.committed && draft.text.trim() !== '' && draft.value === null;
   });
 
-  private readonly keyManager = new ActiveDescendantKeyManager<UiOption<string>>(
-    this.options,
-    this.injector,
-  )
-    .withVerticalOrientation()
-    .withPageUpDown()
-    // UiOption has no public `disabled` getter, which the CDK default skip reads.
-    .skipPredicate((option) => option.ɵdisabled);
-
-  constructor() {
-    super();
-    inject(ɵUiOptionParent).connect({
-      multiple: () => false,
-      isSelected: (value) => value === this.time(),
-      isIndeterminate: () => false,
-      isFilteredOut: () => false,
-      isBlocked: () => false,
-      selectOption: (value) => this.pick(value as string),
-    });
-    this.keyManager.change.subscribe(() =>
-      this.activeId.set(this.keyManager.activeItem?.ɵid ?? null),
-    );
-    // A list opened before the field became readonly or disabled must not stay open.
-    effect(() => {
-      if (this.readonly() || this.isDisabled()) untracked(() => this.close());
-    });
-    inject(DestroyRef).onDestroy(() => this.keyManager.destroy());
-  }
+  /** The list of times. Typed text is a value too: Enter without an active time commits it. */
+  protected readonly listbox = ɵinjectListbox<string>({
+    mode: () => 'freeText',
+    id: () => this.id(),
+    items: this.slots,
+    // Every time stays rendered (1440 at an interval of 1): the harness reads the whole list.
+    virtualThreshold: () => Infinity,
+    locked: () => this.readonly() || this.isDisabled(),
+    // The selected time, or the time now; the nearest slot at or after it.
+    openAt: () => this.nearestSlot(this.time() ?? uiTimeOf(new Date())),
+    isSelected: (value) => value === this.time(),
+    select: (value) => this.pick(value as string),
+    opened: () => this.opened.emit(),
+    closed: () => this.closed.emit(),
+  });
 
   /**
    * The field shows the parse message itself, bound or not: a text the user still has to fix is
@@ -299,35 +247,13 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     this.control().nativeElement.focus(options);
   }
 
+  /** Opens the list at the selected time, or the one nearest to now. */
   open(): void {
-    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.panelOffsetX.set(overlayOffsetX(this.host.ownerDocument));
-    this.panelWidth.set(this.host.getBoundingClientRect().width);
-    this.isOpen.set(true);
-    this.opened.emit();
-    afterNextRender(
-      () => {
-        // Keys pressed before the list rendered have already moved the active time.
-        if (!this.keyManager.activeItem) this.activateNear(this.time() ?? uiTimeOf(new Date()));
-      },
-      { injector: this.injector },
-    );
+    this.listbox.open();
   }
 
   close(): void {
-    if (!this.isOpen()) return;
-    this.isOpen.set(false);
-    this.keyManager.setActiveItem(-1);
-    this.activeId.set(null);
-    this.closed.emit();
-  }
-
-  protected onAttach(): void {
-    syncOverlayDirection(this.overlay()?.overlayRef, this.host);
-  }
-
-  protected onOutsideClick(event: MouseEvent): void {
-    if (!this.host.contains(event.target as Node)) this.close();
+    this.listbox.close();
   }
 
   protected onFieldClick(): void {
@@ -355,37 +281,12 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     this.draft.set({ text, value, committed: false });
     if (this.value() !== before) this.notifyChange(value);
     this.open();
-    if (value !== null) this.activateNear(value);
+    if (value !== null) this.listbox.activateValue(this.nearestSlot(value));
   }
 
   protected onKeydown(event: KeyboardEvent): void {
-    const { key } = event;
-    if (key === 'ArrowDown' || key === 'ArrowUp') {
-      event.preventDefault();
-      if (!this.isOpen()) {
-        this.open();
-        return;
-      }
-      if (key === 'ArrowUp' && event.altKey) this.close();
-      else this.keyManager.onKeydown(event);
-    } else if ((key === 'PageDown' || key === 'PageUp') && this.isOpen()) {
-      this.keyManager.onKeydown(event);
-    } else if (key === 'Enter') {
-      const active = this.isOpen() ? this.keyManager.activeItem : null;
-      if (active) {
-        event.preventDefault();
-        this.pick(active.value());
-      } else {
-        this.commitDraft();
-      }
-    } else if (key === 'Escape' && this.isOpen()) {
-      // Close only the list, not a surrounding dialog.
-      event.preventDefault();
-      event.stopPropagation();
-      this.close();
-    } else if (key === 'Tab') {
-      this.close();
-    }
+    // The listbox leaves Enter without an active time to the field: it commits the typed text.
+    if (!this.listbox.handleKeydown(event) && event.key === 'Enter') this.commitDraft();
   }
 
   protected onBlur(): void {
@@ -394,17 +295,16 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     this.notifyTouched();
   }
 
-  /** Moves the active option to `time`, or the first later time (the last one after all). */
-  private activateNear(time: string): void {
+  /** The slot at `time`, or the first later one (the last one after all); `null` without slots. */
+  private nearestSlot(time: string): string | null {
     const minutes = toMinutes(time) ?? 0;
     const slots = this.slots();
-    const index = slots.findIndex((slot) => (toMinutes(slot.value) ?? 0) >= minutes);
-    const target = index >= 0 ? index : slots.length - 1;
-    if (target >= 0) this.keyManager.setActiveItem(target);
+    const later = slots.find((slot) => (toMinutes(slot.value) ?? 0) >= minutes);
+    return (later ?? slots.at(-1))?.value ?? null;
   }
 
   private pick(value: string): void {
-    if (this.readonly() || this.isDisabled()) return;
+    // The listbox does not select while the field is readonly or disabled.
     // Drops typed text and its message, also when the same time is picked again.
     this.draft.set(null);
     if (value !== this.time()) {
