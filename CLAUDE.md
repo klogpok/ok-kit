@@ -38,6 +38,7 @@ Area-specific gotchas live in `.claude/rules/` and load when you open matching f
 
 - The package is consumed through tsconfig paths, not `node_modules`.
 - pnpm 12: dependencies that need build scripts must be listed under `allowBuilds` in `pnpm-workspace.yaml`. Do not use `pnpm dlx` for such CLIs.
+- A git worktree (`.claude/worktrees/`) gets its own `pnpm install --frozen-lockfile --prefer-offline`, run from the PowerShell tool (Bash gets "Access denied"). pnpm rewrites a `node_modules` linked from the main checkout to point into the worktree, and the main checkout breaks once the worktree is gone; repair it with the same install in the root. Delete a leftover worktree folder with `cmd /c rmdir /s /q`, which does not follow junctions.
 - Change file content with Edit/Write, or with a `.mjs` script written by Write and run with `node <file>`. Inline `node -e "…"` and unquoted heredocs lose backticks: `` `ui-tree` `` in a comment becomes empty.
 - In sed and perl replacements `\u` upper-cases the next character, and the agent's Write/Edit tools and heredocs turn a typed `\u2066` into the raw character. Build the backslash in Node (`String.fromCharCode(92) + 'u2066'`) and check the file with grep.
 
