@@ -82,6 +82,8 @@ const SELECT_ALL = 'all';
 class TestField {
   readonly mode = input<UiListboxMode>('trigger');
   readonly items = input<readonly UiOptionItem<string>[] | null>(null);
+  readonly virtualThreshold = input(100);
+  readonly filterText = input('');
   readonly activateOnOpen = input(true);
   readonly openAt = input<string | null>(null);
   readonly showEmpty = input(true);
@@ -103,6 +105,8 @@ class TestField {
     contentOptions: this.content,
     leadingOptions: this.leading,
     items: this.items,
+    virtualThreshold: this.virtualThreshold,
+    filterText: this.filterText,
     activateOnOpen: this.activateOnOpen,
     openAt: () => this.openAt(),
     showEmpty: this.showEmpty,
@@ -135,6 +139,8 @@ class TestField {
       [multiple]="selectAll()"
       [locked]="locked()"
       [items]="items()"
+      [virtualThreshold]="virtualThreshold()"
+      [filterText]="filterText()"
       [(value)]="value"
     >
       @for (fruit of fruits(); track fruit) {
@@ -151,6 +157,8 @@ class Host {
   readonly selectAll = signal(false);
   readonly locked = signal(false);
   readonly items = signal<readonly UiOptionItem<string>[] | null>(null);
+  readonly virtualThreshold = signal(100);
+  readonly filterText = signal('');
   readonly fruits = signal(['Apple', 'Banana', 'Cherry', 'Date']);
   readonly value = signal<readonly string[]>([]);
 }
@@ -381,6 +389,23 @@ describe('UiListboxController', () => {
   describe('items', () => {
     const fruits = (count: number): UiOptionItem<string>[] =>
       Array.from({ length: count }, (_, i) => ({ value: `f${i + 1}`, label: `Fruit ${i + 1}` }));
+    /** `count` apartments `a1`, `a2`, …; every tenth one is disabled. */
+    const apartments = (count: number): UiOptionItem<string>[] =>
+      Array.from({ length: count }, (_, i) => ({
+        value: `a${i + 1}`,
+        label: `Apartment ${i + 1}`,
+        disabled: i % 10 === 9,
+      }));
+    const options = () => [...(panel()?.querySelectorAll<HTMLElement>('ui-option') ?? [])];
+    const viewport = () => panel()?.querySelector('cdk-virtual-scroll-viewport') ?? null;
+    const activeOption = () =>
+      document.getElementById(control().getAttribute('aria-activedescendant') ?? '');
+    /** The viewport renders its window in an animation frame. */
+    const frame = async () => {
+      await settle(fixture);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      await settle(fixture);
+    };
 
     beforeAll(() => {
       // jsdom has no Element.scrollTo, which the viewport calls.
@@ -390,6 +415,8 @@ describe('UiListboxController', () => {
     afterAll(() => {
       delete (Element.prototype as Partial<Element>).scrollTo;
     });
+
+    afterEach(() => vi.restoreAllMocks());
 
     it('renders the items and moves through them with the keyboard', async () => {
       host.items.set(fruits(3));
@@ -419,6 +446,241 @@ describe('UiListboxController', () => {
       await press('Enter');
       expect(host.value()).toEqual(['f500']);
       scroll.mockRestore();
+    });
+
+    describe('below the virtual threshold', () => {
+      const SHORT: UiOptionItem<string>[] = [
+        { value: 'dana', label: 'Dana', description: 'Coordinator' },
+        { value: 'david', label: 'David', disabled: true },
+        { value: 'yael', label: 'Yael' },
+      ];
+
+      beforeEach(async () => {
+        host.items.set(SHORT);
+        await settle(fixture);
+      });
+
+      it('renders the label, description and disabled state of every item', async () => {
+        control().click();
+        await settle(fixture);
+        expect(viewport()).toBeNull();
+        expect(
+          options().map((o) => (o.querySelector('.ui-option__label')!.textContent ?? '').trim()),
+        ).toEqual(['Dana', 'David', 'Yael']);
+        expect(options()[0].querySelector('.ui-option__description')!.textContent).toBe(
+          'Coordinator',
+        );
+        expect(options()[1].getAttribute('aria-disabled')).toBe('true');
+      });
+
+      it('moves past disabled items with the keyboard', async () => {
+        await press('ArrowDown');
+        await press('ArrowDown');
+        expect(activeOption()).toBe(options()[2]);
+        expect(activeOption()!.classList).toContain('ui-option--active');
+        expect(options()[0].classList).not.toContain('ui-option--active');
+      });
+
+      it('turns on the viewport at a lower virtualThreshold', async () => {
+        host.virtualThreshold.set(3);
+        await settle(fixture);
+        control().click();
+        await settle(fixture);
+        expect(viewport()).not.toBeNull();
+      });
+    });
+
+    describe('above the virtual threshold', () => {
+      beforeEach(async () => {
+        host.items.set(apartments(1000));
+        await settle(fixture);
+      });
+
+      it('renders only a window of the options in a viewport', async () => {
+        control().click();
+        await frame();
+        expect(viewport()).not.toBeNull();
+        expect(options().length).toBeGreaterThan(0);
+        expect(options().length).toBeLessThan(100);
+        // Assistive technologies get the position in the whole list.
+        expect(options()[0].getAttribute('aria-setsize')).toBe('1000');
+        expect(options()[0].getAttribute('aria-posinset')).toBe('1');
+      });
+
+      it('points aria-activedescendant at a rendered option', async () => {
+        keydown(control(), 'ArrowDown');
+        await frame();
+        expect(activeOption()).toBe(options()[0]);
+        expect(activeOption()!.classList).toContain('ui-option--active');
+      });
+
+      it('moves to options that are not rendered and selects them', async () => {
+        const scroll = vi.spyOn(CdkVirtualScrollViewport.prototype, 'scrollToOffset');
+        await press('ArrowDown');
+        await press('End');
+        expect(scroll).toHaveBeenCalled();
+        expect(scroll.mock.lastCall![0]).toBeGreaterThan(0);
+        // The last option is not rendered here (jsdom does not scroll), so nothing is active in the DOM.
+        expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+        await press('Enter');
+        // a1000 is disabled, like every tenth one.
+        expect(host.value()).toEqual(['a999']);
+      });
+
+      it('scrolls again once it has measured a taller option', async () => {
+        // Options with a description are taller than the default size of the viewport.
+        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
+          DOMRect.fromRect({ width: 200, height: 44 }),
+        );
+        // A laid-out viewport, as in the browser.
+        vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(300);
+        vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(100_000);
+        const scroll = vi.spyOn(CdkVirtualScrollViewport.prototype, 'scrollToOffset');
+        keydown(control(), 'End');
+        await frame();
+        await frame();
+        // a999 is the last enabled item, at index 998: its end meets the end of the 300px viewport.
+        expect(scroll.mock.lastCall![0]).toBe(999 * 44 - 300);
+      });
+
+      it('skips disabled items that are not rendered', async () => {
+        await press('ArrowDown');
+        for (let i = 0; i < 9; i++) keydown(control(), 'ArrowDown');
+        await press('Enter');
+        // Apartment 10 is disabled.
+        expect(host.value()).toEqual(['a11']);
+      });
+
+      it('opens at the selected item', async () => {
+        const scroll = vi.spyOn(CdkVirtualScrollViewport.prototype, 'scrollToOffset');
+        host.value.set(['a501']);
+        await settle(fixture);
+        control().click();
+        await settle(fixture);
+        expect(scroll).toHaveBeenCalled();
+        // The first arrow activates the selected item, the second moves on.
+        keydown(control(), 'ArrowDown');
+        keydown(control(), 'ArrowDown');
+        await press('Enter');
+        expect(host.value()).toEqual(['a501', 'a502']);
+      });
+
+      it('filters all items with the search, not only the rendered ones', async () => {
+        host.filterText.set('Apartment 99');
+        await settle(fixture);
+        keydown(control(), 'ArrowDown');
+        await frame();
+        // 99 and 990–999.
+        expect((options()[0].querySelector('.ui-option__label')!.textContent ?? '').trim()).toBe(
+          'Apartment 99',
+        );
+        expect(options()[0].getAttribute('aria-setsize')).toBe('11');
+        await press('Enter');
+        expect(host.value()).toEqual(['a99']);
+      });
+
+      it('jumps with typeahead to an option that is not rendered', async () => {
+        host.items.set([...apartments(999), { value: 'zion', label: 'Zion tower' }]);
+        await settle(fixture);
+        vi.useFakeTimers();
+        try {
+          keydown(control(), 'ArrowDown');
+          fixture.detectChanges();
+          keydown(control(), 'z');
+          vi.advanceTimersByTime(250);
+          fixture.detectChanges();
+        } finally {
+          vi.useRealTimers();
+        }
+        await press('Enter');
+        expect(host.value()).toEqual(['zion']);
+      });
+
+      it('moves a page up from an option that is not rendered', async () => {
+        await press('ArrowDown');
+        keydown(control(), 'End');
+        keydown(control(), 'PageUp');
+        await press('Enter');
+        // From a999 (a1000 is disabled) ten options up.
+        expect(host.value()).toEqual(['a989']);
+      });
+
+      it('marks only the active one of two items with the same value', async () => {
+        host.items.set([
+          { value: 'a1', label: 'Apartment 1' },
+          { value: 'a1', label: 'Apartment 1 (copy)' },
+          ...apartments(200).slice(1),
+        ]);
+        await settle(fixture);
+        await press('ArrowDown');
+        keydown(control(), 'ArrowDown');
+        await frame();
+        const active = options().filter((option) => option.classList.contains('ui-option--active'));
+        expect(active).toEqual([options()[1]]);
+        expect(control().getAttribute('aria-activedescendant')).toBe(options()[1].id);
+      });
+
+      it('keeps the active option when the items are replaced by copies', async () => {
+        await press('ArrowDown');
+        host.items.set(apartments(200).map((item) => ({ ...item })));
+        await settle(fixture);
+        await press('Enter');
+        expect(host.value()).toEqual(['a1']);
+      });
+
+      it('keeps the active option when the items are recomputed with the same values', async () => {
+        await press('ArrowDown');
+        keydown(control(), 'ArrowDown');
+        await frame();
+        host.items.set(apartments(1000).map((item) => ({ ...item })));
+        await frame();
+        await press('Enter');
+        expect(host.value()).toEqual(['a2']);
+      });
+
+      it('shows the new label and state of a kept option', async () => {
+        await press('ArrowDown');
+        keydown(control(), 'ArrowDown');
+        await frame();
+        host.items.set(
+          apartments(1000).map((item) =>
+            item.value === 'a2'
+              ? { ...item, label: 'Apartment 2 (sold)' }
+              : { ...item, disabled: true },
+          ),
+        );
+        await frame();
+        expect((activeOption()!.querySelector('.ui-option__label')!.textContent ?? '').trim()).toBe(
+          'Apartment 2 (sold)',
+        );
+        expect(options()[0].getAttribute('aria-disabled')).toBe('true');
+      });
+
+      it('keeps the active one of two items with the same value', async () => {
+        const items = (): UiOptionItem<string>[] => [
+          { value: 'a1', label: 'Apartment 1' },
+          { value: 'a1', label: 'Apartment 1 (copy)' },
+          ...apartments(200).slice(1),
+        ];
+        host.items.set(items());
+        await settle(fixture);
+        await press('ArrowDown');
+        keydown(control(), 'ArrowDown');
+        await frame();
+        host.items.set(items());
+        await frame();
+        expect(control().getAttribute('aria-activedescendant')).toBe(options()[1].id);
+      });
+
+      it('starts at the first option when the active value is gone', async () => {
+        await press('ArrowDown');
+        keydown(control(), 'ArrowDown');
+        await frame();
+        host.items.set(apartments(1000).filter((item) => item.value !== 'a2'));
+        await frame();
+        await press('Enter');
+        expect(host.value()).toEqual(['a1']);
+      });
     });
   });
 
