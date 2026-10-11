@@ -32,15 +32,15 @@
       aria-autocomplete="list"
       aria-haspopup="listbox"
       [id]="controlId()"
-      [value]="isOpen() ? query() : displayLabel()"
+      [value]="listbox.isOpen() ? query() : displayLabel()"
       [placeholder]="displayLabel() || placeholder()"
       [disabled]="isDisabled()"
       [readOnly]="readonly()"
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-readonly]="readonly() ? 'true' : null"
-      [attr.aria-expanded]="isOpen()"
-      [attr.aria-controls]="isOpen() ? panelId() : null"
-      [attr.aria-activedescendant]="isOpen() ? activeId() : null"
+      [attr.aria-expanded]="listbox.shown()"
+      [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
+      [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
       [attr.aria-required]="isRequired() ? 'true' : null"
       [attr.aria-invalid]="showError() ? 'true' : null"
       [attr.aria-describedby]="describedBy()"
@@ -60,9 +60,9 @@
       [attr.name]="name() || null"
       [attr.aria-label]="ariaLabel() || null"
       [attr.aria-readonly]="readonly() ? 'true' : null"
-      [attr.aria-expanded]="isOpen()"
-      [attr.aria-controls]="isOpen() ? panelId() : null"
-      [attr.aria-activedescendant]="isOpen() ? activeId() : null"
+      [attr.aria-expanded]="listbox.shown()"
+      [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
+      [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
       [attr.aria-required]="isRequired() ? 'true' : null"
       [attr.aria-invalid]="showError() ? 'true' : null"
       [attr.aria-describedby]="describedBy()"
@@ -96,97 +96,26 @@
   }
 </div>
 
-<ng-template
-  cdkConnectedOverlay
-  [cdkConnectedOverlayOrigin]="origin"
-  [cdkConnectedOverlayOpen]="isOpen()"
-  [cdkConnectedOverlayPositions]="positions"
-  [cdkConnectedOverlayMinWidth]="panelWidth()"
-  [cdkConnectedOverlayOffsetX]="panelOffsetX()"
-  (attach)="onAttach()"
-  (detach)="close()"
-  (overlayOutsideClick)="onOutsideClick($event)"
->
-  <!-- Options keep focus on the trigger: mousedown must not move it. -->
-  <!-- The --_option-* variables give the options the size of the select. -->
-  <div
-    role="listbox"
-    class="ui-select__panel"
-    [class.ui-select__panel--virtual]="items() && virtual()"
-    [style.--_option-padding]="'var(--ui-control-padding-inline-' + size() + ')'"
-    [style.--_option-font-size]="'var(--ui-control-font-size-' + size() + ')'"
-    [id]="panelId()"
+<ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
+  <ui-listbox
+    [size]="size()"
     [attr.aria-label]="ariaLabel() || null"
     [attr.aria-labelledby]="listLabelledBy()"
-    [attr.aria-multiselectable]="multiple || null"
-    [attr.aria-busy]="loading() ? 'true' : null"
-    (mousedown)="$event.preventDefault()"
-    cdkVirtualScrollingElement
   >
+    <!-- The row sticks over a virtual list. With items the option opens the set that their
+         aria-posinset continues. -->
     @if (showSelectAll()) {
-      <!-- The row sticks over a virtual list. With items the option opens the set that their
-           aria-posinset continues. -->
-      <div class="ui-select__all-row" role="none">
+      <div class="ui-select__all-row" role="none" uiListboxLeading>
         <ui-option
           #selectAllOption
           class="ui-select__all"
           [value]="selectAllValue"
-          [attr.aria-setsize]="items() ? visibleItems().length + 1 : null"
+          [attr.aria-setsize]="items() ? listbox.visibleItems().length + 1 : null"
           [attr.aria-posinset]="items() ? 1 : null"
           >{{ labels().selectAll }}</ui-option
         >
       </div>
     }
-    @if (items()) {
-      @if (virtual()) {
-        <!-- The listbox scrolls, so axe sees the combobox popup it is. -->
-        <cdk-virtual-scroll-viewport
-          [itemSize]="itemSize()"
-          [minBufferPx]="itemSize() * 5"
-          [maxBufferPx]="itemSize() * 10"
-        >
-          <ng-container
-            *cdkVirtualFor="let entry of visibleItems(); trackBy: trackEntry; let i = index"
-          >
-            <ng-container
-              *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
-            />
-          </ng-container>
-        </cdk-virtual-scroll-viewport>
-      } @else {
-        @for (entry of visibleItems(); track entry; let i = $index) {
-          <ng-container
-            *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
-          />
-        }
-      }
-    } @else {
-      <ng-content />
-    }
-    @if (loading()) {
-      <div class="ui-select__empty ui-select__loading">
-        <ui-spinner size="sm" decorative />
-        {{ labels().loading }}
-      </div>
-    } @else if (noResults()) {
-      <div class="ui-select__empty">{{ labels().noOptions }}</div>
-    }
-  </div>
-</ng-template>
-
-<!-- An option of `items`. The position counts the whole list: the viewport renders only a part. -->
-<ng-template #itemOptionTemplate let-entry let-index="index">
-  <ui-option
-    [uiItemEntry]="entry"
-    [value]="entry.item.value"
-    [label]="entry.item.label"
-    [disabled]="entry.isDisabled()"
-    [attr.aria-setsize]="visibleItems().length + (showSelectAll() ? 1 : 0)"
-    [attr.aria-posinset]="index + 1 + (showSelectAll() ? 1 : 0)"
-  >
-    {{ entry.item.label }}
-    @if (entry.item.description) {
-      <span uiOptionDescription>{{ entry.item.description }}</span>
-    }
-  </ui-option>
+    <ng-content />
+  </ui-listbox>
 </ng-template>

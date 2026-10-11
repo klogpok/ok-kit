@@ -1,19 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, forwardRef, model } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { NgTemplateOutlet } from '@angular/common';
-import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
-import {
-  CdkFixedSizeVirtualScroll,
-  CdkVirtualForOf,
-  CdkVirtualScrollableElement,
-  CdkVirtualScrollViewport,
-} from '@angular/cdk/scrolling';
-import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { UI_FORM_FIELD_CONTROL, ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
-import { UiOption, ɵUiItemOption as UiItemOption } from '@vplans/ui-kit/listbox';
-import { provideUiOptionParent } from './option';
+import {
+  UiOption,
+  type ɵUiListbox as UiListbox,
+  ɵUiListboxPanel as UiListboxPanel,
+  ɵinjectListbox as injectListbox,
+  ɵprovideUiListbox as provideUiListbox,
+} from '@vplans/ui-kit/listbox';
 import { UiSelectBase } from './select-base';
 
 /**
@@ -38,46 +36,32 @@ import { UiSelectBase } from './select-base';
  */
 @Component({
   selector: 'ui-select',
-  imports: [
-    CdkConnectedOverlay,
-    CdkOverlayOrigin,
-    CdkFixedSizeVirtualScroll,
-    CdkVirtualForOf,
-    CdkVirtualScrollableElement,
-    CdkVirtualScrollViewport,
-    NgTemplateOutlet,
-    UiChip,
-    UiIcon,
-    UiItemOption,
-    UiOption,
-    UiSpinner,
-  ],
+  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListboxPanel, UiOption, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSelect) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSelect), multi: true },
-    provideUiOptionParent(),
+    provideUiListbox(),
   ],
   host: { class: 'ui-select' },
 })
 export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
   readonly value = model<T | null>(null);
-  readonly multiple = false;
 
-  protected readonly displayLabel = computed(() => this.labelFor(this.value()));
+  protected readonly listbox: UiListbox<T> = injectListbox<T>({
+    ...this.listboxConfig(),
+    isSelected: (value) => this.listbox.matches(value, this.value()),
+    select: (value) => {
+      this.value.set(value as T);
+      this.notifyChange(value as T);
+      this.close();
+    },
+  });
+
+  protected readonly displayLabel = computed(() => this.listbox.labelFor(this.value()));
   protected readonly hasValue = computed(() => this.value() !== null);
-
-  protected isSelected(value: unknown): boolean {
-    return this.matches(value, this.value());
-  }
-
-  protected selectOption(value: unknown): void {
-    this.value.set(value as T);
-    this.notifyChange(value as T);
-    this.close();
-  }
 
   protected clearValue(): void {
     this.value.set(null);

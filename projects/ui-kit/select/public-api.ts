@@ -1,9 +1,8 @@
 export { UiOption, UiOptionGroup, type UiOptionItem } from '@vplans/ui-kit/listbox';
 export * from './select';
 export * from './multi-select';
-// Internal: shared with other entry points of the kit (`ui-autocomplete`, `ui-time-input`) until
-// they use the listbox controller of `@vplans/ui-kit/listbox`. Not a public API.
-export { UiOptionPanel as ɵUiOptionPanel } from './option-panel';
+// Internal: `ui-time-input` until it uses the listbox controller of `@vplans/ui-kit/listbox`
+// (ticket 06 of the popup listbox removes these). Not a public API.
 export {
   UiOptionParent as ɵUiOptionParent,
   provideUiOptionParent as ɵprovideUiOptionParent,

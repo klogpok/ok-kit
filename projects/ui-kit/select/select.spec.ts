@@ -693,7 +693,7 @@ describe('UiSelect clearable, loading and option slots', () => {
     control().click();
     await settle(fixture);
     expect(listbox()?.getAttribute('aria-busy')).toBe('true');
-    expect(listbox()?.querySelector('.ui-select__loading')?.textContent?.trim()).toBe('Loading');
+    expect(listbox()?.querySelector('.ui-listbox__loading')?.textContent?.trim()).toBe('Loading');
   });
 
   it('renders the icon and the description of an option', async () => {

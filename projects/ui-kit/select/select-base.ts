@@ -1,33 +1,45 @@
 import {
   Directive,
+  ElementRef,
   Signal,
+  WritableSignal,
   booleanAttribute,
   computed,
+  contentChildren,
   effect,
+  inject,
   input,
+  numberAttribute,
   output,
   signal,
   viewChild,
   viewChildren,
 } from '@angular/core';
+import { _IdGenerator } from '@angular/cdk/a11y';
+import { UI_LABELS, UiFormControlBase, UiFormFieldControl, UiSize } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { uiIconChevronDown, uiIconX } from '@vplans/ui-kit/icon';
-import { UiOption } from '@vplans/ui-kit/listbox';
-import { UiOptionPanel } from './option-panel';
-
-/** Keys that navigate the list; in `searchable` mode all other keys edit the search text. */
-const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
+import {
+  UiOption,
+  type UiOptionItem,
+  type ɵUiListbox as UiListbox,
+  type ɵUiListboxConfig as UiListboxConfig,
+} from '@vplans/ui-kit/listbox';
 
 /**
- * Shared behavior of `ui-select` and `ui-multi-select`: the combobox trigger, keyboard handling
- * and search on top of the option panel. Internal.
- *
- * Subclasses declare the `value` model and decide what selecting an option does.
+ * Shared trigger of `ui-select` and `ui-multi-select`: the combobox button or search field,
+ * the chips, the clear button and the inputs of the list. The popup listbox is a controller
+ * that each subclass creates with `injectListbox({ ...this.listboxConfig(), ... })`, adding what
+ * selecting an option does. Internal.
  */
 @Directive({
   host: {
+    '[attr.id]': 'id()',
+    // The inner control carries the label and descriptions; static attributes stay on the host too.
+    '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
     '[class]': '"ui-select--" + size()',
-    '[class.ui-select--open]': 'isOpen()',
+    '[class.ui-select--open]': 'listbox.isOpen()',
     '[class.ui-select--disabled]': 'isDisabled()',
     '[class.ui-select--readonly]': 'readonly()',
     '[class.ui-select--invalid]': 'showError()',
@@ -35,7 +47,20 @@ const NAVIGATION_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
     '[class.ui-select--chips]': 'chipList().length > 0',
   },
 })
-export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
+export abstract class UiSelectBase<T, V>
+  extends UiFormControlBase<V>
+  implements UiFormFieldControl
+{
+  protected readonly labels = inject(UI_LABELS);
+
+  abstract readonly value: WritableSignal<V>;
+  /** The popup listbox; the subclass creates it with `injectListbox()`. */
+  protected abstract readonly listbox: UiListbox<T>;
+
+  readonly size = input<UiSize>('md');
+  /** Host id; the control gets `${id}-control`. */
+  readonly id = input(inject(_IdGenerator).getId('ui-select-'));
+  readonly ariaLabel = input('', { alias: 'aria-label' });
   readonly placeholder = input('');
   /** `name` of the trigger button. The search field of a `searchable` select has none. */
   readonly name = input('');
@@ -43,15 +68,54 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
   readonly searchable = input(false, { transform: booleanAttribute });
   /** Shows a button that clears the value while one is selected. */
   readonly clearable = input(false, { transform: booleanAttribute });
+  /**
+   * Options are loading (e.g. server-side search): a spinner is shown and the list is marked
+   * busy.
+   */
+  readonly loading = input(false, { transform: booleanAttribute });
+  /** Hide options whose label does not contain the search text. Turn off for server-side search. */
+  readonly filterOptions = input(true, { transform: booleanAttribute });
+  /**
+   * Compares an option value with a selected value, e.g. by id for objects. Called as
+   * `compareWith(option, selected)` and never with `null`: a `null` value matches only `null`.
+   */
+  readonly compareWith = input<(option: T, selected: T) => boolean>(Object.is);
+  /**
+   * Label of a selected value that is not among the options and was never shown in the list,
+   * e.g. an initial value before server-side search results arrive.
+   */
+  readonly displayWith = input<((value: T) => string) | null>(null);
+  /**
+   * The options as data, instead of projected `ui-option`s. Projected options are ignored while
+   * it is set (`[]` is an empty list).
+   */
+  readonly items = input<readonly UiOptionItem<T>[] | null>(null);
+  /**
+   * From this many `items` on, the list renders only the options in view (a virtual scroll
+   * viewport). The options must then all have the same height.
+   */
+  readonly virtualThreshold = input(100, { transform: numberAttribute });
 
+  readonly opened = output();
+  readonly closed = output();
   /**
    * Emits the search text as the user types (`searchable` only), and `''` when the list closes
    * with a search, so server-side results can be reset.
    */
   readonly searchChange = output<string>();
 
+  readonly labelStrategy = 'for' as const;
+  readonly controlId = computed(() => `${this.id()}-control`);
+
+  /** The projected options. */
+  private readonly contentOptions = contentChildren<UiOption<T>>(UiOption, { descendants: true });
+  /** "Select all" of `ui-multi-select`; the keyboard reaches it before the app's options. */
+  private readonly leadingOptions = viewChildren<UiOption<T>>('selectAllOption');
+  protected readonly selectAllOption = viewChild<UiOption>('selectAllOption');
+  protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
+  private readonly chipViews = viewChildren(UiChip);
+
   protected readonly query = signal('');
-  protected readonly filterText = computed(() => (this.searchable() ? this.query() : ''));
   protected readonly chevron = uiIconChevronDown;
   protected readonly clearIcon = uiIconX;
 
@@ -67,11 +131,12 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
   /** The "select all" option of `ui-multi-select`. */
   protected readonly showSelectAll: Signal<boolean> = computed(() => false);
   protected readonly selectAllValue: unknown = null;
-  private readonly chipViews = viewChildren(UiChip);
-  protected readonly selectAllOption = viewChild<UiOption>('selectAllOption');
 
   protected readonly showClear = computed(
     () => this.clearable() && this.hasValue() && !this.isDisabled() && !this.readonly(),
+  );
+  protected readonly listLabelledBy = computed(() =>
+    this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
   );
 
   /** Sets the empty value (`null` or `[]`) and reports it to the form. */
@@ -85,13 +150,44 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
     });
   }
 
-  override close(): void {
-    if (!this.isOpen()) return;
-    if (this.query()) {
-      this.query.set('');
-      this.searchChange.emit('');
-    }
-    super.close();
+  /** What `ui-select` and `ui-multi-select` give their listbox alike. */
+  protected listboxConfig(): Omit<UiListboxConfig<T>, 'isSelected' | 'select'> {
+    return {
+      mode: () => (this.searchable() ? 'searchable' : 'trigger'),
+      id: this.id,
+      contentOptions: this.contentOptions,
+      leadingOptions: this.leadingOptions,
+      items: this.items,
+      filterText: () => (this.searchable() ? this.query() : ''),
+      filterOptions: this.filterOptions,
+      compareWith: this.compareWith,
+      displayWith: this.displayWith,
+      virtualThreshold: this.virtualThreshold,
+      loading: this.loading,
+      locked: () => this.readonly() || this.isDisabled(),
+      opened: () => this.opened.emit(),
+      closed: () => {
+        // The search starts over next time; server-side results go back to the full list.
+        if (this.query()) {
+          this.query.set('');
+          this.searchChange.emit('');
+        }
+        this.closed.emit();
+      },
+    };
+  }
+
+  focus(options?: FocusOptions): void {
+    this.control().nativeElement.focus(options);
+  }
+
+  /** Opens the list at the selected option, else at the first one. */
+  open(): void {
+    this.listbox.open();
+  }
+
+  close(): void {
+    this.listbox.close();
   }
 
   // --- Template handlers ----------------------------------------------------------------
@@ -99,8 +195,8 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
   protected toggle(event: MouseEvent): void {
     // Clicks in the search text keep the list open; the chevron always toggles it.
     const onChevron = !!(event.target as Element).closest('.ui-select__chevron');
-    if (this.isOpen() && (!this.searchable() || onChevron)) this.close();
-    else this.openList(false);
+    if (this.listbox.isOpen() && (!this.searchable() || onChevron)) this.close();
+    else this.listbox.open({ activate: false });
     this.focus();
   }
 
@@ -132,61 +228,11 @@ export abstract class UiSelectBase<T, V> extends UiOptionPanel<T, V> {
     const text = (event.target as HTMLInputElement).value;
     this.query.set(text);
     this.searchChange.emit(text);
-    this.open();
-    this.keyManager.setFirstItemActive();
+    this.listbox.open();
+    this.listbox.activateFirst();
   }
 
   protected onKeydown(event: KeyboardEvent): void {
-    const { key } = event;
-    const searchable = this.searchable();
-
-    if (!this.isOpen()) {
-      const opens =
-        key === 'ArrowDown' || key === 'ArrowUp' || key === 'Enter' || (key === ' ' && !searchable);
-      if (opens) {
-        event.preventDefault();
-        this.open();
-      } else if (key === 'Home' || key === 'End') {
-        // APG: open the list at the first or last option.
-        event.preventDefault();
-        this.open();
-        if (key === 'Home') this.keyManager.setFirstItemActive();
-        else this.keyManager.setLastItemActive();
-      } else if (!searchable && key.length === 1 && !event.ctrlKey && !event.metaKey) {
-        // Typeahead on a closed select opens it at the matching option.
-        this.open();
-        this.keyManager.onKeydown(event);
-      }
-      return;
-    }
-
-    if (key === 'Escape') {
-      // Close only the list, not a surrounding dialog.
-      event.preventDefault();
-      event.stopPropagation();
-      this.close();
-    } else if (key === 'Enter' || (key === ' ' && !searchable)) {
-      // Also stops the button from turning Space into a click.
-      event.preventDefault();
-      if (key === ' ' && this.keyManager.isTyping()) {
-        this.keyManager.onKeydown(event);
-        return;
-      }
-      this.selectActive();
-    } else if (key === 'ArrowUp' && event.altKey) {
-      event.preventDefault();
-      this.close();
-    } else if (key === 'Tab') {
-      this.close();
-    } else if ((key === 'ArrowDown' || key === 'ArrowUp') && !this.keyManager.activeItem) {
-      // A list opened with a click has no active option: start at the selected one, else at the
-      // end the key points to (the key manager would not move up from no option).
-      event.preventDefault();
-      if (this.activateResting()) return;
-      if (key === 'ArrowDown') this.keyManager.setFirstItemActive();
-      else this.keyManager.setLastItemActive();
-    } else if (!searchable || NAVIGATION_KEYS.has(key)) {
-      this.keyManager.onKeydown(event);
-    }
+    this.listbox.handleKeydown(event);
   }
 }

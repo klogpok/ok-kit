@@ -3,6 +3,24 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (popup listbox)
+
+### Changed
+
+- **select, autocomplete:** the popup list is the `ui-listbox` element of the new internal entry
+  point `@vplans/ui-kit/listbox` instead of a `div.ui-select__panel`. The internal classes
+  `ui-select__panel`, `ui-select__panel--virtual`, `ui-select__empty` and `ui-select__loading`
+  become `ui-listbox`, `ui-listbox--virtual`, `ui-listbox__empty` and `ui-listbox__loading`;
+  the `--ui-select-panel-*` tokens stay. Nothing outside the kit used these classes, and the
+  harnesses do not read them. `ui-time-input` keeps the old panel class until it moves to the
+  listbox.
+- **select:** the internal export `ɵUiOptionPanel` is removed (`ɵUiItemOption` moved to
+  `@vplans/ui-kit/listbox`): `ui-select`, `ui-multi-select` and `ui-autocomplete` no longer
+  extend a shared option panel; they extend `UiFormControlBase` and create the listbox
+  controller. `UiOption`, `UiOptionGroup` and `UiOptionItem` are still exported from
+  `@vplans/ui-kit/select`. `ɵUiOptionParent` and `ɵprovideUiOptionParent` stay only for
+  `ui-time-input`.
+
 ## Unreleased (chip appearance)
 
 ### Breaking
