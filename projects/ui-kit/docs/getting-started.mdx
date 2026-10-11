@@ -1,4 +1,6 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from '../button/button.stories';
+import * as FormFieldStories from '../form-field/form-field.stories';
 
 <Meta title="Docs/Getting started" />
 
@@ -31,13 +33,10 @@ The app needs the peer dependencies of `projects/ui-kit/package.json` (`@angular
 ## 3. Add the font and the global stylesheet
 
 The kit uses the font stack `Assistant, Roboto, "Helvetica Neue", sans-serif`. Assistant covers
-Hebrew and Latin. If the app does not load the font already, add it together with the global
+Hebrew and Latin. `@fontsource/assistant` is already a dependency of the workspace (root
+`package.json`), so there is nothing to install: add its weights together with the global
 stylesheet (tokens, document defaults, typography) to the app's build options in `angular.json`.
 `includePaths` lets app SCSS use the mixins with `@use 'ui-kit/styles' as ui`.
-
-```bash
-pnpm add @fontsource/assistant
-```
 
 ```jsonc
 "styles": [
@@ -56,7 +55,8 @@ If you only need the CSS variables and not the document defaults, use
 
 ## 4. Register icons and the theme
 
-Register the icons you use and (optionally) configure the theme:
+Register the icons you use and apply the stored theme mode at startup. The theme options, the
+no-flash script and token overrides are on the [Theming](?path=/docs/docs-theming--docs) page.
 
 ```ts
 import { provideUiIcons, uiIconCheck, uiIconX, uiIconSearch } from '@vplans/ui-kit/icon';
@@ -65,7 +65,7 @@ import { provideUiTheme } from '@vplans/ui-kit/theme';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideUiIcons([uiIconCheck, uiIconX, uiIconSearch]),
-    provideUiTheme({ defaultMode: 'system', storageKey: 'app-theme' }),
+    provideUiTheme(),
   ],
 };
 ```
@@ -94,6 +94,12 @@ import { UiInput } from '@vplans/ui-kit/input';
 <a ui-button routerLink="/orders">Orders</a>
 <button ui-icon-button label="Close" (click)="close()"><ui-icon icon="x" /></button>
 ```
+
+The form field and the buttons, live (the toolbar switches theme, direction and density):
+
+<Canvas of={FormFieldStories.Default} />
+
+<Canvas of={ButtonStories.AllVariants} />
 
 With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
 A bare `checked` attribute is a compile error.

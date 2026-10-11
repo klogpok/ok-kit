@@ -41,14 +41,17 @@ once something injects `ThemeService`.
 
 ```ts
 export const appConfig: ApplicationConfig = {
-  providers: [provideUiTheme({ defaultMode: 'system', storageKey: 'app-theme' })],
+  providers: [provideUiTheme({ defaultMode: 'system', storageKey: 'ui-theme' })],
 };
 ```
+
+`storageKey` defaults to `'ui-theme'`; `null` turns persistence off.
 
 ### No flash on reload
 
 The app boots after the first paint, so a stored `dark` mode would flash light first. Apply it early
-with an inline script in `index.html` (use your `storageKey`):
+with an inline script in `index.html`. It must read the same key as `storageKey` (here the default
+`'ui-theme'`):
 
 ```html
 <script>

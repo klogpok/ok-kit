@@ -26,7 +26,8 @@ Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Direction
 
 Stylelint keeps the kit's styles logical: physical properties (`margin-left`, `padding-right`,
 `left`, `border-left`, ...) and physical `text-align`/`float` values (`left`, `right`) are
-rejected; use the `inline-start`/`inline-end` properties and `start`/`end` values. Follow the same rule in app styles that sit next to the kit.
+rejected; use the `inline-start`/`inline-end` properties and `start`/`end` values. Follow the same rule in app
+styles that sit next to the kit.
 
 In Storybook, **Direction** in the toolbar switches `dir` on the preview document.
 
@@ -35,10 +36,24 @@ In Storybook, **Direction** in the toolbar switches `dir` on the preview documen
 Select panels, menus, tooltips, popovers, dialogs and toasts render in CDK overlays. The CDK
 `Directionality` service reads the direction once, at startup; the kit's overlays instead read the
 closest `dir` attribute of their trigger **each time they open** (`resolveDirection`,
-`syncOverlayDirection` and `provideUiLiveDirectionality()` in `@vplans/ui-kit/core`). Switching `dir` on `<html>` at runtime is enough,
-and an overlay opened inside a `dir="rtl"` container mirrors even on an LTR page. `dir="auto"` (an
-input with mixed Hebrew and English) is skipped, so its overlay takes the direction of the page
-around it.
+`syncOverlayDirection` and `provideUiLiveDirectionality()` in `@vplans/ui-kit/core`). Switching
+`dir` on `<html>` at runtime is enough, and an overlay opened inside a `dir="rtl"` container
+mirrors even on an LTR page. `dir="auto"` (an input with mixed Hebrew and English) is skipped, so
+its overlay takes the direction of the page around it.
+
+Dialogs, drawers and toasts have no trigger: they take the direction around the focused element
+(for example an app root with `dir`). A dialog's `direction` option fixes it instead.
+
+### Drawer sides and toast position mirror
+
+Drawer sides and toast positions are logical, so they swap sides with the direction:
+
+- **Drawer** (`dialog.openDrawer(Component, { position })`): `end`, the default, is the right side
+  in LTR and the left side in RTL; `start` is the left side in LTR and the right side in RTL. On
+  phones the drawer takes the full width either way.
+- **Toast** (`provideUiToast({ position })`): the default `bottom-end` is the bottom right corner
+  in LTR and the bottom left corner in RTL; `top-start` and `bottom-start` take the opposite
+  corner. `top-center` and `bottom-center` do not move.
 
 The examples below are inside a `dir="rtl"` container. Open them: the panel aligns to the
 trigger's inline-start edge (the right one) and "start" and "end" placements mirror.
