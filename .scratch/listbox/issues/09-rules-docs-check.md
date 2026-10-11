@@ -23,6 +23,19 @@ modes without axe violations, no visual changes, ngc clean, no budget warnings. 
 the Storybook manager: lists aligned to the field with its width in light/dark RTL and LTR,
 toggle and outside clicks close, the range picker fits at 360 px. Review questions: tickets 10–14.
 
+**2026-10-11 - code review fixes.** ArrowDown/ArrowUp on a locked field no longer leave an active
+option on the closed list (test first); `reveal()` injects `DOCUMENT`; the dropdown panel JSDoc
+says the CDK has already detached it after Escape; the CHANGELOG says select and multi-select keep
+`UiSelectBase`; `listbox/public-api.ts` exports only what other entry points import. Renamed: the
+`ui-listbox` component is `UiListbox` (`listbox.ts`, `listbox.scss`), the controller
+`UiListboxController` (`listbox-controller.ts`). The item tests of the listbox moved from
+`select/option-items.spec.ts` to `listbox/listbox.spec.ts` (the rest is
+`select/select-items.spec.ts`). The controller labels the listbox and `fieldListboxConfig()` gives
+the shared `ariaLabel`, `locked` and `opened` / `closed`, replacing three copies of
+`listLabelledBy`; the config reading rule is documented; `activateEnd` takes the arrow key union;
+time-input passes `id: this.id` and gives the product reason for rendering every slot. 968 unit
+tests, lint, format, `ng build`, visual select/autocomplete/time-input with no changes.
+
 ## Русский перевод
 
 # 09: правила, документация и проверка
@@ -50,3 +63,17 @@ core. Полная проверка зелёная: 967 unit-тестов, cover
 бюджетах нет. Браузер в Storybook manager: списки выровнены по полю и равны ему по ширине в
 light/dark RTL и LTR, клик по toggle и снаружи закрывает, range picker помещается в 360 px.
 Вопросы на ревью: тикеты 10–14.
+
+**2026-10-11 — исправления по code review.** ArrowDown/ArrowUp в заблокированном поле больше не
+оставляют active option в закрытом списке (сначала тест); `reveal()` берёт `DOCUMENT` через
+inject; JSDoc dropdown panel говорит, что после Escape CDK уже отсоединил панель; CHANGELOG
+говорит, что select и multi-select остаются на `UiSelectBase`; `listbox/public-api.ts`
+экспортирует только то, что импортируют другие entry points. Переименовано: компонент
+`ui-listbox` — `UiListbox` (`listbox.ts`, `listbox.scss`), контроллер — `UiListboxController`
+(`listbox-controller.ts`). Тесты items listbox перенесены из `select/option-items.spec.ts` в
+`listbox/listbox.spec.ts` (остальное — `select/select-items.spec.ts`). Контроллер сам задаёт
+подпись listbox, а `fieldListboxConfig()` даёт общие `ariaLabel`, `locked` и `opened` / `closed`
+вместо трёх копий `listLabelledBy`; правило чтения config описано; `activateEnd` принимает union
+клавиш-стрелок; time-input передаёт `id: this.id` и объясняет продуктовую причину отрисовки всех
+слотов. 968 unit-тестов, lint, format, `ng build`, visual select/autocomplete/time-input без
+изменений.
