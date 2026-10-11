@@ -9,6 +9,15 @@
   color: var(--ui-color-text);
 }
 
+// The docs prose is English: it stays LTR under the RTL toolbar, while the canvases follow it.
+.sbdocs.sbdocs-wrapper {
+  direction: ltr;
+}
+
+[dir='rtl'] .docs-story {
+  direction: rtl;
+}
+
 .sbdocs.sbdocs-wrapper {
   :is(h1, h2, h3, h4, h5, h6, p, li, strong, em, blockquote, th, td):not(.docs-story *) {
     color: inherit;
