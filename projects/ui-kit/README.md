@@ -14,6 +14,8 @@ The consumer guides are MDX pages in the **Docs** section at the top of the Stor
   theme, import from the entry points and build a first screen.
 - **Theming** — token layers, light and dark (`data-theme`, `ThemeService`, `provideUiTheme`, the
   no-flash script), overriding tokens with theme scopes, mixins and typography classes.
+- **RTL** — direction and logical properties, overlays that follow `dir`, built-in texts and i18n.
+- **Forms** — Reactive and template forms through `ControlValueAccessor`, form-field and errors.
 - **Tokens** — live token galleries, breakpoints, layout classes and density.
 - **Contributing** — a map of the [Contributing](#contributing) rules below.
 
@@ -23,15 +25,15 @@ and the contribution rules.
 ## Contents
 
 - [Actions](#actions)
-- [Forms](#forms)
-- [RTL](#rtl)
+- [Forms](#forms) (guide: Docs/Forms in Storybook)
+- [RTL](#rtl) (guide: Docs/RTL in Storybook)
 - [Overlays](#overlays)
 - [Feedback](#feedback)
 - [Data display](#data-display)
 - [Navigation](#navigation)
 - [Testing](#testing)
 - [Components](#components)
-- [Tokens](#tokens)
+- [Tokens](#tokens) (guide: Docs/Tokens in Storybook)
 - [Contributing](#contributing)
 
 ## Actions
@@ -60,70 +62,10 @@ instead of wrapping the button in an element with `uiTooltip`.
 
 ## Forms
 
-All form controls work with **Reactive Forms** and **template-driven forms** through
-`ControlValueAccessor`: bind them with `formControl`, `formControlName` or `ngModel`. Signal
-Forms is **not** supported — the kit targets Angular 20, where it does not exist.
-
-| Control                    | Value                  | How it registers                          |
-| -------------------------- | ---------------------- | ----------------------------------------- |
-| `input[ui-input]`          | the native value       | Angular's `DefaultValueAccessor`          |
-| `textarea[ui-textarea]`    | the native value       | Angular's `DefaultValueAccessor`          |
-| `ui-checkbox`, `ui-switch` | `checked`              | `NG_VALUE_ACCESSOR` (`UiCheckableBase`)   |
-| `ui-radio-group`           | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-select`                | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-multi-select`          | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-datepicker`            | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-date-range-picker`     | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-time-input`            | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-number-input`          | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-chip-input`            | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-autocomplete`          | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-file-upload`           | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-slider`                | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-range-slider`          | `value` (tuple)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-segmented`             | `value`                | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-button-toggle-group`   | `value` (array)        | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-| `ui-tree`                  | `value` (key or array) | `NG_VALUE_ACCESSOR` (`UiFormControlBase`) |
-
-Every control supports `disabled`, `readonly`, `required` and `aria-describedby`. `disabled` and
-`required` are also read from the bound control (`control.disable()`, `Validators.required`). A
-readonly control stays focusable and reports `aria-readonly`. A `required` checkbox or switch is
-invalid until checked.
-
-The model outputs (`valueChange`, `checkedChange`) also fire when a forms directive writes a value
-(`setValue()`, `reset()`), not only for user input. With a forms directive bound, react to the
-form (`valueChanges`) instead of these outputs.
-
-`ui-form-field` renders the label, hint and errors, and links them for you: `label[for]` (or
-`aria-labelledby` for groups), `aria-describedby`, `aria-invalid`, and `aria-required`. Errors show
-once the control is **invalid and touched** (a blur, or `markAllAsTouched()` / `submit()`).
-
-```html
-<!-- Project <ui-error>, or let your validators return string-valued errors / { message } -->
-<ui-form-field label="Email" hint="We never share it">
-  <input ui-input type="email" formControlName="email" />
-</ui-form-field>
-
-<ui-form-field label="Username">
-  <input ui-input formControlName="username" />
-  @if (username.hasError('required')) {
-  <ui-error>Username is required</ui-error>
-  }
-</ui-form-field>
-
-<ui-form-field label="Delivery">
-  <ui-radio-group formControlName="delivery">
-    <ui-radio value="pickup">Pickup</ui-radio>
-    <ui-radio value="courier">Courier</ui-radio>
-  </ui-radio-group>
-</ui-form-field>
-```
-
-Without a forms directive, use the `invalid` input to show the error state manually.
-
-`ui-select`, `ui-multi-select` and `ui-radio-group` take `compareWith` for object values, e.g.
-`(option: City, selected: City) => option.id === selected.id`. It is called as
-`compareWith(option, selected)` and never with `null`; a `null` value matches only `null`.
+How controls plug into Reactive and template forms (`ControlValueAccessor`, the control table,
+`disabled`/`readonly`/`required`, `valueChange` vs `valueChanges`, `ui-form-field` and errors,
+validator messages, `compareWith`) is on the **Docs/Forms** page in Storybook. This section is
+the per-control reference.
 
 `ui-datepicker` sets `null` for typed text that is not an allowed date and, once the user leaves
 the field, shows the `invalidDate` label. That message is the field's own: it never becomes an
@@ -341,44 +283,13 @@ Affixes are meant for `input[ui-input]`, `textarea[ui-textarea]` and `ui-number-
 
 ## RTL
 
-Components use only logical properties (`margin-inline-start`, `inset-inline-end`, ...).
-Set `dir="rtl"` on `<html>` (or any container) and everything mirrors. Directional icons flip with
-`<ui-icon icon="arrow-right" flipRtl />`.
-
-### Built-in texts and i18n
-
-Built-in texts (close buttons, confirm dialogs, empty lists, the spinner name) default to Hebrew
-(`UI_LABELS_HE`). Keys you do not set keep the Hebrew default. `provideUiLabels()` accepts fixed
-values, a signal, or a factory, so it works with any i18n library:
-
-```ts
-import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
-
-// English app
-provideUiLabels(UI_LABELS_EN);
-
-// @angular/localize (build-time translation)
-provideUiLabels({ close: $localize`:@@ui.close:Close`, cancel: $localize`:@@ui.cancel:Cancel` });
-
-// Transloco or ngx-translate (runtime switch): the factory runs in an injection context,
-// and the kit follows the signal when the language changes.
-provideUiLabels(() =>
-  toSignal(inject(TranslocoService).selectTranslateObject('uiKit'), { initialValue: {} }),
-);
-```
-
-Texts with numbers are functions, e.g. `pageLabel: (page) => ...` and
-`pageRange: (start, end, length) => ...` for `ui-pagination`. When the source only gives strings,
-build them in the factory.
-
-Texts that belong to a specific use (a button label, a tooltip, a dialog title) are plain inputs:
-translate them in your templates as usual.
+Direction, logical properties, `flipRtl`, how overlays follow `dir` and the built-in texts
+(`UI_LABELS_HE`, `provideUiLabels()`) are on the **Docs/RTL** page in Storybook.
 
 ## Overlays
 
 Select panels, tooltips, dialogs and toasts render in CDK overlays, which use the browser top layer
-(Popover API). They read the text direction when they open, so switching `dir` on `<html>` at
-runtime is enough.
+(Popover API). How they follow the text direction is on the **Docs/RTL** page.
 
 ```ts
 // Dialog: focus trap, Escape/backdrop close and focus restore come from CDK Dialog.
