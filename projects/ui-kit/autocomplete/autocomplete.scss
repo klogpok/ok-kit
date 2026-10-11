@@ -1,5 +1,4 @@
 @use '../styles/mixins';
-@use '../select/panel';
 
 // The field shares the input tokens, so it looks like a text input in a form.
 
@@ -95,8 +94,6 @@
   color: var(--ui-color-text-disabled);
   cursor: not-allowed;
 }
-
-@include panel.styles;
 
 @media (forced-colors: active) {
   :host(.ui-autocomplete--invalid) .ui-autocomplete__field {

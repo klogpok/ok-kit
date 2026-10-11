@@ -1,28 +1,38 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  booleanAttribute,
   computed,
+  contentChildren,
   forwardRef,
   inject,
   input,
   linkedSignal,
   model,
+  numberAttribute,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { _IdGenerator } from '@angular/cdk/a11y';
-import { NgTemplateOutlet } from '@angular/common';
-import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
-  CdkFixedSizeVirtualScroll,
-  CdkVirtualForOf,
-  CdkVirtualScrollableElement,
-  CdkVirtualScrollViewport,
-} from '@angular/cdk/scrolling';
-import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
-import { UiOption, ɵUiItemOption } from '@vplans/ui-kit/listbox';
-import { ɵUiOptionPanel, ɵprovideUiOptionParent } from '@vplans/ui-kit/select';
+  UI_FORM_FIELD_CONTROL,
+  UiFormControlBase,
+  UiFormFieldControl,
+  UiSize,
+  ɵUiDropdownPanel as UiDropdownPanel,
+} from '@vplans/ui-kit/core';
+import {
+  UiOption,
+  type ɵUiListbox as UiListbox,
+  type UiOptionItem,
+  ɵUiListboxPanel as UiListboxPanel,
+  ɵinjectListbox as injectListbox,
+  ɵprovideUiListbox as provideUiListbox,
+} from '@vplans/ui-kit/listbox';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 
 /**
@@ -58,18 +68,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
  */
 @Component({
   selector: 'ui-autocomplete',
-  imports: [
-    CdkConnectedOverlay,
-    CdkOverlayOrigin,
-    CdkFixedSizeVirtualScroll,
-    CdkVirtualForOf,
-    CdkVirtualScrollableElement,
-    CdkVirtualScrollViewport,
-    NgTemplateOutlet,
-    UiOption,
-    UiSpinner,
-    ɵUiItemOption,
-  ],
+  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListboxPanel, UiSpinner],
   template: `
     <div class="ui-autocomplete__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
       <input
@@ -88,9 +87,9 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
         [attr.name]="name() || null"
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-readonly]="readonly() ? 'true' : null"
-        [attr.aria-expanded]="panelShown()"
-        [attr.aria-controls]="panelShown() ? panelId() : null"
-        [attr.aria-activedescendant]="panelShown() ? activeId() : null"
+        [attr.aria-expanded]="listbox.shown()"
+        [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
+        [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
         [attr.aria-required]="isRequired() ? 'true' : null"
         [attr.aria-invalid]="showError() ? 'true' : null"
         [attr.aria-describedby]="describedBy()"
@@ -104,83 +103,14 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
       }
     </div>
 
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="origin"
-      [cdkConnectedOverlayOpen]="panelShown()"
-      [cdkConnectedOverlayPositions]="positions"
-      [cdkConnectedOverlayOffsetX]="panelOffsetX()"
-      [cdkConnectedOverlayMinWidth]="panelWidth()"
-      (attach)="onAttach()"
-      (detach)="close()"
-      (overlayOutsideClick)="onOutsideClick($event)"
-    >
-      <!-- Options keep focus in the field: mousedown must not move it. -->
-      <div
-        role="listbox"
-        class="ui-select__panel"
-        [class.ui-select__panel--virtual]="items() && virtual()"
-        [style.--_option-padding]="'var(--ui-control-padding-inline-' + size() + ')'"
-        [style.--_option-font-size]="'var(--ui-control-font-size-' + size() + ')'"
-        [id]="panelId()"
+    <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
+      <ui-listbox
+        [size]="size()"
         [attr.aria-label]="ariaLabel() || null"
         [attr.aria-labelledby]="listLabelledBy()"
-        [attr.aria-busy]="loading() ? 'true' : null"
-        (mousedown)="$event.preventDefault()"
-        cdkVirtualScrollingElement
       >
-        @if (items()) {
-          @if (virtual()) {
-            <!-- The listbox scrolls, so axe sees the combobox popup it is. -->
-            <cdk-virtual-scroll-viewport
-              [itemSize]="itemSize()"
-              [minBufferPx]="itemSize() * 5"
-              [maxBufferPx]="itemSize() * 10"
-            >
-              <ng-container
-                *cdkVirtualFor="let entry of visibleItems(); trackBy: trackEntry; let i = index"
-              >
-                <ng-container
-                  *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
-                />
-              </ng-container>
-            </cdk-virtual-scroll-viewport>
-          } @else {
-            @for (entry of visibleItems(); track entry; let i = $index) {
-              <ng-container
-                *ngTemplateOutlet="itemOptionTemplate; context: { $implicit: entry, index: i }"
-              />
-            }
-          }
-        } @else {
-          <ng-content />
-        }
-        @if (loading()) {
-          <div class="ui-select__empty ui-select__loading">
-            <ui-spinner size="sm" decorative />
-            {{ labels().loading }}
-          </div>
-        } @else if (noResults()) {
-          <div class="ui-select__empty">{{ labels().noOptions }}</div>
-        }
-      </div>
-    </ng-template>
-
-    <!-- An option of items. The position counts the whole list: the viewport renders only a part. -->
-    <ng-template #itemOptionTemplate let-entry let-index="index">
-      <ui-option
-        [uiItemEntry]="entry"
-        [value]="entry.item.value"
-        [label]="entry.item.label"
-        [disabled]="entry.isDisabled()"
-        [attr.aria-setsize]="visibleItems().length"
-        [attr.aria-posinset]="index + 1"
-      >
-        {{ entry.item.label }}
-        @if (entry.item.description) {
-          <span uiOptionDescription>{{ entry.item.description }}</span>
-        }
-      </ui-option>
+        <ng-content />
+      </ui-listbox>
     </ng-template>
   `,
   styleUrl: './autocomplete.scss',
@@ -188,61 +118,129 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiAutocomplete) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiAutocomplete), multi: true },
-    ɵprovideUiOptionParent(),
+    provideUiListbox(),
   ],
   host: {
     class: 'ui-autocomplete',
+    '[attr.id]': 'id()',
+    // The inner control carries the label and descriptions; static attributes stay on the host too.
+    '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
     '[class]': '"ui-autocomplete--" + size()',
     '[class.ui-autocomplete--disabled]': 'isDisabled()',
     '[class.ui-autocomplete--readonly]': 'readonly()',
     '[class.ui-autocomplete--invalid]': 'showError()',
   },
 })
-export class UiAutocomplete<T = string> extends ɵUiOptionPanel<T, T | string | null> {
+export class UiAutocomplete<T = string>
+  extends UiFormControlBase<T | string | null>
+  implements UiFormFieldControl
+{
   readonly value = model<T | string | null>(null);
-  readonly multiple = false;
 
-  override readonly id = input(inject(_IdGenerator).getId('ui-autocomplete-'));
+  readonly size = input<UiSize>('md');
+  /** Host id; the input gets `${id}-control`. */
+  readonly id = input(inject(_IdGenerator).getId('ui-autocomplete-'));
+  readonly ariaLabel = input('', { alias: 'aria-label' });
   readonly placeholder = input('');
   readonly name = input('');
+  /**
+   * Options are loading (e.g. server-side search): a spinner is shown and the list is marked
+   * busy.
+   */
+  readonly loading = input(false, { transform: booleanAttribute });
+  /** Hide options whose label does not contain the text. Turn off for server-side search. */
+  readonly filterOptions = input(true, { transform: booleanAttribute });
+  /**
+   * Compares an option value with the value, e.g. by id for objects. Called as
+   * `compareWith(option, selected)` and never with `null`.
+   */
+  readonly compareWith = input<(option: T, selected: T) => boolean>(Object.is);
+  /**
+   * Text of a picked value; setting it makes the field pick-only. Also the label of a value that
+   * is not among the options.
+   */
+  readonly displayWith = input<((value: T) => string) | null>(null);
+  /**
+   * The options as data, instead of projected `ui-option`s. Projected options are ignored while
+   * it is set (`[]` is an empty list).
+   */
+  readonly items = input<readonly UiOptionItem<T>[] | null>(null);
+  /**
+   * From this many `items` on, the list renders only the options in view (a virtual scroll
+   * viewport). The options must then all have the same height.
+   */
+  readonly virtualThreshold = input(100, { transform: numberAttribute });
 
+  readonly opened = output();
+  readonly closed = output();
   /** Emits the text as the user types, e.g. to load options from a server. */
   readonly searchChange = output<string>();
 
+  readonly labelStrategy = 'for' as const;
+  readonly controlId = computed(() => `${this.id()}-control`);
+
+  private readonly control = viewChild.required<ElementRef<HTMLInputElement>>('control');
+  /** The projected options. */
+  private readonly contentOptions = contentChildren<UiOption<T>>(UiOption, { descendants: true });
+
   /** Text typed since the last pick; it filters the options. */
   private readonly query = signal('');
-  protected readonly filterText = this.query.asReadonly();
   /** A value must be picked from the options: `displayWith` is set. */
   private readonly pickOnly = computed(() => this.displayWith() !== null);
 
+  /**
+   * The suggestions. The list shows while it has options, a message after a search in a
+   * pick-only field, or a spinner; no option is active until the user moves to one.
+   */
+  protected readonly listbox: UiListbox<T> = injectListbox<T>({
+    mode: () => 'freeText',
+    id: this.id,
+    contentOptions: this.contentOptions,
+    items: this.items,
+    filterText: this.query,
+    filterOptions: this.filterOptions,
+    compareWith: this.compareWith,
+    displayWith: this.displayWith,
+    virtualThreshold: this.virtualThreshold,
+    loading: this.loading,
+    locked: () => this.readonly() || this.isDisabled(),
+    showEmpty: () => this.pickOnly() && this.query().trim() !== '',
+    activateOnOpen: () => false,
+    isSelected: (value) => this.listbox.matches(value, this.value()),
+    select: (value) => this.pick(value as T),
+    opened: () => this.opened.emit(),
+    closed: () => this.closed.emit(),
+  });
+
   /** The text in the field. Follows the value, and holds the typed text in between. */
   protected readonly text = linkedSignal(() => this.displayText(this.value()));
-
-  /** The list is shown while it has options, a message after a search, or a spinner. */
-  protected readonly panelShown = computed(
-    () =>
-      this.isOpen() &&
-      (this.loading() || !this.noResults() || (this.pickOnly() && this.query().trim() !== '')),
+  protected readonly listLabelledBy = computed(() =>
+    this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
   );
 
-  protected override activateOnOpen(): boolean {
-    return false;
+  focus(options?: FocusOptions): void {
+    this.control().nativeElement.focus(options);
   }
 
-  protected isSelected(value: unknown): boolean {
-    return this.matches(value, this.value());
+  open(): void {
+    this.listbox.open();
   }
 
-  protected selectOption(value: unknown): void {
-    this.query.set('');
-    this.setValue(value as T);
-    this.text.set(this.displayText(value as T));
-    this.close();
+  close(): void {
+    this.listbox.close();
   }
 
   writeValue(value: T | string | null | undefined): void {
     this.query.set('');
     this.value.set(value ?? null);
+  }
+
+  private pick(value: T): void {
+    this.query.set('');
+    this.setValue(value);
+    this.text.set(this.displayText(value));
+    this.close();
   }
 
   protected onInput(event: Event): void {
@@ -253,47 +251,17 @@ export class UiAutocomplete<T = string> extends ɵUiOptionPanel<T, T | string | 
     else if (this.value() !== null) this.setValue(null);
     // After the value changed, so the typed text wins over the text of the value.
     this.text.set(text);
-    this.open();
-    this.keyManager.setActiveItem(-1);
+    this.listbox.open();
+    this.listbox.clearActive();
   }
 
   protected onKeydown(event: KeyboardEvent): void {
-    const { key } = event;
-    if (key === 'ArrowDown' || key === 'ArrowUp') {
+    if (this.listbox.handleKeydown(event)) return;
+    // Escape on a hidden list empties the field.
+    if (event.key === 'Escape' && this.text() && !this.readonly()) {
       event.preventDefault();
-      const wasOpen = this.isOpen();
-      if (event.altKey) {
-        // Alt+ArrowDown opens without moving, Alt+ArrowUp closes.
-        if (!wasOpen) this.open();
-        else if (key === 'ArrowUp') this.close();
-        return;
-      }
-      if (!wasOpen) this.open();
-      if (!wasOpen || !this.keyManager.activeItem) {
-        // Start at the end the key points to: the key manager would not move up from no option.
-        if (key === 'ArrowDown') this.keyManager.setFirstItemActive();
-        else this.keyManager.setLastItemActive();
-        return;
-      }
-      this.keyManager.onKeydown(event);
-    } else if ((key === 'PageDown' || key === 'PageUp') && this.isOpen()) {
-      this.keyManager.onKeydown(event);
-    } else if (key === 'Enter') {
-      // Without an active option, Enter submits the form as usual.
-      if (this.panelShown() && this.selectActive()) event.preventDefault();
-    } else if (key === 'Escape') {
-      if (this.panelShown()) {
-        // Close only the list, not a surrounding dialog.
-        event.preventDefault();
-        event.stopPropagation();
-        this.close();
-      } else if (this.text() && !this.readonly()) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.clear();
-      }
-    } else if (key === 'Tab') {
-      this.close();
+      event.stopPropagation();
+      this.clear();
     }
   }
 
@@ -317,7 +285,7 @@ export class UiAutocomplete<T = string> extends ɵUiOptionPanel<T, T | string | 
     if (value == null) return '';
     const displayWith = this.displayWith();
     if (displayWith) return displayWith(value as T);
-    return typeof value === 'string' ? value : this.labelFor(value);
+    return typeof value === 'string' ? value : this.listbox.labelFor(value);
   }
 
   private setValue(value: T | string | null): void {
