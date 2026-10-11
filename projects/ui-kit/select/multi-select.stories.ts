@@ -4,7 +4,7 @@ import { expect } from 'storybook/test';
 import { press, until } from '../.storybook/play';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiMultiSelect } from './multi-select';
-import { UiOption, UiOptionGroup } from './option';
+import { UiOption, UiOptionGroup } from '@vplans/ui-kit/listbox';
 
 type MultiSelectArgs = UiMultiSelect<string> & { label: string; hint: string };
 

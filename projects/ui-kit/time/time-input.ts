@@ -33,7 +33,8 @@ import {
   UI_DROPDOWN_POSITIONS,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
-import { UiOption, ɵUiOptionParent } from '@vplans/ui-kit/select';
+import { UiOption } from '@vplans/ui-kit/listbox';
+import { ɵUiOptionParent, ɵprovideUiOptionParent } from '@vplans/ui-kit/select';
 import {
   formatTime,
   maskTime,
@@ -154,7 +155,7 @@ interface Draft {
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiTimeInput) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiTimeInput), multi: true },
-    ɵUiOptionParent,
+    ɵprovideUiOptionParent(),
   ],
   host: {
     class: 'ui-time-input',

@@ -6,7 +6,7 @@ import { FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angu
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiSelectHarness } from '@vplans/ui-kit/testing';
-import { UiOption, UiOptionGroup } from './option';
+import { UiOption, UiOptionGroup } from '@vplans/ui-kit/listbox';
 import { UiSelect } from './select';
 
 // The CDK key managers read the legacy keyCode.

@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { UiMultiSelect } from './multi-select';
-import { UiOptionItem } from './option-items';
+import { UiOptionItem } from '@vplans/ui-kit/listbox';
 import { UiSelect } from './select';
 
 // The CDK key managers read the legacy keyCode.

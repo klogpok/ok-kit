@@ -21,7 +21,8 @@ import {
   CdkVirtualScrollViewport,
 } from '@angular/cdk/scrolling';
 import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
-import { UiOption, ɵUiItemOption, ɵUiOptionPanel, ɵUiOptionParent } from '@vplans/ui-kit/select';
+import { UiOption, ɵUiItemOption } from '@vplans/ui-kit/listbox';
+import { ɵUiOptionPanel, ɵprovideUiOptionParent } from '@vplans/ui-kit/select';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 
 /**
@@ -187,7 +188,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiAutocomplete) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiAutocomplete), multi: true },
-    ɵUiOptionParent,
+    ɵprovideUiOptionParent(),
   ],
   host: {
     class: 'ui-autocomplete',

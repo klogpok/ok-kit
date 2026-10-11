@@ -12,8 +12,8 @@ import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
-import { UiOption, UiOptionParent } from './option';
-import { UiItemOption } from './option-items';
+import { UiOption, ɵUiItemOption as UiItemOption } from '@vplans/ui-kit/listbox';
+import { provideUiOptionParent } from './option';
 import { UiSelectBase } from './select-base';
 
 /**
@@ -58,7 +58,7 @@ import { UiSelectBase } from './select-base';
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiSelect) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiSelect), multi: true },
-    UiOptionParent,
+    provideUiOptionParent(),
   ],
   host: { class: 'ui-select' },
 })

@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { uiIconChevronDown, uiIconX } from '@vplans/ui-kit/icon';
-import { UiOption } from './option';
+import { UiOption } from '@vplans/ui-kit/listbox';
 import { UiOptionPanel } from './option-panel';
 
 /** Keys that navigate the list; in `searchable` mode all other keys edit the search text. */

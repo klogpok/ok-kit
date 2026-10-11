@@ -21,8 +21,12 @@ import { UI_FORM_FIELD_CONTROL } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
-import { UiOption, UiOptionHandle, UiOptionParent } from './option';
-import { UiItemOption } from './option-items';
+import {
+  UiOption,
+  type ɵUiOptionHandle as UiOptionHandle,
+  ɵUiItemOption as UiItemOption,
+} from '@vplans/ui-kit/listbox';
+import { provideUiOptionParent } from './option';
 import { UiSelectBase } from './select-base';
 
 /** Value of the "select all" option; never part of the value. */
@@ -75,7 +79,7 @@ const SELECT_ALL = Symbol('ui-select-all');
   providers: [
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiMultiSelect) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiMultiSelect), multi: true },
-    UiOptionParent,
+    provideUiOptionParent(),
   ],
   host: { class: 'ui-select ui-multi-select' },
 })

@@ -4,7 +4,7 @@ import { press, until } from '../.storybook/play';
 import { UiAvatar } from '@vplans/ui-kit/avatar';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiIcon } from '@vplans/ui-kit/icon';
-import { UiOption, UiOptionGroup } from './option';
+import { UiOption, UiOptionGroup } from '@vplans/ui-kit/listbox';
 import { UiSelect } from './select';
 
 type SelectArgs = UiSelect<string> & { label: string; hint: string };

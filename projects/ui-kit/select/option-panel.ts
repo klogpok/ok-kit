@@ -34,8 +34,15 @@ import {
   syncOverlayDirection,
   UI_DROPDOWN_POSITIONS,
 } from '@vplans/ui-kit/core';
-import { UiOption, UiOptionHandle, UiOptionOwner, UiOptionParent } from './option';
-import { UiItemEntry, UiItemEntryOwner, UiItemOption, UiOptionItem } from './option-items';
+import {
+  UiOption,
+  type UiOptionItem,
+  type ɵUiOptionHandle as UiOptionHandle,
+  ɵUiItemEntry as UiItemEntry,
+  type ɵUiItemEntryOwner as UiItemEntryOwner,
+  ɵUiItemOption as UiItemOption,
+} from '@vplans/ui-kit/listbox';
+import { UiOptionOwner, UiOptionParent } from './option';
 
 /** An option of the list: a projected `ui-option` or an entry of `items`. Internal. */
 export interface UiListEntry<T> extends Highlightable, UiOptionHandle {
