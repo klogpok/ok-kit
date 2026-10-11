@@ -471,3 +471,19 @@ The deviations listed in the roadmap are accepted: each layout element sets its 
 
 - **Playground sections get one shared card style, and JSON blocks read left to right** (ticket 32):
   the fix is ticket 33.
+
+## Phase 9.4: harnesses (review questions answered 2026-10-11)
+
+Tickets 15–19 and 33 in `.scratch/phase-9/issues/`; the report is ticket 20 and the roadmap status.
+Review answers:
+
+- **Toast and dialog harnesses load through `documentRootLoader(fixture)`** (ticket 34); trigger
+  harnesses (menu, popover, tooltip) find their panel from the document root themselves.
+- **The API beyond the spec stays** (ticket 35): `UiAvatarGroupHarness`, `UiTabNavHarness` /
+  `UiTabLinkHarness`, `UiDatepickerHarness.clickToday()` / `clickClear()`,
+  `UiFormFieldHarness.getControl()` without a query, and the markup the harnesses need (trigger host
+  classes, panel ids with `aria-controls`, pagination arrow classes).
+- **Date pickers act on their own panel only** (ticket 36): the range picker got the same panel id and
+  scoped lookup as the datepicker (ticket 38).
+- **The table harness does not select Shift ranges** (ticket 37); documented, added when a screen test
+  needs it.

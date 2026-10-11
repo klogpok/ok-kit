@@ -283,7 +283,7 @@
 > - `UiPaginationHarness.getPageSize()` возвращает `null` без выбора размера страницы: на последней странице текст диапазона не равен размеру.
 > - Коммиты harnesses названы то `feat(testing)`, то `feat(<компонент>)`.
 >
-> Вопросы для решения: тикеты 34 (toast через `documentRootLoader`), 35 (API сверх спеки), 36 (harness date-range-picker ищет панель глобально), 37 (Shift-диапазон в harness таблицы).
+> Вопросы для решения: тикеты 34 (toast через `documentRootLoader`), 35 (API сверх спеки), 36 (harness date-range-picker ищет панель глобально), 37 (Shift-диапазон в harness таблицы). **Ответы (2026-10-11)** — в [DECISIONS.md](DECISIONS.md); тикет 36 исправлен тикетом 38.
 
 1. **Harnesses для всех компонентов** в `@vplans/ui-kit/testing` (включая компоненты фазы 6, сделанные до 6.0). Постепенно переводить наши спеки на них.
 2. **Токены breakpoints и density:**

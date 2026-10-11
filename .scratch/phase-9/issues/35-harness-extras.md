@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → 9.4
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** the 9.4 tickets added public API that the spec does not list:
 
@@ -16,13 +16,17 @@
 1. Keep all of it (recommended).
 2. Drop some of it: say which (for example `getControl()` without a query).
 
+## Answer
+
+Keep all of it. Recorded in docs/DECISIONS.md (2026-10-11).
+
 ## Русский перевод
 
 # 35: API harnesses сверх спеки
 
 **Спека:** [../spec.md](../spec.md) → 9.4
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** тикеты 9.4 добавили публичный API, которого нет в спеке:
 
@@ -35,3 +39,7 @@
 
 1. Оставить всё (рекомендую).
 2. Убрать часть: укажите, что именно (например, `getControl()` без запроса).
+
+## Ответ
+
+Оставить всё. Записано в docs/DECISIONS.md (2026-10-11).
