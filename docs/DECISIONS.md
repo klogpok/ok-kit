@@ -507,7 +507,7 @@ and its spec are closed. The visual baselines were re-taken after Edge moved fro
 
 Chosen in the architecture review; spec and tickets 01–09 in `.scratch/listbox/`, terms in
 `GLOSSARY.md` → "Dropdowns". Delivered 2026-10-11 (tickets 01–09); review questions are tickets
-10–14 in `.scratch/listbox/issues/`.
+10–14 in `.scratch/listbox/issues/`, answered in "Popup listbox: review answers" below.
 
 - **Two modules**: a dropdown panel in `core` (overlay lifecycle, direction and offset on open,
   outside click, optional focus return) for the date pickers and the listbox; a popup listbox on top
@@ -555,3 +555,23 @@ Delivered (what the implementation settled where the plan was silent):
   `select-harness.ts`; `isActive()` reads `aria-activedescendant`.
 - **Rules:** `overlays.md` and `forms.md` cover `listbox` and `time`; the direction and offset
   bullets point to `uiDropdownPanel`.
+
+## Popup listbox: review answers (decided 2026-10-11)
+
+Tickets 10–14 in `.scratch/listbox/issues/` and the code review. The work is approved.
+
+- **`UiSelectBase` stays** (ticket 10): `ui-select` and `ui-multi-select` keep their shared
+  abstract base between `UiFormControlBase` and the fields, because they share one template and
+  its inputs. Decision 6 of the plan holds for the option panel level only.
+- **A time-input with no slots shows the "no options" row** (ticket 11), like every popup listbox.
+- **ArrowUp without an active option goes to the last option in every field** (ticket 12),
+  time-input included; no per-field mode.
+- **The select, autocomplete and time harnesses expose `getActiveOption()`** (ticket 13): the
+  option named by the field's `aria-activedescendant`, or `null`; it delegates to the internal
+  listbox harness. `UiOptionHarness.isActive()` stays on `aria-activedescendant`.
+- **An open panel does not follow a live direction switch** (ticket 14): the direction, offset and
+  width are read when the panel opens.
+- **The names `injectListbox` / `provideUiListbox` stay** (code review).
+- **An internal entry point has no stories of its own** (code review): `listbox` is covered by
+  its consumers' stories and its own spec. The exception is in `projects/ui-kit/README.md` →
+  "Adding a component".

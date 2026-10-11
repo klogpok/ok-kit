@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → tickets 04, 06
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** when `minTime` is after `maxTime`, `ui-time-input` has no slots. Before ticket 06 the
 list then opened as an empty panel (a border with nothing inside). Now the field renders
@@ -20,13 +20,15 @@ covered the old empty panel.
 
 ## Comments
 
+- 2026-10-11: Answered by the user: option 1, keep the "no options" row. Recorded in `docs/DECISIONS.md` → "Popup listbox: review answers".
+
 ## Русский перевод
 
 # 11: time-input без слотов показывает «нет вариантов»
 
 **Спека:** [../spec.md](../spec.md) → тикеты 04, 06
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** когда `minTime` позже `maxTime`, у `ui-time-input` нет слотов. До тикета 06 список
 тогда открывался пустой панелью (рамка без содержимого). Теперь поле рендерит `ui-listbox`, который
@@ -43,3 +45,5 @@ covered the old empty panel.
 3. Вернуть пустую панель.
 
 ## Комментарии
+
+- 2026-10-11: Ответ пользователя: вариант 1, оставить строку «нет вариантов». Записано в `docs/DECISIONS.md` → «Popup listbox: review answers».

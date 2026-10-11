@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 11; ticket 08
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** ticket 08 put the select, autocomplete and time harnesses on one internal listbox
 harness (`testing/listbox-harness.ts`, not exported). Their public interface did not change, as
@@ -26,13 +26,15 @@ decision 11 asked. Two things are open:
 
 ## Comments
 
+- 2026-10-11: Answered by the user: option 1. `isActive()` stays on ARIA; `getActiveOption()` added to `UiSelectHarness`, `UiAutocompleteHarness` and `UiTimeInputHarness` (a spec each, delegating to the internal listbox harness), noted in the README harness table and the CHANGELOG: `feat(testing): getActiveOption on the select, autocomplete and time harnesses`. Recorded in `docs/DECISIONS.md` → "Popup listbox: review answers".
+
 ## Русский перевод
 
 # 13: активная опция в публичных harness'ах
 
 **Спека:** [../spec.md](../spec.md) → решение 11; тикет 08
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** тикет 08 поставил harness'ы select, autocomplete и time на один внутренний
 listbox-harness (`testing/listbox-harness.ts`, не экспортируется). Их публичный интерфейс не
@@ -56,3 +58,5 @@ listbox-harness (`testing/listbox-harness.ts`, не экспортируется
 3. Вернуть `isActive()` на класс, публичные harness'ы не трогать.
 
 ## Комментарии
+
+- 2026-10-11: Ответ пользователя: вариант 1. `isActive()` остаётся на ARIA; `getActiveOption()` добавлен в `UiSelectHarness`, `UiAutocompleteHarness` и `UiTimeInputHarness` (по спеке на каждый, делегирование во внутренний listbox-harness), отмечен в таблице harness в README и в CHANGELOG: `feat(testing): getActiveOption on the select, autocomplete and time harnesses`. Записано в `docs/DECISIONS.md` → «Popup listbox: review answers».

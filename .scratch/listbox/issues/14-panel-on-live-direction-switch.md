@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 1; ticket 09 browser check
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** checked in the built Storybook manager (Edge, page scrollbar shown). A datepicker panel
 opened in LTR, then the toolbar switched the page to RTL while the panel stayed open:
@@ -26,13 +26,15 @@ direction on attach). The app is Hebrew and switches direction only in Storybook
 
 ## Comments
 
+- 2026-10-11: Answered by the user: option 1, keep it; the direction is read when the panel opens. Recorded in `docs/DECISIONS.md` → "Popup listbox: review answers".
+
 ## Русский перевод
 
 # 14: открытая панель не следует за переключением направления на лету
 
 **Спека:** [../spec.md](../spec.md) → решение 1; браузерная проверка тикета 09
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** проверено в собранном Storybook manager (Edge, полоса прокрутки страницы видна). Панель
 datepicker открыта в LTR, затем toolbar переключил страницу в RTL, панель осталась открытой:
@@ -56,3 +58,5 @@ datepicker открыта в LTR, затем toolbar переключил стр
 3. Перечитывать направление и перепозиционировать открытую панель при таком изменении.
 
 ## Комментарии
+
+- 2026-10-11: Ответ пользователя: вариант 1, оставить; направление читается при открытии панели. Записано в `docs/DECISIONS.md` → «Popup listbox: review answers».

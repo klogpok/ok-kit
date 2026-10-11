@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 6
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** decision 6 says "Fields stay on `UiFormControlBase`; the three-level hierarchy goes
 away". Ticket 05 removed the option panel level (`UiOptionPanel`), but `ui-select` and
@@ -30,13 +30,15 @@ keyboard or overlay code any more: each field creates its own listbox with
 
 ## Comments
 
+- 2026-10-11: Answered by the user: option 1, keep the two levels (`UiFormControlBase` → `UiSelectBase` → `UiSelect` / `UiMultiSelect`). Recorded in `docs/DECISIONS.md` → "Popup listbox: review answers".
+
 ## Русский перевод
 
 # 10: select и multi-select сохраняют общий базовый класс
 
 **Спека:** [../spec.md](../spec.md) → решение 6
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** решение 6 гласит: «Поля остаются на `UiFormControlBase`; трёхуровневая иерархия
 уходит». Тикет 05 убрал уровень панели опций (`UiOptionPanel`), но `ui-select` и
@@ -64,3 +66,5 @@ keyboard or overlay code any more: each field creates its own listbox with
    помощник, создаваемый функцией `inject…()`, как listbox.
 
 ## Комментарии
+
+- 2026-10-11: Ответ пользователя: вариант 1, оставить два уровня (`UiFormControlBase` → `UiSelectBase` → `UiSelect` / `UiMultiSelect`). Записано в `docs/DECISIONS.md` → «Popup listbox: review answers».

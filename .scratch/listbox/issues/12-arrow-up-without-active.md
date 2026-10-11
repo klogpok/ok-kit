@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decisions 7, 8; tickets 01, 04, 06
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** the listbox controller has one keyboard handler for all four fields. In an open list
 with no active option, ArrowUp now activates the last option and ArrowDown the first, in
@@ -27,13 +27,15 @@ The WAI-ARIA combobox pattern allows both "last option" and "do nothing" here.
 
 ## Comments
 
+- 2026-10-11: Answered by the user: option 1, one rule for every field (time-input included). Recorded in `docs/DECISIONS.md` → "Popup listbox: review answers".
+
 ## Русский перевод
 
 # 12: ArrowUp без активной опции везде ведёт к последней опции
 
 **Спека:** [../spec.md](../spec.md) → решения 7, 8; тикеты 01, 04, 06
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** у контроллера listbox один обработчик клавиатуры для всех четырёх полей. В открытом
 списке без активной опции ArrowUp теперь активирует последнюю опцию, а ArrowDown — первую, в
@@ -56,3 +58,5 @@ The WAI-ARIA combobox pattern allows both "last option" and "do nothing" here.
    контроллере).
 
 ## Комментарии
+
+- 2026-10-11: Ответ пользователя: вариант 1, одно правило для всех полей (включая time-input). Записано в `docs/DECISIONS.md` → «Popup listbox: review answers».
