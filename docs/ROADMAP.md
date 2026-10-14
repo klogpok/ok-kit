@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-10):** фазы 1–8 и миграция на Angular 20 сделаны и одобрены; следующая — фаза 9. Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-14):** фазы 1–9, миграция на Angular 20, вид чипсов и popup listbox сделаны и одобрены; план и SPEC исчерпаны. Следующий шаг — пилот: перевести на кит экраны приложения VPlans. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -347,7 +347,7 @@
 playground, `lint` и `format:check` чисто, обе сборки и `build-storybook` успешны, 263 стори в
 3 режимах без нарушений axe и без визуальных изменений.
 
-## Вид чипсов (сделано 2026-10-10, ждёт ревью)
+## Вид чипсов (сделано и одобрено 2026-10-10)
 
 > Отдельная задача вне фаз: тикет `.scratch/chip-appearance/issues/01-chip-appearance.md`. Новый вид по умолчанию `outline`, прежний — `appearance="soft"`; `size` (`sm`/`md`), `tone`, иконки в фильтрах, `provideUiChip()`. Решения — в [DECISIONS.md](DECISIONS.md) («Chips: outline by default, soft on request»).
 
@@ -366,6 +366,19 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 > Вопросы ревью закрыты: тикеты 10–14 в `.scratch/listbox/issues/` — сделано.
 
 **Зачем.** Четыре поля повторяют жизненный цикл выпадающей панели, три — политику клавиатуры, а `time-input` и `autocomplete` опираются на внутренности `select`. Итог: dropdown panel в `core` (директива на `ng-template`) и internal entry point `@vplans/ui-kit/listbox`, на которых стоят `select`, `multi-select`, `autocomplete`, `time-input` и оба датапикера.
+
+## Пилот в client (спека готова 2026-10-14)
+
+> Работа вне фаз после закрытия фазы 9: первый экран приложения `C:\vplans\client` на ките. Спека и тикеты 01–07 — в `.scratch/client-pilot/`; решения — в [DECISIONS.md](DECISIONS.md) («Client pilot: plan»).
+>
+> **Статус (2026-10-14): спека и тикеты готовы, работа не начата.**
+>
+> - Экран — `settings/action-weights-section` в `apartment-changes-new`.
+> - Общие файлы client (`tsconfig*`, `angular.json`, `.eslintrc`, `package.json`, `styles.scss`, корневые провайдеры) не меняются; все правки — внутри `apartment-changes-new/`.
+> - Доставка — `scripts/sync-to-client.mjs`: самодостаточная копия в `apartment-changes-new/ui-kit/`, импорты переписаны на относительные. Проверено 2026-10-14: `ngc` с опциями client — 0 ошибок, 58 стилей собираются без `includePaths`.
+> - Потребитель сам подключает `<ui-embed-styles />` (встраиваемые стили без `_base` и авто-dark) и `provideUiLabels`.
+> - Вендорная копия `ok-kit` (префикс `ok-`) заменяется: `creatable`/`maxLength` переезжают в `ui-select`, `price-quotes-case` переходит на копию, папка удаляется.
+> - Работа в client — в ветке `feat/ui-kit-pilot`, без push.
 
 ## Критичные файлы и что переиспользовать
 

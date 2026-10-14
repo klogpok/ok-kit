@@ -575,3 +575,35 @@ Tickets 10–14 in `.scratch/listbox/issues/` and the code review. The work is a
 - **An internal entry point has no stories of its own** (code review): `listbox` is covered by
   its consumers' stories and its own spec. The exception is in `projects/ui-kit/README.md` →
   "Adding a component".
+
+## Client pilot: plan (decided 2026-10-14)
+
+Phase 9 closed the SPEC; the next step is a pilot in the real app, `C:\vplans\client`. Spec and
+tickets 01–07 are in `.scratch/client-pilot/`.
+
+- **Pilot screen:** `apartment-changes-new/settings/action-weights-section`, chosen from a survey
+  of `apartment-changes-new`. The section wrapper and `MatSnackBar` stay.
+- **No common client file changes:** `tsconfig*.json`, `angular.json`, `.eslintrc.json`,
+  `package.json`, `src/styles.scss` and the root providers stay; every client change is inside
+  `apartment-changes-new/`.
+- **Delivery:** a copy script in the kit (`scripts/sync-to-client.mjs`) writes a self-contained
+  copy into `apartment-changes-new/ui-kit/`, rewriting the cross-entry imports to relative paths
+  (its only transformation). The copy is never edited by hand. Checked on 2026-10-14: the copy
+  compiles with `ngc` under the client's `tsconfig.json` options (0 errors) and its 58 component
+  stylesheets compile without `includePaths`.
+- **Each consumer loads the kit itself:** `<ui-embed-styles />` (new, in `@vplans/ui-kit/theme`)
+  loads `styles/ui-kit-embed.scss` (tokens without the OS dark block, plus layout classes; no
+  `_base`, no typography), and `provideUiLabels` by `LOCALE_ID` sits in the consumer's
+  `providers`.
+- **The kit resists host global CSS itself:** a browser check with the client's global CSS changed
+  266 of 306 stories (Bootstrap reboot's `body { text-align: left }` breaks RTL alignment,
+  `label { margin-bottom }` and `svg { vertical-align }` shift controls). Component roots set
+  `text-align: start`, and the kit's `label` and `svg` elements set their own margin, display and
+  vertical alignment; a host-CSS check with a Bootstrap reboot fixture joins `/phase-check`.
+- **The vendored `ok-kit` in the client is replaced within the pilot:** `creatable`, `maxLength`
+  and the closed-search cursor move into `ui-select`/`ui-multi-select`; `price-quotes-case` and
+  `apartment-changes-dialog` move to the copy; the folder is deleted.
+- **Tests:** `test:price-quotes` works unchanged; the action-weights spec runs through a tsconfig in
+  the client's gitignored `.scratch/`.
+- **Client work** goes on branch `feat/ui-kit-pilot`, follows the client's `AGENTS.md` and is not
+  pushed without approval.
