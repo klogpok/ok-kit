@@ -13,7 +13,9 @@ describe('UiEmbedStyles', () => {
   it('renders a hidden element without content', () => {
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
-    const element = (fixture.nativeElement as HTMLElement).querySelector('ui-embed-styles');
+    const element = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(
+      'ui-embed-styles',
+    );
     expect(element).not.toBeNull();
     expect(element?.hidden).toBe(true);
     expect(element?.childNodes.length).toBe(0);
