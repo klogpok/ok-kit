@@ -101,6 +101,9 @@ Before/after screenshots: `../prototype/*.png`.
   vertical: the story's `<p>` margins). Before the fixes the first full run failed 695 of 700
   captures; now 0, with 9 known captures of those three stories. Added to `/phase-check`.
 - Visual baselines: unchanged (`pnpm test-visual`).
+- **Open:** `pnpm build:playground` fails on the 8 kB `anyComponentStyle` budget, because the
+  playground imports `@vplans/ui-kit/theme` and so compiles the 41 kB embed stylesheet; options in
+  ticket 08. The `color`/`letter-spacing` decision is ticket 09.
 
 ## Русский перевод
 
@@ -205,3 +208,6 @@ Material, фон на `html {}`), нужны токены и стили комп
   отступы `<p>` story). До исправлений первый полный прогон падал на 695 из 700 снимков; теперь 0,
   и 9 известных снимков этих трёх story. Добавлено в `/phase-check`.
 - Базовые снимки не изменились (`pnpm test-visual`).
+- **Открыто:** `pnpm build:playground` падает на бюджете `anyComponentStyle` 8 kB: playground
+  импортирует `@vplans/ui-kit/theme` и поэтому компилирует встраиваемые стили на 41 kB; варианты —
+  в тикете 08. Решение по `color`/`letter-spacing` — тикет 09.
