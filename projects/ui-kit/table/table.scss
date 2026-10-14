@@ -2,6 +2,8 @@
 
 // Unencapsulated: styles projected rows and cells. Every selector is scoped under `.ui-table`.
 .ui-table {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   inline-size: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -22,8 +24,11 @@
     --ui-table-cell-padding-block: var(--ui-table-cell-padding-block-compact);
   }
 
+  // The initial side, padding and color too: a host reboot moves captions to the bottom in gray.
   > caption {
-    padding-block-end: var(--ui-space-sm);
+    caption-side: top;
+    padding-block: 0 var(--ui-space-sm);
+    color: inherit;
     font-weight: var(--ui-font-weight-semibold);
     text-align: start;
   }
@@ -219,6 +224,8 @@
 // `cdk-virtual-scroll-viewport[uiTableViewport]`: the scrolling region of a virtual table.
 .ui-table-viewport {
   box-sizing: border-box;
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   padding-block-end: var(--_header-size, 0);
   overscroll-behavior: contain;
   @include ui.focus-visible;

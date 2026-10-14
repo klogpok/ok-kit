@@ -1,6 +1,8 @@
 @use 'avatar-size';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   --_bg: var(--ui-avatar-fallback-bg);
   --_text: var(--ui-avatar-fallback-text);
 
@@ -37,6 +39,8 @@
 
 .ui-avatar__image {
   inline-size: 100%;
+  // The initial value, set so that a host `img { vertical-align }` (Bootstrap reboot) does not apply.
+  vertical-align: baseline;
   block-size: 100%;
   object-fit: cover;
 }

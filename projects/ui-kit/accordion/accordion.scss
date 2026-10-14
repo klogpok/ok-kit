@@ -1,4 +1,6 @@
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   overflow: hidden;
   border: var(--ui-border-width-default) solid var(--ui-accordion-border);

@@ -5,6 +5,7 @@ export default {
     'dist/**',
     '**/tokens.css',
     '**/_tokens.scss',
+    '**/_tokens-embed.scss',
     '**/_breakpoints.scss',
     '**/_spacing.scss',
     'node_modules/**',

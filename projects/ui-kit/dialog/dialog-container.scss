@@ -9,6 +9,8 @@
 }
 
 .ui-dialog-container {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: flex;
   flex-direction: column;
   gap: var(--ui-dialog-gap);

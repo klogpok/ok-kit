@@ -1,6 +1,8 @@
 // Global styles (ViewEncapsulation.None): every selector is scoped to a ui-drawer class.
 
 .ui-drawer-container {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   --_slide-from: 100%;
 
   display: flex;

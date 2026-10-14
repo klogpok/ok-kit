@@ -1,4 +1,5 @@
 **/tokens.generated.ts
 **/_tokens.scss
+**/_tokens-embed.scss
 **/tokens.css
 dist

@@ -135,7 +135,24 @@ ${declarations(componentCompact, 'component')}
 `;
 }
 
-const css = `${header}
+/**
+ * The token stylesheet. With `systemDark` it switches to the dark tokens under
+ * `prefers-color-scheme: dark` unless `data-theme='light'` is set (`ui-kit.scss`). The embed
+ * stylesheet leaves that block out: a host app chooses its own theme, so only an explicit
+ * `[data-theme='dark']` turns the kit dark there.
+ */
+function tokensCss(systemDark: boolean): string {
+  const media = systemDark
+    ? `
+@media (prefers-color-scheme: dark) {
+  /* :where() keeps the specificity of :root, so app overrides on :root also win in dark mode. */
+  :root:where(:not([data-theme='light'])) {
+${declarations(dark, 'semantic', '    ')}
+  }
+}
+`
+    : '';
+  return `${header}
 :root {
 ${primitives.map((t) => `  ${cssName('ref-', t.path)}: ${t.value};`).join('\n')}
 ${declarations(base, 'semantic')}
@@ -145,14 +162,7 @@ ${declarations(base, 'semantic')}
 [data-theme='light'] {
 ${declarations(light, 'semantic')}
 }
-
-@media (prefers-color-scheme: dark) {
-  /* :where() keeps the specificity of :root, so app overrides on :root also win in dark mode. */
-  :root:where(:not([data-theme='light'])) {
-${declarations(dark, 'semantic', '    ')}
-  }
-}
-
+${media}
 [data-theme='dark'] {
 ${declarations(dark, 'semantic')}
 }
@@ -170,6 +180,9 @@ ${declarations(dark, 'semantic')}
 ${declarations(component, 'component')}
 }
 ${compactDensityCss()}`;
+}
+
+const css = tokensCss(true);
 
 // ---- Contrast validation --------------------------------------------------
 
@@ -362,6 +375,7 @@ export const UI_TOKENS: readonly UiTokenDoc[] = ${JSON.stringify(docs, null, 2)}
 
 writeFileSync(resolve(libRoot, 'styles/tokens.css'), css);
 writeFileSync(resolve(libRoot, 'styles/_tokens.scss'), css);
+writeFileSync(resolve(libRoot, 'styles/_tokens-embed.scss'), tokensCss(false));
 writeFileSync(resolve(here, 'tokens.generated.ts'), ts);
 
 // ---- Docs tables -------------------------------------------------------------

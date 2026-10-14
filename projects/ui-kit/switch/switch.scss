@@ -1,6 +1,8 @@
 @use '../styles/mixins';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: inline-flex;
   font-family: var(--ui-font-family-sans);
   color: var(--ui-color-text);
@@ -26,6 +28,8 @@
 
 .ui-switch__label {
   display: inline-flex;
+  // A host reboot (`label { margin-bottom }`) must not move it.
+  margin: 0;
   flex-direction: row-reverse;
   align-items: center;
   gap: var(--ui-space-sm);
@@ -58,6 +62,8 @@
 }
 
 .ui-switch__input {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   margin: 0;
   inline-size: 100%;
   block-size: 100%;

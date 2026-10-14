@@ -3,6 +3,8 @@
 // The field shares the input tokens, so it looks like a text input in a form.
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   inline-size: 100%;
   font-family: var(--ui-font-family-sans);
@@ -85,6 +87,8 @@
 }
 
 .ui-number-input__step {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;

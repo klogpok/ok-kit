@@ -1,6 +1,8 @@
 @use 'avatar-size';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: inline-flex;
   align-items: center;
   // Room for the ring of the first avatar.

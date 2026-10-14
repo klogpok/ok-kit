@@ -4,6 +4,8 @@
 // private --_ properties; the size sets the font size and the inline padding.
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: inline-flex;
   align-items: center;
   gap: var(--ui-chip-gap);
@@ -95,6 +97,8 @@
 }
 
 .ui-chip__remove {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;

@@ -7,6 +7,9 @@
   justify-content: center;
   box-sizing: border-box;
   block-size: var(--_height);
+  // The browser's own value for a button, set for `a[ui-button]` too: a host `text-align` must
+  // not leak into a link button.
+  text-align: center;
   min-inline-size: var(--_height);
   margin: 0;
   padding-block: 0;

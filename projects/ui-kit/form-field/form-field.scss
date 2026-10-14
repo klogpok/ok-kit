@@ -1,6 +1,8 @@
 @use '../styles/mixins';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: flex;
   flex-direction: column;
   gap: var(--ui-form-field-gap);
@@ -9,7 +11,10 @@
 }
 
 .ui-form-field__label {
+  // A host reboot (`label { display: inline-block; margin-bottom }`) must not move it.
+  display: block;
   align-self: flex-start;
+  margin: 0;
   color: var(--ui-form-field-label-color);
   font-size: var(--ui-form-field-label-font-size);
   font-weight: var(--ui-form-field-label-font-weight);

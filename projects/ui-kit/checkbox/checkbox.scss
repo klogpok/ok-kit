@@ -1,6 +1,8 @@
 @use '../styles/mixins';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: inline-flex;
   font-family: var(--ui-font-family-sans);
   color: var(--ui-color-text);
@@ -23,6 +25,8 @@
 
 .ui-checkbox__label {
   display: inline-flex;
+  // A host reboot (`label { margin-bottom }`) must not move it.
+  margin: 0;
   align-items: flex-start;
   gap: var(--ui-space-sm);
   font-size: var(--_font-size);
@@ -41,6 +45,8 @@
 }
 
 .ui-checkbox__input {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   margin: 0;
   inline-size: 100%;
   block-size: 100%;
@@ -66,6 +72,8 @@
 
 .ui-checkbox__mark {
   position: absolute;
+  // The initial value, set so that a host `svg { vertical-align }` (Bootstrap reboot) does not apply.
+  vertical-align: baseline;
   inset: 0;
   inline-size: 100%;
   block-size: 100%;

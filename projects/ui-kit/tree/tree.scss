@@ -1,6 +1,8 @@
 @use '../styles/mixins';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   color: var(--ui-tree-text);
   font-family: var(--ui-font-family-sans);
@@ -113,6 +115,8 @@
 
 .ui-tree__mark {
   inline-size: 100%;
+  // The initial value, set so that a host `svg { vertical-align }` (Bootstrap reboot) does not apply.
+  vertical-align: baseline;
   block-size: 100%;
   fill: none;
   stroke: var(--ui-checkbox-checked-color);

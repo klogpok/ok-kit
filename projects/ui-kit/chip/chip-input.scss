@@ -4,6 +4,8 @@
 // inside it and the text field takes the rest of the last line.
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   inline-size: 100%;
   font-family: var(--ui-font-family-sans);

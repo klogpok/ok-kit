@@ -3,6 +3,8 @@
 // Sizes (--_height, --_padding, --_font-size, --_gap) come from ui-segmented.
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: flex;
   flex: var(--_segment-flex, 0 1 auto);
   min-inline-size: 0;
@@ -12,6 +14,8 @@
 .ui-segment__label {
   position: relative;
   display: inline-flex;
+  // A host reboot (`label { margin-bottom }`) must not move it.
+  margin: 0;
   flex: 1;
   align-items: center;
   // ui-segmented--vertical puts the text at the start edge, like a list.
@@ -42,6 +46,8 @@
 }
 
 .ui-segment__input {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   position: absolute;
   inset: 0;
   margin: 0;
