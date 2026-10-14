@@ -1566,24 +1566,25 @@ the **Tokens** docs page.
 
 ### Scripts
 
-| Command                   | What it does                                                                                           |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `pnpm start`              | Playground dev server                                                                                  |
-| `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and the density table in `docs/tokens.mdx`; checks WCAG contrast |
-| `pnpm test`               | Unit tests (Vitest)                                                                                    |
-| `pnpm test:watch`         | Unit tests in watch mode                                                                               |
-| `pnpm test:coverage`      | Unit tests with a coverage report; fails below the thresholds                                          |
-| `pnpm test:playground`    | Playground smoke tests                                                                                 |
-| `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint                                              |
-| `pnpm format`             | Prettier (write)                                                                                       |
-| `pnpm format:check`       | Prettier (check only)                                                                                  |
-| `pnpm build`              | Tokens and the library build into `dist/ui-kit`                                                        |
-| `pnpm build:playground`   | Playground build (checks the bundle budgets)                                                           |
-| `pnpm storybook`          | Storybook dev server                                                                                   |
-| `pnpm build-storybook`    | Static Storybook in `dist/storybook/ui-kit`                                                            |
-| `pnpm test-storybook`     | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes                                    |
-| `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`                                     |
-| `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                                                         |
+| Command                   | What it does                                                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm start`              | Playground dev server                                                                                                          |
+| `pnpm tokens`             | Regenerates CSS/SCSS/TS/README tokens and the density table in `docs/tokens.mdx`; checks WCAG contrast                         |
+| `pnpm test`               | Unit tests (Vitest)                                                                                                            |
+| `pnpm test:watch`         | Unit tests in watch mode                                                                                                       |
+| `pnpm test:coverage`      | Unit tests with a coverage report; fails below the thresholds                                                                  |
+| `pnpm test:playground`    | Playground smoke tests                                                                                                         |
+| `pnpm lint`               | ESLint (strictTypeChecked, templates, a11y) and Stylelint                                                                      |
+| `pnpm format`             | Prettier (write)                                                                                                               |
+| `pnpm format:check`       | Prettier (check only)                                                                                                          |
+| `pnpm build`              | Tokens and the library build into `dist/ui-kit`                                                                                |
+| `pnpm build:playground`   | Playground build (checks the bundle budgets)                                                                                   |
+| `pnpm storybook`          | Storybook dev server                                                                                                           |
+| `pnpm build-storybook`    | Static Storybook in `dist/storybook/ui-kit`                                                                                    |
+| `pnpm test-storybook`     | axe (WCAG 2.1 AA) and console errors for every built story, 3 modes                                                            |
+| `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`                                                             |
+| `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                                                                                 |
+| `pnpm test-host-css`      | Every built story with a host app's global CSS (Bootstrap 4.6 fixture) prepended, 3 modes; fails when it changes a kit element |
 
 ### Adding a component
 

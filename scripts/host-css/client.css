@@ -1,0 +1,25 @@
+/*
+ * The html and body rules of the VPlans client's src/styles.scss (2026-10-14), loaded after
+ * bootstrap-4.6.2.min.css as in the client's build. Fixture of scripts/check-host-css.mjs.
+ */
+html {
+  background-color: #e4e7ed;
+}
+
+body {
+  background: #e4e7ed;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Assistant, Roboto, 'Helvetica Neue', sans-serif;
+  letter-spacing: -0.01em;
+}
