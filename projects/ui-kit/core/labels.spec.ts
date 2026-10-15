@@ -43,4 +43,9 @@ describe('UI_LABELS_HE', () => {
     expect(UI_LABELS_HE.pageRange(51, 75, 480)).toBe('⁦51–75⁩ מתוך 480');
     expect(UI_LABELS_EN.pageRange(51, 75, 480)).toBe('51–75 of 480');
   });
+
+  it('isolates the text of the "add" option so Latin text or digits keep their place', () => {
+    expect(UI_LABELS_HE.create('Pool 2')).toBe('הוספת «⁨Pool 2⁩»');
+    expect(UI_LABELS_EN.create('Pool 2')).toBe('Add «Pool 2»');
+  });
 });

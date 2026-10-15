@@ -18,8 +18,30 @@ so versions mark review points rather than releases.
 - **scripts:** `pnpm test-host-css` runs every story with a host app's global CSS prepended
   (Bootstrap 4.6.2 and the VPlans client's html/body rules, vendored in `scripts/host-css/`) in
   light RTL, light LTR and with a focused button, and fails when it changes a kit element.
+- **select:** `creatable` on `ui-select` and `ui-multi-select` (with `searchable`, for string
+  values): search text that matches no option label and no selected value is offered as a first
+  "Add «text»" option; picking it (click, or Enter while it is active) sets the text as the
+  value of `ui-select`, or adds it to `ui-multi-select` and clears the search. A matching option
+  stays active above it. A string value outside the list is shown as its own label or chip.
+  Over `items` the option opens the set (`aria-posinset`) and sticks above a virtual list with
+  "select all".
+- **select:** `maxLength` limits the search text of a `searchable` select (`maxlength` of the
+  field).
+- **core:** the `create` label (`UiLabels`): "Add «text»", Hebrew `הוספת «text»` with the text
+  isolated (FSI…PDI). An app that passes a full `UiLabels` object of its own must add it.
+- **testing:** `UiSelectHarness.create(text)` searches and clicks the "Add «…»" option.
+
+### Changed
+
+- **select:** the search field of a closed `searchable` select shows the trigger's cursor
+  (`pointer`, or that of a readonly or disabled field) instead of `text`; the text cursor
+  returns once the list is open. The row that holds "select all" is now `ui-select__leading`
+  (was `ui-select__all-row`, an internal class).
 
 ### Fixed
+
+- **select:** a search that hides every option leaves the list without an active option. Before,
+  the option active before the search stayed active although hidden, and Enter picked it.
 
 - **all components:** a host app's global CSS no longer bends the kit. Component roots and
   overlay panels set `text-align: start` (`a[ui-button]` sets `center`, like a button), so

@@ -73,13 +73,19 @@
   outline: none;
 }
 
+// A closed list keeps the trigger's cursor (`pointer`, or that of a readonly or disabled
+// field); the text cursor appears once the user can type.
 .ui-select__input {
-  cursor: text;
+  cursor: inherit;
 
   &::placeholder {
     color: var(--ui-input-placeholder);
     opacity: 1;
   }
+}
+
+:host(.ui-select--open) .ui-select__input {
+  cursor: text;
 }
 
 // With a value selected, the placeholder shows that value while the user searches.
@@ -196,14 +202,15 @@
   }
 }
 
-// "Select all" is set off from the options below it.
+// "Add «…»" and "select all" are set off from the options below them.
+.ui-select__create,
 .ui-select__all {
   margin-block-end: var(--ui-space-2xs);
   border-block-end: var(--ui-border-width-default) solid var(--ui-select-panel-border);
 }
 
-// Over a virtual list "select all" stays in view while the rows scroll under it.
-.ui-listbox--virtual .ui-select__all-row {
+// Over a virtual list "Add «…»" and "select all" stay in view while the rows scroll under them.
+.ui-listbox--virtual .ui-select__leading {
   position: sticky;
   // Over the panel padding too, so no row shows above it.
   inset-block-start: calc(-1 * var(--ui-space-2xs));

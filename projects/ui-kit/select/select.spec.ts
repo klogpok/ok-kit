@@ -427,6 +427,16 @@ describe('UiSelect', () => {
       expect(listbox()!.textContent).toContain('אין תוצאות');
     });
 
+    it('leaves no option active when the search hides the active one', async () => {
+      await type('yo');
+      expect(control().getAttribute('aria-activedescendant')).toBe(options()[3].id);
+      await type('yoz');
+      expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+      keydown(control(), 'Enter');
+      await settle(fixture);
+      expect(fixture.componentInstance.value()).toBeNull();
+    });
+
     it('keeps Space for typing', async () => {
       await open();
       const space = keydown(control(), ' ');

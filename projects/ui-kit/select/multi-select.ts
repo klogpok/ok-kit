@@ -39,6 +39,11 @@ const SELECT_ALL = Symbol('ui-select-all');
  *   "select all").
  * - `chips` shows the selected values as chips in the trigger; their x removes a value with the
  *   mouse, the keyboard deselects in the list.
+ * - `creatable` (with `searchable`, string values) adds a first option "Add «text»" while the
+ *   search text equals no option label and no selected value, and `maxSelections` is not
+ *   reached. A matching option stays active, so Enter adds the text only when the search shows
+ *   no other option. Adding clears the search and keeps the list open. A string value outside
+ *   the list is its own label.
  *
  * The value is a new array on every change. Implements `ControlValueAccessor`: bind it with
  * `formControl`, `formControlName` or `ngModel`.
@@ -87,8 +92,7 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
       !this.allSelected() &&
       this.selectable().some((item) => this.isSelected(item.value())),
     isBlocked: (option: UiOptionHandle) =>
-      this.limitReached() && option !== this.selectAllOption() && !this.isSelected(option.value()),
-    alwaysShown: (option) => option === this.selectAllOption(),
+      this.limitReached() && !this.isLeading(option) && !this.isSelected(option.value()),
   });
 
   protected override readonly selectAllValue = SELECT_ALL;
@@ -138,13 +142,36 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
 
   private isSelected(value: unknown): boolean {
     if (value === SELECT_ALL) return this.allSelected();
+    if (this.isCreate(value)) return false;
     return this.value().some((selected) => this.listbox.matches(value, selected));
+  }
+
+  protected selectedValues(): readonly T[] {
+    return this.value();
+  }
+
+  protected override createBlocked(): boolean {
+    return this.limitReached();
+  }
+
+  /** Adds the text to the value and clears the search; the list stays open. */
+  protected addCreated(text: string): void {
+    this.setValue([...this.value(), text as T]);
+    // Enter before the next render: the `[value]` binding may still hold the empty text it had
+    // when the list opened, and would not write `''` again.
+    (this.control().nativeElement as HTMLInputElement).value = '';
+    this.query.set('');
+    this.searchChange.emit('');
   }
 
   /** Adds the value, or removes it when it is already selected. */
   private toggleValue(value: unknown): void {
     if (value === SELECT_ALL) {
       this.toggleAll();
+      return;
+    }
+    if (this.isCreate(value)) {
+      this.create();
       return;
     }
     const current = this.value();

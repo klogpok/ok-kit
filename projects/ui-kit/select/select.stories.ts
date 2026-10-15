@@ -146,6 +146,63 @@ export const Clearable: Story = {
   }),
 };
 
+/**
+ * Types into the search field of the story's select, like a user. Waits for the fonts first: the
+ * panel takes the trigger's size when it opens, and a trigger laid out in the fallback font may
+ * be taller.
+ */
+async function typeSearch(canvasElement: HTMLElement, text: string): Promise<HTMLInputElement> {
+  await document.fonts.ready;
+  const control = canvasElement.querySelector<HTMLInputElement>('.ui-select__control')!;
+  control.focus();
+  control.value = text;
+  control.dispatchEvent(new Event('input', { bubbles: true }));
+  return control;
+}
+
+/** Whether the "Add «…»" option is the active one of the control. */
+function addIsActive(control: HTMLElement): boolean {
+  const add = document.querySelector('.ui-select__create');
+  return !!add && control.getAttribute('aria-activedescendant') === add.id;
+}
+
+/**
+ * `creatable`: search text that matches no option can be added as the value. A string value that
+ * is not in the list (here "מחסן") is shown as its own label. `maxLength` limits the search text.
+ */
+export const Creatable: Story = {
+  render: () => ({
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:240px;min-block-size:14rem">
+        <ui-form-field label="מיקום">
+          <ui-select
+            placeholder="הוספת מיקום"
+            searchable
+            creatable
+            clearable
+            size="sm"
+            [maxLength]="40"
+            [value]="'מחסן'"
+          >
+            @for (name of ['מטבח', 'אמבטיה', 'מרפסת', 'חדר שינה']; track name) {
+              <ui-option [value]="name">{{ name }}</ui-option>
+            }
+          </ui-select>
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
+/** Text that matches no option: "Add «…»" is the only option, active, and Enter adds it. */
+export const CreatableAdd: Story = {
+  ...Creatable,
+  play: async ({ canvasElement }) => {
+    const control = await typeSearch(canvasElement, 'חדר כביסה');
+    await until(() => addIsActive(control), 'the add option is not active');
+    await expect(document.querySelector('.ui-listbox__empty')).toBeNull();
+  },
+};
+
 /** Server-side search in progress: a spinner replaces the chevron and the list is busy. */
 export const Loading: Story = {
   render: () => ({
@@ -233,5 +290,30 @@ export const ManyOptionsAtEnd: Story = {
     };
     await until(() => !!active()?.textContent?.includes('דירה 1999'), 'not at the last item');
     await expect(active()?.getAttribute('aria-posinset')).toBe('1999');
+  },
+};
+
+/**
+ * `creatable` over a virtual list of `items`: "Add «…»" sticks above the rows and opens the set;
+ * a matching item stays active until ArrowUp moves to it.
+ */
+export const ManyOptionsCreatable: Story = {
+  render: () => ({
+    props: { apartments: APARTMENTS },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:320px;min-block-size:18rem">
+        <ui-form-field label="דירה">
+          <ui-select placeholder="בחירת דירה" searchable creatable [items]="apartments" />
+        </ui-form-field>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const control = await typeSearch(canvasElement, '12');
+    await until(() => !!document.querySelector('.ui-select__create'), 'no add option');
+    press('ArrowUp');
+    await until(() => addIsActive(control), 'the add option is not active');
+    await expect(document.querySelector('.ui-select__create')!.getAttribute('aria-posinset')).toBe(
+      '1',
+    );
   },
 };

@@ -431,6 +431,28 @@ It emits `''` when the list closes, so the full list can come back. The trigger 
 a selected option after it leaves the results. For a value that was never in the list (e.g. an
 initial value), give `[displayWith]="nameOf"`.
 
+`creatable` lets a `searchable` select take a value that is not in the list, for string values.
+While the search text (trimmed) equals no option label and no selected value's label, ignoring
+case, the list starts with an "Add «text»" option (the `create` label). It is a normal option for
+the keyboard and screen readers: arrows reach it, `aria-activedescendant` names it, and over
+`items` it opens the set (`aria-posinset` 1). A matching option stays active above it, so Enter
+picks the match; when nothing else matches, "Add" is active and Enter adds the text. In
+`ui-select` the text becomes the value and the list closes; in `ui-multi-select` it is added, the
+search clears and the list stays open ("Add" is not offered once `maxSelections` is reached).
+Leaving the field drops typed text that was not added. A string value outside the list is shown
+as its own label (or chip), unless `displayWith` labels it. Without `searchable` there is no text
+to add: `creatable` then only shows such a string value as its own label. `maxLength` limits the
+search text (`maxlength` of the field), so a created value fits a column of that size.
+
+```html
+<!-- A value from the project's list, or a new one of up to 255 characters -->
+<ui-select formControlName="location" searchable creatable clearable [maxLength]="255">
+  @for (name of locations(); track name) {
+  <ui-option [value]="name">{{ name }}</ui-option>
+  }
+</ui-select>
+```
+
 `clearable` adds a clear button (the `clear` label) while a value is selected. `loading` shows a
 spinner instead of the chevron and marks the list busy, e.g. during server-side search. In an
 option, mark an icon or avatar with `uiOptionIcon` and a second line with `uiOptionDescription`;
@@ -853,6 +875,10 @@ so they keep working when that DOM changes.
 works (without the required marker). Every harness extends `UiHarness`: `focus()`, `blur()`,
 `isFocused()` act on the element that takes focus, and `getHarness()` loads harnesses inside it
 (e.g. the buttons of a dialog).
+
+`UiSelectHarness.create(text)` types into a `searchable` `creatable` select and clicks its
+"Add «…»" option, whatever the language of the `create` label; it throws when the option is not
+offered. `getOptions()` lists that option too, as the first one.
 
 The menu, popover and tooltip harnesses sit on the trigger, so the fixture's loader finds them;
 they find the menu, popover or tooltip from the document root. `getHarness()` of a popover loads

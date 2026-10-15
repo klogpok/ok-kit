@@ -12,6 +12,7 @@ import {
   numberAttribute,
   output,
   signal,
+  untracked,
   viewChild,
   viewChildren,
 } from '@angular/core';
@@ -24,14 +25,19 @@ import {
   type UiOptionItem,
   type ɵUiListboxController as UiListboxController,
   type ɵUiListboxConfig as UiListboxConfig,
+  type ɵUiOptionHandle as UiOptionHandle,
   ɵfieldListboxConfig as fieldListboxConfig,
 } from '@vplans/ui-kit/listbox';
 
+/** Value of the "Add «…»" option of `creatable`; never part of the value. */
+const CREATE = Symbol('ui-select-create');
+
 /**
  * Shared trigger of `ui-select` and `ui-multi-select`: the combobox button or search field,
- * the chips, the clear button and the inputs of the list. The popup listbox is a controller
- * that each subclass creates with `injectListbox({ ...this.listboxConfig(), ... })`, adding what
- * selecting an option does. Internal.
+ * the chips, the clear button, the "Add «…»" option of `creatable` and the inputs of the list.
+ * The popup listbox is a controller that each subclass creates with
+ * `injectListbox({ ...this.listboxConfig(), ... })`, adding what selecting an option does.
+ * Internal.
  */
 @Directive({
   host: {
@@ -69,6 +75,17 @@ export abstract class UiSelectBase<T, V>
   readonly searchable = input(false, { transform: booleanAttribute });
   /** Shows a button that clears the value while one is selected. */
   readonly clearable = input(false, { transform: booleanAttribute });
+  /**
+   * With `searchable`: search text that matches no option label can be added as a value, from an
+   * "Add «…»" option (the `create` label). For string values. A string value that is not in the
+   * list is shown as its own label. Without `searchable` there is no text to add, so only that
+   * label rule applies.
+   */
+  readonly creatable = input(false, { transform: booleanAttribute });
+  /** Most characters of the search text (`searchable` only), so a created value fits as well. */
+  readonly maxLength = input<number | null, unknown>(null, {
+    transform: (value: unknown) => (value == null || value === '' ? null : numberAttribute(value)),
+  });
   /**
    * Options are loading (e.g. server-side search): a spinner is shown and the list is marked
    * busy.
@@ -110,8 +127,12 @@ export abstract class UiSelectBase<T, V>
 
   /** The projected options. */
   private readonly contentOptions = contentChildren<UiOption<T>>(UiOption, { descendants: true });
-  /** "Select all" of `ui-multi-select`; the keyboard reaches it before the app's options. */
-  private readonly leadingOptions = viewChildren<UiOption<T>>('selectAllOption');
+  /**
+   * "Add «…»" and the "select all" of `ui-multi-select`, in that order; the keyboard reaches them
+   * before the app's options.
+   */
+  private readonly leadingOptions = viewChildren<UiOption<T>>('createOption, selectAllOption');
+  protected readonly createOption = viewChild<UiOption>('createOption');
   protected readonly selectAllOption = viewChild<UiOption>('selectAllOption');
   protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
   private readonly chipViews = viewChildren(UiChip);
@@ -132,6 +153,27 @@ export abstract class UiSelectBase<T, V>
   /** The "select all" option of `ui-multi-select`. */
   protected readonly showSelectAll: Signal<boolean> = computed(() => false);
   protected readonly selectAllValue: unknown = null;
+  protected readonly createValue: unknown = CREATE;
+
+  /**
+   * Text the "Add «…»" option adds: the trimmed search text, unless it equals the label of an
+   * option or of a selected value (ignoring case); `''` hides the option.
+   */
+  protected readonly createText = computed(() => {
+    if (!this.creatable() || !this.searchable() || this.createBlocked()) return '';
+    const text = this.query().trim();
+    if (!text) return '';
+    const key = text.toLocaleLowerCase();
+    const taken = (label: string) => label.trim().toLocaleLowerCase() === key;
+    const listed = this.listbox.options().some((option) => taken(option.getLabel()));
+    const selected = this.selectedValues().some((value) => taken(this.listbox.labelFor(value)));
+    return listed || selected ? '' : text;
+  });
+
+  /** Options of this template above the app's options, for `aria-posinset` over `items`. */
+  protected readonly leadingCount = computed(
+    () => (this.createText() ? 1 : 0) + (this.showSelectAll() ? 1 : 0),
+  );
 
   protected readonly showClear = computed(
     () => this.clearable() && this.hasValue() && !this.isDisabled() && !this.readonly(),
@@ -139,12 +181,32 @@ export abstract class UiSelectBase<T, V>
 
   /** Sets the empty value (`null` or `[]`) and reports it to the form. */
   protected abstract clearValue(): void;
+  /** The selected values as a list (`[]` or `[value]` in `ui-select`). */
+  protected abstract selectedValues(): readonly T[];
+  /** Puts the text of the "Add «…»" option into the value. */
+  protected abstract addCreated(text: string): void;
+
+  /** No value can be added now (`maxSelections` of `ui-multi-select`). */
+  protected createBlocked(): boolean {
+    return false;
+  }
 
   constructor() {
     super();
     // The chip buttons are for the mouse; the keyboard deselects in the list.
     effect(() => {
       for (const chip of this.chipViews()) chip.tabIndex.set(-1);
+    });
+    // The search activates an option before "Add «…»" is rendered: activate it once it is, if
+    // no option of the search is active.
+    effect(() => {
+      if (!this.createOption()) return;
+      untracked(() => {
+        const active = this.listbox.active();
+        if (this.listbox.isOpen() && (!active || this.listbox.isHidden(active))) {
+          this.listbox.activateFirst();
+        }
+      });
     });
   }
 
@@ -160,9 +222,21 @@ export abstract class UiSelectBase<T, V>
       filterText: () => (this.searchable() ? this.query() : ''),
       filterOptions: this.filterOptions,
       compareWith: this.compareWith,
-      displayWith: this.displayWith,
+      displayWith: () => {
+        const displayWith = this.displayWith();
+        if (!this.creatable()) return displayWith;
+        // A created value is a string outside the list: its own label.
+        return (value: T) => {
+          const label = displayWith ? displayWith(value) : '';
+          if (label !== '') return label;
+          return typeof value === 'string' ? value : '';
+        };
+      },
       virtualThreshold: this.virtualThreshold,
       loading: this.loading,
+      alwaysShown: (option) => this.isLeading(option),
+      passedOver: (option) => option === this.createOption(),
+      leadingShown: () => this.createText() !== '',
       closed: () => {
         // The search starts over next time; server-side results go back to the full list.
         if (this.query()) {
@@ -172,6 +246,22 @@ export abstract class UiSelectBase<T, V>
         this.closed.emit();
       },
     };
+  }
+
+  /** An option of this template: "Add «…»" or "select all". */
+  protected isLeading(option: UiOptionHandle): boolean {
+    return option === this.createOption() || option === this.selectAllOption();
+  }
+
+  /** Whether a value is the one of the "Add «…»" option. */
+  protected isCreate(value: unknown): boolean {
+    return value === CREATE;
+  }
+
+  /** Adds the text of the "Add «…»" option, if it is shown. */
+  protected create(): void {
+    const text = this.createText();
+    if (text) this.addCreated(text);
   }
 
   focus(options?: FocusOptions): void {
@@ -230,6 +320,17 @@ export abstract class UiSelectBase<T, V>
   }
 
   protected onKeydown(event: KeyboardEvent): void {
+    // Enter typed before "Add «…»" was rendered and activated still adds the text.
+    if (
+      event.key === 'Enter' &&
+      this.listbox.shown() &&
+      !this.listbox.active() &&
+      this.createText()
+    ) {
+      event.preventDefault();
+      this.create();
+      return;
+    }
     this.listbox.handleKeydown(event);
   }
 }
