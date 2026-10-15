@@ -195,6 +195,8 @@ export const Creatable: Story = {
       </div>`,
   }),
   play: async ({ canvasElement }) => {
+    // The panel takes the trigger's size when it opens; in the fallback font the chips wrap.
+    await document.fonts.ready;
     const control = canvasElement.querySelector<HTMLInputElement>('.ui-select__control')!;
     control.focus();
     control.value = 'מיזוג';

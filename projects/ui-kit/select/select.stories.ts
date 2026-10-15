@@ -146,8 +146,13 @@ export const Clearable: Story = {
   }),
 };
 
-/** Types into the search field of the story's select, like a user. */
-function typeSearch(canvasElement: HTMLElement, text: string): HTMLInputElement {
+/**
+ * Types into the search field of the story's select, like a user. Waits for the fonts first: the
+ * panel takes the trigger's size when it opens, and a trigger laid out in the fallback font may
+ * be taller.
+ */
+async function typeSearch(canvasElement: HTMLElement, text: string): Promise<HTMLInputElement> {
+  await document.fonts.ready;
   const control = canvasElement.querySelector<HTMLInputElement>('.ui-select__control')!;
   control.focus();
   control.value = text;
@@ -192,7 +197,7 @@ export const Creatable: Story = {
 export const CreatableAdd: Story = {
   ...Creatable,
   play: async ({ canvasElement }) => {
-    const control = typeSearch(canvasElement, 'חדר כביסה');
+    const control = await typeSearch(canvasElement, 'חדר כביסה');
     await until(() => addIsActive(control), 'the add option is not active');
     await expect(document.querySelector('.ui-listbox__empty')).toBeNull();
   },
@@ -303,7 +308,7 @@ export const ManyOptionsCreatable: Story = {
       </div>`,
   }),
   play: async ({ canvasElement }) => {
-    const control = typeSearch(canvasElement, '12');
+    const control = await typeSearch(canvasElement, '12');
     await until(() => !!document.querySelector('.ui-select__create'), 'no add option');
     press('ArrowUp');
     await until(() => addIsActive(control), 'the add option is not active');
