@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 5, ticket 01
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** `UiEmbedStyles` lives in `@vplans/ui-kit/theme`, as decision 5 and ticket 01 say. Its
 stylesheet is the tokens plus the layout classes: about 41 kB compiled, and it cannot get much
@@ -28,13 +28,17 @@ not met by 33.11 kB". The budgets are the user's (`docs/DECISIONS.md`, phase 2 r
    at run time). No budget applies, but it is not the `styleUrl` that ticket 01 asks for, needs a
    `<style>` element of its own (CSP) and duplicates what Angular already does.
 
+## Comments
+
+- 2026-10-15: Answered by the user: option 2, raise the playground budget. Only the playground's `anyComponentStyle` `maximumError` in `angular.json` is now 48 kB; the 7 kB warning stays (`build:playground` warns about `ui-kit-embed.scss`, 41.11 kB, and passes). `UiEmbedStyles` stays in `@vplans/ui-kit/theme`. Recorded in `docs/DECISIONS.md` → "Client pilot: review answers".
+
 ## Русский перевод
 
 # 08: встраиваемые стили ломают бюджет стилей компонента в playground
 
 **Спека:** [../spec.md](../spec.md) → решение 5, тикет 01
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** `UiEmbedStyles` лежит в `@vplans/ui-kit/theme`, как сказано в решении 5 и тикете 01.
 Его стили — токены и layout-классы: около 41 kB после компиляции, и сильно меньше они не станут
@@ -60,3 +64,7 @@ not met by 33.11 kB". The budgets are the user's (`docs/DECISIONS.md`, phase 2 r
 3. Оставить в `theme` и загружать CSS без `styleUrl` (сгенерированная строка TypeScript,
    вставляемая в рантайме). Бюджет не применяется, но это не тот `styleUrl`, который просит тикет
    01, нужен свой элемент `<style>` (CSP), и это повторяет то, что Angular уже делает сам.
+
+## Комментарии
+
+- 2026-10-15: Ответ пользователя: вариант 2, поднять бюджет playground. В `angular.json` изменена только ошибка `anyComponentStyle` (`maximumError`) у playground — теперь 48 kB; предупреждение 7 kB осталось (`build:playground` предупреждает про `ui-kit-embed.scss` на 41.11 kB и проходит). `UiEmbedStyles` остаётся в `@vplans/ui-kit/theme`. Записано в `docs/DECISIONS.md` → «Client pilot: review answers».

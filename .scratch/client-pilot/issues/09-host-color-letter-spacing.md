@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 5, ticket 01
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** ticket 01 left open whether component roots and overlay panels also set `color` and
 `letter-spacing` or keep inheriting them from the host. They keep inheriting (ticket 01 →
@@ -23,13 +23,17 @@ host body's `color` and `letter-spacing` to both captures, so they do not count 
    `letter-spacing: normal`, except `ui-icon` and `ui-spinner`; `test-host-css` then runs strict.
    The kit looks the same in every host, but differs slightly from the client's own text.
 
+## Comments
+
+- 2026-10-15: Answered by the user: option 1, keep inheriting. Kit components keep inheriting `color` and `letter-spacing` from the host; nothing changes in the code. Recorded in `docs/DECISIONS.md` → "Client pilot: review answers".
+
 ## Русский перевод
 
 # 09: текст кита наследует color и letter-spacing хоста
 
 **Спека:** [../spec.md](../spec.md) → решение 5, тикет 01
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** тикет 01 оставил открытым, задают ли корни компонентов и панели оверлеев ещё `color` и
 `letter-spacing` или продолжают наследовать их от хоста. Они продолжают наследовать (тикет 01 →
@@ -49,3 +53,7 @@ tree, accordion, calendar…). `ui-icon` и `ui-spinner` рисуют через
    `letter-spacing: normal`, кроме `ui-icon` и `ui-spinner`; `test-host-css` тогда работает в
    строгом режиме. Кит выглядит одинаково в любом хосте, но чуть отличается от собственного текста
    клиента.
+
+## Комментарии
+
+- 2026-10-15: Ответ пользователя: вариант 1, наследовать дальше. Компоненты кита продолжают наследовать `color` и `letter-spacing` от хоста; код не меняется. Записано в `docs/DECISIONS.md` → «Client pilot: review answers».

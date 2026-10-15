@@ -101,9 +101,10 @@ Before/after screenshots: `../prototype/*.png`.
   vertical: the story's `<p>` margins). Before the fixes the first full run failed 695 of 700
   captures; now 0, with 9 known captures of those three stories. Added to `/phase-check`.
 - Visual baselines: unchanged (`pnpm test-visual`).
-- **Open:** `pnpm build:playground` fails on the 8 kB `anyComponentStyle` budget, because the
-  playground imports `@vplans/ui-kit/theme` and so compiles the 41 kB embed stylesheet; options in
-  ticket 08. The `color`/`letter-spacing` decision is ticket 09.
+- `pnpm build:playground` failed on the 8 kB `anyComponentStyle` budget, because the playground
+  imports `@vplans/ui-kit/theme` and so compiles the 41 kB embed stylesheet. Ticket 08 (2026-10-15):
+  the playground's error budget is now 48 kB, the 7 kB warning stays. Ticket 09 (2026-10-15): the
+  user confirmed that `color`/`letter-spacing` stay inherited.
 
 ## Русский перевод
 
@@ -208,6 +209,7 @@ Material, фон на `html {}`), нужны токены и стили комп
   отступы `<p>` story). До исправлений первый полный прогон падал на 695 из 700 снимков; теперь 0,
   и 9 известных снимков этих трёх story. Добавлено в `/phase-check`.
 - Базовые снимки не изменились (`pnpm test-visual`).
-- **Открыто:** `pnpm build:playground` падает на бюджете `anyComponentStyle` 8 kB: playground
-  импортирует `@vplans/ui-kit/theme` и поэтому компилирует встраиваемые стили на 41 kB; варианты —
-  в тикете 08. Решение по `color`/`letter-spacing` — тикет 09.
+- `pnpm build:playground` падал на бюджете `anyComponentStyle` 8 kB: playground импортирует
+  `@vplans/ui-kit/theme` и поэтому компилирует встраиваемые стили на 41 kB. Тикет 08 (2026-10-15):
+  ошибка бюджета в playground теперь 48 kB, предупреждение 7 kB осталось. Тикет 09 (2026-10-15):
+  пользователь подтвердил, что `color`/`letter-spacing` наследуются дальше.
