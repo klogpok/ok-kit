@@ -9,7 +9,15 @@ Run every step. Report failures with their output; do not report the phase as do
 
 ## 1. Automated checks
 
-Run from the repo root, in this order (later steps depend on earlier builds):
+First check that the branch contains the local `master` (a worktree starts at the older `origin/master`):
+
+```sh
+git merge-base --is-ancestor master HEAD
+```
+
+A non-zero exit stops the check: run `git merge --ff-only master` (or merge `master`), then start over.
+
+Then run from the repo root, in this order (later steps depend on earlier builds):
 
 ```sh
 pnpm tokens && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm test:playground && pnpm build && pnpm build:playground && pnpm build-storybook && pnpm test-storybook && pnpm test-visual && pnpm test-host-css
