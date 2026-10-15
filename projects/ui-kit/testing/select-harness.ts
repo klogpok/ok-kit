@@ -119,6 +119,18 @@ export class UiSelectHarness extends UiHarness {
     if (text) await control.sendKeys(text);
   }
 
+  /**
+   * Types `text` into a `searchable` `creatable` select and clicks its "Add «…»" option, whatever
+   * the language of the `create` label. Throws when the option is not offered (the text matches
+   * an option or a selected value, or `maxSelections` is reached).
+   */
+  async create(text: string): Promise<void> {
+    await this.search(text);
+    const options = await this.listbox.getOptions({ selector: '.ui-select__create' });
+    if (!options.length) throw Error(`The select does not offer to add ${JSON.stringify(text)}.`);
+    await options[0].click();
+  }
+
   /** Clicks the clear button of a `clearable` select. Throws when it is not shown. */
   async clear(): Promise<void> {
     const button = await this.locatorForOptional('.ui-select__clear')();

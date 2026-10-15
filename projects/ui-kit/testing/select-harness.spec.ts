@@ -158,3 +158,44 @@ describe('UiSelectHarness', () => {
     expect(await status.isOpen()).toBe(false);
   });
 });
+
+@Component({
+  imports: [ReactiveFormsModule, UiSelect, UiMultiSelect, UiOption],
+  template: `
+    <ui-select aria-label="Location" searchable creatable [formControl]="location">
+      <ui-option value="Kitchen">Kitchen</ui-option>
+      <ui-option value="Bathroom">Bathroom</ui-option>
+    </ui-select>
+    <ui-multi-select aria-label="Rooms" searchable creatable [(value)]="rooms">
+      <ui-option value="Kitchen">Kitchen</ui-option>
+    </ui-multi-select>
+  `,
+})
+class CreatableHost {
+  readonly location = new FormControl<string | null>(null);
+  readonly rooms = signal<readonly string[]>([]);
+}
+
+describe('UiSelectHarness of a creatable select', () => {
+  let loader: HarnessLoader;
+  let host: CreatableHost;
+
+  beforeEach(() => {
+    const fixture = TestBed.createComponent(CreatableHost);
+    host = fixture.componentInstance;
+    loader = TestbedHarnessEnvironment.loader(fixture);
+  });
+
+  it('adds typed text through the "Add" option, whatever its label', async () => {
+    const location = await loader.getHarness(UiSelectHarness.with({ label: 'Location' }));
+    await location.create('Storage room');
+    expect(host.location.value).toBe('Storage room');
+    expect(await location.getValueText()).toBe('Storage room');
+    await expect(location.create('kitchen')).rejects.toThrow(/does not offer to add "kitchen"/);
+
+    const rooms = await loader.getHarness(UiSelectHarness.with({ label: 'Rooms' }));
+    await rooms.create('Balcony');
+    await rooms.create('Attic');
+    expect(host.rooms()).toEqual(['Balcony', 'Attic']);
+  });
+});

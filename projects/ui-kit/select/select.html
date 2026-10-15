@@ -34,6 +34,7 @@
       [id]="controlId()"
       [value]="listbox.isOpen() ? query() : displayLabel()"
       [placeholder]="displayLabel() || placeholder()"
+      [attr.maxlength]="maxLength()"
       [disabled]="isDisabled()"
       [readOnly]="readonly()"
       [attr.aria-label]="ariaLabel() || null"
@@ -98,18 +99,30 @@
 
 <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
   <ui-listbox [size]="size()">
-    <!-- The row sticks over a virtual list. With items the option opens the set that their
-         aria-posinset continues. -->
-    @if (showSelectAll()) {
-      <div class="ui-select__all-row" role="none" uiListboxLeading>
-        <ui-option
-          #selectAllOption
-          class="ui-select__all"
-          [value]="selectAllValue"
-          [attr.aria-setsize]="items() ? listbox.visibleItems().length + 1 : null"
-          [attr.aria-posinset]="items() ? 1 : null"
-          >{{ labels().selectAll }}</ui-option
-        >
+    <!-- "Add «…»" and "select all": the row sticks over a virtual list. With items these options
+         open the set that their aria-posinset continues. -->
+    @if (leadingCount()) {
+      <div class="ui-select__leading" role="none" uiListboxLeading>
+        @if (createText()) {
+          <ui-option
+            #createOption
+            class="ui-select__create"
+            [value]="createValue"
+            [attr.aria-setsize]="items() ? listbox.visibleItems().length + leadingCount() : null"
+            [attr.aria-posinset]="items() ? 1 : null"
+            >{{ labels().create(createText()) }}</ui-option
+          >
+        }
+        @if (showSelectAll()) {
+          <ui-option
+            #selectAllOption
+            class="ui-select__all"
+            [value]="selectAllValue"
+            [attr.aria-setsize]="items() ? listbox.visibleItems().length + leadingCount() : null"
+            [attr.aria-posinset]="items() ? leadingCount() : null"
+            >{{ labels().selectAll }}</ui-option
+          >
+        }
       </div>
     }
     <ng-content />

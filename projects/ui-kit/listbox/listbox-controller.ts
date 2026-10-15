@@ -104,8 +104,18 @@ export interface UiListboxConfig<T> {
   readonly openAt?: () => unknown;
   /** The option cannot be picked now (`maxSelections`). */
   readonly isBlocked?: (option: UiOptionHandle) => boolean;
-  /** The search never hides the option ("select all"). */
+  /** The search never hides the option ("select all", "Add «…»"). */
   readonly alwaysShown?: (option: UiOptionHandle) => boolean;
+  /**
+   * `activateFirst()` passes over the option while the list shows another one: the "Add «…»"
+   * option of a search that also matches options.
+   */
+  readonly passedOver?: (option: UiOptionHandle) => boolean;
+  /**
+   * A leading option of the field is shown whatever the search ("Add «…»"), so a search without
+   * results still has something to pick: no "no options" row.
+   */
+  readonly leadingShown?: () => boolean;
   /** Mixed state of an option ("select all"). */
   readonly isIndeterminate?: (option: UiOptionHandle) => boolean;
   /** Called after the list opened or closed, e.g. to emit the field's outputs. */
@@ -250,9 +260,12 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
       return [...kept, ...seen];
     },
   });
-  /** Nothing to show: no option passes the search, and nothing is loading. */
+  /** Nothing to show: no option passes the search, no leading option is shown, nothing loads. */
   readonly noResults = computed(
-    () => !this.loading() && this.options().every((option) => this.isHidden(option)),
+    () =>
+      !this.loading() &&
+      !(this.config()?.leadingShown?.() ?? false) &&
+      this.options().every((option) => this.isHidden(option)),
   );
   /** The list is open and has something to show; bind the dropdown panel and ARIA to it. */
   readonly shown = computed(
@@ -420,12 +433,21 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
 
   // --- Active option ------------------------------------------------------------------------
 
+  /**
+   * Activates the first option that can be picked, passing over a `passedOver` one while another
+   * follows it. With none, the list is left without an active option: an option the search has
+   * just hidden must not stay active, or Enter would pick it.
+   */
   activateFirst(): void {
     this.keyManager.setFirstItemActive();
+    const first = this.keyManager.activeItem;
+    if (first && this.config()?.passedOver?.(first)) this.keyManager.setNextItemActive();
+    this.dropUnavailableActive();
   }
 
   activateLast(): void {
     this.keyManager.setLastItemActive();
+    this.dropUnavailableActive();
   }
 
   /** Makes the first option with this value active, if it can be. Returns whether it did. */
@@ -579,6 +601,15 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
 
   private locked(): boolean {
     return this.config()?.locked?.() ?? false;
+  }
+
+  /**
+   * The key manager keeps its active option when no option can be activated (every one is
+   * hidden or disabled). Clear it then.
+   */
+  private dropUnavailableActive(): void {
+    const active = this.keyManager.activeItem;
+    if (active && (active.ɵdisabled || this.isHidden(active))) this.clearActive();
   }
 
   private activatesOnOpen(): boolean {

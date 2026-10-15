@@ -22,6 +22,11 @@ import { UiSelectBase } from './select-base';
  * - Open: arrows, Home/End and PageUp/PageDown move, Enter (or Space) selects, Escape and Tab close.
  * - `searchable` turns the trigger into a text input that filters the options by label.
  *   Listen to `searchChange` and set `filterOptions="false"` to filter on the server instead.
+ *   `maxLength` limits the search text.
+ * - `creatable` (with `searchable`, string values) adds a first option "Add «text»" while the
+ *   search text equals no option label and not the value's label. Picking it (or Enter while
+ *   it is active) makes the text the value and closes the list. A string value outside the list
+ *   is its own label.
  *
  * Implements `ControlValueAccessor`: bind it with `formControl`, `formControlName` or `ngModel`.
  *
@@ -52,16 +57,31 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
 
   protected readonly listbox: UiListboxController<T> = injectListbox<T>({
     ...this.listboxConfig(),
-    isSelected: (value) => this.listbox.matches(value, this.value()),
+    isSelected: (value) => !this.isCreate(value) && this.listbox.matches(value, this.value()),
     select: (value) => {
-      this.value.set(value as T);
-      this.notifyChange(value as T);
-      this.close();
+      if (this.isCreate(value)) this.create();
+      else this.setValue(value as T);
     },
   });
 
   protected readonly displayLabel = computed(() => this.listbox.labelFor(this.value()));
   protected readonly hasValue = computed(() => this.value() !== null);
+
+  protected selectedValues(): readonly T[] {
+    const value = this.value();
+    return value === null ? [] : [value];
+  }
+
+  /** The text becomes the value, and the list closes as after picking an option. */
+  protected addCreated(text: string): void {
+    this.setValue(text as T);
+  }
+
+  private setValue(value: T): void {
+    this.value.set(value);
+    this.notifyChange(value);
+    this.close();
+  }
 
   protected clearValue(): void {
     this.value.set(null);

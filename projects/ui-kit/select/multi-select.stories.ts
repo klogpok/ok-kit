@@ -175,6 +175,42 @@ export const MaxSelections: Story = {
   }),
 };
 
+/**
+ * `creatable`: "Add «…»" adds the search text and keeps the list open. A matching option stays
+ * active above it, so Enter picks the match; ArrowUp reaches "Add". A selected value outside the
+ * list ("נגרות") is its own chip.
+ */
+export const Creatable: Story = {
+  render: () => ({
+    props: { trades: TRADES },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:360px;min-block-size:18rem">
+        <ui-form-field label="מקצועות">
+          <ui-multi-select chips searchable creatable [value]="['חשמל', 'נגרות']">
+            @for (trade of trades; track trade) {
+              <ui-option [value]="trade">{{ trade }}</ui-option>
+            }
+          </ui-multi-select>
+        </ui-form-field>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const control = canvasElement.querySelector<HTMLInputElement>('.ui-select__control')!;
+    control.focus();
+    control.value = 'מיזוג';
+    control.dispatchEvent(new Event('input', { bubbles: true }));
+    const active = () => {
+      const id = control.getAttribute('aria-activedescendant');
+      return id ? document.getElementById(id) : null;
+    };
+    await until(
+      () => !!document.querySelector('.ui-select__create') && !!active(),
+      'the list did not show the add option',
+    );
+    await expect(active()?.textContent).toContain('מיזוג אוויר');
+  },
+};
+
 const UNITS = Array.from({ length: 500 }, (_, i) => ({
   value: `unit-${i + 1}`,
   label: `יחידה ${i + 1}`,
@@ -234,7 +270,7 @@ export const ManyOptionsPageUp: Story = {
       return id ? document.getElementById(id) : null;
     };
     await until(() => !!active()?.textContent?.includes('יחידה 10'), 'not at item 10');
-    const row = document.querySelector('.ui-select__all-row')!.getBoundingClientRect();
+    const row = document.querySelector('.ui-select__leading')!.getBoundingClientRect();
     const listbox = document.querySelector('[role="listbox"]')!.getBoundingClientRect();
     // The list is scrolled, "select all" sticks at its top, and the active item shows below it.
     // (The listbox border is 1px.)

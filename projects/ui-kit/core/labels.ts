@@ -15,6 +15,11 @@ export interface UiLabels {
   cancel: string;
   /** Shown by `ui-select` when no option matches the search. */
   noOptions: string;
+  /**
+   * The "add" option of a `creatable` `ui-select` or `ui-multi-select` for the search text,
+   * e.g. "Add «Storage room»".
+   */
+  create: (text: string) => string;
   /** Clear buttons of `ui-select`, `ui-multi-select` and `ui-datepicker`. */
   clear: string;
   /** Accessible name of the toast region. */
@@ -136,6 +141,8 @@ export const UI_LABELS_HE: UiLabels = {
   confirm: 'אישור',
   cancel: 'ביטול',
   noOptions: 'אין תוצאות',
+  // The isolate (FSI…PDI) keeps typed Latin text or digits from reordering the Hebrew text.
+  create: (text) => `הוספת «\u2068${text}\u2069»`,
   clear: 'ניקוי',
   notifications: 'התראות',
   required: 'חובה',
@@ -205,6 +212,7 @@ export const UI_LABELS_EN: UiLabels = {
   confirm: 'Confirm',
   cancel: 'Cancel',
   noOptions: 'No options',
+  create: (text) => `Add «${text}»`,
   clear: 'Clear',
   notifications: 'Notifications',
   required: 'required',
