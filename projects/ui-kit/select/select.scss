@@ -3,6 +3,8 @@
 // The trigger shares the input tokens, so selects and text inputs look the same in a form.
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   inline-size: 100%;
   font-family: var(--ui-font-family-sans);
@@ -140,6 +142,8 @@
 }
 
 .ui-select__clear {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   position: absolute;
   inset-inline-end: calc(var(--_padding) + var(--ui-icon-size-sm) + var(--ui-space-2xs));
   display: inline-flex;

@@ -1,6 +1,8 @@
 @use '../styles/mixins';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   --_fill: var(--ui-slider-fill-bg);
   --_thumb-border: var(--ui-slider-thumb-border);
   display: block;
@@ -90,6 +92,8 @@
 
 // Keys, focus and screen readers; the pointer is handled by the control.
 .ui-slider__input {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   position: absolute;
   inset: 0;
   inline-size: 100%;

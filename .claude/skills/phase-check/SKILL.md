@@ -12,7 +12,7 @@ Run every step. Report failures with their output; do not report the phase as do
 Run from the repo root, in this order (later steps depend on earlier builds):
 
 ```sh
-pnpm tokens && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm test:playground && pnpm build && pnpm build:playground && pnpm build-storybook && pnpm test-storybook && pnpm test-visual
+pnpm tokens && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm test:playground && pnpm build && pnpm build:playground && pnpm build-storybook && pnpm test-storybook && pnpm test-visual && pnpm test-host-css
 ```
 
 Then type-check the stories:
@@ -22,6 +22,7 @@ pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit
 ```
 
 - `pnpm test-storybook` runs axe on every story in three modes (light/rtl, dark/rtl, light/ltr).
+- `pnpm test-host-css` prepends a host app's global CSS (the fixture in `scripts/host-css/`: Bootstrap 4.6.2 and the client's html/body rules) to every story in light RTL, light LTR and with a focused button, and fails when it changes a kit element (computed styles, or the pixels of a kit component). The inherited host body `color` and `letter-spacing` are accepted. Captures of a failure are in `dist/host-css/`; put the number of captures in the report.
 - Budget warnings from `pnpm build:playground` are not failures, but list them in the report. The limits are in [docs/DECISIONS.md](../../../docs/DECISIONS.md) (phase 2 review answers).
 - `pnpm test:coverage` fails below the thresholds in `scripts/check-coverage.mjs`. Put the four numbers in the report.
 

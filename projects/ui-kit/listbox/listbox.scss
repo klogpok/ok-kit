@@ -1,5 +1,7 @@
 // The popup listbox of ui-select, ui-multi-select, ui-autocomplete and ui-time-input.
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   box-sizing: border-box;
   inline-size: 100%;

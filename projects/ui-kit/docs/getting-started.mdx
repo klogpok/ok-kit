@@ -104,6 +104,68 @@ The form field and the buttons, live (the toolbar switches theme, direction and 
 With `strictTemplates` on, bind `model()` booleans explicitly: `<ui-checkbox [checked]="true">`.
 A bare `checked` attribute is a compile error.
 
+## Embedding into an existing app
+
+An app that already has global styles of its own (Bootstrap, an Angular Material theme, a
+background on `html`) and must not change its `angular.json` loads the kit from the component
+that uses it instead of steps 3 and 4. Render `<ui-embed-styles />` once in that component's
+template and provide the built-in texts there:
+
+```ts
+import { Component, LOCALE_ID, inject } from '@angular/core';
+import { UiButton } from '@vplans/ui-kit/button';
+import { UI_LABELS_EN, UI_LABELS_HE, provideUiLabels } from '@vplans/ui-kit/core';
+import { UiEmbedStyles } from '@vplans/ui-kit/theme';
+
+@Component({
+  selector: 'app-action-weights',
+  imports: [UiEmbedStyles, UiButton],
+  providers: [
+    provideUiLabels(() => (inject(LOCALE_ID).startsWith('he') ? UI_LABELS_HE : UI_LABELS_EN)),
+  ],
+  template: `
+    <ui-embed-styles />
+    …
+  `,
+})
+export class ActionWeights {}
+```
+
+`ui-embed-styles` is a hidden, unencapsulated component whose stylesheet is
+`styles/ui-kit-embed.scss`: the tokens on `:root` (so overlays get them too) and the layout
+classes (`ui-stack`, `ui-cluster`, `ui-grid`, `ui-container`). Angular keeps the stylesheet in the
+document while at least one component that renders it is on screen. `provideUiIcons()` is an
+environment provider, so without access to the app's providers register icons with
+`inject(UiIconRegistry).register([...])` in the component, or pass the icon itself:
+`<ui-icon [icon]="uiIconCheck" />`. The stylesheet uses only relative `@use`, so a copy of the
+kit compiles it without `includePaths`.
+
+Left out, compared with `ui-kit.scss`:
+
+- **The document defaults** (`_base.scss`: font, color, line-height and background on `:root`,
+  the `body` margin, `box-sizing: border-box` on every element). They would restyle the whole
+  host app. The kit expects `border-box`, which Bootstrap's reboot and most resets already set.
+- **The typography classes** (`ui-display`, `ui-heading-*`, `ui-body*`, `ui-caption`, `ui-label`,
+  `ui-code`, `ui-text-muted`). The host has its own.
+- **The switch to dark tokens under `prefers-color-scheme: dark`.** The host decides its theme:
+  only an explicit `data-theme="dark"` turns the kit dark. Inside such a region, set the text
+  color and background yourself (`var(--ui-color-text)`, `var(--ui-color-bg)`); the document
+  defaults that did it are left out.
+
+What a host rule can still reach. The kit's components resist the usual global rules of a host:
+their roots and overlay panels set `text-align: start` (Bootstrap's `body { text-align: left }`
+would break RTL), the `label` and `svg` elements they render set their own margin, display and
+vertical alignment, and their native inputs and icon buttons set their own font.
+`pnpm test-host-css` checks this on every story with Bootstrap 4.6 prepended. Still inherited
+from the host, on purpose:
+
+- **`color` and `letter-spacing`** where a component does not set its own (plain text in a list
+  option, projected text): kit text then matches the host's text around it.
+- **The position of a component** in the host's own markup: an inline component, such as a
+  button, follows the `text-align` of its parent.
+- **Rules more specific than the kit's or with `!important`**, and rules on properties the kit
+  does not set (for example `::-webkit-scrollbar` styles of scrolling panels).
+
 ## Next steps
 
 - The other pages of this Docs section cover [theming](?path=/docs/docs-theming--docs),

@@ -371,7 +371,7 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 > Работа вне фаз после закрытия фазы 9: первый экран приложения `C:\vplans\client` на ките. Спека и тикеты 01–07 — в `.scratch/client-pilot/`; решения — в [DECISIONS.md](DECISIONS.md) («Client pilot: plan»).
 >
-> **Статус (2026-10-14): спека и тикеты готовы, работа не начата.**
+> **Статус (2026-10-14): спека и тикеты готовы; тикет 01 (встраиваемые стили, `ui-embed-styles`, устойчивость к CSS хоста, `pnpm test-host-css`) сделан; вопросы 08 (ошибка бюджета `anyComponentStyle` в playground — 48 kB) и 09 (`color`/`letter-spacing` наследуются от хоста) решены 2026-10-15.**
 >
 > - Экран — `settings/action-weights-section` в `apartment-changes-new`.
 > - Общие файлы client (`tsconfig*`, `angular.json`, `.eslintrc`, `package.json`, `styles.scss`, корневые провайдеры) не меняются; все правки — внутри `apartment-changes-new/`.

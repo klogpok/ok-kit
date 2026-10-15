@@ -1,5 +1,7 @@
 // Unencapsulated: spaces projected dividers. Every selector is scoped under `.ui-menu`.
 .ui-menu {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;

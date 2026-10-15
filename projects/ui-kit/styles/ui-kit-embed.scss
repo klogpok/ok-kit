@@ -1,0 +1,13 @@
+// The kit's global styles for a host app that keeps its own document styles: the tokens and the
+// layout classes. Loaded by `<ui-embed-styles />` (`@vplans/ui-kit/theme`).
+
+// Left out on purpose, compared with ui-kit.scss:
+// - `_base` (font, color, line-height and background on `:root`, `body` margin, `box-sizing`),
+//   which would restyle the whole host app;
+// - `_typography` (the `.ui-display`, `.ui-heading-*`, `.ui-body*` … classes);
+// - the `prefers-color-scheme: dark` switch of the tokens: only an explicit
+//   `[data-theme='dark']` turns the kit dark.
+
+// Relative `@use` only: a copy of the kit compiles this file without `includePaths`.
+@use 'tokens-embed';
+@use 'layout-classes';

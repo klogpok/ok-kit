@@ -28,7 +28,8 @@ Review answers:
 - toast defaults stay: `bottom-end`, 5 s, max 3;
 - dialogs focus the first form field on open;
 - budgets: the playground bundle warning is 900 kB (raised in the phase 6 and 7 reviews) and the
-  component style warning is 7 kB (raised in the phase 6 and 8.6 reviews); errors stay at 1 MB and 8 kB;
+  component style warning is 7 kB (raised in the phase 6 and 8.6 reviews); errors stay at 1 MB and 8 kB
+  (the component style error became 48 kB in the client pilot review, ticket 08);
 - multi-select belongs to phase 3.
 
 ## Phase 3: data and navigation (approved 2026-09-25)
@@ -607,3 +608,17 @@ tickets 01–07 are in `.scratch/client-pilot/`.
   the client's gitignored `.scratch/`.
 - **Client work** goes on branch `feat/ui-kit-pilot`, follows the client's `AGENTS.md` and is not
   pushed without approval.
+
+## Client pilot: review answers (decided 2026-10-15)
+
+Tickets 08 and 09 in `.scratch/client-pilot/issues/`, raised by ticket 01.
+
+- **The playground's component style error budget is 48 kB** (ticket 08): the playground imports
+  `@vplans/ui-kit/theme`, so it compiles the 41 kB stylesheet of `UiEmbedStyles` although it never
+  renders it. Only the playground's `anyComponentStyle` `maximumError` is raised; the 7 kB warning
+  stays (the embed stylesheet now warns on every `build:playground`), and `UiEmbedStyles` stays in
+  `@vplans/ui-kit/theme` as decision 5 of the plan says.
+- **Kit text inherits the host's `color` and `letter-spacing`** (ticket 09): component roots and
+  overlay panels set `text-align: start` but not `color` or `letter-spacing`, so kit text without
+  a color of its own matches the host's text around it. `pnpm test-host-css` applies the host
+  body's `color` and `letter-spacing` to both captures; `--strict` reports them.

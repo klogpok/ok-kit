@@ -1,6 +1,8 @@
 @use '../styles/mixins';
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: inline-flex;
   font-family: var(--ui-font-family-sans);
   color: var(--ui-color-text);
@@ -23,6 +25,8 @@
 
 .ui-radio__label {
   display: inline-flex;
+  // A host reboot (`label { margin-bottom }`) must not move it.
+  margin: 0;
   align-items: flex-start;
   gap: var(--ui-space-sm);
   font-size: var(--_font-size);
@@ -39,6 +43,8 @@
 }
 
 .ui-radio__input {
+  // A host reboot (`button, input { font-family/size/line-height: inherit }`) must not change it.
+  font: inherit;
   display: grid;
   place-content: center;
   margin: 0;

@@ -2,6 +2,8 @@
 @use 'tab-styles';
 
 :host(.ui-tab-nav) {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   font-family: var(--ui-font-family-sans);
   @include tab-styles.list;
 }

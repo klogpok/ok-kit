@@ -1,4 +1,6 @@
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: inline-block;
   flex-shrink: 0;
   inline-size: var(--_size);
@@ -21,6 +23,8 @@
 
 .ui-spinner__svg {
   display: block;
+  // The initial value, set so that a host `svg { vertical-align }` (Bootstrap reboot) does not apply.
+  vertical-align: baseline;
   inline-size: 100%;
   block-size: 100%;
   animation: ui-spinner-rotate var(--ui-spinner-duration) linear infinite;

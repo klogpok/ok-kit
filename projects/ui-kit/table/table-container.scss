@@ -3,6 +3,8 @@
 // A box that scrolls the table sideways. Its own stacking context keeps the z-index of sticky
 // cells inside it.
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   position: relative;
   display: flex;
   flex-direction: column;

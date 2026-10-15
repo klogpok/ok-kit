@@ -1,6 +1,8 @@
 @use '../styles/mixins' as ui;
 
 :host {
+  // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
+  text-align: start;
   display: block;
   color: var(--ui-color-text);
   font-family: var(--ui-font-family-sans);
