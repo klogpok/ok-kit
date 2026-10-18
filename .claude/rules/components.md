@@ -31,6 +31,14 @@ paths:
 - CDK key managers take `horizontalOrientation` from `Directionality` once, when they are created, so ←/→ stay LTR after a runtime switch to RTL. `ui-tree` provides its own `TREE_KEY_MANAGER` factory that swaps the arrows at key time (`tree/tree-key-manager.ts`).
 - axe rejects `aria-expanded` on a `tr` outside a treegrid (`aria-conditional-attr`); `aria-selected` on a `tr` is fine. Expand state lives on the toggle button.
 
+## The client copy
+
+`pnpm sync:client` copies the kit into the VPlans client (README → "Consuming the kit"), so kit code must survive a copy with relative imports:
+
+- Import another entry point only as `'@vplans/ui-kit/<entry>'` in an `import`/`export` (or `import()`). The sync rewrites module specifiers only and fails on any other `@vplans/ui-kit` outside a comment: a bare `'@vplans/ui-kit'`, a string constant, a template literal.
+- Only folders with a `public-api.ts` and `styles/` are copied. Code a component needs at runtime never lives in `src/`, `tokens/` (`tokens.generated.ts` is for stories) or a `*.spec.ts`/`*.stories.ts` file.
+- Never fix a bug in the client's `apartment-changes-new/ui-kit/`: fix the kit and sync again. `pnpm sync:client --verify` compiles the copy with the client's `tsconfig.json` options, which differ from the kit's: `useDefineForClassFields: false`, `module: preserve`, `typeCheckHostBindings: false`.
+
 ## Storybook JIT
 
 Storybook dev compiles components in JIT (Analog plugin); `build-storybook` is not affected.

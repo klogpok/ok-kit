@@ -33,6 +33,7 @@ and the contribution rules.
 - [Data display](#data-display)
 - [Navigation](#navigation)
 - [Testing](#testing)
+- [Consuming the kit](#consuming-the-kit)
 - [Components](#components)
 - [Tokens](#tokens) (guide: Docs/Tokens in Storybook)
 - [Contributing](#contributing)
@@ -920,6 +921,39 @@ await dialog.close();
 Every component with state or behavior has a harness. Purely visual components (divider,
 skeleton, spinner, icon, card) have none: query them in a test as plain markup.
 
+## Consuming the kit
+
+The VPlans client (`C:\vplans\client`) uses the kit as a self-contained copy in
+`src/app/pages/dashboard/apartment-changes-new/ui-kit/`, without any change to its `tsconfig`,
+`angular.json` or root providers. `scripts/sync-to-client.mjs` writes that copy:
+
+```sh
+pnpm sync:client            # writes the copy into ../client (next to this repo)
+pnpm sync:client <target>   # writes it into another folder, whose parent must exist
+pnpm sync:client --check    # exits 1 when the copy differs from what a sync would write
+pnpm sync:client --verify   # syncs into dist/client-sync-verify/, compiles it with ngc using the
+                            # options of the client's tsconfig.json, and compiles every stylesheet
+                            # with sass without includePaths (--client <path> to name the client)
+```
+
+The copy holds every entry point that has a `public-api.ts` (including `testing` and the internal
+`listbox`) and `styles/`, with the same layout, without specs, stories, `ng-package.json`,
+`package.json`, `tsconfig*.json`, docs, `src/`, test setup and `tokens/`. Files removed from the kit
+are removed from the copy. Its only transformation: every `'@vplans/ui-kit/<entry>'` import becomes
+the relative `'../<entry>/public-api'`; a sync fails when `@vplans/ui-kit` is still named outside a
+comment. `SYNCED.md` at the root of the copy records the source commit and whether the kit's working
+tree was dirty. The script writes nothing outside the target and refuses a non-empty target without
+its own `SYNCED.md`; a target with one is its previous output and is mirrored as a whole, so a file
+added there by hand is deleted.
+
+A consumer imports from the copy's entry points (`'../ui-kit/button/public-api'`) and brings what
+the kit needs itself, as in [Embedding into an existing app](./docs/getting-started.mdx): an
+unencapsulated `<ui-embed-styles />` in its template and `provideUiLabels(...)`, keyed on
+`LOCALE_ID`, in its own `providers`.
+
+**A fix goes into the kit, never into the copy.** Change the kit, commit, and run
+`pnpm sync:client` again; `--check` shows a copy that was edited by hand or is stale.
+
 ## Components
 
 | Entry point                   | Exports                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -1611,6 +1645,8 @@ the **Tokens** docs page.
 | `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`                                                             |
 | `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                                                                                 |
 | `pnpm test-host-css`      | Every built story with a host app's global CSS (Bootstrap 4.6 fixture) prepended, 3 modes; fails when it changes a kit element |
+| `pnpm test:scripts`       | Tests of the repo scripts (`node --test`, `scripts/*.test.mjs`)                                                                |
+| `pnpm sync:client`        | Writes the kit's self-contained copy into the client; `--check`, `--verify` (see [Consuming the kit](#consuming-the-kit))      |
 
 ### Adding a component
 
