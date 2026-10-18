@@ -97,6 +97,25 @@ describe('syncTarget and checkTarget', () => {
     ]);
   });
 
+  it('treats a CRLF checkout of the copy as matching, and leaves its files alone', async () => {
+    const target = join(await folder({ 'x.ts': 'x' }), 'ui-kit');
+    const files = { 'core/a.ts': 'a\nb\n', 'styles/s.scss': 'a {}\n' };
+    await syncTarget(target, plan(files));
+    // What git with core.autocrlf=true writes on a fresh checkout of the committed copy.
+    for (const [path, data] of await readTree(target)) {
+      await writeFile(join(target, path), String(data).replace(/\n/g, '\r\n'));
+    }
+    const none = { added: [], changed: [], removed: [] };
+    assert.deepEqual(await checkTarget(target, plan(files)), none);
+    assert.deepEqual(await syncTarget(target, plan(files)), none);
+    assert.equal(String((await readTree(target)).get('core/a.ts')), 'a\r\nb\r\n');
+
+    const edited = { ...files, 'core/a.ts': 'a\nc\n' };
+    assert.deepEqual(await checkTarget(target, plan(edited)), { ...none, changed: ['core/a.ts'] });
+    assert.deepEqual(await syncTarget(target, plan(edited)), { ...none, changed: ['core/a.ts'] });
+    assert.equal(String((await readTree(target)).get('core/a.ts')), 'a\nc\n');
+  });
+
   it('refuses a target that holds files it did not write', async () => {
     const parent = await folder({ 'ui-kit/button.ts': 'theirs' });
     await assert.rejects(

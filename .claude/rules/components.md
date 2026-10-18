@@ -38,6 +38,7 @@ paths:
 - Import another entry point only as `'@vplans/ui-kit/<entry>'` in an `import`/`export` (or `import()`). The sync rewrites module specifiers only and fails on any other `@vplans/ui-kit` outside a comment: a bare `'@vplans/ui-kit'`, a string constant, a template literal.
 - Only folders with a `public-api.ts` and `styles/` are copied. Code a component needs at runtime never lives in `src/`, `tokens/` (`tokens.generated.ts` is for stories) or a `*.spec.ts`/`*.stories.ts` file.
 - Never fix a bug in the client's `apartment-changes-new/ui-kit/`: fix the kit and sync again. `pnpm sync:client --verify` compiles the copy with the client's `tsconfig.json` options, which differ from the kit's: `useDefineForClassFields: false`, `module: preserve`, `typeCheckHostBindings: false`.
+- The client has no `.gitattributes` and checks the copy out with CRLF. `--check` and the sync compare text with CRLF read as LF; do not make them compare bytes again, and do not add a `.gitattributes` to the copy (`client-pilot` ticket 10).
 
 ## Storybook JIT
 

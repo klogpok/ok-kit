@@ -946,6 +946,12 @@ tree was dirty. The script writes nothing outside the target and refuses a non-e
 its own `SYNCED.md`; a target with one is its previous output and is mirrored as a whole, so a file
 added there by hand is deleted.
 
+Line endings do not count: `--check` and a sync read CRLF as LF in text files (any file without a
+NUL byte). The client has no `.gitattributes`, and Git for Windows checks the committed copy out
+with CRLF (`core.autocrlf=true`). `--check` still matches such a checkout, and a sync leaves a file
+alone when only its line endings differ, so it does not mark every file as modified in
+`git status`. A file the kit changed is written with the kit's LF.
+
 A consumer imports from the copy's entry points (`'../ui-kit/button/public-api'`) and brings what
 the kit needs itself, as in [Embedding into an existing app](./docs/getting-started.mdx): an
 unencapsulated `<ui-embed-styles />` in its template and `provideUiLabels(...)`, keyed on
