@@ -103,14 +103,23 @@ export async function readTree(root) {
   return new Map([...tree].sort(([a], [b]) => (a < b ? -1 : 1)));
 }
 
+// `ignoreBOM` keeps a byte order mark in the text, so adding or dropping one is a change.
+const UTF8 = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
+
 /**
  * A file's content for comparison: text with CRLF read as LF. The client has no `.gitattributes`
  * and Git for Windows checks files out with `core.autocrlf=true`, so a fresh checkout of the copy
- * has CRLF where the kit has LF. A file with a NUL byte is binary and compared as is.
+ * has CRLF where the kit has LF. A file with a NUL byte or bytes that are not valid UTF-8 is
+ * binary and compared as is: decoding it would turn different invalid bytes into the same U+FFFD.
  */
 function comparable(data) {
   const bytes = Buffer.from(data);
-  return bytes.includes(0) ? bytes : Buffer.from(String(bytes).replace(/\r\n/g, '\n'));
+  if (bytes.includes(0)) return bytes;
+  try {
+    return Buffer.from(UTF8.decode(bytes).replace(/\r\n/g, '\n'));
+  } catch {
+    return bytes;
+  }
 }
 
 function diff(plan, existing, ignoreSource) {
