@@ -31,20 +31,18 @@ const DEFAULT_TARGET = 'src/app/pages/dashboard/apartment-changes-new/ui-kit';
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const kit = join(repo, 'projects/ui-kit');
 const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
-// The client sits next to the main checkout, also when this runs in a worktree of it.
-const mainCheckout = dirname(git('rev-parse', '--path-format=absolute', '--git-common-dir'));
 
-const { values, positionals } = parseArgs({
-  allowPositionals: true,
-  options: {
-    check: { type: 'boolean', default: false },
-    verify: { type: 'boolean', default: false },
-    client: { type: 'string', default: join(mainCheckout, '../client') },
-  },
-});
-const client = resolve(values.client);
-
+let client;
 try {
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: {
+      check: { type: 'boolean', default: false },
+      verify: { type: 'boolean', default: false },
+      client: { type: 'string' },
+    },
+  });
+  client = resolve(values.client ?? defaultClient());
   if (values.verify) {
     if (positionals.length > 0 || values.check)
       throw new Error('--verify takes no target and no --check');
@@ -57,6 +55,12 @@ try {
 } catch (error) {
   console.error(`sync-to-client: ${error.message}`);
   process.exitCode = 1;
+}
+
+/** The client next to the main checkout, also when this runs in a worktree of it. */
+function defaultClient() {
+  const mainCheckout = dirname(git('rev-parse', '--path-format=absolute', '--git-common-dir'));
+  return join(mainCheckout, '../client');
 }
 
 async function plan() {
