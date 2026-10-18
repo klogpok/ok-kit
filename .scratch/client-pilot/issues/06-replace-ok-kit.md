@@ -78,6 +78,21 @@ the vendored ok-kit` on `feat/ui-kit-pilot-06` (from `feat/ui-kit-pilot` `6b270e
 - **Open.** None blocking. The spec run prints `NG0956` (track by identity) when the project's
   options change; it is the template's existing `track name`, not from the kit.
 
+**2026-10-18 - review fixes.** Client commit `8bb3153f2` `refactor(ac): shared ui-kit labels
+provider, spec helpers` on `feat/ui-kit-pilot-review` (worktree
+`C:\vplans\worktrees\client\ui-kit-pilot-review`, from `feat/ui-kit-pilot` at `dbaa9cc09`). Not
+pushed.
+
+- The apartment changes dialog takes its kit labels from the shared `provideAcUiLabels()`
+  (`apartment-changes-new/shared/ui-kit-labels.util.ts`), also used by the action weights section.
+- The location spec "offers to add only text that names no option" reads the entries with the
+  existing `entryTexts` helper instead of its own inline copy. The maxlength test still reads the
+  `.col-location input`: the copy's `UiSelectHarness` has no getter for it, and the kit harness
+  was not changed for this.
+- **Checks:** the action weights spec 9/9 (through the tsconfig above), `test:price-quotes`
+  99/99, `ng build -c production --localize` exit 0 with the same 11 budget warnings;
+  `git diff --name-only master` only under `apartment-changes-new/`.
+
 ## Русский перевод
 
 # 06: заменить вендорный ok-kit
@@ -161,3 +176,18 @@ instead of the vendored ok-kit` в `feat/ui-kit-pilot-06` (от `feat/ui-kit-pil
   кита (здесь не используются). Стили панели и опций в остальном те же.
 - **Открыто.** Ничего блокирующего. Прогон спека печатает `NG0956` (track by identity) при смене
   опций проекта; это существующий `track name` шаблона, не кит.
+
+**2026-10-18 - исправления по ревью.** Коммит клиента `8bb3153f2` `refactor(ac): shared ui-kit
+labels provider, spec helpers` в `feat/ui-kit-pilot-review` (worktree
+`C:\vplans\worktrees\client\ui-kit-pilot-review`, от `feat/ui-kit-pilot` на `dbaa9cc09`). Не
+запушено.
+
+- Диалог apartment changes берёт метки кита из общего `provideAcUiLabels()`
+  (`apartment-changes-new/shared/ui-kit-labels.util.ts`), его же использует раздел action weights.
+- Тест локации «offers to add only text that names no option» читает пункты существующим
+  помощником `entryTexts` вместо своей встроенной копии. Тест maxlength по-прежнему читает
+  `.col-location input`: у `UiSelectHarness` копии нет такого геттера, а harness кита ради этого
+  не менялся.
+- **Проверки:** спек action weights 9/9 (через tsconfig выше), `test:price-quotes` 99/99,
+  `ng build -c production --localize` код 0 с теми же 11 предупреждениями о бюджетах;
+  `git diff --name-only master` только внутри `apartment-changes-new/`.

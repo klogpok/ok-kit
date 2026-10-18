@@ -47,7 +47,7 @@ needs itself:
  * source line of SYNCED.md is not compared: a new kit commit alone does not make the copy stale.
  */
 export async function checkTarget(target, plan) {
-  return diff(plan, await readTree(target), true);
+  return diff(plan, await readTree(target), { ignoreSourceLine: true });
 }
 
 /**
@@ -73,7 +73,7 @@ export async function syncTarget(target, plan) {
       `${root} has files that sync-to-client.mjs did not write (no ${SYNCED_MD} of it)`,
     );
   }
-  const changes = diff(plan, existing, false);
+  const changes = diff(plan, existing);
   for (const path of [...changes.added, ...changes.changed]) {
     await mkdir(dirname(inside(path)), { recursive: true });
     await writeFile(inside(path), plan.get(path));
@@ -100,24 +100,42 @@ export async function readTree(root) {
     }
   };
   await walk(root);
-  return new Map([...tree].sort(([a], [b]) => (a < b ? -1 : 1)));
+  return sortedByKey(tree);
 }
+
+/** `map` with its entries in the order of their keys. */
+function sortedByKey(map) {
+  return new Map([...map].sort(([a], [b]) => (a < b ? -1 : 1)));
+}
+
+// `ignoreBOM` keeps a byte order mark in the text, so adding or dropping one is a change.
+const UTF8 = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
 /**
  * A file's content for comparison: text with CRLF read as LF. The client has no `.gitattributes`
  * and Git for Windows checks files out with `core.autocrlf=true`, so a fresh checkout of the copy
- * has CRLF where the kit has LF. A file with a NUL byte is binary and compared as is.
+ * has CRLF where the kit has LF. A file with a NUL byte or bytes that are not valid UTF-8 is
+ * binary and compared as is: decoding it would turn different invalid bytes into the same U+FFFD.
  */
 function comparable(data) {
   const bytes = Buffer.from(data);
-  return bytes.includes(0) ? bytes : Buffer.from(String(bytes).replace(/\r\n/g, '\n'));
+  if (bytes.includes(0)) return bytes;
+  try {
+    return Buffer.from(UTF8.decode(bytes).replace(/\r\n/g, '\n'));
+  } catch {
+    return bytes;
+  }
 }
 
-function diff(plan, existing, ignoreSource) {
+/**
+ * The paths `added`, `changed` and `removed` from `existing` to `plan`. `ignoreSourceLine` leaves
+ * the source line of SYNCED.md out of the comparison.
+ */
+function diff(plan, existing, { ignoreSourceLine = false } = {}) {
   const same = (path) => {
     const want = comparable(plan.get(path));
     const have = comparable(existing.get(path));
-    return ignoreSource && path === SYNCED_MD
+    return ignoreSourceLine && path === SYNCED_MD
       ? String(want).replace(SOURCE_LINE, '') === String(have).replace(SOURCE_LINE, '')
       : want.equals(have);
   };
@@ -143,7 +161,7 @@ const ENTRY_IMPORT = /^@vplans\/ui-kit\/([a-z][a-z0-9-]*)$/;
 const SKIPPED_FOLDERS = new Set(['src', 'docs', 'tokens', 'node_modules']);
 /** Files that only serve the kit's own build, docs or tests. */
 const SKIPPED_FILE =
-  /(\.spec\.ts|\.stories\.ts|^ng-package\.json|^package\.json|^tsconfig.*\.json|\.mdx?)$/;
+  /(\.spec\.ts|\.stories\.ts|^ng-package\.json|^package\.json|^tsconfig.*\.json|\.mdx?)$|^test-setup/;
 
 /**
  * What a sync writes. `files` maps each path inside the copy (with `/` separators, sorted) to its
@@ -172,9 +190,10 @@ export async function planSync(kit) {
       }
     }
   }
-  return { files: new Map([...files].sort(([a], [b]) => (a < b ? -1 : 1))), rewritten };
+  return { files: sortedByKey(files), rewritten };
 }
 
+/** A folder the copy leaves out, at the top of the kit and inside an entry alike. */
 function skippedFolder(name) {
   return name.startsWith('.') || name.startsWith('test-setup') || SKIPPED_FOLDERS.has(name);
 }
@@ -185,8 +204,8 @@ async function listFiles(root, folder) {
   for (const item of await readdir(join(root, folder), { withFileTypes: true })) {
     const path = `${folder}/${item.name}`;
     if (item.isDirectory()) {
-      if (!item.name.startsWith('.')) files.push(...(await listFiles(root, path)));
-    } else if (!SKIPPED_FILE.test(item.name) && !item.name.startsWith('test-setup')) {
+      if (!skippedFolder(item.name)) files.push(...(await listFiles(root, path)));
+    } else if (!SKIPPED_FILE.test(item.name)) {
       files.push(path);
     }
   }
@@ -202,6 +221,7 @@ export function rewriteImports(text, file) {
   const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const edits = [];
   const leftovers = [];
+  const lineOf = (node) => source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
   const visit = (node) => {
     if (ts.isStringLiteralLike(node) && node.text.includes('@vplans/ui-kit')) {
       const match = ENTRY_IMPORT.exec(node.text);
@@ -210,10 +230,10 @@ export function rewriteImports(text, file) {
         const quote = text[start];
         edits.push({ start, end: node.end, value: quote + relativeEntry(file, match[1]) + quote });
       } else {
-        leftovers.push(source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1);
+        leftovers.push(lineOf(node));
       }
     } else if (ts.isTemplateExpression(node) && node.getText(source).includes('@vplans/ui-kit')) {
-      leftovers.push(source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1);
+      leftovers.push(lineOf(node));
     }
     ts.forEachChild(node, visit);
   };

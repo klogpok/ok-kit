@@ -1,4 +1,4 @@
-// Tests of the pure logic of `sync-to-client.mjs`. Run with `pnpm test:scripts`.
+// Tests of the pure logic of `sync-to-client.mjs`. Run with `pnpm test-scripts`.
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -116,6 +116,20 @@ describe('syncTarget and checkTarget', () => {
     assert.equal(String((await readTree(target)).get('core/a.ts')), 'a\nc\n');
   });
 
+  it('compares a file that is not UTF-8 byte for byte', async () => {
+    const target = join(await folder({ 'x.ts': 'x' }), 'ui-kit');
+    // No NUL byte, and both decode to the same text once invalid bytes become U+FFFD.
+    const before = Buffer.from([0xff, 0x0d, 0x0a, 0x41]);
+    const after = Buffer.from([0xfe, 0x0d, 0x0a, 0x41]);
+    await syncTarget(target, plan({ 'styles/font.bin': before }));
+    const none = { added: [], changed: [], removed: [] };
+    assert.deepEqual(await checkTarget(target, plan({ 'styles/font.bin': before })), none);
+    const changed = { ...none, changed: ['styles/font.bin'] };
+    assert.deepEqual(await checkTarget(target, plan({ 'styles/font.bin': after })), changed);
+    assert.deepEqual(await syncTarget(target, plan({ 'styles/font.bin': after })), changed);
+    assert.deepEqual((await readTree(target)).get('styles/font.bin'), after);
+  });
+
   it('refuses a target that holds files it did not write', async () => {
     const parent = await folder({ 'ui-kit/button.ts': 'theirs' });
     await assert.rejects(
@@ -181,6 +195,10 @@ describe('planSync', () => {
       'select/parts/option.html': '<li></li>',
       'select/parts/option.scss': ':host { display: block; }',
       'select/notes.mdx': 'docs',
+      'select/test-setup.ts': 'setup',
+      'select/test-setup/setup.ts': 'setup',
+      'select/.cache/x.ts': 'cache',
+      'select/docs/notes.html': 'docs',
       'styles/_base.scss': 'a {}',
       'styles/tokens.css': ':root {}',
       'tokens/tokens.json': '{}',
