@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-14):** фазы 1–9, миграция на Angular 20, вид чипсов и popup listbox сделаны и одобрены; план и SPEC исчерпаны. Следующий шаг — пилот: перевести на кит экраны приложения VPlans. Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-18):** фазы 1–9, миграция на Angular 20, вид чипсов и popup listbox сделаны и одобрены; план и SPEC исчерпаны. Пилот в client (первый экран приложения VPlans на ките) сделан и ждёт одобрения и проверки пользователя в браузере — раздел «Пилот в client» ниже. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -367,11 +367,13 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 **Зачем.** Четыре поля повторяют жизненный цикл выпадающей панели, три — политику клавиатуры, а `time-input` и `autocomplete` опираются на внутренности `select`. Итог: dropdown panel в `core` (директива на `ng-template`) и internal entry point `@vplans/ui-kit/listbox`, на которых стоят `select`, `multi-select`, `autocomplete`, `time-input` и оба датапикера.
 
-## Пилот в client (спека готова 2026-10-14)
+## Пилот в client (спека готова 2026-10-14, отчёт 2026-10-18)
 
 > Работа вне фаз после закрытия фазы 9: первый экран приложения `C:\vplans\client` на ките. Спека и тикеты 01–07 — в `.scratch/client-pilot/`; решения — в [DECISIONS.md](DECISIONS.md) («Client pilot: plan»).
 >
 > **Статус (2026-10-14): спека и тикеты готовы; тикет 01 (встраиваемые стили, `ui-embed-styles`, устойчивость к CSS хоста, `pnpm test-host-css`) сделан; вопросы 08 (ошибка бюджета `anyComponentStyle` в playground — 48 kB) и 09 (`color`/`letter-spacing` наследуются от хоста) решены 2026-10-15. Тикет 02 сделан 2026-10-15: `creatable` и `maxLength` у `ui-select`/`ui-multi-select`, курсор `pointer` у закрытого поиска, `UiLabels.create`, `UiSelectHarness.create()`; 4 новые stories, 12 снимков. Тикет 03 сделан 2026-10-16: `pnpm sync:client [target]` (`--check`, `--verify`) пишет самодостаточную копию в `apartment-changes-new/ui-kit/` (237 файлов, 117 импортов переписано, `SYNCED.md`); `--verify` — `ngc` с опциями client 0 ошибок, 59/59 стилей; тесты скрипта — `pnpm test-scripts`.**
+>
+> **Статус (2026-10-18): тикеты 01–07 и 10 сделаны, пилот ждёт одобрения пользователя и его проверки в браузере (тикет 14).** Тикет 10 (2026-10-18): `sync:client --check` сравнивает текст без учёта концов строк, CRLF-checkout копии совпадает. Тикет 04: копия (237 файлов) в ветке клиента `feat/ui-kit-pilot` (worktree `C:\vplans\worktrees\client\ui-kit-pilot`, без push). Тикет 05: `action-weights-section` на `ui-checkbox`, `ui-number-input` с `%`, `ui-button` (Save с loading), `ui-spinner`; спек 9 тестов через tsconfig в `.scratch/` клиента. Тикет 06: `price-quotes-case` на `ui-select` (creatable, maxLength), диалог на `<ui-embed-styles />`, папка `ok-kit` удалена. Правки ревью: `provideAcUiLabels()` в `apartment-changes-new/shared/`, правки скрипта синхронизации, `test:scripts` → `test-scripts`. Тикет 07 (отчёт): `/phase-check` кита зелёный — 993 unit-теста, coverage 98.68/83.54/94.49/98.68, playground 8, 310 stories × 3 режима без нарушений axe, снимки без изменений, `test-host-css` 711 снимков (6 упавших в полном прогоне — таймауты и известный нестабильный снимок, прошли по одной), `test-scripts` 15/15; браузер (Edge, light/dark RTL, light LTR) — контролы пилота. Клиент: `ng build -c production --localize` exit 0 (те же 11 предупреждений бюджета, ни одного от кита), спек весов 9/9, `test:price-quotes` 99/99, `sync:client --check` совпадает (237 файлов), `git diff --stat master` — 272 файла, все внутри `apartment-changes-new/`. Решения пользователя 2026-10-16: без новых i18n id; живые экраны проверяет пользователь. Открыто: 11 (кнопки −/+ у весов), 12 (рамки строки итога), 13 (три поведения синхронизации), 14 (проверка в браузере, `ready-for-human`), 15 (следующий экран: `create-quote-item-dialog` или `deadline-dialog` → `schedule-dialog`). Решения — в [DECISIONS.md](DECISIONS.md) («Client pilot: delivered»).
 >
 > - Экран — `settings/action-weights-section` в `apartment-changes-new`.
 > - Общие файлы client (`tsconfig*`, `angular.json`, `.eslintrc`, `package.json`, `styles.scss`, корневые провайдеры) не меняются; все правки — внутри `apartment-changes-new/`.

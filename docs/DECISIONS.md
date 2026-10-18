@@ -622,3 +622,42 @@ Tickets 08 and 09 in `.scratch/client-pilot/issues/`, raised by ticket 01.
   overlay panels set `text-align: start` but not `color` or `letter-spacing`, so kit text without
   a color of its own matches the host's text around it. `pnpm test-host-css` applies the host
   body's `color` and `letter-spacing` to both captures; `--strict` reports them.
+
+## Client pilot: delivered (reported 2026-10-18, awaiting approval)
+
+Tickets 02–06 and 10 in `.scratch/client-pilot/issues/`; the report is ticket 07 and the roadmap
+status. The client work is on its branch `feat/ui-kit-pilot` (worktree
+`C:\vplans\worktrees\client\ui-kit-pilot`), not pushed; every client change is under
+`apartment-changes-new/`. Open: tickets 11–15.
+
+User decisions (2026-10-16):
+
+- **No new i18n ids in the client.** The pilot adds no `i18n` attribute and changes no
+  `src/languages/*.xlf`: each action weight is named by its row's existing label
+  (`aria-label`), and the section spinner's name is the kit's `loading` label from
+  `provideUiLabels`.
+- **The browser check of the live screens is the user's** (ticket 14): agents have no backend,
+  credentials or project data, and port 4200 is the user's dev server. The checklists are in the
+  Comments of tickets 05 and 06.
+
+Agent decisions recorded in the tickets, for the user to see:
+
+- **`creatable` alone shows a string value outside the list as its own label** (ticket 02; the
+  vendored kit also required `searchable`), and the Hebrew "Add" label isolates the typed text
+  (FSI…PDI).
+- **The client copy carries no `.gitattributes`** (ticket 10): `sync:client` compares UTF-8 text
+  with line endings normalized, so a CRLF checkout matches and is not rewritten.
+- **The sync script's three open behaviors** (mirror a `SYNCED.md` target wholesale, `--check`
+  ignores the source commit line, the default `--client` next to the main checkout) are in the code
+  and wait for ticket 13.
+- **One labels provider per module:** `provideAcUiLabels()` in
+  `apartment-changes-new/shared/ui-kit-labels.util.ts` (`he` → `UI_LABELS_HE`, otherwise
+  `UI_LABELS_EN`) serves both consumers.
+- **The action-weights spec has no tsconfig in the client's commits:** the spec is committed, but
+  it runs through the gitignored `.scratch/client-pilot/tsconfig.action-weights.spec.json`, which
+  each client worktree needs a copy of. The client's CI runs no tests (its only job builds and
+  deploys `master`).
+- **Client CLI:** `npx ng` fails locally on the client's `devEngines` (pnpm `>=11 <12`,
+  `EBADDEVENGINES`); agents run `node node_modules/@angular/cli/bin/ng.js …`, the same CLI. The
+  client's `.gitlab-ci.yml` deploy job still calls `npm install` and `npx ng build -c "production"
+  --localize`; that predates the pilot.
