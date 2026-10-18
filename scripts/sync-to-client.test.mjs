@@ -1,4 +1,4 @@
-// Tests of the pure logic of `sync-to-client.mjs`. Run with `pnpm test:scripts`.
+// Tests of the pure logic of `sync-to-client.mjs`. Run with `pnpm test-scripts`.
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';

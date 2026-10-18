@@ -1651,7 +1651,7 @@ the **Tokens** docs page.
 | `pnpm test-visual`        | Screenshots of every built story, 3 modes, compared with `visual/`                                                             |
 | `pnpm test-visual:update` | Writes new or changed baselines into `visual/`                                                                                 |
 | `pnpm test-host-css`      | Every built story with a host app's global CSS (Bootstrap 4.6 fixture) prepended, 3 modes; fails when it changes a kit element |
-| `pnpm test:scripts`       | Tests of the repo scripts (`node --test`, `scripts/*.test.mjs`)                                                                |
+| `pnpm test-scripts`       | Tests of the repo scripts (`node --test`, `scripts/*.test.mjs`)                                                                |
 | `pnpm sync:client`        | Writes the kit's self-contained copy into the client; `--check`, `--verify` (see [Consuming the kit](#consuming-the-kit))      |
 
 ### Adding a component

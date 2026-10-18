@@ -21,7 +21,7 @@
     "test-visual": "node scripts/check-visual.mjs",
     "test-visual:update": "node scripts/check-visual.mjs --update",
     "test-host-css": "node scripts/check-host-css.mjs",
-    "test:scripts": "node --test \"scripts/*.test.mjs\"",
+    "test-scripts": "node --test \"scripts/*.test.mjs\"",
     "sync:client": "node scripts/sync-to-client.mjs"
   },
   "private": true,
