@@ -40,7 +40,7 @@ and 7. Behavior does not change: same data, validation, auto calculation, reset 
 **2026-10-18 - done.** Client commit `33908a42b` `feat(ac-settings): action weights on
 @vplans/ui-kit` on `feat/ui-kit-pilot-05` (worktree `C:\vplans\worktrees\client\ui-kit-pilot-05`,
 branched from `feat/ui-kit-pilot` at `6b270e1ab`), then `feat/ui-kit-pilot` (`4cce81c12`, with
-ticket 06) merged in: `7c56747f9`. Not pushed, not merged into `feat/ui-kit-pilot`.
+ticket 06) merged in: `7c56747f9`. Merged into `feat/ui-kit-pilot` as `dbaa9cc09`; not pushed.
 
 - **Component.** `ui-checkbox` (`[checked]` + `(checkedChange)`), `ui-number-input` in a
   `ui-form-field` with `<span uiSuffix>%</span>` (`min="0" step="1" maxFractionDigits="0"
@@ -62,7 +62,10 @@ ticket 06) merged in: `7c56747f9`. Not pushed, not merged into `feat/ui-kit-pilo
   spinner, toggling a row, typing a weight (remaining / over hints), an emptied weight is 0, auto
   calculation (17/17/17/17/16/16, and 0 for a row that is off), Save disabled until 100, Save
   loading and the mutation input plus the snackbar, reset. Written test-first; the builder accepts
-  the tsconfig in `.scratch/client-pilot/` (it is in the worktree, gitignored).
+  the tsconfig in `.scratch/client-pilot/` (it is in the worktree, gitignored). It is not in any
+  commit: a copy is in each client worktree that runs the spec
+  (`C:\vplans\worktrees\client\ui-kit-pilot-05`, `…\ui-kit-pilot`, `…\ui-kit-pilot-review`), at
+  `.scratch/client-pilot/tsconfig.action-weights.spec.json`; its paths are relative to that folder.
   `npx ng` fails on `devEngines` (pnpm 11), so it ran as `node node_modules/@angular/cli/bin/ng.js
   test --ts-config=.scratch/client-pilot/tsconfig.action-weights.spec.json
   --include="src/app/pages/dashboard/apartment-changes-new/settings/action-weights-section/**/*.spec.ts"
@@ -96,6 +99,19 @@ then the same under `/en/`:
    ArrowUp/Down change a weight; a screen reader names each weight by its row.
 8. Look next to the other settings sections: fonts, sizes, colors and spacing fit; nothing else on
    the page or on other pages changed.
+
+**2026-10-18 - review fixes.** Client commit `8bb3153f2` `refactor(ac): shared ui-kit labels
+provider, spec helpers` on `feat/ui-kit-pilot-review` (worktree
+`C:\vplans\worktrees\client\ui-kit-pilot-review`, from `feat/ui-kit-pilot` at `dbaa9cc09`). Not
+pushed.
+
+- `provideAcUiLabels()` in `apartment-changes-new/shared/ui-kit-labels.util.ts` replaces the
+  `provideUiLabels(() => inject(LOCALE_ID)…)` factory that this component and the apartment changes
+  dialog each had.
+- The spec clicks kit buttons through one `clickButton(loader, text)` helper.
+- **Checks:** the action weights spec 9/9 (through the tsconfig above), `test:price-quotes`
+  99/99, `ng build -c production --localize` exit 0 with the same 11 budget warnings;
+  `git diff --name-only master` only under `apartment-changes-new/`.
 
 ## Русский перевод
 
@@ -139,7 +155,8 @@ then the same under `/en/`:
 **2026-10-18 - сделано.** Коммит клиента `33908a42b` `feat(ac-settings): action weights on
 @vplans/ui-kit` в `feat/ui-kit-pilot-05` (worktree `C:\vplans\worktrees\client\ui-kit-pilot-05`,
 ответвлён от `feat/ui-kit-pilot` на `6b270e1ab`), затем в него влит `feat/ui-kit-pilot`
-(`4cce81c12`, с тикетом 06): `7c56747f9`. Не запушено, в `feat/ui-kit-pilot` не влито.
+(`4cce81c12`, с тикетом 06): `7c56747f9`. Влито в `feat/ui-kit-pilot` как `dbaa9cc09`; не
+запушено.
 
 - **Компонент.** `ui-checkbox` (`[checked]` + `(checkedChange)`), `ui-number-input` в
   `ui-form-field` с `<span uiSuffix>%</span>` (`min="0" step="1" maxFractionDigits="0"
@@ -161,7 +178,10 @@ then the same under `/en/`:
   загрузки, выключение строки, ввод веса (подсказки «осталось» / «превышает»), пустой вес = 0,
   автоматический расчёт (17/17/17/17/16/16 и 0 у выключенной строки), Save недоступна до 100,
   loading у Save, вход мутации и snackbar, сброс. Написан test-first; builder принимает tsconfig
-  в `.scratch/client-pilot/` (лежит в worktree, в `.gitignore`). `npx ng` падает на `devEngines`
+  в `.scratch/client-pilot/` (лежит в worktree, в `.gitignore`). Ни в одном коммите его нет:
+  копия лежит в каждом worktree клиента, где запускается спек
+  (`C:\vplans\worktrees\client\ui-kit-pilot-05`, `…\ui-kit-pilot`, `…\ui-kit-pilot-review`), в
+  `.scratch/client-pilot/tsconfig.action-weights.spec.json`; пути в нём относительны этой папки. `npx ng` падает на `devEngines`
   (pnpm 11), поэтому запуск через `node node_modules/@angular/cli/bin/ng.js test
   --ts-config=.scratch/client-pilot/tsconfig.action-weights.spec.json
   --include="src/app/pages/dashboard/apartment-changes-new/settings/action-weights-section/**/*.spec.ts"
@@ -195,3 +215,16 @@ then the same under `/en/`:
    ArrowUp/Down меняют вес; скринридер называет каждый вес по его строке.
 8. Вид рядом с остальными разделами настроек: шрифты, размеры, цвета и отступы подходят; больше
    ничего на странице и на других страницах не изменилось.
+
+**2026-10-18 - исправления по ревью.** Коммит клиента `8bb3153f2` `refactor(ac): shared ui-kit
+labels provider, spec helpers` в `feat/ui-kit-pilot-review` (worktree
+`C:\vplans\worktrees\client\ui-kit-pilot-review`, от `feat/ui-kit-pilot` на `dbaa9cc09`). Не
+запушено.
+
+- `provideAcUiLabels()` в `apartment-changes-new/shared/ui-kit-labels.util.ts` заменяет фабрику
+  `provideUiLabels(() => inject(LOCALE_ID)…)`, которая была и в этом компоненте, и в диалоге
+  apartment changes.
+- Спек нажимает кнопки кита через один помощник `clickButton(loader, text)`.
+- **Проверки:** спек action weights 9/9 (через tsconfig выше), `test:price-quotes` 99/99,
+  `ng build -c production --localize` код 0 с теми же 11 предупреждениями о бюджетах;
+  `git diff --name-only master` только внутри `apartment-changes-new/`.
