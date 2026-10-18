@@ -103,13 +103,23 @@ export async function readTree(root) {
   return new Map([...tree].sort(([a], [b]) => (a < b ? -1 : 1)));
 }
 
+/**
+ * A file's content for comparison: text with CRLF read as LF. The client has no `.gitattributes`
+ * and Git for Windows checks files out with `core.autocrlf=true`, so a fresh checkout of the copy
+ * has CRLF where the kit has LF. A file with a NUL byte is binary and compared as is.
+ */
+function comparable(data) {
+  const bytes = Buffer.from(data);
+  return bytes.includes(0) ? bytes : Buffer.from(String(bytes).replace(/\r\n/g, '\n'));
+}
+
 function diff(plan, existing, ignoreSource) {
   const same = (path) => {
-    const want = String(plan.get(path));
-    const have = String(existing.get(path));
+    const want = comparable(plan.get(path));
+    const have = comparable(existing.get(path));
     return ignoreSource && path === SYNCED_MD
-      ? want.replace(SOURCE_LINE, '') === have.replace(SOURCE_LINE, '')
-      : Buffer.from(plan.get(path)).equals(existing.get(path));
+      ? String(want).replace(SOURCE_LINE, '') === String(have).replace(SOURCE_LINE, '')
+      : want.equals(have);
   };
   const keys = [...plan.keys()];
   return {
