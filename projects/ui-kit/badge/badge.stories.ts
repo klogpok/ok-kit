@@ -1,4 +1,5 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiBadge } from './badge';
 
@@ -89,6 +90,26 @@ export const Count: Story = {
         <ui-badge tone="danger" [count]="12" max="9" size="lg">alerts</ui-badge>
       </div>`,
   }),
+};
+
+/**
+ * A count badge at the end of a long collapsed panel (`block-size: 0; overflow: hidden`), with no
+ * positioned ancestor. The hidden label is clipped with the badge, so the page does not scroll down
+ * to where the badge would be (client-pilot ticket 16).
+ */
+export const InCollapsedPanel: Story = {
+  render: () => ({
+    template: `
+      <p style="margin:0">The panel below is collapsed.</p>
+      <div style="block-size:0;overflow:hidden">
+        <div style="block-size:200rem"></div>
+        <ui-badge tone="danger" [count]="3">unread messages</ui-badge>
+      </div>`,
+  }),
+  play: async () => {
+    const page = document.scrollingElement!;
+    await expect(page.scrollHeight).toBe(page.clientHeight);
+  },
 };
 
 /** Only a dot in the tone color; the text stays for screen readers. */
