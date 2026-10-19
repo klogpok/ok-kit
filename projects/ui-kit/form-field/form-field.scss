@@ -3,6 +3,9 @@
 :host {
   // A host app's `text-align` (Bootstrap reboot: `body { text-align: left }`) must not leak in.
   text-align: start;
+  // Contains the visually hidden error region, so a collapsed (clipped) ancestor clips it too and
+  // the page does not scroll to where it would be (client-pilot ticket 16).
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--ui-form-field-gap);

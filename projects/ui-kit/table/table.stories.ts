@@ -395,6 +395,32 @@ export const Empty: Story = {
   }),
 };
 
+/**
+ * A table at the end of a long collapsed panel (`block-size: 0; overflow: hidden`), with no
+ * positioned ancestor. Its `ui-visually-hidden` caption and header text are clipped with the
+ * table, so the page does not scroll down to where the table would be (client-pilot ticket 16).
+ */
+export const InCollapsedPanel: Story = {
+  render: () => ({
+    template: `
+      <p style="margin:0">The panel below is collapsed.</p>
+      <div style="block-size:0;overflow:hidden">
+        <div style="block-size:200rem"></div>
+        <table ui-table>
+          <caption class="ui-visually-hidden">Units</caption>
+          <thead>
+            <tr><th scope="col">Unit</th><th scope="col"><span class="ui-visually-hidden">Actions</span></th></tr>
+          </thead>
+          <tbody><tr><td>Unit 1</td><td></td></tr></tbody>
+        </table>
+      </div>`,
+  }),
+  play: async () => {
+    const page = document.scrollingElement!;
+    await expect(page.scrollHeight).toBe(page.clientHeight);
+  },
+};
+
 /** The header stays visible while the container scrolls. */
 export const StickyHeader: Story = {
   render: () => ({

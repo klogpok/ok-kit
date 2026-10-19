@@ -30,6 +30,9 @@
 }
 
 .ui-stepper__header {
+  // Contains the visually hidden step state, so a collapsed (clipped) ancestor clips it too and the
+  // page does not scroll to where it would be (client-pilot ticket 16).
+  position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
