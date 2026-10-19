@@ -1,4 +1,5 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UiButton } from '@vplans/ui-kit/button';
 import { UiError, UiFormField } from '@vplans/ui-kit/form-field';
@@ -79,6 +80,29 @@ export const States: Story = {
         </ui-stepper>
       </div>`,
   }),
+};
+
+/**
+ * A stepper at the end of a long collapsed panel (`block-size: 0; overflow: hidden`), with no
+ * positioned ancestor. The hidden step states are clipped with the stepper, so the page does not
+ * scroll down to where the stepper would be (client-pilot ticket 16).
+ */
+export const InCollapsedPanel: Story = {
+  render: () => ({
+    template: `
+      <p style="margin:0">The panel below is collapsed.</p>
+      <div style="block-size:0;overflow:hidden">
+        <div style="block-size:200rem"></div>
+        <ui-stepper [selectedIndex]="1">
+          <ui-step label="פרטי הבקשה" [completed]="true"><p>הושלם</p></ui-step>
+          <ui-step label="תשלום"><p>השלב הנוכחי.</p></ui-step>
+        </ui-stepper>
+      </div>`,
+  }),
+  play: async () => {
+    const page = document.scrollingElement!;
+    await expect(page.scrollHeight).toBe(page.clientHeight);
+  },
 };
 
 export const Vertical: Story = {
