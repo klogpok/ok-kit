@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { argsToTemplate, moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
 import { UiButton } from '@vplans/ui-kit/button';
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
 import { UiInput, UiTextarea } from '@vplans/ui-kit/input';
@@ -176,6 +177,28 @@ export const WithError: Story = {
         </ui-form-field>
       </div>`,
   }),
+};
+
+/**
+ * A field at the end of a long collapsed panel (`block-size: 0; overflow: hidden`), as in an
+ * accordion, with no positioned ancestor. The visually hidden error region is clipped with the
+ * field, so the page does not scroll down to where the field would be (client-pilot ticket 16).
+ */
+export const InCollapsedPanel: Story = {
+  render: () => ({
+    template: `
+      <div style="max-inline-size:360px">
+        <p style="margin:0">The panel below is collapsed.</p>
+        <div style="block-size:0;overflow:hidden">
+          <div style="block-size:200rem"></div>
+          <ui-form-field label="Weight"><input ui-input /></ui-form-field>
+        </div>
+      </div>`,
+  }),
+  play: async () => {
+    const page = document.scrollingElement!;
+    await expect(page.scrollHeight).toBe(page.clientHeight);
+  },
 };
 
 export const AccountForm: Story = {
