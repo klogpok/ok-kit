@@ -623,7 +623,7 @@ Tickets 08 and 09 in `.scratch/client-pilot/issues/`, raised by ticket 01.
   a color of its own matches the host's text around it. `pnpm test-host-css` applies the host
   body's `color` and `letter-spacing` to both captures; `--strict` reports them.
 
-## Client pilot: delivered (reported 2026-10-18, awaiting approval)
+## Client pilot: delivered (reported 2026-10-18, approved 2026-10-19)
 
 Tickets 02–06 and 10 in `.scratch/client-pilot/issues/`; the report is ticket 07 and the roadmap
 status. The client work is on its branch `feat/ui-kit-pilot` (worktree
@@ -662,7 +662,7 @@ Agent decisions recorded in the tickets, for the user to see:
   client's `.gitlab-ci.yml` deploy job still calls `npm install` and `npx ng build -c "production"
   --localize`; that predates the pilot.
 
-## Client pilot: approved (decided 2026-10-19, reopened the same day)
+## Client pilot: approved (decided 2026-10-19)
 
 The user checked both pilot screens in the live app (ticket 14) and approved the pilot. Every
 answer keeps what ticket 05 or 03 built, so no code changes.
@@ -672,8 +672,10 @@ while the action weights section was collapsed. The empty error region of `ui-fo
 visually hidden with `position: absolute` and escaped the collapsed section's clipping, because the
 field's host was not positioned. Ticket 16 gives the hosts that hold visually hidden text
 `position: relative` (`ui-form-field`, `ui-badge`, `.ui-stepper__header`, `.ui-table`) and adds an
-`InCollapsedPanel` play story to each. The user chose to fix all four at once. The pilot waits for
-the fix to be synced into the client and for the user to check the page again (ticket 14).
+`InCollapsedPanel` play story to each. The user chose to fix all four at once. The fix was synced
+into `feat/ui-kit-pilot` (`e5ddbf58e`) and merged into the main client checkout's
+`try/ui-kit-pilot` (`8d8195c68`), where the user confirmed the page no longer scrolls into empty
+space, and approved the pilot.
 
 - **Action weights keep the −/+ steppers** and the `10rem` field (ticket 11): the kit's default
   number field, and a mouse user can still change a weight without typing.

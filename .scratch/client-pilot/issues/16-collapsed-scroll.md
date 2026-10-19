@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md), tickets 05 and 14
 
-**Status:** ready-for-human
+**Status:** done
 **Blocked by:** None
 
 **Facts:** the user's browser check (ticket 14) found that the `apartment-changes-new` settings page
@@ -31,7 +31,7 @@ hidden label of a `ui-badge` count or dot, and a `ui-visually-hidden` caption or
   for badge, stepper and table).
 - [x] `pnpm sync:client` into `feat/ui-kit-pilot`, `--check` and `--verify`, and commit the copy
   there.
-- [ ] The user checks the settings page again (ticket 14).
+- [x] The user checks the settings page again (ticket 14).
 
 ## Comments
 
@@ -50,6 +50,7 @@ hidden label of a `ui-badge` count or dot, and a `ui-visually-hidden` caption or
   - **Client.** `sync:client --check` matches (237 files); `--verify`: `ngc` 0 errors in 41 entry
     points, 59/59 stylesheets. The client's production build was not rerun: the change is four
     `position: relative` lines.
+- 2026-10-19: Verified by the user in the live app after `feat/ui-kit-pilot` was merged into `try/ui-kit-pilot` (`8d8195c68`): the page no longer scrolls into empty space.
 
 ## Русский перевод
 
@@ -57,7 +58,7 @@ hidden label of a `ui-badge` count or dot, and a `ui-visually-hidden` caption or
 
 **Спека:** [../spec.md](../spec.md), тикеты 05 и 14
 
-**Статус:** ready-for-human
+**Статус:** сделано
 **Заблокирован:** нет
 
 **Факты:** при проверке в браузере (тикет 14) пользователь заметил, что страница настроек
@@ -86,7 +87,7 @@ hidden label of a `ui-badge` count or dot, and a `ui-visually-hidden` caption or
 - [x] Коммит `fix(form-field): contain the hidden error region in a collapsed panel` (и такие же для
   badge, stepper и table).
 - [x] `pnpm sync:client` в `feat/ui-kit-pilot`, `--check` и `--verify`, и коммит копии там.
-- [ ] Пользователь заново проверяет страницу настроек (тикет 14).
+- [x] Пользователь заново проверяет страницу настроек (тикет 14).
 
 ## Комментарии
 
@@ -106,3 +107,4 @@ hidden label of a `ui-badge` count or dot, and a `ui-visually-hidden` caption or
   - **Клиент.** `sync:client --check` совпадает (237 файлов); `--verify`: `ngc` 0 ошибок в 41 entry
     point, 59/59 стилей. Production-сборку клиента заново не запускали: правка — четыре строки
     `position: relative`.
+- 2026-10-19: Пользователь проверил в живом приложении после слияния `feat/ui-kit-pilot` в `try/ui-kit-pilot` (`8d8195c68`): страница больше не прокручивается в пустоту.

@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → tickets 05 and 06
 
-**Status:** ready-for-human
+**Status:** done
 
 **Facts:** the browser items of tickets 05 and 06 need the running client with a backend, an admin
 account and real project data. Agents have none of these, and port 4200 is the user's own dev
@@ -17,7 +17,7 @@ The pilot is not approved until this check is done.
   [06-replace-ok-kit.md](06-replace-ok-kit.md) → Comments.
 - [x] Decide tickets 11 and 12 while looking at the action weights section.
 - [x] Anything that looks wrong: a new ticket here, with the screen, locale and a screenshot.
-- [ ] After ticket 16 is synced: the settings page no longer scrolls into empty space below the
+- [x] After ticket 16 is synced: the settings page no longer scrolls into empty space below the
   last card while the action weights section is collapsed.
 
 The branch to run is `feat/ui-kit-pilot` (worktree `C:\vplans\worktrees\client\ui-kit-pilot`, its
@@ -29,6 +29,7 @@ client's pnpm 11 `devEngines`). Add `--port 4300` if the main checkout's server 
 
 - 2026-10-19: The user checked both pilot screens in the live app and found nothing wrong; tickets 11 and 12 were decided (option 1 each). The pilot is approved. Recorded in `docs/DECISIONS.md` → "Client pilot: approved".
 - 2026-10-19: Reopened. The user then found the settings page scrolling into empty space below the last card (ticket 16, a kit bug in `ui-form-field`). The pilot waits for the fix to be synced and for the user to check the page again.
+- 2026-10-19: The user checked the settings page on `try/ui-kit-pilot` (the main client checkout, merge `8d8195c68` of `feat/ui-kit-pilot`): no empty space below the last card. The pilot is approved.
 
 ## Русский перевод
 
@@ -36,7 +37,7 @@ client's pnpm 11 `devEngines`). Add `--port 4300` if the main checkout's server 
 
 **Спека:** [../spec.md](../spec.md) → тикеты 05 и 06
 
-**Статус:** ready-for-human
+**Статус:** сделано
 
 **Факты:** пункты «браузер» тикетов 05 и 06 требуют запущенного клиента с бэкендом, аккаунтом
 администратора и настоящими данными проекта. У агентов ничего этого нет, а порт 4200 — dev-сервер
@@ -51,7 +52,7 @@ client's pnpm 11 `devEngines`). Add `--port 4300` if the main checkout's server 
   [06-replace-ok-kit.md](06-replace-ok-kit.md) → Комментарии.
 - [x] Решить тикеты 11 и 12, глядя на раздел весов действий.
 - [x] Всё, что выглядит неправильно: новый тикет здесь, с экраном, локалью и скриншотом.
-- [ ] После синхронизации тикета 16: страница настроек больше не прокручивается в пустоту ниже
+- [x] После синхронизации тикета 16: страница настроек больше не прокручивается в пустоту ниже
   последней карточки, пока раздел весов действий свёрнут.
 
 Запускать ветку `feat/ui-kit-pilot` (worktree `C:\vplans\worktrees\client\ui-kit-pilot`, его
@@ -64,3 +65,4 @@ client's pnpm 11 `devEngines`). Add `--port 4300` if the main checkout's server 
 
 - 2026-10-19: Пользователь проверил оба экрана пилота в живом приложении, замечаний нет; тикеты 11 и 12 решены (вариант 1 в обоих). Пилот одобрен. Записано в `docs/DECISIONS.md` → «Client pilot: approved».
 - 2026-10-19: Открыт снова. Затем пользователь заметил, что страница настроек прокручивается в пустоту ниже последней карточки (тикет 16, баг кита в `ui-form-field`). Пилот ждёт синхронизации исправления и повторной проверки страницы пользователем.
+- 2026-10-19: Пользователь проверил страницу настроек на `try/ui-kit-pilot` (основной checkout клиента, слияние `8d8195c68` из `feat/ui-kit-pilot`): пустого места ниже последней карточки нет. Пилот одобрен.
