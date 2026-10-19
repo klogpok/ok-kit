@@ -11,17 +11,24 @@ agents: kit `/phase-check`, the client's `ng build -c production --localize`, th
 spec (9 tests) and `test:price-quotes` (99 tests) on `feat/ui-kit-pilot` (ticket 07 → Comments).
 The pilot is not approved until this check is done.
 
-- [ ] Action weights section in he/RTL and en/LTR: the 8 points under "Manual browser check (the
+- [x] Action weights section in he/RTL and en/LTR: the 8 points under "Manual browser check (the
   user)" in [05-action-weights.md](05-action-weights.md) → Comments.
-- [ ] Price quotes case in he/RTL and en/LTR: the 8 points under "Browser: handed to the user" in
+- [x] Price quotes case in he/RTL and en/LTR: the 8 points under "Browser: handed to the user" in
   [06-replace-ok-kit.md](06-replace-ok-kit.md) → Comments.
-- [ ] Decide tickets 11 and 12 while looking at the action weights section.
-- [ ] Anything that looks wrong: a new ticket here, with the screen, locale and a screenshot.
+- [x] Decide tickets 11 and 12 while looking at the action weights section.
+- [x] Anything that looks wrong: a new ticket here, with the screen, locale and a screenshot.
+- [ ] After ticket 16 is synced: the settings page no longer scrolls into empty space below the
+  last card while the action weights section is collapsed.
 
 The branch to run is `feat/ui-kit-pilot` (worktree `C:\vplans\worktrees\client\ui-kit-pilot`, its
 `node_modules` is a junction to the main checkout's). `pnpm start` serves `he` (`ng serve -c
 he`); for `en` run `node node_modules/@angular/cli/bin/ng.js serve -c en` (`npx ng` refuses the
 client's pnpm 11 `devEngines`). Add `--port 4300` if the main checkout's server holds 4200.
+
+## Comments
+
+- 2026-10-19: The user checked both pilot screens in the live app and found nothing wrong; tickets 11 and 12 were decided (option 1 each). The pilot is approved. Recorded in `docs/DECISIONS.md` → "Client pilot: approved".
+- 2026-10-19: Reopened. The user then found the settings page scrolling into empty space below the last card (ticket 16, a kit bug in `ui-form-field`). The pilot waits for the fix to be synced and for the user to check the page again.
 
 ## Русский перевод
 
@@ -38,15 +45,22 @@ client's pnpm 11 `devEngines`). Add `--port 4300` if the main checkout's server 
 действий (9 тестов) и `test:price-quotes` (99 тестов) на `feat/ui-kit-pilot` (тикет 07 →
 Комментарии). Пилот не одобрен, пока эта проверка не сделана.
 
-- [ ] Раздел весов действий в he/RTL и en/LTR: 8 пунктов в «Manual browser check (the user)» в
+- [x] Раздел весов действий в he/RTL и en/LTR: 8 пунктов в «Manual browser check (the user)» в
   [05-action-weights.md](05-action-weights.md) → Комментарии.
-- [ ] Price quotes case в he/RTL и en/LTR: 8 пунктов в «Browser: handed to the user» в
+- [x] Price quotes case в he/RTL и en/LTR: 8 пунктов в «Browser: handed to the user» в
   [06-replace-ok-kit.md](06-replace-ok-kit.md) → Комментарии.
-- [ ] Решить тикеты 11 и 12, глядя на раздел весов действий.
-- [ ] Всё, что выглядит неправильно: новый тикет здесь, с экраном, локалью и скриншотом.
+- [x] Решить тикеты 11 и 12, глядя на раздел весов действий.
+- [x] Всё, что выглядит неправильно: новый тикет здесь, с экраном, локалью и скриншотом.
+- [ ] После синхронизации тикета 16: страница настроек больше не прокручивается в пустоту ниже
+  последней карточки, пока раздел весов действий свёрнут.
 
 Запускать ветку `feat/ui-kit-pilot` (worktree `C:\vplans\worktrees\client\ui-kit-pilot`, его
 `node_modules` — junction на `node_modules` основного checkout). `pnpm start` запускает `he`
 (`ng serve -c he`); для `en` — `node node_modules/@angular/cli/bin/ng.js serve -c en` (`npx ng`
 отказывается из-за `devEngines` с pnpm 11 у клиента). Добавить `--port 4300`, если 4200 занят
 сервером основного checkout.
+
+## Комментарии
+
+- 2026-10-19: Пользователь проверил оба экрана пилота в живом приложении, замечаний нет; тикеты 11 и 12 решены (вариант 1 в обоих). Пилот одобрен. Записано в `docs/DECISIONS.md` → «Client pilot: approved».
+- 2026-10-19: Открыт снова. Затем пользователь заметил, что страница настроек прокручивается в пустоту ниже последней карточки (тикет 16, баг кита в `ui-form-field`). Пилот ждёт синхронизации исправления и повторной проверки страницы пользователем.

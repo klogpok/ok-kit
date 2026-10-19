@@ -628,7 +628,7 @@ Tickets 08 and 09 in `.scratch/client-pilot/issues/`, raised by ticket 01.
 Tickets 02–06 and 10 in `.scratch/client-pilot/issues/`; the report is ticket 07 and the roadmap
 status. The client work is on its branch `feat/ui-kit-pilot` (worktree
 `C:\vplans\worktrees\client\ui-kit-pilot`), not pushed; every client change is under
-`apartment-changes-new/`. Open: tickets 11–15.
+`apartment-changes-new/`. Tickets 11–15 are answered in "Client pilot: approved" below.
 
 User decisions (2026-10-16):
 
@@ -648,8 +648,8 @@ Agent decisions recorded in the tickets, for the user to see:
 - **The client copy carries no `.gitattributes`** (ticket 10): `sync:client` compares UTF-8 text
   with line endings normalized, so a CRLF checkout matches and is not rewritten.
 - **The sync script's three open behaviors** (mirror a `SYNCED.md` target wholesale, `--check`
-  ignores the source commit line, the default `--client` next to the main checkout) are in the code
-  and wait for ticket 13.
+  ignores the source commit line, the default `--client` next to the main checkout) are in the code;
+  the user confirmed them in ticket 13.
 - **One labels provider per module:** `provideAcUiLabels()` in
   `apartment-changes-new/shared/ui-kit-labels.util.ts` (`he` → `UI_LABELS_HE`, otherwise
   `UI_LABELS_EN`) serves both consumers.
@@ -661,3 +661,28 @@ Agent decisions recorded in the tickets, for the user to see:
   `EBADDEVENGINES`); agents run `node node_modules/@angular/cli/bin/ng.js …`, the same CLI. The
   client's `.gitlab-ci.yml` deploy job still calls `npm install` and `npx ng build -c "production"
   --localize`; that predates the pilot.
+
+## Client pilot: approved (decided 2026-10-19, reopened the same day)
+
+The user checked both pilot screens in the live app (ticket 14) and approved the pilot. Every
+answer keeps what ticket 05 or 03 built, so no code changes.
+
+The approval was then reopened: the settings page scrolled into empty space below its last card
+while the action weights section was collapsed. The empty error region of `ui-form-field` is
+visually hidden with `position: absolute` and escaped the collapsed section's clipping, because the
+field's host was not positioned. Ticket 16 gives the hosts that hold visually hidden text
+`position: relative` (`ui-form-field`, `ui-badge`, `.ui-stepper__header`, `.ui-table`) and adds an
+`InCollapsedPanel` play story to each. The user chose to fix all four at once. The pilot waits for
+the fix to be synced into the client and for the user to check the page again (ticket 14).
+
+- **Action weights keep the −/+ steppers** and the `10rem` field (ticket 11): the kit's default
+  number field, and a mouse user can still change a weight without typing.
+- **The total line keeps full-color borders** (ticket 12): `--ui-color-success` /
+  `--ui-color-danger`, as `ui-alert` draws them; no `--ui-ref-*` tokens in the client.
+- **The sync script's three behaviors stand** (ticket 13): a `SYNCED.md` target is mirrored as a
+  whole, `--check` ignores the source commit line (and line endings), and the default `--client`
+  is `../client` next to the main kit checkout.
+- **No next screen for now** (ticket 15, `wontfix`): the pilot ends with its two screens. A next
+  screen starts with a new spec when the user asks for one; ticket 15 holds the survey
+  (`create-quote-item-dialog` or `deadline-dialog` → `schedule-dialog`, and the
+  `.cdk-overlay-pane` clash with a kit `ui-dialog`).

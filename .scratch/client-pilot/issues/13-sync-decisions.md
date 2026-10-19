@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 3, tickets 03 and 10
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** ticket 03 (→ Comments) made three choices in `scripts/sync-to-client.mjs` that the spec
 did not settle. All three are in the code and tested (`pnpm test-scripts`, 15 tests), and
@@ -33,13 +33,17 @@ README → "Consuming the kit" describes them. Each one can be confirmed or chan
 4. Change point 3: no default target or client; both must be named on every run (no chance of
    writing into the main client checkout by accident).
 
+## Comments
+
+- 2026-10-19: User's answer: option 1, all three behaviors confirmed as they are in `scripts/sync-to-client.mjs`. No code change. Recorded in `docs/DECISIONS.md` → "Client pilot: approved".
+
 ## Русский перевод
 
 # 13: три поведения скрипта синхронизации на подтверждение
 
 **Спека:** [../spec.md](../spec.md) → решение 3, тикеты 03 и 10
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** тикет 03 (→ Комментарии) сделал в `scripts/sync-to-client.mjs` три выбора, которые
 спека не решала. Все три есть в коде и покрыты тестами (`pnpm test-scripts`, 15 тестов), README →
@@ -70,3 +74,7 @@ README → "Consuming the kit" describes them. Each one can be confirmed or chan
    в клиенте надо пересинхронизировать после каждого коммита кита).
 4. Изменить пункт 3: без папки и клиента по умолчанию; оба указываются при каждом запуске (нельзя
    случайно записать в основной checkout клиента).
+
+## Комментарии
+
+- 2026-10-19: Ответ пользователя: вариант 1, все три поведения подтверждены в том виде, как они есть в `scripts/sync-to-client.mjs`. Код не меняется. Записано в `docs/DECISIONS.md` → «Client pilot: approved».

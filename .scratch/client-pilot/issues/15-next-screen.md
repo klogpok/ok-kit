@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → "Out of scope"
 
-**Status:** needs-info
+**Status:** wontfix
 
 **Facts:** the spec's survey of `apartment-changes-new` ranks two screens after the pilot; they
 wait for the pilot report (ticket 07). Both are Material dialogs (`MatDialogRef`,
@@ -36,13 +36,17 @@ putting kit controls inside avoids it; moving to `ui-dialog` needs either a kit-
 3. `deadline-dialog` → `schedule-dialog`, inside the `MatDialog` shell: more users, brings the kit
    date picker into the client, and it is two screens at once.
 
+## Comments
+
+- 2026-10-19: User's answer: no next screen for now. The pilot ends with its two screens; a next screen starts with a new spec when the user asks for one, and the facts above are its starting point. Recorded in `docs/DECISIONS.md` → "Client pilot: approved".
+
 ## Русский перевод
 
 # 15: следующий экран после пилота
 
 **Спека:** [../spec.md](../spec.md) → «Вне рамок»
 
-**Статус:** needs-info
+**Статус:** wontfix
 
 **Факты:** обзор `apartment-changes-new` в спеке ставит после пилота два экрана; они ждут отчёта
 пилота (тикет 07). Оба — диалоги Material (`MatDialogRef`, `MAT_DIALOG_DATA`), так что следующий
@@ -74,3 +78,7 @@ putting kit controls inside avoids it; moving to `ui-dialog` needs either a kit-
    `.cdk-overlay-pane` (сначала тикет в ките, замер проверкой CSS хоста с этим правилом).
 3. `deadline-dialog` → `schedule-dialog` в оболочке `MatDialog`: больше пользователей, приносит в
    клиент датапикер кита, но это сразу два экрана.
+
+## Комментарии
+
+- 2026-10-19: Ответ пользователя: следующий экран пока не нужен. Пилот заканчивается на двух своих экранах; следующий экран начнётся с новой спеки, когда пользователь о нём попросит, и факты выше станут её отправной точкой. Записано в `docs/DECISIONS.md` → «Client pilot: approved».

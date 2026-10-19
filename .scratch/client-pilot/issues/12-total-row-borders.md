@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 1, ticket 05
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** the total line under the action weights ("total = 100%") is green when the weights add
 up to 100 and red otherwise. Ticket 05 moved its colors to kit tokens:
@@ -27,13 +27,17 @@ full-color border (`--ui-alert-success-border` / `--ui-alert-danger-border`) for
    tokens are never used in components or apps.
 3. A neutral `--ui-color-border` border, with only the text and background colored.
 
+## Comments
+
+- 2026-10-19: User's answer: option 1, keep the full success/danger border colors. No code change. Recorded in `docs/DECISIONS.md` → "Client pilot: approved".
+
 ## Русский перевод
 
 # 12: цвет рамки строки итога весов действий
 
 **Спека:** [../spec.md](../spec.md) → решение 1, тикет 05
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** строка итога под весами («итог = 100%») зелёная, когда сумма равна 100, и красная в
 остальных случаях. Тикет 05 перевёл её цвета на токены кита:
@@ -56,3 +60,7 @@ danger рисует такую же рамку полного цвета. Люб
 2. Бледные рамки через ref-токены `--ui-ref-color-green-200` / `--ui-ref-color-red-200`: старый
    вид, но страница Theming запрещает примитивные токены `--ui-ref-*` в компонентах и приложениях.
 3. Нейтральная рамка `--ui-color-border`, цветные только текст и фон.
+
+## Комментарии
+
+- 2026-10-19: Ответ пользователя: вариант 1, рамки остаются полного цвета success/danger. Код не меняется. Записано в `docs/DECISIONS.md` → «Client pilot: approved».

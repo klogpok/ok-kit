@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 1, ticket 05
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** ticket 05 replaced the native `<input type="number">` of each action weight with
 `ui-number-input` in a `ui-form-field` and a `%` suffix. The old field was `90px` wide plus a
@@ -20,13 +20,17 @@ attribute and one width in the client, inside `apartment-changes-new/`; the kit 
 2. Hide them with `[steppers]="false"` and narrow the field to about the old width (`6rem` with
    `%`). Closer to the old row; the value is then changed by typing or ArrowUp/Down only.
 
+## Comments
+
+- 2026-10-19: User's answer: option 1, keep the steppers and the `10rem` field. No code change. Recorded in `docs/DECISIONS.md` → "Client pilot: approved".
+
 ## Русский перевод
 
 # 11: кнопки −/+ у полей весов действий
 
 **Спека:** [../spec.md](../spec.md) → решение 1, тикет 05
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** тикет 05 заменил нативный `<input type="number">` каждого веса на `ui-number-input` в
 `ui-form-field` с suffix `%`. Старое поле было шириной `90px` плюс отдельный блок `%` и показывало
@@ -43,3 +47,7 @@ attribute and one width in the client, inside `apartment-changes-new/`; the kit 
    выглядят одинаково.
 2. Скрыть их через `[steppers]="false"` и сузить поле примерно до старой ширины (`6rem` вместе с
    `%`). Ближе к старой строке; значение тогда меняется только вводом или ArrowUp/Down.
+
+## Комментарии
+
+- 2026-10-19: Ответ пользователя: вариант 1, кнопки −/+ и поле `10rem` остаются. Код не меняется. Записано в `docs/DECISIONS.md` → «Client pilot: approved».
