@@ -221,7 +221,11 @@ export class UiPopoverTrigger {
   constructor() {
     // The popover is named by the trigger unless it has a label.
     if (!this.host.id) this.host.id = this.ids.getId('ui-popover-trigger-');
-    inject(DestroyRef).onDestroy(() => this.overlayRef?.dispose());
+    inject(DestroyRef).onDestroy(() => {
+      // The trigger is gone: dispose silently, `closed` is already destroyed (NG0953).
+      this.isOpen.set(false);
+      this.overlayRef?.dispose();
+    });
   }
 
   toggle(): void {

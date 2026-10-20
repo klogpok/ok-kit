@@ -115,6 +115,16 @@ describe('UiPopoverTrigger', () => {
     expect(fixture.componentInstance.events).toEqual(['opened', 'closed']);
   });
 
+  it('removes an open popover with its trigger without emitting closed (NG0953)', async () => {
+    trigger().click();
+    await settle();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    fixture.destroy();
+    expect(panel()).toBeNull();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   it('closes on Escape, returns focus and keeps Escape from reaching the page', async () => {
     trigger().click();
     await settle();
