@@ -908,5 +908,47 @@ describe('UiListboxController', () => {
         expect(selectAll()).toBeNull();
       });
     });
+
+    it('come before the options, which their aria-posinset and aria-setsize count on', async () => {
+      host.mode.set('searchable');
+      host.creatable.set(true);
+      host.allAction.set(true);
+      host.items.set([
+        { value: 'a', label: 'Apple' },
+        { value: 'b', label: 'Banana' },
+        { value: 'c', label: 'Cherry' },
+      ]);
+      await settle(fixture);
+      field.search('an');
+      await settle(fixture);
+      const options = [...panel()!.querySelectorAll('ui-option')];
+      expect(options.map((option) => option.id)).toEqual([
+        'fruit-listbox-create',
+        'fruit-listbox-select-all',
+        expect.stringMatching(/^ui-option-/),
+      ]);
+      expect(
+        options.map((option) => [
+          option.getAttribute('aria-posinset'),
+          option.getAttribute('aria-setsize'),
+        ]),
+      ).toEqual([
+        ['1', '3'],
+        ['2', '3'],
+        ['3', '3'],
+      ]);
+      // activateFirst passes over "Add «…»".
+      expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-select-all');
+      await press('ArrowUp');
+      expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-create');
+      await press('ArrowDown');
+      await press('ArrowDown');
+      expect(activeLabel()).toBe('Banana');
+
+      // Projected options are all in the DOM: no positions.
+      host.items.set(null);
+      await settle(fixture);
+      expect(panel()!.querySelector('[aria-posinset]')).toBeNull();
+    });
   });
 });

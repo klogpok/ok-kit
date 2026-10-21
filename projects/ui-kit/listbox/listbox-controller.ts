@@ -337,6 +337,24 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     ...(this.createText() ? [this.createEntry] : []),
     ...(this.selectAllShown() ? [this.selectAllEntry] : []),
   ]);
+  /** Options above the `items`: the leading actions, then the field's leading options. */
+  private readonly leadingCount = computed(
+    () => this.leadingActions().length + this.leadingOptions().length,
+  );
+  /**
+   * `aria-setsize` of the leading actions and the `items`: the viewport renders a part of the
+   * list, so the options say where they are in it. `null` for projected options, which are all
+   * in the DOM.
+   */
+  readonly setSize = computed(() =>
+    this.items() ? this.leadingCount() + this.visibleItems().length : null,
+  );
+
+  /** `aria-posinset` of the n-th leading action or the n-th shown item; `null` without `items`. */
+  posInSet(part: 'action' | 'item', index: number): number | null {
+    if (this.setSize() === null) return null;
+    return (part === 'item' ? this.leadingCount() : 0) + index + 1;
+  }
   /** Every option the keyboard moves through. */
   private readonly listOptions = computed((): readonly UiListEntry[] => [
     ...this.leadingActions(),

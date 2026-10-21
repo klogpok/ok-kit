@@ -51,11 +51,13 @@ import { UiItemOption } from './option-items';
     <!-- "Add «…»" and "Select all": the row sticks over a virtual list. -->
     @if (listbox.leadingActions().length) {
       <div class="ui-listbox__actions" role="none">
-        @for (action of listbox.leadingActions(); track action) {
+        @for (action of listbox.leadingActions(); track action; let i = $index) {
           <ui-option
             [value]="action"
             [class.ui-listbox__create]="action.kind === 'create'"
             [class.ui-listbox__select-all]="action.kind === 'selectAll'"
+            [attr.aria-setsize]="listbox.setSize()"
+            [attr.aria-posinset]="listbox.posInSet('action', i)"
             >{{ action.getLabel() }}</ui-option
           >
         }
@@ -107,8 +109,8 @@ import { UiItemOption } from './option-items';
         [value]="entry.item.value"
         [label]="entry.item.label"
         [disabled]="entry.isDisabled()"
-        [attr.aria-setsize]="listbox.visibleItems().length + listbox.leadingOptions().length"
-        [attr.aria-posinset]="index + 1 + listbox.leadingOptions().length"
+        [attr.aria-setsize]="listbox.setSize()"
+        [attr.aria-posinset]="listbox.posInSet('item', index)"
       >
         {{ entry.item.label }}
         @if (entry.item.description) {
