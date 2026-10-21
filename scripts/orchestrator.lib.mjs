@@ -1,6 +1,7 @@
-// Pure logic of the `/orchestrate-spec` skill (`scripts/orchestrator.mjs`) and of the PreToolUse
-// guard (`scripts/guard-tool-use.mjs`). Nothing here touches the disk or spawns a process, so
-// `scripts/orchestrator.test.mjs` covers all of it.
+// Pure logic of the `/orchestrate-spec` skill (`scripts/orchestrator.mjs`), of its heartbeat hook
+// (`scripts/orchestrator-heartbeat.mjs`) and of the PreToolUse guard (`scripts/guard-tool-use.mjs`).
+// Nothing here touches the disk or spawns a process, so `scripts/orchestrator.test.mjs` covers
+// all of it.
 
 // ---------------------------------------------------------------------------------------------
 // Tickets
@@ -32,7 +33,7 @@ export function parseTicket(fileName, text) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Batches
+// Plan and frontier
 
 const normalize = (path) => path.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
 
@@ -45,16 +46,13 @@ export function pathsOverlap(a, b) {
 const touchesAny = (files, taken) => files.some((file) => taken.some((t) => pathsOverlap(file, t)));
 
 /**
- * Splits the selected tickets into batches that can run in parallel. A ticket joins a batch once
- * every ticket it is blocked by sits in an earlier batch, and only if none of its predicted files
- * overlaps a file of a ticket already in that batch. Blockers that are closed (`doneIds`) are
- * satisfied; a blocker that is neither selected nor closed is an error, as is a cycle.
+ * Checks the selected tickets before an orchestration: every blocker is selected or closed
+ * (`doneIds`), and the blockers have no cycle. Throws with the first problem.
  *
- * @param {{ id: string, blockedBy: string[], files: string[] }[]} tickets
+ * @param {{ id: string, blockedBy: string[] }[]} tickets
  * @param {Iterable<string>} doneIds
- * @returns {string[][]}
  */
-export function computeBatches(tickets, doneIds = []) {
+export function validatePlan(tickets, doneIds = []) {
   const done = new Set(doneIds);
   const selected = new Map(tickets.map((ticket) => [ticket.id, ticket]));
   for (const ticket of tickets) {
@@ -63,50 +61,102 @@ export function computeBatches(tickets, doneIds = []) {
       throw new Error(`${ticket.id} is blocked by ${missing.join(', ')}, which is not selected`);
     }
   }
-
-  const scheduled = new Set();
-  const batches = [];
-  const byId = (a, b) => a.id.localeCompare(b.id, 'en', { numeric: true });
-  while (scheduled.size < tickets.length) {
-    const ready = tickets
-      .filter((t) => !scheduled.has(t.id))
-      .filter((t) => t.blockedBy.every((id) => done.has(id) || scheduled.has(id)))
-      .sort(byId);
+  const finished = new Set();
+  while (finished.size < tickets.length) {
+    const ready = tickets.filter(
+      (t) => !finished.has(t.id) && t.blockedBy.every((id) => done.has(id) || finished.has(id)),
+    );
     if (!ready.length) {
-      const left = tickets.filter((t) => !scheduled.has(t.id)).map((t) => t.id);
+      const left = tickets.filter((t) => !finished.has(t.id)).map((t) => t.id);
       throw new Error(`dependency cycle between ${left.join(', ')}`);
     }
-    const batch = [];
-    const taken = [];
-    for (const ticket of ready) {
-      if (batch.length && touchesAny(ticket.files, taken)) continue;
-      batch.push(ticket.id);
-      taken.push(...ticket.files);
-    }
-    batch.forEach((id) => scheduled.add(id));
-    batches.push(batch);
+    ready.forEach((t) => finished.add(t.id));
   }
-  return batches;
+}
+
+/** Ticket states in `.orchestrator/state.json`, in the order a ticket goes through them. */
+export const STATES = ['pending', 'running', 'review', 'merging', 'merged', 'failed', 'skipped'];
+
+/** States whose ticket holds its files: an agent works on them or a merge is under way. */
+const IN_FLIGHT = new Set(['running', 'review', 'merging']);
+
+const byId = ([a], [b]) => a.localeCompare(b, 'en', { numeric: true });
+
+/**
+ * The tickets to launch now, in ticket order: pending, every blocker merged (a blocker outside
+ * the orchestration was closed before it), no predicted file overlapping a ticket in flight or
+ * one picked before it, and no more than `max` tickets in flight in all.
+ */
+export function frontier(state, max = Infinity) {
+  const entries = Object.entries(state.tickets).sort(byId);
+  const inFlight = entries.filter(([, t]) => IN_FLIGHT.has(t.status));
+  const taken = inFlight.flatMap(([, t]) => t.files);
+  const merged = (id) => !state.tickets[id] || state.tickets[id].status === 'merged';
+  const ready = [];
+  for (const [id, ticket] of entries) {
+    if (inFlight.length + ready.length >= max) break;
+    if (ticket.status !== 'pending' || !ticket.blockedBy.every(merged)) continue;
+    if (touchesAny(ticket.files, taken)) continue;
+    ready.push(id);
+    taken.push(...ticket.files);
+  }
+  return ready;
+}
+
+/** Pending tickets that can never start, because a ticket they are blocked by failed or was
+ * skipped. */
+export function blockedForGood(state) {
+  const dead = (id) => ['failed', 'skipped'].includes(state.tickets[id]?.status);
+  return Object.entries(state.tickets)
+    .filter(([, t]) => t.status === 'pending' && t.blockedBy.some(dead))
+    .map(([id]) => id)
+    .sort();
 }
 
 // ---------------------------------------------------------------------------------------------
 // Heartbeats and progress
 
-/** Ticket states in `.orchestrator/state.json`, in the order a ticket goes through them. */
-export const STATES = ['pending', 'running', 'review', 'merging', 'merged', 'failed', 'skipped'];
-
 /**
  * The running tickets whose agent has gone silent: the last heartbeat (or the start, when there is
- * none yet) is more than `maxAgeMs` old.
+ * none yet) is more than `maxAgeMs` old. While the agent is inside a tool call (`inTool`, written
+ * on PreToolUse) the limit doubles, because one Bash call may legally run for 10 minutes.
  */
 export function findStale(state, beats, now, maxAgeMs) {
   return Object.entries(state.tickets)
     .filter(([, ticket]) => ticket.status === 'running')
     .filter(([id, ticket]) => {
-      const last = Date.parse(beats[id]?.at ?? ticket.startedAt ?? '');
-      return !Number.isFinite(last) || now - last > maxAgeMs;
+      const beat = beats[id];
+      const last = Date.parse(beat?.at ?? ticket.startedAt ?? '');
+      const limit = beat?.inTool ? maxAgeMs * 2 : maxAgeMs;
+      return !Number.isFinite(last) || now - last > limit;
     })
-    .map(([id]) => id);
+    .map(([id]) => id)
+    .sort();
+}
+
+/**
+ * The heartbeat a hook event writes. Only a tool call of the agent of a running ticket beats: it
+ * records the time, the tool, whether the call is still under way and the agent's working folder,
+ * and keeps the step the agent described with `beat`. Undefined for every other event.
+ */
+export function heartbeatFor(state, beats, event, now) {
+  if (!event.agent_id || !state?.tickets) return undefined;
+  const entry = Object.entries(state.tickets).find(
+    ([, ticket]) => ticket.status === 'running' && ticket.agent === event.agent_id,
+  );
+  if (!entry) return undefined;
+  const [id] = entry;
+  return {
+    id,
+    beat: {
+      ...beats[id],
+      ticket: id,
+      at: new Date(now).toISOString(),
+      tool: event.tool_name,
+      inTool: event.hook_event_name === 'PreToolUse',
+      cwd: event.cwd,
+    },
+  };
 }
 
 const ago = (iso, now) => {
@@ -121,7 +171,7 @@ const cell = (text) =>
 
 /** `.orchestrator/progress.md`: what the user reads while the orchestration runs. */
 export function renderProgress(state, beats, now) {
-  const tickets = Object.entries(state.tickets);
+  const tickets = Object.entries(state.tickets).sort(byId);
   const count = (status) => tickets.filter(([, t]) => t.status === status).length;
   const lines = [
     `# Orchestration: ${state.spec}`,
@@ -132,19 +182,17 @@ export function renderProgress(state, beats, now) {
     `Merged ${count('merged')} of ${tickets.length}; running ${count('running')}; ` +
       `failed ${count('failed')}. Phase: **${state.phase}**.`,
     '',
-    '| Batch | Ticket | Status | Last heartbeat | Step | Note |',
+    '| Ticket | Blocked by | Status | Last heartbeat | Step | Note |',
     '| --- | --- | --- | --- | --- | --- |',
   ];
-  state.batches.forEach((batch, index) => {
-    for (const id of batch) {
-      const ticket = state.tickets[id];
-      const beat = beats[id];
-      lines.push(
-        `| ${index + 1} | ${id} ${cell(ticket.title)} | ${ticket.status} | ` +
-          `${beat ? ago(beat.at, now) : '—'} | ${cell(beat?.step)} | ${cell(ticket.note)} |`,
-      );
-    }
-  });
+  for (const [id, ticket] of tickets) {
+    const beat = beats[id];
+    const heartbeat = beat ? `${ago(beat.at, now)}${beat.tool ? ` (${beat.tool})` : ''}` : '—';
+    lines.push(
+      `| ${id} ${cell(ticket.title)} | ${ticket.blockedBy.join(', ') || '—'} | ${ticket.status} | ` +
+        `${heartbeat} | ${cell(beat?.step)} | ${cell(ticket.note)} |`,
+    );
+  }
   if (state.log?.length) {
     lines.push('', '## Log', '', ...state.log.map((entry) => `- ${entry.at} ${entry.text}`));
   }

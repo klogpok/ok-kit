@@ -1,16 +1,21 @@
 // State keeper of the `/orchestrate-spec` skill (`.claude/skills/orchestrate-spec/SKILL.md`).
 // Everything lives in `.orchestrator/` of the main checkout (git-ignored), whichever worktree the
 // command runs from: `lock`, `plan.json`, `state.json`, one `<ticket>.json` heartbeat per ticket
-// and `progress.md`, which every write re-renders.
+// and `progress.md`, which every write re-renders. The heartbeats are written by the hook
+// `scripts/orchestrator-heartbeat.mjs` on every tool call of a ticket agent; `beat` only adds a
+// description of the step.
 //
 // Usage (`node <main checkout>/scripts/orchestrator.mjs <command>`):
 //   lock acquire | release | status   one orchestration per checkout, owned by a Claude Code session
 //   tickets <spec dir>                the tickets of a spec as JSON, closed ones included
-//   init <plan.json>                  batches the selected tickets and writes state.json
+//   init [<plan.json>] [--force]      checks the plan and writes state.json; refuses to replace an
+//                                     unfinished orchestration without --force
+//   next [--max <n>]                  the tickets to launch now (default: at most 4 in flight)
+//   status                            every ticket with its agent, worktree and last heartbeat
 //   set <ticket> <status> [--agent <id>] [--worktree <path>] [--branch <name>] [--note <text>]
-//   phase <name>                      the current phase: implement, merge, review, verify, done
+//   phase <name>                      the current phase: implement, review, verify, done
 //   log <text>                        adds a line to the log of progress.md
-//   beat <ticket> <step>              a heartbeat; ticket agents call it every few steps
+//   beat <ticket> <step>              describes the current step of a ticket agent
 //   watch [--stale <s>] [--every <s>] waits until an agent is silent for --stale seconds (prints
 //                                     STALE <ids>) or nothing runs (prints IDLE), then exits
 //   progress                          re-renders progress.md and prints its path
@@ -22,11 +27,13 @@ import { parseArgs } from 'node:util';
 
 import {
   STATES,
-  computeBatches,
+  blockedForGood,
   findStale,
+  frontier,
   lockStatus,
   parseTicket,
   renderProgress,
+  validatePlan,
 } from './orchestrator.lib.mjs';
 
 const fail = (message) => {
@@ -118,7 +125,19 @@ switch (command) {
   }
 
   case 'init': {
-    const plan = readJson(resolve(rest[0] ?? path('plan.json')));
+    const { values, positionals } = parseArgs({
+      args: rest,
+      allowPositionals: true,
+      options: { force: { type: 'boolean', default: false } },
+    });
+    const previous = readJson(path('state.json'));
+    if (previous && previous.phase !== 'done' && !values.force) {
+      fail(
+        `an orchestration of ${previous.spec} is unfinished (phase ${previous.phase}): ` +
+          'resume it (`status`), or pass --force to discard it',
+      );
+    }
+    const plan = readJson(resolve(positionals[0] ?? path('plan.json')));
     if (!plan?.spec || !plan.branch || !plan.base || !plan.tickets?.length) {
       fail('the plan needs spec, base, branch and a non-empty tickets list');
     }
@@ -129,9 +148,8 @@ switch (command) {
       return { ...ticket, files };
     });
     const done = [...all.values()].filter((ticket) => !ticket.open).map((ticket) => ticket.id);
-    let batches;
     try {
-      batches = computeBatches(selected, done);
+      validatePlan(selected, done);
     } catch (error) {
       fail(error.message);
     }
@@ -142,7 +160,6 @@ switch (command) {
       branch: plan.branch,
       startedAt: now(),
       phase: 'implement',
-      batches,
       tickets: Object.fromEntries(
         selected.map((t) => [
           t.id,
@@ -155,10 +172,50 @@ switch (command) {
           },
         ]),
       ),
-      log: [{ at: now(), text: `planned ${selected.length} tickets in ${batches.length} batches` }],
+      log: [{ at: now(), text: `planned ${selected.length} tickets` }],
     };
     saveState(state);
-    console.log(JSON.stringify(batches));
+    console.log(`planned ${selected.length} tickets; first to launch: ${frontier(state, 4)}`);
+    break;
+  }
+
+  case 'next': {
+    const { values } = parseArgs({
+      args: rest,
+      options: { max: { type: 'string', default: '4' } },
+    });
+    const state = loadState();
+    const statuses = Object.values(state.tickets).map((ticket) => ticket.status);
+    console.log(
+      JSON.stringify({
+        launch: frontier(state, Number(values.max)),
+        inFlight: statuses.filter((s) => ['running', 'review', 'merging'].includes(s)).length,
+        pending: statuses.filter((s) => s === 'pending').length,
+        blockedForGood: blockedForGood(state),
+      }),
+    );
+    break;
+  }
+
+  case 'status': {
+    const state = loadState();
+    const beats = readBeats(state);
+    const tickets = Object.entries(state.tickets).map(([id, t]) => ({
+      id,
+      status: t.status,
+      agent: t.agent,
+      worktree: t.worktree ?? beats[id]?.cwd,
+      branch: t.branch,
+      beat: beats[id] && { at: beats[id].at, step: beats[id].step, tool: beats[id].tool },
+      note: t.note,
+    }));
+    console.log(
+      JSON.stringify(
+        { spec: state.spec, branch: state.branch, phase: state.phase, tickets },
+        null,
+        2,
+      ),
+    );
     break;
   }
 
@@ -201,7 +258,8 @@ switch (command) {
   case 'beat': {
     const [id, ...step] = rest;
     if (!id || !step.length) fail('beat <ticket> <step>');
-    writeJson(path(`${id}.json`), { ticket: id, at: now(), step: step.join(' ') });
+    const beat = readJson(path(`${id}.json`));
+    writeJson(path(`${id}.json`), { ...beat, ticket: id, at: now(), step: step.join(' ') });
     const state = readJson(path('state.json'));
     if (state) saveState(state);
     break;
@@ -211,7 +269,7 @@ switch (command) {
     const { values } = parseArgs({
       args: rest,
       options: {
-        stale: { type: 'string', default: '300' },
+        stale: { type: 'string', default: '600' },
         every: { type: 'string', default: '300' },
       },
     });
@@ -247,5 +305,5 @@ switch (command) {
   }
 
   default:
-    fail('commands: lock, tickets, init, set, phase, log, beat, watch, progress');
+    fail('commands: lock, tickets, init, next, status, set, phase, log, beat, watch, progress');
 }

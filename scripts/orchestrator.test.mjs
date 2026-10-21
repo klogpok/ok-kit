@@ -1,11 +1,13 @@
-// Tests of the pure logic of `orchestrator.mjs` and `guard-tool-use.mjs`. Run with
-// `pnpm test-scripts`.
+// Tests of the pure logic of `orchestrator.mjs`, `orchestrator-heartbeat.mjs` and
+// `guard-tool-use.mjs`. Run with `pnpm test-scripts`.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-  computeBatches,
+  blockedForGood,
   findStale,
+  frontier,
+  heartbeatFor,
   isDescendant,
   killTargets,
   lockStatus,
@@ -13,6 +15,7 @@ import {
   pathsOverlap,
   renderProgress,
   skipsGitHooks,
+  validatePlan,
 } from './orchestrator.lib.mjs';
 
 describe('parseTicket', () => {
@@ -68,33 +71,65 @@ describe('pathsOverlap', () => {
   });
 });
 
-describe('computeBatches', () => {
-  const t = (id, blockedBy = [], files = [`f${id}`]) => ({ id, blockedBy, files });
+describe('validatePlan', () => {
+  const t = (id, blockedBy = []) => ({ id, blockedBy });
 
-  it('runs independent tickets with disjoint files in one batch', () => {
-    assert.deepEqual(computeBatches([t('01'), t('02'), t('03')]), [['01', '02', '03']]);
-  });
-
-  it('puts a ticket after the batch of its blocker', () => {
-    assert.deepEqual(computeBatches([t('02', ['01']), t('01'), t('03', ['02'])]), [
-      ['01'],
-      ['02'],
-      ['03'],
-    ]);
-  });
-
-  it('moves a ticket whose files overlap to the next batch', () => {
-    const batches = computeBatches([t('01', [], ['a/x.ts']), t('02', [], ['a']), t('03')]);
-    assert.deepEqual(batches, [['01', '03'], ['02']]);
-  });
-
-  it('treats closed blockers as satisfied', () => {
-    assert.deepEqual(computeBatches([t('05', ['01'])], ['01']), [['05']]);
+  it('accepts selected and closed blockers', () => {
+    assert.doesNotThrow(() => validatePlan([t('01'), t('02', ['01']), t('05', ['03'])], ['03']));
   });
 
   it('rejects a blocker that is neither selected nor closed, and a cycle', () => {
-    assert.throws(() => computeBatches([t('05', ['04'])]), /05 is blocked by 04/);
-    assert.throws(() => computeBatches([t('01', ['02']), t('02', ['01'])]), /cycle/);
+    assert.throws(() => validatePlan([t('05', ['04'])]), /05 is blocked by 04/);
+    assert.throws(() => validatePlan([t('01', ['02']), t('02', ['01'])]), /cycle between 01, 02/);
+  });
+});
+
+describe('frontier', () => {
+  const t = (status, blockedBy = [], files) => ({ status, blockedBy, files });
+  const state = (tickets) => ({ tickets });
+
+  it('starts every pending ticket whose blockers are merged and whose files are free', () => {
+    const s = state({
+      '01': t('merged', [], ['a']),
+      '02': t('pending', ['01'], ['b']),
+      '03': t('pending', ['04'], ['c']),
+      '04': t('running', [], ['d']),
+      '05': t('pending', ['99'], ['e']),
+    });
+    assert.deepEqual(frontier(s), ['02', '05']);
+  });
+
+  it('holds back a ticket whose files overlap one in flight or one picked before it', () => {
+    const s = state({
+      '01': t('review', [], ['projects/ui-kit/select']),
+      '02': t('pending', [], ['projects/ui-kit/select/select.ts']),
+      '03': t('pending', [], ['x']),
+      '04': t('pending', [], ['x/y.ts']),
+    });
+    assert.deepEqual(frontier(s), ['03']);
+  });
+
+  it('keeps at most `max` tickets in flight', () => {
+    const s = state({
+      '01': t('running', [], ['a']),
+      '02': t('pending', [], ['b']),
+      '03': t('pending', [], ['c']),
+    });
+    assert.deepEqual(frontier(s, 2), ['02']);
+    assert.deepEqual(frontier(s, 1), []);
+  });
+});
+
+describe('blockedForGood', () => {
+  it('lists pending tickets behind a failed or skipped blocker', () => {
+    const s = {
+      tickets: {
+        '01': { status: 'failed', blockedBy: [] },
+        '02': { status: 'pending', blockedBy: ['01'] },
+        '03': { status: 'pending', blockedBy: [] },
+      },
+    };
+    assert.deepEqual(blockedForGood(s), ['02']);
   });
 });
 
@@ -106,17 +141,62 @@ describe('findStale', () => {
       '02': { status: 'running', startedAt: '2026-10-21T11:59:00Z' },
       '03': { status: 'running', startedAt: '2026-10-21T11:00:00Z' },
       '04': { status: 'merged', startedAt: '2026-10-21T10:00:00Z' },
+      '05': { status: 'running', startedAt: '2026-10-21T11:00:00Z' },
+      '06': { status: 'running', startedAt: '2026-10-21T11:00:00Z' },
     },
   };
 
   it('returns running tickets silent for longer than the limit', () => {
-    const beats = { '03': { at: '2026-10-21T11:58:00Z' } };
-    assert.deepEqual(findStale(state, beats, now, 5 * 60_000), ['01']);
+    const beats = {
+      '03': { at: '2026-10-21T11:55:00Z' },
+      '05': { at: '2026-10-21T11:45:00Z', inTool: true },
+      '06': { at: '2026-10-21T11:35:00Z', inTool: true },
+    };
+    assert.deepEqual(findStale(state, beats, now, 10 * 60_000), ['01', '06']);
+  });
+});
+
+describe('heartbeatFor', () => {
+  const state = {
+    tickets: {
+      '01': { status: 'running', agent: 'a1' },
+      '02': { status: 'merged', agent: 'a2' },
+    },
+  };
+  const now = Date.parse('2026-10-21T12:00:00Z');
+  const event = (agent, hook = 'PostToolUse') => ({
+    agent_id: agent,
+    hook_event_name: hook,
+    tool_name: 'Bash',
+    cwd: 'D:\\wt\\t01',
+  });
+
+  it('beats for the agent of a running ticket and keeps its step', () => {
+    const beats = { '01': { at: '2026-10-21T11:00:00Z', step: 'red: test' } };
+    assert.deepEqual(heartbeatFor(state, beats, event('a1', 'PreToolUse'), now), {
+      id: '01',
+      beat: {
+        ticket: '01',
+        at: '2026-10-21T12:00:00.000Z',
+        step: 'red: test',
+        tool: 'Bash',
+        inTool: true,
+        cwd: 'D:\\wt\\t01',
+      },
+    });
+    assert.equal(heartbeatFor(state, beats, event('a1'), now).beat.inTool, false);
+  });
+
+  it('ignores the orchestrator, finished tickets and unknown agents', () => {
+    assert.equal(heartbeatFor(state, {}, event(undefined), now), undefined);
+    assert.equal(heartbeatFor(state, {}, event('a2'), now), undefined);
+    assert.equal(heartbeatFor(state, {}, event('zz'), now), undefined);
+    assert.equal(heartbeatFor(undefined, {}, event('a1'), now), undefined);
   });
 });
 
 describe('renderProgress', () => {
-  it('lists every ticket by batch with its last heartbeat', () => {
+  it('lists every ticket with its blockers and last heartbeat', () => {
     const md = renderProgress(
       {
         spec: '.scratch/x',
@@ -124,18 +204,20 @@ describe('renderProgress', () => {
         base: 'master',
         startedAt: '2026-10-21T11:00:00Z',
         phase: 'implement',
-        batches: [['01', '02']],
         tickets: {
-          '01': { title: 'One | two', status: 'running' },
-          '02': { title: 'Three', status: 'merged', note: 'ok' },
+          '02': { title: 'Three', status: 'merged', note: 'ok', blockedBy: ['01'] },
+          '01': { title: 'One | two', status: 'running', blockedBy: [] },
         },
         log: [{ at: '2026-10-21T11:00:00Z', text: 'started' }],
       },
-      { '01': { at: '2026-10-21T11:59:30Z', step: 'red: select test' } },
+      { '01': { at: '2026-10-21T11:59:30Z', step: 'red: select test', tool: 'Bash' } },
       Date.parse('2026-10-21T12:00:00Z'),
     );
     assert.match(md, /Merged 1 of 2; running 1; failed 0/);
-    assert.match(md, /\| 1 \| 01 One \\\| two \| running \| 30 s ago \| red: select test \|/);
+    assert.match(
+      md,
+      /\| 01 One \\\| two \| — \| running \| 30 s ago \(Bash\) \| red: select test \|  \|\n\| 02 Three \| 01 \|/,
+    );
     assert.match(md, /- 2026-10-21T11:00:00Z started/);
   });
 });
