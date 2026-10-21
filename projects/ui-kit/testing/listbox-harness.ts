@@ -132,6 +132,14 @@ export class UiPopupListbox {
   }
 
   /**
+   * The "Select all" leading action of the open list; `null` while it is not offered (no option
+   * to act on) or the list is closed. `isSelected()` is true while every option it acts on is.
+   */
+  async getSelectAllAction(): Promise<UiOptionHarness | null> {
+    return (await this.getOptions({ selector: '.ui-listbox__select-all' }))[0] ?? null;
+  }
+
+  /**
    * Clicks the first matching option of the open list, or every one with `all`. Throws
    * `No <noun> matches <filters>.` when none matches.
    */

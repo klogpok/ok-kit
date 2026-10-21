@@ -13,8 +13,9 @@ class FieldHarness extends ComponentHarness {
   readonly listbox = new UiPopupListbox(this.control, this.documentRootLocatorFactory());
 }
 
-const CITY = new HarnessPredicate(FieldHarness, { selector: ':not(.tags)' });
+const CITY = new HarnessPredicate(FieldHarness, { selector: ':not(.tags):not(.rooms)' });
 const TAGS = new HarnessPredicate(FieldHarness, { selector: '.tags' });
+const ROOMS = new HarnessPredicate(FieldHarness, { selector: '.rooms' });
 
 @Component({
   imports: [UiSelect, UiMultiSelect, UiOption],
@@ -28,11 +29,23 @@ const TAGS = new HarnessPredicate(FieldHarness, { selector: '.tags' });
       <ui-option value="new">New</ui-option>
       <ui-option value="urgent">Urgent</ui-option>
     </ui-multi-select>
+    <ui-multi-select
+      aria-label="Rooms"
+      class="rooms"
+      searchable
+      creatable
+      selectAll
+      [(value)]="rooms"
+    >
+      <ui-option value="kitchen">Kitchen</ui-option>
+      <ui-option value="balcony">Balcony</ui-option>
+    </ui-multi-select>
   `,
 })
 class Host {
   readonly city = signal<string | null>(null);
   readonly tags = signal<readonly string[]>([]);
+  readonly rooms = signal<readonly string[]>([]);
 }
 
 describe('UiPopupListbox', () => {
@@ -85,5 +98,22 @@ describe('UiPopupListbox', () => {
     await expect(tags.listbox.clickOptions({ text: 'Done' }, { noun: 'tag' })).rejects.toThrow(
       'No tag matches {"text":"Done"}.',
     );
+  });
+
+  it('finds the leading actions of the open list', async () => {
+    const rooms = await loader.getHarness(ROOMS);
+    expect(await rooms.listbox.getSelectAllAction()).toBeNull();
+
+    await (await rooms.control()).click();
+    expect(await rooms.listbox.getCreateAction()).toBeNull();
+    const all = await rooms.listbox.getSelectAllAction();
+    expect(await all?.isSelected()).toBe(false);
+    await all?.click();
+    expect(host.rooms()).toEqual(['kitchen', 'balcony']);
+
+    await (await rooms.control()).sendKeys('Pantry');
+    expect(await rooms.listbox.getSelectAllAction()).toBeNull();
+    await (await rooms.listbox.getCreateAction())?.click();
+    expect(host.rooms()).toEqual(['kitchen', 'balcony', 'Pantry']);
   });
 });
