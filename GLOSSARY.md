@@ -50,6 +50,10 @@ _Avoid_: item, entry
 The option the keyboard currently points to; Enter chooses it. It is not necessarily chosen.
 _Avoid_: highlighted option, focused option, selected option
 
+**Leading action**:
+A choice at the top of a popup listbox that acts on the value instead of being one value: "Add «…»" adds the typed text, "Select all" selects or deselects every option shown. The keyboard reaches it before the options.
+_Avoid_: leading option, action option, action row
+
 ## Layout
 
 **Density**:
