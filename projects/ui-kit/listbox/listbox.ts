@@ -52,9 +52,12 @@ import { UiItemOption } from './option-items';
     @if (listbox.leadingActions().length) {
       <div class="ui-listbox__actions" role="none">
         @for (action of listbox.leadingActions(); track action) {
-          <ui-option [value]="action" [class.ui-listbox__create]="action.kind === 'create'">{{
-            action.getLabel()
-          }}</ui-option>
+          <ui-option
+            [value]="action"
+            [class.ui-listbox__create]="action.kind === 'create'"
+            [class.ui-listbox__select-all]="action.kind === 'selectAll'"
+            >{{ action.getLabel() }}</ui-option
+          >
         }
       </div>
     }

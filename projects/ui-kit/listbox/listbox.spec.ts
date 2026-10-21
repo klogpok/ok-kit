@@ -91,6 +91,8 @@ class TestField {
   readonly multiple = input(false);
   readonly locked = input(false);
   readonly creatable = input(false);
+  /** The "Select all" leading action. */
+  readonly allAction = input(false);
   readonly value = model<readonly string[]>([]);
   /** Keys the listbox left to the field. */
   readonly unhandled: string[] = [];
@@ -118,6 +120,18 @@ class TestField {
         this.events.push(`create ${text}`);
         this.value.set([...this.value(), text]);
         this.query.set('');
+      },
+    },
+    selectAllAction: {
+      available: this.allAction,
+      selectAll: (values, on) => {
+        this.events.push(`${on ? 'select' : 'deselect'} ${values.join(',')}`);
+        const current = this.value();
+        this.value.set(
+          on
+            ? [...current, ...values.filter((value) => !current.includes(value))]
+            : current.filter((value) => !values.includes(value)),
+        );
       },
     },
     activateOnOpen: this.activateOnOpen,
@@ -156,9 +170,10 @@ class TestField {
       [openAt]="openAt()"
       [showEmpty]="showEmpty()"
       [selectAll]="selectAll()"
-      [multiple]="selectAll()"
+      [multiple]="selectAll() || allAction()"
       [locked]="locked()"
       [creatable]="creatable()"
+      [allAction]="allAction()"
       [items]="items()"
       [virtualThreshold]="virtualThreshold()"
       [filterText]="filterText()"
@@ -178,6 +193,7 @@ class Host {
   readonly selectAll = signal(false);
   readonly locked = signal(false);
   readonly creatable = signal(false);
+  readonly allAction = signal(false);
   readonly items = signal<readonly UiOptionItem<string>[] | null>(null);
   readonly virtualThreshold = signal(100);
   readonly filterText = signal('');
@@ -829,6 +845,67 @@ describe('UiListboxController', () => {
         await settle(fixture);
         expect(host.value()).toEqual(['Kiwi']);
         expect(field.events).toContain('create Kiwi');
+      });
+    });
+
+    describe('"Select all"', () => {
+      const selectAll = () =>
+        actions()?.querySelector<HTMLElement>('.ui-listbox__select-all') ?? null;
+
+      beforeEach(async () => {
+        host.allAction.set(true);
+        await settle(fixture);
+      });
+
+      it('comes first and selects the enabled options, then deselects them', async () => {
+        await press('ArrowDown');
+        expect(panel()!.querySelector('ui-option')).toBe(selectAll());
+        expect(labelOf(selectAll()!)).toBe(labels().selectAll);
+        expect(selectAll()!.id).toBe('fruit-listbox-select-all');
+        expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-select-all');
+        await press('Enter');
+        // Cherry is disabled.
+        expect(field.events).toContain('select Apple,Banana,Date');
+        expect(host.value()).toEqual(['Apple', 'Banana', 'Date']);
+        expect(selectAll()!.getAttribute('aria-selected')).toBe('true');
+        await press('Enter');
+        expect(field.events).toContain('deselect Apple,Banana,Date');
+        expect(host.value()).toEqual([]);
+        expect(selectAll()!.getAttribute('aria-selected')).toBe('false');
+      });
+
+      it('is partly checked while some of its options are selected', async () => {
+        host.value.set(['Banana']);
+        await settle(fixture);
+        control().click();
+        await settle(fixture);
+        expect(selectAll()!.getAttribute('aria-selected')).toBe('false');
+        expect(selectAll()!.classList).toContain('ui-option--selected');
+        selectAll()!.click();
+        await settle(fixture);
+        expect(field.events).toContain('select Apple,Banana,Date');
+        expect(host.value()).toEqual(['Banana', 'Apple', 'Date']);
+        expect(selectAll()!.getAttribute('aria-selected')).toBe('true');
+      });
+
+      it('acts on the options the search shows and is hidden without one', async () => {
+        host.mode.set('searchable');
+        await settle(fixture);
+        field.search('an');
+        await settle(fixture);
+        expect(selectAll()!.hidden).toBe(false);
+        expect(selectAll()!.classList).not.toContain('ui-option--disabled');
+        expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-select-all');
+        await press('Enter');
+        expect(field.events).toContain('select Banana');
+        // Cherry is shown but disabled.
+        field.search('Cherry');
+        await settle(fixture);
+        expect(selectAll()).toBeNull();
+        field.search('');
+        host.allAction.set(false);
+        await settle(fixture);
+        expect(selectAll()).toBeNull();
       });
     });
   });

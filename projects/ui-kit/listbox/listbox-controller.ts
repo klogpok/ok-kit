@@ -111,6 +111,17 @@ export interface UiListboxCreateAction<T> {
 }
 
 /**
+ * "Select all": acts on the enabled options the search shows and is shown while there is one.
+ * It is checked while they are all selected and partly checked while some are.
+ */
+export interface UiListboxSelectAllAction<T> {
+  /** The field offers it (`selectAll` without `maxSelections`). */
+  readonly available: () => boolean;
+  /** The user picked it: select the values (`on`), or deselect them. */
+  selectAll(values: readonly T[], on: boolean): void;
+}
+
+/**
  * What the field gives its listbox. Values that change are functions (signals or inputs fit);
  * the rest are callbacks into the field.
  */
@@ -154,6 +165,8 @@ export interface UiListboxConfig<T> {
   readonly showEmpty?: () => boolean;
   /** The "Add «…»" leading action. */
   readonly createAction?: UiListboxCreateAction<T>;
+  /** The "Select all" leading action. */
+  readonly selectAllAction?: UiListboxSelectAllAction<T>;
 
   /** Whether an option value is selected. */
   isSelected(value: unknown): boolean;
@@ -285,10 +298,12 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   );
   private readonly actionOwner: UiLeadingActionOwner = {
     idOf: (action) => `${this.panelId()}-${action.kind === 'create' ? 'create' : 'select-all'}`,
-    labelOf: () => this.labels().create(this.createText()),
+    labelOf: (action) =>
+      action.kind === 'create' ? this.labels().create(this.createText()) : this.labels().selectAll,
     reveal: (action) => this.reveal(action),
   };
   private readonly createEntry = new UiLeadingAction('create', this.actionOwner);
+  private readonly selectAllEntry = new UiLeadingAction('selectAll', this.actionOwner);
   /**
    * Text "Add «…»" adds: the trimmed search text, unless it is, ignoring case, the label of an
    * option or of a selected value. `''` while the field cannot add a value.
@@ -304,10 +319,24 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     const selected = create.selected().some((value) => taken(this.labelFor(value)));
     return listed || selected ? '' : text;
   });
-  /** The leading actions shown, in keyboard order; `ui-listbox` renders these. */
-  readonly leadingActions = computed((): readonly UiLeadingAction[] =>
-    this.createText() ? [this.createEntry] : [],
+  /** Options "Select all" acts on: enabled and shown by the search. */
+  private readonly selectAllTargets = computed(() =>
+    this.options().filter((option) => !option.isDisabled() && !this.isHidden(option)),
   );
+  /** "Select all" is checked: every option it acts on is selected. */
+  private readonly allSelected = computed(() => {
+    const targets = this.selectAllTargets();
+    return targets.length > 0 && targets.every((option) => this.cfg.isSelected(option.value()));
+  });
+  private readonly selectAllShown = computed(
+    () =>
+      (this.config()?.selectAllAction?.available() ?? false) && this.selectAllTargets().length > 0,
+  );
+  /** The leading actions shown, in keyboard order; `ui-listbox` renders these. */
+  readonly leadingActions = computed((): readonly UiLeadingAction[] => [
+    ...(this.createText() ? [this.createEntry] : []),
+    ...(this.selectAllShown() ? [this.selectAllEntry] : []),
+  ]);
   /** Every option the keyboard moves through. */
   private readonly listOptions = computed((): readonly UiListEntry[] => [
     ...this.leadingActions(),
@@ -433,7 +462,8 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   // --- Options (what `ui-option` asks) ------------------------------------------------------
 
   isSelected(value: unknown): boolean {
-    if (value instanceof UiLeadingAction) return false;
+    if (value instanceof UiLeadingAction)
+      return value === this.selectAllEntry && this.allSelected();
     return this.cfg.isSelected(value);
   }
 
@@ -444,6 +474,12 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   }
 
   isIndeterminate(option: UiOptionHandle): boolean {
+    if (option.value() === this.selectAllEntry) {
+      return (
+        !this.allSelected() &&
+        this.selectAllTargets().some((target) => this.cfg.isSelected(target.value()))
+      );
+    }
     return this.config()?.isIndeterminate?.(option) ?? false;
   }
 
@@ -773,8 +809,13 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
 
   /** Calls the field's handler of a leading action. */
   private pick(action: UiLeadingAction): void {
+    if (action === this.selectAllEntry) {
+      const values = this.selectAllTargets().map((option) => option.value());
+      this.config()?.selectAllAction?.selectAll(values, !this.allSelected());
+      return;
+    }
     const text = this.createText();
-    if (action === this.createEntry && text) this.config()?.createAction?.create(text);
+    if (text) this.config()?.createAction?.create(text);
   }
 
   /** Id of a rendered option; `null` while an item is not rendered. */
