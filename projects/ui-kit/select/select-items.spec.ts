@@ -180,7 +180,7 @@ describe('UiMultiSelect with items', () => {
   it('keeps "select all" above the viewport and selects every enabled item', async () => {
     control().click();
     await frame(fixture);
-    const all = document.querySelector<HTMLElement>('.ui-select__all')!;
+    const all = document.querySelector<HTMLElement>('.ui-listbox__select-all')!;
     expect(all.closest('cdk-virtual-scroll-viewport')).toBeNull();
     // "Select all" opens the set that the items continue.
     expect(all.getAttribute('aria-posinset')).toBe('1');

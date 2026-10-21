@@ -126,9 +126,9 @@ export class UiSelectHarness extends UiHarness {
    */
   async create(text: string): Promise<void> {
     await this.search(text);
-    const options = await this.listbox.getOptions({ selector: '.ui-select__create' });
-    if (!options.length) throw Error(`The select does not offer to add ${JSON.stringify(text)}.`);
-    await options[0].click();
+    const action = await this.listbox.getCreateAction();
+    if (!action) throw Error(`The select does not offer to add ${JSON.stringify(text)}.`);
+    await action.click();
   }
 
   /** Clicks the clear button of a `clearable` select. Throws when it is not shown. */

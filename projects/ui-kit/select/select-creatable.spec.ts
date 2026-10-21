@@ -40,7 +40,7 @@ function type(control: HTMLInputElement, text: string): void {
 }
 
 const options = () => [...document.querySelectorAll<HTMLElement>('ui-option:not([hidden])')];
-const createOption = () => document.querySelector<HTMLElement>('ui-option.ui-select__create');
+const createOption = () => document.querySelector<HTMLElement>('ui-option.ui-listbox__create');
 const emptyRow = () => document.querySelector('.ui-listbox__empty');
 const activeId = (control: HTMLElement) => control.getAttribute('aria-activedescendant');
 
@@ -356,7 +356,7 @@ describe('UiMultiSelect creatable with ngModel', () => {
     await settle(fixture);
     const [add, all, bathroom] = options();
     expect(add).toBe(createOption()!);
-    expect(all.classList).toContain('ui-select__all');
+    expect(all.classList).toContain('ui-listbox__select-all');
     expect(bathroom.textContent!.trim()).toBe('Bathroom');
     // "Select all" covers the options the search shows, not the add option.
     all.click();
@@ -419,7 +419,7 @@ describe('UiSelect creatable with items', () => {
     await settle(fixture);
     type(control(), '12');
     await frame(fixture);
-    const all = document.querySelector<HTMLElement>('ui-option.ui-select__all')!;
+    const all = document.querySelector<HTMLElement>('ui-option.ui-listbox__select-all')!;
     expect(createOption()!.getAttribute('aria-posinset')).toBe('1');
     expect(all.getAttribute('aria-posinset')).toBe('2');
     expect(all.getAttribute('aria-setsize')).toBe('15');

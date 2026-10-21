@@ -162,7 +162,7 @@ async function typeSearch(canvasElement: HTMLElement, text: string): Promise<HTM
 
 /** Whether the "Add «…»" option is the active one of the control. */
 function addIsActive(control: HTMLElement): boolean {
-  const add = document.querySelector('.ui-select__create');
+  const add = document.querySelector('.ui-listbox__create');
   return !!add && control.getAttribute('aria-activedescendant') === add.id;
 }
 
@@ -309,10 +309,10 @@ export const ManyOptionsCreatable: Story = {
   }),
   play: async ({ canvasElement }) => {
     const control = await typeSearch(canvasElement, '12');
-    await until(() => !!document.querySelector('.ui-select__create'), 'no add option');
+    await until(() => !!document.querySelector('.ui-listbox__create'), 'no add option');
     press('ArrowUp');
     await until(() => addIsActive(control), 'the add option is not active');
-    await expect(document.querySelector('.ui-select__create')!.getAttribute('aria-posinset')).toBe(
+    await expect(document.querySelector('.ui-listbox__create')!.getAttribute('aria-posinset')).toBe(
       '1',
     );
   },

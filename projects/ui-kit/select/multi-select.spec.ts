@@ -360,7 +360,7 @@ describe('UiMultiSelect extras', () => {
   let host: ExtrasHost;
   let root: HTMLElement;
   const control = () => root.querySelector<HTMLInputElement>('.ui-select__control')!;
-  const all = () => document.querySelector<HTMLElement>('ui-option.ui-select__all');
+  const all = () => document.querySelector<HTMLElement>('ui-option.ui-listbox__select-all');
   const option = (text: string) => options().find((o) => o.textContent?.includes(text))!;
   const open = async () => {
     keydown(control(), 'ArrowDown');

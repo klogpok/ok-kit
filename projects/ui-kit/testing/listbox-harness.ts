@@ -124,6 +124,14 @@ export class UiPopupListbox {
   }
 
   /**
+   * The "Add «…»" leading action of the open list, whatever the language of its label; `null`
+   * while it is not offered or the list is closed.
+   */
+  async getCreateAction(): Promise<UiOptionHarness | null> {
+    return (await this.getOptions({ selector: '.ui-listbox__create' }))[0] ?? null;
+  }
+
+  /**
    * Clicks the first matching option of the open list, or every one with `all`. Throws
    * `No <noun> matches <filters>.` when none matches.
    */

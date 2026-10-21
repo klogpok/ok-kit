@@ -15,7 +15,6 @@ import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import {
-  UiOption,
   type ɵUiListboxController as UiListboxController,
   type ɵUiOptionHandle as UiOptionHandle,
   ɵUiListbox as UiListbox,
@@ -23,9 +22,6 @@ import {
   ɵprovideUiListbox as provideUiListbox,
 } from '@vplans/ui-kit/listbox';
 import { UiSelectBase } from './select-base';
-
-/** Value of the "select all" option; never part of the value. */
-const SELECT_ALL = Symbol('ui-select-all');
 
 /**
  * Dropdown for picking several values from a list. Same keyboard and search behavior as
@@ -59,7 +55,7 @@ const SELECT_ALL = Symbol('ui-select-all');
  */
 @Component({
   selector: 'ui-multi-select',
-  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiOption, UiSpinner],
+  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,33 +83,19 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
     multiple: true,
     isSelected: (value) => this.isSelected(value),
     select: (value) => this.toggleValue(value),
-    isIndeterminate: (option) =>
-      option === this.selectAllOption() &&
-      !this.allSelected() &&
-      this.selectable().some((item) => this.isSelected(item.value())),
-    isBlocked: (option: UiOptionHandle) =>
-      this.limitReached() && !this.isLeading(option) && !this.isSelected(option.value()),
+    selectAllAction: {
+      available: () => this.selectAll() && this.maxSelections() === null,
+      selectAll: (values, on) => this.setAll(values, on),
+    },
+    // Reads the option's value only once the limit is reached.
+    isBlocked: (option: UiOptionHandle) => this.limitReached() && !this.isSelected(option.value()),
   });
 
-  protected override readonly selectAllValue = SELECT_ALL;
-  /** Options "select all" acts on: enabled and shown by the search. */
-  private readonly selectable = computed(() =>
-    this.listbox
-      .options()
-      .filter((option) => !option.isDisabled() && !this.listbox.isHidden(option)),
-  );
-  private readonly allSelected = computed(() => {
-    const options = this.selectable();
-    return options.length > 0 && options.every((option) => this.isSelected(option.value()));
-  });
   private readonly limitReached = computed(() => {
     const max = this.maxSelections();
     return max !== null && this.value().length >= max;
   });
 
-  protected override readonly showSelectAll = computed(
-    () => this.selectAll() && this.maxSelections() === null && this.selectable().length > 0,
-  );
   protected override readonly chipList = computed(() =>
     this.chips()
       ? this.value().map((value) => ({ value, label: this.listbox.labelFor(value) }))
@@ -141,8 +123,6 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
   protected readonly hasValue = computed(() => this.value().length > 0);
 
   private isSelected(value: unknown): boolean {
-    if (value === SELECT_ALL) return this.allSelected();
-    if (this.isCreate(value)) return false;
     return this.value().some((selected) => this.listbox.matches(value, selected));
   }
 
@@ -166,14 +146,6 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
 
   /** Adds the value, or removes it when it is already selected. */
   private toggleValue(value: unknown): void {
-    if (value === SELECT_ALL) {
-      this.toggleAll();
-      return;
-    }
-    if (this.isCreate(value)) {
-      this.create();
-      return;
-    }
     const current = this.value();
     if (this.isSelected(value)) {
       this.setValue(current.filter((selected) => !this.listbox.matches(value, selected)));
@@ -182,16 +154,15 @@ export class UiMultiSelect<T = unknown> extends UiSelectBase<T, readonly T[]> {
     }
   }
 
-  /** Selects the options the search shows, or deselects them when they are all selected. */
-  private toggleAll(): void {
-    const values = this.selectable().map((option) => option.value());
+  /** "Select all": adds the values that are not selected (`on`), or removes them all. */
+  private setAll(values: readonly T[], on: boolean): void {
     const current = this.value();
-    if (this.allSelected()) {
+    if (on) {
+      this.setValue([...current, ...values.filter((v) => !this.isSelected(v))]);
+    } else {
       this.setValue(
         current.filter((selected) => !values.some((v) => this.listbox.matches(v, selected))),
       );
-    } else {
-      this.setValue([...current, ...values.filter((v) => !this.isSelected(v))]);
     }
   }
 

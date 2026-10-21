@@ -6,7 +6,6 @@ import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import {
-  UiOption,
   type ɵUiListboxController as UiListboxController,
   ɵUiListbox as UiListbox,
   ɵinjectListbox as injectListbox,
@@ -41,7 +40,7 @@ import { UiSelectBase } from './select-base';
  */
 @Component({
   selector: 'ui-select',
-  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiOption, UiSpinner],
+  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiSpinner],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,11 +56,8 @@ export class UiSelect<T = unknown> extends UiSelectBase<T, T | null> {
 
   protected readonly listbox: UiListboxController<T> = injectListbox<T>({
     ...this.listboxConfig(),
-    isSelected: (value) => !this.isCreate(value) && this.listbox.matches(value, this.value()),
-    select: (value) => {
-      if (this.isCreate(value)) this.create();
-      else this.setValue(value as T);
-    },
+    isSelected: (value) => this.listbox.matches(value, this.value()),
+    select: (value) => this.setValue(value as T),
   });
 
   protected readonly displayLabel = computed(() => this.listbox.labelFor(this.value()));

@@ -99,32 +99,6 @@
 
 <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
   <ui-listbox [size]="size()">
-    <!-- "Add «…»" and "select all": the row sticks over a virtual list. With items these options
-         open the set that their aria-posinset continues. -->
-    @if (leadingCount()) {
-      <div class="ui-select__leading" role="none" uiListboxLeading>
-        @if (createText()) {
-          <ui-option
-            #createOption
-            class="ui-select__create"
-            [value]="createValue"
-            [attr.aria-setsize]="items() ? listbox.visibleItems().length + leadingCount() : null"
-            [attr.aria-posinset]="items() ? 1 : null"
-            >{{ labels().create(createText()) }}</ui-option
-          >
-        }
-        @if (showSelectAll()) {
-          <ui-option
-            #selectAllOption
-            class="ui-select__all"
-            [value]="selectAllValue"
-            [attr.aria-setsize]="items() ? listbox.visibleItems().length + leadingCount() : null"
-            [attr.aria-posinset]="items() ? leadingCount() : null"
-            >{{ labels().selectAll }}</ui-option
-          >
-        }
-      </div>
-    }
     <ng-content />
   </ui-listbox>
 </ng-template>

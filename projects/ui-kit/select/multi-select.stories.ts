@@ -206,7 +206,7 @@ export const Creatable: Story = {
       return id ? document.getElementById(id) : null;
     };
     await until(
-      () => !!document.querySelector('.ui-select__create') && !!active(),
+      () => !!document.querySelector('.ui-listbox__create') && !!active(),
       'the list did not show the add option',
     );
     await expect(active()?.textContent).toContain('מיזוג אוויר');
@@ -272,7 +272,7 @@ export const ManyOptionsPageUp: Story = {
       return id ? document.getElementById(id) : null;
     };
     await until(() => !!active()?.textContent?.includes('יחידה 10'), 'not at item 10');
-    const row = document.querySelector('.ui-select__leading')!.getBoundingClientRect();
+    const row = document.querySelector('.ui-listbox__actions')!.getBoundingClientRect();
     const listbox = document.querySelector('[role="listbox"]')!.getBoundingClientRect();
     // The list is scrolled, "select all" sticks at its top, and the active item shows below it.
     // (The listbox border is 1px.)
