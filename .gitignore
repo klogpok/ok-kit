@@ -45,3 +45,6 @@ Thumbs.db
 
 # Agent worktrees
 .claude/worktrees/
+
+# State of /orchestrate-spec (scripts/orchestrator.mjs)
+/.orchestrator/
