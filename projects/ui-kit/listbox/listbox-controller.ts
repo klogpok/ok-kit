@@ -480,8 +480,8 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   // --- Options (what `ui-option` asks) ------------------------------------------------------
 
   isSelected(value: unknown): boolean {
-    if (value instanceof UiLeadingAction)
-      return value === this.selectAllEntry && this.allSelected();
+    if (value === this.selectAllEntry) return this.allSelected();
+    if (value instanceof UiLeadingAction) return false;
     return this.cfg.isSelected(value);
   }
 

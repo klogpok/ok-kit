@@ -93,6 +93,8 @@ class TestField {
   readonly creatable = input(false);
   /** The "Select all" leading action. */
   readonly allAction = input(false);
+  /** Every option is blocked, as by a reached `maxSelections`. */
+  readonly blocked = input(false);
   readonly value = model<readonly string[]>([]);
   /** Keys the listbox left to the field. */
   readonly unhandled: string[] = [];
@@ -139,6 +141,7 @@ class TestField {
     showEmpty: this.showEmpty,
     locked: this.locked,
     displayWith: () => (value) => `#${value}`,
+    isBlocked: () => this.blocked(),
     alwaysShown: (option) => option.value() === SELECT_ALL,
     isSelected: (value) => this.value().includes(value as string),
     select: (value) => {
@@ -174,6 +177,7 @@ class TestField {
       [locked]="locked()"
       [creatable]="creatable()"
       [allAction]="allAction()"
+      [blocked]="blocked()"
       [items]="items()"
       [virtualThreshold]="virtualThreshold()"
       [filterText]="filterText()"
@@ -194,6 +198,7 @@ class Host {
   readonly locked = signal(false);
   readonly creatable = signal(false);
   readonly allAction = signal(false);
+  readonly blocked = signal(false);
   readonly items = signal<readonly UiOptionItem<string>[] | null>(null);
   readonly virtualThreshold = signal(100);
   readonly filterText = signal('');
@@ -944,6 +949,19 @@ describe('UiListboxController', () => {
       await press('ArrowDown');
       await press('ArrowDown');
       expect(activeLabel()).toBe('Banana');
+
+      // Never blocked, unlike the options.
+      host.blocked.set(true);
+      await settle(fixture);
+      expect(options.map((option) => option.getAttribute('aria-disabled'))).toEqual([
+        null,
+        null,
+        'true',
+      ]);
+      await press('ArrowUp');
+      await press('ArrowUp');
+      await press('Enter');
+      expect(host.value()).toEqual(['an']);
 
       // Projected options are all in the DOM: no positions.
       host.items.set(null);
