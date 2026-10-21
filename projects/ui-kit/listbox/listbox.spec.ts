@@ -790,6 +790,46 @@ describe('UiListboxController', () => {
         expect(create()!.id).toBe('fruit-listbox-create');
         expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-create');
       });
+
+      it('is not shown for the label of an option or of a selected value, ignoring case', async () => {
+        host.value.set(['Kiwi']);
+        await settle(fixture);
+        // The selected value is labelled by displayWith.
+        for (const text of [' banana ', '#KIWI', '   ']) {
+          field.search(text);
+          await settle(fixture);
+          expect(create()).toBeNull();
+        }
+        field.search('Kiwis');
+        await settle(fixture);
+        expect(create()).not.toBeNull();
+        host.creatable.set(false);
+        await settle(fixture);
+        expect(create()).toBeNull();
+      });
+
+      it('is passed over by activateFirst while the search shows another option', async () => {
+        field.search('an');
+        await settle(fixture);
+        expect(labelOf(create()!)).toBe(labels().create('an'));
+        expect(activeLabel()).toBe('Banana');
+        await press('ArrowUp');
+        expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-create');
+        expect(create()!.classList).toContain('ui-option--active');
+        await press('Enter');
+        expect(host.value()).toEqual(['an']);
+      });
+
+      it('keeps the "no options" row away and is never hidden by the search', async () => {
+        field.search('Kiwi');
+        await settle(fixture);
+        expect(create()!.hidden).toBe(false);
+        expect(panel()!.querySelector('.ui-listbox__empty')).toBeNull();
+        create()!.click();
+        await settle(fixture);
+        expect(host.value()).toEqual(['Kiwi']);
+        expect(field.events).toContain('create Kiwi');
+      });
     });
   });
 });
