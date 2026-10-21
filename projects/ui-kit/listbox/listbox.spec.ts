@@ -10,7 +10,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
+import { UI_LABELS, ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
 import { UiListboxMode, injectListbox, provideUiListbox } from './listbox-controller';
 import { UiListbox } from './listbox';
 import { UiOption } from './option';
@@ -90,11 +90,14 @@ class TestField {
   readonly selectAll = input(false);
   readonly multiple = input(false);
   readonly locked = input(false);
+  readonly creatable = input(false);
   readonly value = model<readonly string[]>([]);
   /** Keys the listbox left to the field. */
   readonly unhandled: string[] = [];
   readonly events: string[] = [];
   protected readonly selectAllValue = SELECT_ALL;
+  /** Text typed into the control. */
+  private readonly query = signal('');
 
   private readonly content = contentChildren<UiOption<string>>(UiOption, { descendants: true });
   private readonly leading = viewChildren<UiOption<string>>('leading');
@@ -107,7 +110,16 @@ class TestField {
     leadingOptions: this.leading,
     items: this.items,
     virtualThreshold: this.virtualThreshold,
-    filterText: this.filterText,
+    filterText: () => this.query() || this.filterText(),
+    createAction: {
+      available: this.creatable,
+      selected: this.value,
+      create: (text) => {
+        this.events.push(`create ${text}`);
+        this.value.set([...this.value(), text]);
+        this.query.set('');
+      },
+    },
     activateOnOpen: this.activateOnOpen,
     openAt: () => this.openAt(),
     showEmpty: this.showEmpty,
@@ -126,6 +138,13 @@ class TestField {
   protected onKeydown(event: KeyboardEvent): void {
     if (!this.listbox.handleKeydown(event)) this.unhandled.push(event.key);
   }
+
+  /** Typing in a searchable field: the list opens at the first option the search shows. */
+  search(text: string): void {
+    this.query.set(text);
+    this.listbox.open();
+    this.listbox.activateFirst();
+  }
 }
 
 @Component({
@@ -139,6 +158,7 @@ class TestField {
       [selectAll]="selectAll()"
       [multiple]="selectAll()"
       [locked]="locked()"
+      [creatable]="creatable()"
       [items]="items()"
       [virtualThreshold]="virtualThreshold()"
       [filterText]="filterText()"
@@ -157,6 +177,7 @@ class Host {
   readonly showEmpty = signal(true);
   readonly selectAll = signal(false);
   readonly locked = signal(false);
+  readonly creatable = signal(false);
   readonly items = signal<readonly UiOptionItem<string>[] | null>(null);
   readonly virtualThreshold = signal(100);
   readonly filterText = signal('');
@@ -735,5 +756,40 @@ describe('UiListboxController', () => {
     control().click();
     await settle(fixture);
     expect(panel()!.querySelector('.ui-listbox__empty')).not.toBeNull();
+  });
+
+  describe('leading actions', () => {
+    const labels = () => TestBed.inject(UI_LABELS)();
+    const actions = () => panel()?.querySelector<HTMLElement>('.ui-listbox__actions') ?? null;
+    const labelOf = (option: Element) =>
+      (option.querySelector('.ui-option__label')!.textContent ?? '').trim();
+
+    describe('"Add «…»"', () => {
+      const create = () => actions()?.querySelector<HTMLElement>('.ui-listbox__create') ?? null;
+
+      beforeEach(async () => {
+        host.mode.set('searchable');
+        host.creatable.set(true);
+        await settle(fixture);
+      });
+
+      it('adds the trimmed search text with Enter typed right after it', () => {
+        field.search('  Kiwi ');
+        const enter = keydown(control(), 'Enter');
+        expect(enter.defaultPrevented).toBe(true);
+        expect(field.events).toContain('create Kiwi');
+        expect(host.value()).toEqual(['Kiwi']);
+      });
+
+      it('comes first, with the create label and an id from the listbox', async () => {
+        field.search('Kiwi');
+        await settle(fixture);
+        expect(create()).not.toBeNull();
+        expect(panel()!.querySelector('ui-option')).toBe(create());
+        expect(labelOf(create()!)).toBe(labels().create('Kiwi'));
+        expect(create()!.id).toBe('fruit-listbox-create');
+        expect(control().getAttribute('aria-activedescendant')).toBe('fruit-listbox-create');
+      });
+    });
   });
 });

@@ -18,7 +18,7 @@ import {
 } from '@angular/core';
 import { ActiveDescendantKeyManager, Highlightable } from '@angular/cdk/a11y';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { UI_FORM_FIELD } from '@vplans/ui-kit/core';
+import { UI_FORM_FIELD, UI_LABELS } from '@vplans/ui-kit/core';
 import { UiListboxHost, UiOption, UiOptionHandle } from './option';
 import { UiItemEntry, UiItemEntryOwner, UiItemOption, UiOptionItem } from './option-items';
 
@@ -43,6 +43,71 @@ export interface UiListEntry<T = unknown> extends Highlightable, UiOptionHandle 
   readonly ɵdisabled: boolean;
   /** The search hides it. */
   ɵfilteredOut(): boolean;
+}
+
+/** What a leading action asks of the listbox that shows it. Internal. */
+interface UiLeadingActionOwner {
+  idOf(action: UiLeadingAction): string;
+  labelOf(action: UiLeadingAction): string;
+  reveal(action: UiLeadingAction): void;
+}
+
+/**
+ * A leading action ("Add «…»", "Select all") as the key manager and `ui-listbox` see it. It is in
+ * the keyboard order as soon as the listbox shows it, without waiting for a render. Its value is
+ * itself, so the option that renders it hands it back to the listbox when clicked. Never
+ * disabled, blocked or hidden by the search. Internal.
+ */
+export class UiLeadingAction implements UiListEntry<UiLeadingAction> {
+  readonly ɵdisabled = false;
+
+  constructor(
+    readonly kind: 'create' | 'selectAll',
+    private readonly owner: UiLeadingActionOwner,
+  ) {}
+
+  /** Id of the option that renders it, derived from the listbox id. */
+  get id(): string {
+    return this.owner.idOf(this);
+  }
+
+  value(): this {
+    return this;
+  }
+
+  getLabel(): string {
+    return this.owner.labelOf(this);
+  }
+
+  isDisabled(): boolean {
+    return false;
+  }
+
+  ɵfilteredOut(): boolean {
+    return false;
+  }
+
+  setActiveStyles(): void {
+    this.owner.reveal(this);
+  }
+
+  setInactiveStyles(): void {
+    // The rendered option reads the active action from the list.
+  }
+}
+
+/**
+ * "Add «…»": the search text becomes a value. The listbox shows it while the field can add a
+ * value and the trimmed search text, ignoring case, is the label of no option and of no selected
+ * value.
+ */
+export interface UiListboxCreateAction<T> {
+  /** The field can add a value now (`creatable`, `searchable`, `maxSelections` not reached). */
+  readonly available: () => boolean;
+  /** The selected values. */
+  readonly selected: () => readonly T[];
+  /** The user picked "Add «text»"; `text` is the trimmed search text. */
+  create(text: string): void;
 }
 
 /**
@@ -87,6 +152,8 @@ export interface UiListboxConfig<T> {
    * does not, `shown()` is false and the keys act as on a closed list.
    */
   readonly showEmpty?: () => boolean;
+  /** The "Add «…»" leading action. */
+  readonly createAction?: UiListboxCreateAction<T>;
 
   /** Whether an option value is selected. */
   isSelected(value: unknown): boolean;
@@ -148,6 +215,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   private readonly injector = inject(Injector);
   private readonly document = inject(DOCUMENT);
   private readonly formField = inject(UI_FORM_FIELD, { optional: true });
+  private readonly labels = inject(UI_LABELS);
   /**
    * The field's configuration, set by `injectListbox()` in the field initializer. One rule reads
    * it: optional members through `config()?.`, falling back to their default; required members
@@ -192,7 +260,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   private readonly entryOwner: UiItemEntryOwner = {
     isFilteredOut: (label, option) => this.isFilteredOut(label, option),
     isBlocked: (option) => this.isBlocked(option),
-    reveal: (entry) => this.reveal(entry as UiItemEntry<T>),
+    reveal: (entry) => this.reveal(entry),
   };
   /**
    * An entry per item. A new array (recomputed by the app) keeps the entries of the values it
@@ -215,8 +283,34 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   readonly visibleItems = computed(() =>
     this.itemEntries().filter((entry) => !entry.ɵfilteredOut()),
   );
+  private readonly actionOwner: UiLeadingActionOwner = {
+    idOf: (action) => `${this.panelId()}-${action.kind === 'create' ? 'create' : 'select-all'}`,
+    labelOf: () => this.labels().create(this.createText()),
+    reveal: (action) => this.reveal(action),
+  };
+  private readonly createEntry = new UiLeadingAction('create', this.actionOwner);
+  /**
+   * Text "Add «…»" adds: the trimmed search text, unless it is, ignoring case, the label of an
+   * option or of a selected value. `''` while the field cannot add a value.
+   */
+  readonly createText = computed(() => {
+    const create = this.config()?.createAction;
+    if (!create?.available()) return '';
+    const text = (this.config()?.filterText?.() ?? '').trim();
+    if (!text) return '';
+    const key = text.toLocaleLowerCase();
+    const taken = (label: string) => label.trim().toLocaleLowerCase() === key;
+    const listed = this.options().some((option) => taken(option.getLabel()));
+    const selected = create.selected().some((value) => taken(this.labelFor(value)));
+    return listed || selected ? '' : text;
+  });
+  /** The leading actions shown, in keyboard order; `ui-listbox` renders these. */
+  readonly leadingActions = computed((): readonly UiLeadingAction[] =>
+    this.createText() ? [this.createEntry] : [],
+  );
   /** Every option the keyboard moves through. */
-  private readonly listOptions = computed((): readonly UiListEntry<T>[] => [
+  private readonly listOptions = computed((): readonly UiListEntry[] => [
+    ...this.leadingActions(),
     ...this.leadingOptions(),
     ...(this.items() ? this.visibleItems() : this.contentOptions()),
   ]);
@@ -232,10 +326,10 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
    * The selected option a list opened with a click scrolls to without making it active; the
    * first arrow key activates it.
    */
-  private restingEntry: UiListEntry<T> | null = null;
+  private restingEntry: UiListEntry | null = null;
 
   readonly isOpen = signal(false);
-  private readonly activeEntry = signal<UiListEntry<T> | null>(null);
+  private readonly activeEntry = signal<UiListEntry | null>(null);
   /** The option the keyboard is on. */
   readonly active = this.activeEntry.asReadonly();
   /** Id of the active option; `null` while an active item is not rendered. */
@@ -260,10 +354,11 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
       return [...kept, ...seen];
     },
   });
-  /** Nothing to show: no option passes the search, no leading option is shown, nothing loads. */
+  /** Nothing to show: no option passes the search, no "Add «…»" is shown, nothing loads. */
   readonly noResults = computed(
     () =>
       !this.loading() &&
+      !this.createText() &&
       !(this.config()?.leadingShown?.() ?? false) &&
       this.options().every((option) => this.isHidden(option)),
   );
@@ -274,7 +369,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
       ((this.config()?.showEmpty?.() ?? true) || this.loading() || !this.noResults()),
   );
 
-  private readonly keyManager = new ActiveDescendantKeyManager<UiListEntry<T>>(
+  private readonly keyManager = new ActiveDescendantKeyManager<UiListEntry>(
     this.listOptions,
     this.injector,
   )
@@ -338,7 +433,14 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   // --- Options (what `ui-option` asks) ------------------------------------------------------
 
   isSelected(value: unknown): boolean {
+    if (value instanceof UiLeadingAction) return false;
     return this.cfg.isSelected(value);
+  }
+
+  /** Id of a rendered option: the id of the leading action it renders, else its own. */
+  optionId(option: UiOptionHandle): string | null {
+    const value = option.value();
+    return value instanceof UiLeadingAction ? value.id : null;
   }
 
   isIndeterminate(option: UiOptionHandle): boolean {
@@ -348,17 +450,21 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   isFilteredOut(label: string, option: UiOptionHandle): boolean {
     const query = (this.config()?.filterText?.() ?? '').trim().toLocaleLowerCase();
     if (!query || !(this.config()?.filterOptions?.() ?? true)) return false;
+    if (option.value() instanceof UiLeadingAction) return false;
     if (this.config()?.alwaysShown?.(option)) return false;
     return !label.toLocaleLowerCase().includes(query);
   }
 
   isBlocked(option: UiOptionHandle): boolean {
-    return this.config()?.isBlocked?.(option) ?? false;
+    // The field's rule reads the value only when it may block.
+    const blocked = this.config()?.isBlocked?.(option) ?? false;
+    return blocked && !(option.value() instanceof UiLeadingAction);
   }
 
-  /** Whether a rendered option shows the active entry of `items`. */
+  /** Whether a rendered option shows the active leading action or entry of `items`. */
   isActive(option: UiOptionHandle): boolean {
     const entry = this.activeEntry();
+    if (entry instanceof UiLeadingAction) return option.value() === entry;
     return (
       entry instanceof UiItemEntry &&
       this.itemOptions().some(
@@ -370,6 +476,10 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   /** Selects an option the user chose, unless the value cannot change. */
   selectOption(value: unknown): void {
     if (this.locked()) return;
+    if (value instanceof UiLeadingAction) {
+      this.pick(value);
+      return;
+    }
     // Server-side search may replace the options in the same tick (closing resets the search).
     const option = this.options().find((item) => this.matches(item.value(), value));
     if (option) this.knownLabels.update((known) => [...known, [value, option.getLabel()]]);
@@ -377,7 +487,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   }
 
   /** Whether the search hides an option. */
-  isHidden(option: UiListEntry<T>): boolean {
+  isHidden(option: UiListEntry): boolean {
     return option.ɵfilteredOut();
   }
 
@@ -434,14 +544,15 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   // --- Active option ------------------------------------------------------------------------
 
   /**
-   * Activates the first option that can be picked, passing over a `passedOver` one while another
-   * follows it. With none, the list is left without an active option: an option the search has
-   * just hidden must not stay active, or Enter would pick it.
+   * Activates the first option that can be picked, passing over "Add «…»" (or a `passedOver`
+   * option) while another follows it. With none, the list is left without an active option: an
+   * option the search has just hidden must not stay active, or Enter would pick it.
    */
   activateFirst(): void {
     this.keyManager.setFirstItemActive();
     const first = this.keyManager.activeItem;
-    if (first && this.config()?.passedOver?.(first)) this.keyManager.setNextItemActive();
+    const passedOver = first === this.createEntry || (first && this.config()?.passedOver?.(first));
+    if (passedOver) this.keyManager.setNextItemActive();
     this.dropUnavailableActive();
   }
 
@@ -455,7 +566,10 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     const list = this.listOptions();
     const index = list.findIndex(
       (option) =>
-        !option.ɵdisabled && !this.isHidden(option) && this.matches(option.value(), value),
+        !(option instanceof UiLeadingAction) &&
+        !option.ɵdisabled &&
+        !this.isHidden(option) &&
+        this.matches(option.value(), value),
     );
     if (index < 0) return false;
     this.keyManager.setActiveItem(index);
@@ -641,7 +755,12 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     const openAt = this.config()?.openAt?.();
     const target =
       openAt != null
-        ? list.find((option) => !option.ɵdisabled && this.matches(option.value(), openAt))
+        ? list.find(
+            (option) =>
+              !(option instanceof UiLeadingAction) &&
+              !option.ɵdisabled &&
+              this.matches(option.value(), openAt),
+          )
         : this.selectedOptions().find((option) => !option.ɵdisabled);
     const index = target ? list.indexOf(target) : -1;
     if (!activate) {
@@ -652,15 +771,22 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     else this.keyManager.setFirstItemActive();
   }
 
+  /** Calls the field's handler of a leading action. */
+  private pick(action: UiLeadingAction): void {
+    const text = this.createText();
+    if (action === this.createEntry && text) this.config()?.createAction?.create(text);
+  }
+
   /** Id of a rendered option; `null` while an item is not rendered. */
-  private idOf(entry: UiListEntry<T> | null): string | null {
+  private idOf(entry: UiListEntry | null): string | null {
+    if (entry instanceof UiLeadingAction) return entry.id;
     if (entry instanceof UiOption) return entry.ɵid;
     if (!entry) return null;
     return this.itemOptions().find((rendered) => rendered.entry() === entry)?.option.ɵid ?? null;
   }
 
   /** Scrolls an option into view; in the viewport it may not be rendered yet. */
-  private reveal(entry: UiListEntry<T>): void {
+  private reveal(entry: UiListEntry): void {
     const viewport = this.viewport();
     // A key that opens the list (End) activates an item before the viewport is rendered.
     if (!viewport && this.virtual()) {

@@ -36,6 +36,8 @@ export abstract class UiListboxHost {
   abstract isBlocked(option: UiOptionHandle): boolean;
   /** The option renders an item that the key manager made active (`items` of the list). */
   abstract isActive(option: UiOptionHandle): boolean;
+  /** Id the list gives the option (a leading action's); `null` keeps its own. */
+  abstract optionId(option: UiOptionHandle): string | null;
   /** The user clicked the option. */
   abstract selectOption(value: unknown): void;
 }
@@ -82,7 +84,7 @@ export abstract class UiListboxHost {
   host: {
     role: 'option',
     class: 'ui-option',
-    '[id]': 'optionId',
+    '[id]': 'elementId()',
     '[attr.aria-selected]': 'selected()',
     '[attr.aria-disabled]': 'unavailable() ? "true" : null',
     '[class.ui-option--active]': 'active()',
@@ -107,7 +109,8 @@ export class UiOption<T = unknown> implements Highlightable {
    */
   readonly label = input('');
 
-  protected readonly optionId = inject(_IdGenerator).getId('ui-option-');
+  private readonly optionId = inject(_IdGenerator).getId('ui-option-');
+  protected readonly elementId = computed(() => this.parent.optionId(this) ?? this.optionId);
   protected readonly multiple = this.parent.multiple;
   /** Set by the key manager when the option itself is in it. */
   private readonly highlighted = signal(false);
@@ -140,7 +143,7 @@ export class UiOption<T = unknown> implements Highlightable {
 
   /** Internal: the list points `aria-activedescendant` at it. */
   get ɵid(): string {
-    return this.optionId;
+    return this.elementId();
   }
 
   /** Internal: for the key manager of the list. Disabled, or blocked by the list. */

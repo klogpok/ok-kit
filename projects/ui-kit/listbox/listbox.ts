@@ -48,6 +48,16 @@ import { UiItemOption } from './option-items';
   // The listbox scrolls, also over a virtual list, so axe sees the combobox popup it is.
   hostDirectives: [CdkVirtualScrollableElement],
   template: `
+    <!-- "Add «…»" and "Select all": the row sticks over a virtual list. -->
+    @if (listbox.leadingActions().length) {
+      <div class="ui-listbox__actions" role="none">
+        @for (action of listbox.leadingActions(); track action) {
+          <ui-option [value]="action" [class.ui-listbox__create]="action.kind === 'create'">{{
+            action.getLabel()
+          }}</ui-option>
+        }
+      </div>
+    }
     <ng-content select="[uiListboxLeading]" />
     @if (listbox.items()) {
       @if (listbox.virtual()) {
