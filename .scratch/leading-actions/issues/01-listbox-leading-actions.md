@@ -1,6 +1,6 @@
 # 01: leading actions in the listbox controller and `ui-listbox`
 
-**Status:** ready-for-agent
+**Status:** done
 
 Spec: `../spec.md`, decisions 1–5 and 7.
 
@@ -24,10 +24,10 @@ The listbox controller gains the two leading actions as data, next to the existi
   and items.
 - `listbox.spec.ts`: tests through its test field for every rule above, written first.
 
-- [ ] Tests for both actions in `listbox.spec.ts`, red before the implementation.
-- [ ] The existing specs of select, multi-select, autocomplete and time stay green.
-- [ ] Lint, format and `pnpm build` pass.
-- [ ] Commit `feat(listbox): leading actions`.
+- [x] Tests for both actions in `listbox.spec.ts`, red before the implementation.
+- [x] The existing specs of select, multi-select, autocomplete and time stay green.
+- [x] Lint, format and `pnpm build` pass.
+- [x] Commit `feat(listbox): leading actions`.
 
 ## Comments
 
@@ -35,7 +35,7 @@ The listbox controller gains the two leading actions as data, next to the existi
 
 # 01: leading actions в контроллере listbox и `ui-listbox`
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
 Спека: `../spec.md`, решения 1–5 и 7.
 
@@ -58,7 +58,7 @@ The listbox controller gains the two leading actions as data, next to the existi
   items.
 - `listbox.spec.ts`: тесты через его тестовое поле на каждое правило выше, написанные первыми.
 
-- [ ] Тесты обоих действий в `listbox.spec.ts`, красные до реализации.
-- [ ] Существующие spec select, multi-select, autocomplete и time остаются зелёными.
-- [ ] Lint, format и `pnpm build` проходят.
-- [ ] Коммит `feat(listbox): leading actions`.
+- [x] Тесты обоих действий в `listbox.spec.ts`, красные до реализации.
+- [x] Существующие spec select, multi-select, autocomplete и time остаются зелёными.
+- [x] Lint, format и `pnpm build` проходят.
+- [x] Коммит `feat(listbox): leading actions`.
