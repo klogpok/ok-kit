@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-18):** фазы 1–9, миграция на Angular 20, вид чипсов и popup listbox сделаны и одобрены; план и SPEC исчерпаны. Пилот в client (первый экран приложения VPlans на ките) сделан и ждёт одобрения и проверки пользователя в браузере — раздел «Пилот в client» ниже. Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -385,6 +385,12 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 > - Потребитель сам подключает `<ui-embed-styles />` (встраиваемые стили без `_base` и авто-dark) и `provideUiLabels`.
 > - Вендорная копия `ok-kit` (префикс `ok-`) заменяется: `creatable`/`maxLength` переезжают в `ui-select`, `price-quotes-case` переходит на копию, папка удаляется.
 > - Работа в client — в ветке `feat/ui-kit-pilot`, без push.
+
+## Leading actions в popup listbox (решено 2026-10-21, сделано 2026-10-22)
+
+> Архитектурная работа вне фаз, кандидат 1 архитектурного обзора 2026-10-21. Спека и тикеты 01–03 — в `.scratch/leading-actions/`; решения — в [DECISIONS.md](DECISIONS.md) («Leading actions»).
+>
+> **Статус (2026-10-22): тикеты 01–03 сделаны, ждёт одобрения пользователя.** «Добавить «…»» и «Выбрать все» стали данными контроллера listbox (`createAction`, `selectAllAction`); `ui-select`/`ui-multi-select` на них переведены; слот `[uiListboxLeading]` и хуки `leadingOptions`, `alwaysShown`, `passedOver`, `leadingShown`, `isIndeterminate` удалены; классы `.ui-select__leading`/`__create`/`__all` → `.ui-listbox__actions`/`__create`/`__select-all` (в CHANGELOG). Публичный интерфейс select и его harness не изменились. Клиент локально не выкачан: проверить, стилизует ли он старые классы, не удалось (тикет 03).
 
 ## Критичные файлы и что переиспользовать
 

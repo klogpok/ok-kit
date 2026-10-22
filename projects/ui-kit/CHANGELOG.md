@@ -3,6 +3,27 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (leading actions)
+
+### Changed
+
+- **select:** the internal classes of the "Add «…»" and "Select all" options of `ui-select` and
+  `ui-multi-select` moved to the popup listbox: `.ui-select__leading` is now
+  `.ui-listbox__actions`, `.ui-select__create` is `.ui-listbox__create` and `.ui-select__all` is
+  `.ui-listbox__select-all` (styles in `listbox/listbox.scss`). An app that styles or queries the
+  old classes must switch; `UiSelectHarness` keeps its methods.
+- **listbox (internal):** the listbox controller owns the two leading actions ("Add «…»",
+  "Select all") as data and applies their rules; the field passes `createAction` /
+  `selectAllAction`. Removed: the `[uiListboxLeading]` slot of `ui-listbox` and the
+  `leadingOptions`, `alwaysShown`, `passedOver`, `leadingShown` and `isIndeterminate` members of
+  `UiListboxConfig`. The internal listbox harness finds the actions with `getCreateAction()` and
+  `getSelectAllAction()`.
+
+### Fixed
+
+- **select:** typing that turns "Select all" into "Add «…»" no longer logs the dev-mode warning
+  NG0956.
+
 ## Unreleased (client pilot)
 
 ### Added

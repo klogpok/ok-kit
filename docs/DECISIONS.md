@@ -698,3 +698,54 @@ re-rendered. `test-visual` now runs the Chromium headless shell of `playwright-c
 exact version in `package.json`, with `--disable-lcd-text`, and every baseline was re-taken in it.
 A `playwright-core` bump is a deliberate change that re-takes the baselines in the same commit.
 `test-storybook` and `test-host-css` stay on Edge: they do not compare against earlier runs.
+
+## Leading actions (decided 2026-10-21, delivered 2026-10-22)
+
+Architecture work outside the phases, candidate 1 of the architecture review of 2026-10-21. Spec
+and tickets 01–03 are in `.scratch/leading-actions/`; the term **leading action** is in
+`GLOSSARY.md` → "Dropdowns". It replaces the hooks that the "Select all" row of the popup listbox
+(above) and `creatable` (client pilot, ticket 02) had added.
+
+User decisions (2026-10-21):
+
+- **Two named leading actions.** The popup listbox knows "Add «…»" (create) and "Select all" and
+  applies their rules itself; there is no generic "action row" with flags.
+- **Leading actions are data of the listbox controller**, like the entries of `items`, and
+  `ui-listbox` renders them with labels from `UI_LABELS` (`create(text)`, `selectAll`). They are in
+  the keyboard order as soon as they exist, so Enter typed right after the search text adds it;
+  `select-base.ts` lost its activation effect and its Enter case.
+- **Separate handlers.** Picking "Add «…»" calls the field's `create(text)`, picking "Select all"
+  its `selectAll(values, on)`; never `select(value)`. The `CREATE` and `SELECT_ALL` symbols are
+  gone.
+- **The listbox owns the "Add «…»" rule.** The field says whether it can create now (`creatable`,
+  `searchable`, `maxSelections` not reached) and which values are selected; the listbox offers the
+  trimmed search text unless, ignoring case, it is the label of an option or of a selected value.
+  "Add «…»" comes first, is passed over by `activateFirst()` while the search shows another option,
+  and keeps the "no options" row away.
+- **The listbox owns the "Select all" state.** The field says whether it is on (`selectAll` without
+  `maxSelections`); the listbox acts on the enabled options the search shows, shows the action while
+  there is one, and checks it fully or partly. `ui-multi-select` only builds the new array.
+- **Classes of the listbox:** `.ui-select__leading`, `.ui-select__create` and `.ui-select__all` are
+  now `.ui-listbox__actions`, `.ui-listbox__create` and `.ui-listbox__select-all` in
+  `listbox/listbox.scss`, with the row that sticks over a virtual list. The CHANGELOG notes the
+  rename. The internal listbox harness has `getCreateAction()` and `getSelectAllAction()`.
+- **Tests replace, not layer:** the rules are tested in `listbox.spec.ts` through its test field;
+  the select specs keep what the value means and one end-to-end test per action.
+- **Removed:** the `[uiListboxLeading]` slot of `ui-listbox` and the `leadingOptions`,
+  `alwaysShown`, `passedOver`, `leadingShown` and `isIndeterminate` members of `UiListboxConfig`;
+  multi-select's `isBlocked` no longer excludes leading options (leading actions are never
+  blocked). The "Hooks beyond the plan" of "Popup listbox: plan" above are history for these.
+- **Out of scope:** the `input.value = ''` write in `UiMultiSelect.addCreated` stays in the field
+  (candidate 2, the combobox shell). No ADR: easy to reverse.
+
+Agent notes (ticket 03):
+
+- **The option host keeps `isIndeterminate(option)`:** `ui-option` draws the mixed checkbox from
+  it, and the listbox controller now answers it for "Select all" alone; only the config hook is
+  gone.
+- **Leading actions are tracked by kind** in `ui-listbox`: by identity, typing that turns "Select
+  all" into "Add «…»" recreated the row and logged NG0956 in dev mode.
+- **Client check:** `pnpm sync:client --check` found no client checkout next to the main kit
+  checkout (`D:\projects\client`), so whether the VPlans client styles the old classes stays
+  unknown; see ticket 03. The client copy in `feat/ui-kit-pilot` gets the new classes at its next
+  sync.
