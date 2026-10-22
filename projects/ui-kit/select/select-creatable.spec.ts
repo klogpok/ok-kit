@@ -2,9 +2,13 @@ import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UI_LABELS_EN, provideUiLabels } from '@vplans/ui-kit/core';
-import { UiOption, UiOptionItem } from '@vplans/ui-kit/listbox';
+import { UiOption } from '@vplans/ui-kit/listbox';
 import { UiMultiSelect } from './multi-select';
 import { UiSelect } from './select';
+
+// The rules of "Add «…»" (when it is shown, its place in the keyboard order, Enter right after
+// typing, aria-posinset) are the listbox's: see `listbox/listbox.spec.ts`. These tests cover what
+// a created value means to the field.
 
 // The CDK key managers read the legacy keyCode.
 const KEY_CODES: Record<string, number> = {
@@ -27,13 +31,6 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
 }
 
-/** The viewport renders its window in an animation frame. */
-async function frame(fixture: ComponentFixture<unknown>): Promise<void> {
-  await settle(fixture);
-  await new Promise((resolve) => requestAnimationFrame(resolve));
-  await settle(fixture);
-}
-
 function type(control: HTMLInputElement, text: string): void {
   control.value = text;
   control.dispatchEvent(new Event('input'));
@@ -41,7 +38,6 @@ function type(control: HTMLInputElement, text: string): void {
 
 const options = () => [...document.querySelectorAll<HTMLElement>('ui-option:not([hidden])')];
 const createOption = () => document.querySelector<HTMLElement>('ui-option.ui-listbox__create');
-const emptyRow = () => document.querySelector('.ui-listbox__empty');
 const activeId = (control: HTMLElement) => control.getAttribute('aria-activedescendant');
 
 const LOCATIONS = ['Kitchen', 'Bathroom', 'Balcony'];
@@ -97,7 +93,6 @@ class FormControlNameHost {
       searchable
       creatable
       chips
-      [selectAll]="selectAll()"
       [maxSelections]="maxSelections()"
       [(ngModel)]="rooms"
       (searchChange)="searches.push($event)"
@@ -111,59 +106,9 @@ class FormControlNameHost {
 class MultiNgModelHost {
   readonly locations = LOCATIONS;
   rooms: readonly string[] = ['Attic'];
-  readonly selectAll = signal(false);
   readonly maxSelections = signal<number | null>(null);
   readonly searches: string[] = [];
 }
-
-/** `count` apartments as items. */
-function apartments(count: number): UiOptionItem<string>[] {
-  return Array.from({ length: count }, (_, i) => ({
-    value: `Apartment ${i + 1}`,
-    label: `Apartment ${i + 1}`,
-  }));
-}
-
-@Component({
-  imports: [UiSelect, UiMultiSelect, FormsModule],
-  template: `
-    @if (multiple()) {
-      <ui-multi-select
-        aria-label="Apartments"
-        name="apartments"
-        searchable
-        creatable
-        selectAll
-        [items]="items"
-        [(ngModel)]="apartments"
-      />
-    } @else {
-      <ui-select
-        aria-label="Apartment"
-        name="apartment"
-        searchable
-        creatable
-        [items]="items"
-        [(ngModel)]="apartment"
-      />
-    }
-  `,
-})
-class ItemsHost {
-  readonly items = apartments(300);
-  readonly multiple = signal(false);
-  apartment: string | null = null;
-  apartments: readonly string[] = [];
-}
-
-// jsdom has no Element.scrollTo, which the viewport calls to bring an option into view.
-beforeAll(() => {
-  Element.prototype.scrollTo = () => undefined;
-});
-
-afterAll(() => {
-  delete (Element.prototype as Partial<Element>).scrollTo;
-});
 
 beforeEach(() => {
   TestBed.configureTestingModule({ providers: [provideUiLabels(UI_LABELS_EN)] });
@@ -183,17 +128,10 @@ describe('UiSelect creatable', () => {
 
   afterEach(() => root.remove());
 
-  it('offers the search text as the first, active option and adds it with Enter', async () => {
+  it('makes the trimmed search text the value with "Add «…»" and closes the list', async () => {
     type(control(), '  Storage room ');
     await settle(fixture);
-    const add = createOption()!;
-    expect(add.textContent!.trim()).toBe('Add «Storage room»');
-    expect(add.getAttribute('role')).toBe('option');
-    expect(add.getAttribute('aria-selected')).toBe('false');
-    // Nothing else matches: the option is active and named by aria-activedescendant.
-    expect(activeId(control())).toBe(add.id);
-    // It is something to pick, so the list has no "no options" row.
-    expect(emptyRow()).toBeNull();
+    expect(createOption()!.textContent!.trim()).toBe('Add «Storage room»');
 
     keydown(control(), 'Enter');
     await settle(fixture);
@@ -205,60 +143,12 @@ describe('UiSelect creatable', () => {
     expect(fixture.componentInstance.searches.at(-1)).toBe('');
   });
 
-  it('adds the search text when the option is clicked', async () => {
-    type(control(), 'Pantry');
-    await settle(fixture);
-    createOption()!.click();
-    await settle(fixture);
-    expect(fixture.componentInstance.control.value).toBe('Pantry');
-  });
-
-  it('keeps a matching option active above the add option', async () => {
-    type(control(), 'bal');
-    await settle(fixture);
-    const [add, balcony] = options();
-    expect(add).toBe(createOption()!);
-    expect(balcony.textContent!.trim()).toBe('Balcony');
-    expect(activeId(control())).toBe(balcony.id);
-
-    keydown(control(), 'ArrowUp');
-    await settle(fixture);
-    expect(activeId(control())).toBe(add.id);
-    expect(add.classList).toContain('ui-option--active');
-    keydown(control(), 'Enter');
-    await settle(fixture);
-    expect(fixture.componentInstance.control.value).toBe('bal');
-  });
-
-  it('does not offer text that equals an option label or the value', async () => {
-    type(control(), ' kitchen ');
-    await settle(fixture);
-    expect(createOption()).toBeNull();
-    keydown(control(), 'Escape');
-    await settle(fixture);
-
+  it('does not offer the label of the value again', async () => {
     fixture.componentInstance.control.setValue('Attic');
     await settle(fixture);
     type(control(), 'ATTIC');
     await settle(fixture);
     expect(createOption()).toBeNull();
-    expect(emptyRow()!.textContent!.trim()).toBe('No options');
-  });
-
-  it('adds with Enter typed before the add option is rendered', async () => {
-    type(control(), 'Laundry');
-    keydown(control(), 'Enter');
-    await settle(fixture);
-    expect(fixture.componentInstance.control.value).toBe('Laundry');
-  });
-
-  it('does not pick an option the search has just hidden', async () => {
-    type(control(), 'k');
-    await settle(fixture);
-    type(control(), 'kx');
-    keydown(control(), 'Enter');
-    await settle(fixture);
-    expect(fixture.componentInstance.control.value).toBe('kx');
   });
 
   it('shows a written string value outside the list as its own label', async () => {
@@ -329,7 +219,6 @@ describe('UiMultiSelect creatable with ngModel', () => {
   it('adds the text, clears the search and keeps the list open', async () => {
     type(control(), 'Pantry');
     await settle(fixture);
-    expect(activeId(control())).toBe(createOption()!.id);
     keydown(control(), 'Enter');
     await settle(fixture);
     await settle(fixture);
@@ -343,27 +232,6 @@ describe('UiMultiSelect creatable with ngModel', () => {
     expect(activeId(control())).toBe(options()[0].id);
   });
 
-  it('does not offer a selected value again', async () => {
-    type(control(), 'attic');
-    await settle(fixture);
-    expect(createOption()).toBeNull();
-  });
-
-  it('lists the add option before "select all"', async () => {
-    fixture.componentInstance.selectAll.set(true);
-    await settle(fixture);
-    type(control(), 'b');
-    await settle(fixture);
-    const [add, all, bathroom] = options();
-    expect(add).toBe(createOption()!);
-    expect(all.classList).toContain('ui-listbox__select-all');
-    expect(bathroom.textContent!.trim()).toBe('Bathroom');
-    // "Select all" covers the options the search shows, not the add option.
-    all.click();
-    await settle(fixture);
-    expect(fixture.componentInstance.rooms).toEqual(['Attic', 'Bathroom', 'Balcony']);
-  });
-
   it('offers nothing to add once maxSelections is reached', async () => {
     fixture.componentInstance.maxSelections.set(1);
     await settle(fixture);
@@ -373,57 +241,5 @@ describe('UiMultiSelect creatable with ngModel', () => {
     keydown(control(), 'Enter');
     await settle(fixture);
     expect(fixture.componentInstance.rooms).toEqual(['Attic']);
-  });
-});
-
-describe('UiSelect creatable with items', () => {
-  let fixture: ComponentFixture<ItemsHost>;
-  let root: HTMLElement;
-  const control = () => root.querySelector<HTMLInputElement>('.ui-select__control')!;
-
-  beforeEach(async () => {
-    fixture = TestBed.createComponent(ItemsHost);
-    root = fixture.nativeElement as HTMLElement;
-    document.body.appendChild(root);
-    await settle(fixture);
-  });
-
-  afterEach(() => root.remove());
-
-  it('opens the set of a virtual list with the add option', async () => {
-    // "12" matches 13 apartments (12, 112, 120–129, 212) and no label.
-    type(control(), '12');
-    await frame(fixture);
-    expect(document.querySelector('cdk-virtual-scroll-viewport')).not.toBeNull();
-    const add = createOption()!;
-    expect(add.closest('cdk-virtual-scroll-viewport')).toBeNull();
-    expect(add.getAttribute('aria-posinset')).toBe('1');
-    expect(add.getAttribute('aria-setsize')).toBe('14');
-    const first = options()[1];
-    expect(first.textContent!.trim()).toBe('Apartment 12');
-    expect(first.getAttribute('aria-posinset')).toBe('2');
-    expect(first.getAttribute('aria-setsize')).toBe('14');
-    expect(activeId(control())).toBe(first.id);
-
-    keydown(control(), 'ArrowUp');
-    await settle(fixture);
-    expect(activeId(control())).toBe(add.id);
-    keydown(control(), 'Enter');
-    await settle(fixture);
-    expect(fixture.componentInstance.apartment).toBe('12');
-    expect(control().value).toBe('12');
-  });
-
-  it('counts "select all" after the add option of a multi-select', async () => {
-    fixture.componentInstance.multiple.set(true);
-    await settle(fixture);
-    type(control(), '12');
-    await frame(fixture);
-    const all = document.querySelector<HTMLElement>('ui-option.ui-listbox__select-all')!;
-    expect(createOption()!.getAttribute('aria-posinset')).toBe('1');
-    expect(all.getAttribute('aria-posinset')).toBe('2');
-    expect(all.getAttribute('aria-setsize')).toBe('15');
-    expect(options()[2].getAttribute('aria-posinset')).toBe('3');
-    expect(options()[2].getAttribute('aria-setsize')).toBe('15');
   });
 });

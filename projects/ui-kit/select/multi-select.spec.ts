@@ -380,48 +380,23 @@ describe('UiMultiSelect extras', () => {
     root.remove();
   });
 
-  it('selects and deselects every enabled option with "select all"', async () => {
+  // The rules of "select all" (what it acts on, its mixed state, its place in the keyboard order)
+  // are the listbox's: see `listbox/listbox.spec.ts`.
+  it('adds the values that are not selected with "select all", then removes them', async () => {
+    host.value.set(['paint', 'custom']);
+    await settle(fixture);
     await open();
     expect(all()!.textContent?.trim()).toBe('בחירת הכול');
-    expect(options()[0]).toBe(all());
     all()!.click();
     await settle(fixture);
-    expect(host.value()).toEqual(['electric', 'plumbing', 'paint']);
+    // A new array: the selected values first, in their order, then the added ones.
+    expect(host.value()).toEqual(['paint', 'custom', 'electric', 'plumbing']);
     expect(all()!.getAttribute('aria-selected')).toBe('true');
 
-    option('Paint').click();
-    await settle(fixture);
-    expect(all()!.getAttribute('aria-selected')).toBe('false');
-    expect(all()!.classList).toContain('ui-option--selected');
-
     all()!.click();
     await settle(fixture);
-    expect(host.value()).toEqual(['electric', 'plumbing', 'paint']);
-    all()!.click();
-    await settle(fixture);
-    expect(host.value()).toEqual([]);
-  });
-
-  it('acts on the options the search shows and stays visible', async () => {
-    host.value.set(['paint']);
-    await settle(fixture);
-    control().value = 'p';
-    control().dispatchEvent(new Event('input'));
-    await settle(fixture);
-    expect(all()!.hidden).toBe(false);
-    all()!.click();
-    await settle(fixture);
-    expect(host.value()).toEqual(['paint', 'plumbing']);
-  });
-
-  it('is the first option for the keyboard', async () => {
-    await open();
-    keydown(control(), 'ArrowUp');
-    await settle(fixture);
-    expect(control().getAttribute('aria-activedescendant')).toBe(all()!.id);
-    keydown(control(), 'Enter');
-    await settle(fixture);
-    expect(host.value()).toHaveLength(3);
+    // A value outside the list stays.
+    expect(host.value()).toEqual(['custom']);
   });
 
   it('blocks more options once maxSelections is reached and hides "select all"', async () => {
