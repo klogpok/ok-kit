@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → ticket 02, "visual baselines unchanged"
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** `pnpm test-visual` on `spec/leading-actions` fails: 783 captures differ from `visual/`,
 most by 0.1–1.5 %, the largest in stories this spec does not touch (`feedback-toast--default`
@@ -23,13 +23,17 @@ changes". Every other step of `/phase-check` passes.
 2. Re-take every baseline now, without looking for the cause.
 3. Leave the baselines as they are until the drift is understood; `test-visual` stays red.
 
+## Comments
+
+- 2026-10-22: Resolved by the user in `26a4cea` (`chore(visual): pin the screenshot browser to the Chromium of playwright-core`). The facts above were partly wrong: the committed baselines had been taken in the installed Edge, and the pinned Chromium of `check-visual.mjs` was the user's work in progress at the time. Every baseline is now re-taken in the pinned Chromium; see `docs/DECISIONS.md` → "Visual baselines in a pinned Chromium". `pnpm test-visual` on the rebased `spec/leading-actions` is the check.
+
 ## Русский перевод
 
 # 05: закоммиченные визуальные эталоны больше не совпадают с закреплённым Chromium
 
 **Спека:** [../spec.md](../spec.md) → тикет 02, «визуальные эталоны не меняются»
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** `pnpm test-visual` на `spec/leading-actions` падает: 783 снимка отличаются от
 `visual/`, в основном на 0.1–1.5 %, сильнее всего в историях, которых спека не касается
@@ -49,3 +53,7 @@ changes». Остальные шаги `/phase-check` проходят.
    `dist/visual-diff/` (рекомендую).
 2. Пересоздать все эталоны сейчас, не ища причину.
 3. Оставить эталоны как есть, пока дрейф не объяснён; `test-visual` остаётся красным.
+
+## Комментарии
+
+- 2026-10-22: Решено пользователем в `26a4cea` (`chore(visual): pin the screenshot browser to the Chromium of playwright-core`). Факты выше были отчасти неверны: закоммиченные эталоны снимались в установленном Edge, а закреплённый Chromium в `check-visual.mjs` был тогда незакоммиченной работой пользователя. Теперь все эталоны пересняты в закреплённом Chromium; см. `docs/DECISIONS.md` → «Visual baselines in a pinned Chromium». Проверка — `pnpm test-visual` на перебазированной `spec/leading-actions`.
