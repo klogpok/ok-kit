@@ -347,6 +347,15 @@ describe('UiListboxController', () => {
       expect(activeLabel()).toBe('Apple');
     });
 
+    it('does not pick an option the search has just hidden', () => {
+      field.search('a');
+      expect(field.listbox.active()?.getLabel()).toBe('Apple');
+      field.search('ax');
+      keydown(control(), 'Enter');
+      expect(field.listbox.active()).toBeNull();
+      expect(host.value()).toEqual([]);
+    });
+
     it('opens with Enter, but leaves Space and letters of a closed list to the text', async () => {
       await press(' ');
       await press('a');
@@ -792,6 +801,15 @@ describe('UiListboxController', () => {
         expect(enter.defaultPrevented).toBe(true);
         expect(field.events).toContain('create Kiwi');
         expect(host.value()).toEqual(['Kiwi']);
+      });
+
+      it('adds the text, not an option the search has just hidden, with Enter', () => {
+        field.search('a');
+        expect(field.listbox.active()?.getLabel()).toBe('Apple');
+        field.search('ax');
+        keydown(control(), 'Enter');
+        expect(field.events).toContain('create ax');
+        expect(host.value()).toEqual(['ax']);
       });
 
       it('comes first, with the create label and an id from the listbox', async () => {
