@@ -17,7 +17,7 @@ export interface UiOptionItem<T = unknown> {
 
 /** What an item entry needs from the list that owns it. Internal. */
 export interface UiItemEntryOwner {
-  isFilteredOut(label: string, option: UiOptionHandle): boolean;
+  isFilteredOut(label: string): boolean;
   isBlocked(option: UiOptionHandle): boolean;
   /** The key manager made the entry active: bring it into view. */
   reveal(entry: UiItemEntry): void;
@@ -62,7 +62,7 @@ export class UiItemEntry<T = unknown> implements Highlightable {
   }
 
   /** Internal: the search of the list hides the entry. */
-  readonly ɵfilteredOut = computed(() => this.owner.isFilteredOut(this.item.label, this));
+  readonly ɵfilteredOut = computed(() => this.owner.isFilteredOut(this.item.label));
 
   /** For the CDK key manager: disabled, or blocked by the list (`maxSelections`). */
   get ɵdisabled(): boolean {

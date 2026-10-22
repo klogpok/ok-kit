@@ -10,9 +10,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { UI_LABELS, ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
-import { UiListboxMode, injectListbox, provideUiListbox } from './listbox-controller';
+import {
+  UiLeadingAction,
+  UiListboxMode,
+  injectListbox,
+  provideUiListbox,
+} from './listbox-controller';
 import { UiListbox } from './listbox';
-import { UiOption } from './option';
+import { UiOption, UiOptionHandle } from './option';
 import { UiOptionItem } from './option-items';
 
 // The CDK key managers read the legacy keyCode.
@@ -90,6 +95,8 @@ class TestField {
   /** Keys the listbox left to the field. */
   readonly unhandled: string[] = [];
   readonly events: string[] = [];
+  /** Options the field's isBlocked was asked about. */
+  readonly blockChecks: UiOptionHandle[] = [];
   /** Text typed into the control. */
   private readonly query = signal('');
 
@@ -129,7 +136,10 @@ class TestField {
     showEmpty: this.showEmpty,
     locked: this.locked,
     displayWith: () => (value) => `#${value}`,
-    isBlocked: () => this.blocked(),
+    isBlocked: (option) => {
+      this.blockChecks.push(option);
+      return this.blocked();
+    },
     isSelected: (value) => this.value().includes(value as string),
     select: (value) => {
       this.value.set([...this.value(), value as string]);
@@ -940,6 +950,11 @@ describe('UiListboxController', () => {
         null,
         'true',
       ]);
+      // The field's rule is not asked about them.
+      expect(field.blockChecks.length).toBeGreaterThan(0);
+      expect(field.blockChecks.some((option) => option.value() instanceof UiLeadingAction)).toBe(
+        false,
+      );
       await press('ArrowUp');
       await press('ArrowUp');
       await press('Enter');

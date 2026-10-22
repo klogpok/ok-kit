@@ -250,7 +250,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   private readonly contentOptions = computed(() => this.config()?.contentOptions?.() ?? []);
 
   private readonly entryOwner: UiItemEntryOwner = {
-    isFilteredOut: (label, option) => this.isFilteredOut(label, option),
+    isFilteredOut: (label) => this.isFilteredOut(label),
     isBlocked: (option) => this.isBlocked(option),
     reveal: (entry) => this.reveal(entry),
   };
@@ -467,17 +467,15 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     );
   }
 
-  isFilteredOut(label: string, option: UiOptionHandle): boolean {
+  isFilteredOut(label: string): boolean {
     const query = (this.config()?.filterText?.() ?? '').trim().toLocaleLowerCase();
     if (!query || !(this.config()?.filterOptions?.() ?? true)) return false;
-    if (option.value() instanceof UiLeadingAction) return false;
     return !label.toLocaleLowerCase().includes(query);
   }
 
+  /** Leading actions never ask: their options skip this, and the actions are never blocked. */
   isBlocked(option: UiOptionHandle): boolean {
-    // The field's rule reads the value only when it may block.
-    const blocked = this.config()?.isBlocked?.(option) ?? false;
-    return blocked && !(option.value() instanceof UiLeadingAction);
+    return this.config()?.isBlocked?.(option) ?? false;
   }
 
   /** Whether a rendered option shows the active leading action or entry of `items`. */

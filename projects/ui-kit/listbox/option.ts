@@ -29,7 +29,7 @@ export abstract class UiListboxHost {
   abstract isSelected(value: unknown): boolean;
   /** Mixed state: the "Select all" leading action, while some of its options are selected. */
   abstract isIndeterminate(option: UiOptionHandle): boolean;
-  abstract isFilteredOut(label: string, option: UiOptionHandle): boolean;
+  abstract isFilteredOut(label: string): boolean;
   /**
    * The option cannot be selected now, e.g. `maxSelections` is reached. Options are passed
    * whole: their required `value` may not be set yet when this runs.
@@ -43,8 +43,8 @@ export abstract class UiListboxHost {
 
 /**
  * Marks the option `ui-listbox` renders for a leading action ("Add «…»", "Select all") and gives
- * it the id of the action. The option knows it is one from the start, without reading its value.
- * Internal.
+ * it the id of the action. The option knows it is one from the start, without reading its value,
+ * and never asks the list whether the search hides it or the field blocks it. Internal.
  */
 @Directive({ selector: 'ui-option[uiLeadingAction]' })
 export class UiLeadingActionOption {
@@ -131,9 +131,14 @@ export class UiOption<T = unknown> implements Highlightable {
   protected readonly active = computed(() => this.highlighted() || this.parent.isActive(this));
   protected readonly selected = computed(() => this.parent.isSelected(this.value()));
   protected readonly indeterminate = computed(() => this.parent.isIndeterminate(this));
-  protected readonly filteredOut = computed(() => this.parent.isFilteredOut(this.getLabel(), this));
+  /** A leading action is never hidden by the search or blocked: the list is not asked. */
+  protected readonly filteredOut = computed(
+    () => !this.leadingAction && this.parent.isFilteredOut(this.getLabel()),
+  );
   /** Disabled, or blocked by the list (e.g. `maxSelections` is reached). */
-  protected readonly unavailable = computed(() => this.isDisabled() || this.parent.isBlocked(this));
+  protected readonly unavailable = computed(
+    () => this.isDisabled() || (!this.leadingAction && this.parent.isBlocked(this)),
+  );
   protected readonly checkIcon = uiIconCheck;
   protected readonly mixedIcon = uiIconMinus;
   /** Content text after the first DOM change; `null` until then (read live). */
