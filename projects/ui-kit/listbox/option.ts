@@ -26,7 +26,7 @@ export abstract class UiListboxHost {
   /** Multiple selection: options show a checkbox. Read once, when an option is created. */
   abstract readonly multiple: boolean;
   abstract isSelected(value: unknown): boolean;
-  /** Mixed state of the "select all" option. */
+  /** Mixed state: the "Select all" leading action, while some of its options are selected. */
   abstract isIndeterminate(option: UiOptionHandle): boolean;
   abstract isFilteredOut(label: string, option: UiOptionHandle): boolean;
   /**

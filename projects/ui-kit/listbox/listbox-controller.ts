@@ -138,11 +138,6 @@ export interface UiListboxConfig<T> {
    * query is the field's own: signal queries exist only as fields of a directive class.
    */
   readonly contentOptions?: Signal<readonly UiOption<T>[]>;
-  /**
-   * Options of the field's own template that the keyboard reaches first ("select all"), from
-   * `viewChildren`. Render them in `ui-listbox` with the `uiListboxLeading` attribute.
-   */
-  readonly leadingOptions?: Signal<readonly UiOption<T>[]>;
   /** The options as data; while set, projected options are ignored (`[]` is an empty list). */
   readonly items?: () => readonly UiOptionItem<T>[] | null | undefined;
   /** Text that filters the options; `''` shows them all. */
@@ -184,20 +179,6 @@ export interface UiListboxConfig<T> {
   readonly openAt?: () => unknown;
   /** The option cannot be picked now (`maxSelections`). */
   readonly isBlocked?: (option: UiOptionHandle) => boolean;
-  /** The search never hides the option ("select all", "Add «…»"). */
-  readonly alwaysShown?: (option: UiOptionHandle) => boolean;
-  /**
-   * `activateFirst()` passes over the option while the list shows another one: the "Add «…»"
-   * option of a search that also matches options.
-   */
-  readonly passedOver?: (option: UiOptionHandle) => boolean;
-  /**
-   * A leading option of the field is shown whatever the search ("Add «…»"), so a search without
-   * results still has something to pick: no "no options" row.
-   */
-  readonly leadingShown?: () => boolean;
-  /** Mixed state of an option ("select all"). */
-  readonly isIndeterminate?: (option: UiOptionHandle) => boolean;
   /** Called after the list opened or closed, e.g. to emit the field's outputs. */
   readonly opened?: () => void;
   readonly closed?: () => void;
@@ -266,8 +247,6 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   readonly labelledBy = computed(() =>
     this.ariaLabel() ? null : (this.formField?.labelledBy() ?? null),
   );
-  /** Options of the field's own template listed first ("select all"). */
-  readonly leadingOptions = computed(() => this.config()?.leadingOptions?.() ?? []);
   private readonly contentOptions = computed(() => this.config()?.contentOptions?.() ?? []);
 
   private readonly entryOwner: UiItemEntryOwner = {
@@ -337,28 +316,23 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     ...(this.createText() ? [this.createEntry] : []),
     ...(this.selectAllShown() ? [this.selectAllEntry] : []),
   ]);
-  /** Options above the `items`: the leading actions, then the field's leading options. */
-  private readonly leadingCount = computed(
-    () => this.leadingActions().length + this.leadingOptions().length,
-  );
   /**
    * `aria-setsize` of the leading actions and the `items`: the viewport renders a part of the
    * list, so the options say where they are in it. `null` for projected options, which are all
    * in the DOM.
    */
   readonly setSize = computed(() =>
-    this.items() ? this.leadingCount() + this.visibleItems().length : null,
+    this.items() ? this.leadingActions().length + this.visibleItems().length : null,
   );
 
   /** `aria-posinset` of the n-th leading action or the n-th shown item; `null` without `items`. */
   posInSet(part: 'action' | 'item', index: number): number | null {
     if (this.setSize() === null) return null;
-    return (part === 'item' ? this.leadingCount() : 0) + index + 1;
+    return (part === 'item' ? this.leadingActions().length : 0) + index + 1;
   }
   /** Every option the keyboard moves through. */
   private readonly listOptions = computed((): readonly UiListEntry[] => [
     ...this.leadingActions(),
-    ...this.leadingOptions(),
     ...(this.items() ? this.visibleItems() : this.contentOptions()),
   ]);
   /** Render the `items` in a virtual scroll viewport. */
@@ -406,7 +380,6 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     () =>
       !this.loading() &&
       !this.createText() &&
-      !(this.config()?.leadingShown?.() ?? false) &&
       this.options().every((option) => this.isHidden(option)),
   );
   /** The list is open and has something to show; bind the dropdown panel and ARIA to it. */
@@ -491,21 +464,19 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     return value instanceof UiLeadingAction ? value.id : null;
   }
 
+  /** Only "Select all" is partly checked: while some of the options it acts on are selected. */
   isIndeterminate(option: UiOptionHandle): boolean {
-    if (option.value() === this.selectAllEntry) {
-      return (
-        !this.allSelected() &&
-        this.selectAllTargets().some((target) => this.cfg.isSelected(target.value()))
-      );
-    }
-    return this.config()?.isIndeterminate?.(option) ?? false;
+    return (
+      option.value() === this.selectAllEntry &&
+      !this.allSelected() &&
+      this.selectAllTargets().some((target) => this.cfg.isSelected(target.value()))
+    );
   }
 
   isFilteredOut(label: string, option: UiOptionHandle): boolean {
     const query = (this.config()?.filterText?.() ?? '').trim().toLocaleLowerCase();
     if (!query || !(this.config()?.filterOptions?.() ?? true)) return false;
     if (option.value() instanceof UiLeadingAction) return false;
-    if (this.config()?.alwaysShown?.(option)) return false;
     return !label.toLocaleLowerCase().includes(query);
   }
 
@@ -598,15 +569,14 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   // --- Active option ------------------------------------------------------------------------
 
   /**
-   * Activates the first option that can be picked, passing over "Add «…»" (or a `passedOver`
-   * option) while another follows it. With none, the list is left without an active option: an
+   * Activates the first option that can be picked, passing over "Add «…»" while another
+   * follows it. With none, the list is left without an active option: an
    * option the search has just hidden must not stay active, or Enter would pick it.
    */
   activateFirst(): void {
     this.keyManager.setFirstItemActive();
     const first = this.keyManager.activeItem;
-    const passedOver = first === this.createEntry || (first && this.config()?.passedOver?.(first));
-    if (passedOver) this.keyManager.setNextItemActive();
+    if (first === this.createEntry) this.keyManager.setNextItemActive();
     this.dropUnavailableActive();
   }
 

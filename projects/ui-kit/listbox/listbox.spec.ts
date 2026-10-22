@@ -5,7 +5,6 @@ import {
   input,
   model,
   signal,
-  viewChildren,
 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
@@ -49,12 +48,10 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
 }
 
-const SELECT_ALL = 'all';
-
 /** A field on the listbox controller, as the kit's fields use it. */
 @Component({
   selector: 'ui-test-field',
-  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListbox, UiOption],
+  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListbox],
   providers: [provideUiListbox()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -70,12 +67,7 @@ const SELECT_ALL = 'all';
       />
     </div>
     <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
-      <ui-listbox>
-        @if (selectAll()) {
-          <ui-option uiListboxLeading #leading [value]="selectAllValue">All</ui-option>
-        }
-        <ng-content />
-      </ui-listbox>
+      <ui-listbox><ng-content /></ui-listbox>
     </ng-template>
   `,
 })
@@ -87,7 +79,6 @@ class TestField {
   readonly activateOnOpen = input(true);
   readonly openAt = input<string | null>(null);
   readonly showEmpty = input(true);
-  readonly selectAll = input(false);
   readonly multiple = input(false);
   readonly locked = input(false);
   readonly creatable = input(false);
@@ -99,19 +90,16 @@ class TestField {
   /** Keys the listbox left to the field. */
   readonly unhandled: string[] = [];
   readonly events: string[] = [];
-  protected readonly selectAllValue = SELECT_ALL;
   /** Text typed into the control. */
   private readonly query = signal('');
 
   private readonly content = contentChildren<UiOption<string>>(UiOption, { descendants: true });
-  private readonly leading = viewChildren<UiOption<string>>('leading');
 
   readonly listbox = injectListbox<string>({
     mode: this.mode,
     id: () => 'fruit',
     ariaLabel: () => 'Fruit',
     contentOptions: this.content,
-    leadingOptions: this.leading,
     items: this.items,
     virtualThreshold: this.virtualThreshold,
     filterText: () => this.query() || this.filterText(),
@@ -142,7 +130,6 @@ class TestField {
     locked: this.locked,
     displayWith: () => (value) => `#${value}`,
     isBlocked: () => this.blocked(),
-    alwaysShown: (option) => option.value() === SELECT_ALL,
     isSelected: (value) => this.value().includes(value as string),
     select: (value) => {
       this.value.set([...this.value(), value as string]);
@@ -172,8 +159,7 @@ class TestField {
       [activateOnOpen]="activateOnOpen()"
       [openAt]="openAt()"
       [showEmpty]="showEmpty()"
-      [selectAll]="selectAll()"
-      [multiple]="selectAll() || allAction()"
+      [multiple]="allAction()"
       [locked]="locked()"
       [creatable]="creatable()"
       [allAction]="allAction()"
@@ -194,7 +180,6 @@ class Host {
   readonly activateOnOpen = signal(true);
   readonly openAt = signal<string | null>(null);
   readonly showEmpty = signal(true);
-  readonly selectAll = signal(false);
   readonly locked = signal(false);
   readonly creatable = signal(false);
   readonly allAction = signal(false);
@@ -725,19 +710,6 @@ describe('UiListboxController', () => {
         expect(host.value()).toEqual(['a1']);
       });
     });
-  });
-
-  it('lists leading options first, and the search never hides an always shown one', async () => {
-    host.selectAll.set(true);
-    await settle(fixture);
-    await press('ArrowDown');
-    expect(activeLabel()).toBe('All');
-    await press('Enter');
-    expect(host.value()).toEqual([SELECT_ALL]);
-    expect(panel()).not.toBeNull();
-    await press('End');
-    await press('ArrowDown');
-    expect(activeLabel()).toBe('Date');
   });
 
   it('stays closed and picks nothing while locked, and closes when it becomes locked', async () => {

@@ -24,8 +24,7 @@ import { UiItemOption } from './option-items';
  * The popup listbox of a field, rendered inside its `uiDropdownPanel`. It shows the field's
  * projected options, or the `items` of its listbox controller (in a virtual scroll viewport
  * once there are many), and a loading or "no options" row. The leading actions of the controller
- * ("Add «…»", "Select all") come first, with labels from `UI_LABELS`. Options of the field's own
- * template that come first go in with the `uiListboxLeading` attribute.
+ * ("Add «…»", "Select all") come first, with labels from `UI_LABELS`.
  *
  * The id, `aria-label` / `aria-labelledby`, `aria-multiselectable` and `aria-busy` come from the
  * controller. Internal.
@@ -65,7 +64,6 @@ import { UiItemOption } from './option-items';
         }
       </div>
     }
-    <ng-content select="[uiListboxLeading]" />
     @if (listbox.items()) {
       @if (listbox.virtual()) {
         <cdk-virtual-scroll-viewport
