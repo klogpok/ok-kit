@@ -19,11 +19,6 @@ so versions mark review points rather than releases.
   `UiListboxConfig`. The internal listbox harness finds the actions with `getCreateAction()` and
   `getSelectAllAction()`.
 
-### Fixed
-
-- **select:** typing that turns "Select all" into "Add «…»" no longer logs the dev-mode warning
-  NG0956.
-
 ## Unreleased (client pilot)
 
 ### Added
