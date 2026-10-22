@@ -49,10 +49,11 @@ import { UiItemOption } from './option-items';
   // The listbox scrolls, also over a virtual list, so axe sees the combobox popup it is.
   hostDirectives: [CdkVirtualScrollableElement],
   template: `
-    <!-- "Add «…»" and "Select all": the row sticks over a virtual list. -->
+    <!-- "Add «…»" and "Select all": the row sticks over a virtual list. Tracked by kind: by
+      identity, one action replacing the other warns (NG0956). -->
     @if (listbox.leadingActions().length) {
       <div class="ui-listbox__actions" role="none">
-        @for (action of listbox.leadingActions(); track action; let i = $index) {
+        @for (action of listbox.leadingActions(); track action.kind; let i = $index) {
           <ui-option
             [value]="action"
             [class.ui-listbox__create]="action.kind === 'create'"

@@ -968,5 +968,23 @@ describe('UiListboxController', () => {
       await settle(fixture);
       expect(panel()!.querySelector('[aria-posinset]')).toBeNull();
     });
+
+    it('replaces one action with the other without a warning', async () => {
+      const warn = vi.spyOn(console, 'warn');
+      host.mode.set('searchable');
+      host.creatable.set(true);
+      host.allAction.set(true);
+      await settle(fixture);
+      field.search('');
+      await settle(fixture);
+      expect(actions()!.querySelector('.ui-listbox__select-all')).not.toBeNull();
+      // No option matches: "Select all" goes and "Add «Kiwi»" comes.
+      field.search('Kiwi');
+      await settle(fixture);
+      expect(actions()!.querySelector('.ui-listbox__select-all')).toBeNull();
+      expect(actions()!.querySelector('.ui-listbox__create')).not.toBeNull();
+      expect(warn.mock.calls.flat().join('\n')).not.toContain('NG0956');
+      warn.mockRestore();
+    });
   });
 });

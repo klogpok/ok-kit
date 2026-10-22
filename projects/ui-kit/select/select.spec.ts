@@ -41,6 +41,7 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
 }
 
 const options = () => [...document.querySelectorAll<HTMLElement>('ui-option')];
+const users = (...names: string[]) => names.map((name) => ({ id: name.toLowerCase(), name }));
 const listbox = () => document.querySelector<HTMLElement>('[role="listbox"]');
 
 @Component({
@@ -84,20 +85,21 @@ class Host {
       [displayWith]="display"
       (searchChange)="search($event)"
     >
-      @for (name of results(); track name) {
-        <ui-option [value]="name">{{ name }}</ui-option>
+      @for (user of results(); track user.id) {
+        <ui-option [value]="user.name">{{ user.name }}</ui-option>
       }
     </ui-select>
   `,
 })
 class ServerSearchHost {
   readonly value = signal<string | null>(null);
-  readonly results = signal(['Avi', 'Batya']);
+  /** Server results are records, tracked by id as an app does. */
+  readonly results = signal(users('Avi', 'Batya'));
   readonly searches: string[] = [];
   readonly display = (name: string) => `#${name}`;
   search(text: string): void {
     this.searches.push(text);
-    this.results.set(text ? ['Dana', 'Dvora'] : ['Avi', 'Batya']);
+    this.results.set(text ? users('Dana', 'Dvora') : users('Avi', 'Batya'));
   }
 }
 
@@ -162,7 +164,7 @@ describe('UiSelect with server-side search', () => {
 
     const host = fixture.componentInstance;
     expect(host.searches.at(-1)).toBe('');
-    expect(host.results()).toEqual(['Avi', 'Batya']);
+    expect(host.results().map((user) => user.name)).toEqual(['Avi', 'Batya']);
     expect(control.value).toBe('Dana');
     root.remove();
   });
