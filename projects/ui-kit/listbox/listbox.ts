@@ -17,7 +17,7 @@ import {
 import { UI_LABELS, UiSize } from '@vplans/ui-kit/core';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import { UiListboxController } from './listbox-controller';
-import { UiOption } from './option';
+import { UiLeadingActionOption, UiOption } from './option';
 import { UiItemOption } from './option-items';
 
 /**
@@ -42,6 +42,7 @@ import { UiItemOption } from './option-items';
     CdkVirtualScrollViewport,
     NgTemplateOutlet,
     UiItemOption,
+    UiLeadingActionOption,
     UiOption,
     UiSpinner,
   ],
@@ -54,6 +55,7 @@ import { UiItemOption } from './option-items';
       <div class="ui-listbox__actions" role="none">
         @for (action of listbox.leadingActions(); track action.kind; let i = $index) {
           <ui-option
+            [uiLeadingAction]="action"
             [value]="action"
             [class.ui-listbox__create]="action.kind === 'create'"
             [class.ui-listbox__select-all]="action.kind === 'selectAll'"

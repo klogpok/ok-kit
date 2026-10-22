@@ -6,6 +6,7 @@ import {
   booleanAttribute,
   computed,
   contentChildren,
+  Directive,
   inject,
   input,
   signal,
@@ -36,10 +37,18 @@ export abstract class UiListboxHost {
   abstract isBlocked(option: UiOptionHandle): boolean;
   /** The option renders an item that the key manager made active (`items` of the list). */
   abstract isActive(option: UiOptionHandle): boolean;
-  /** Id the list gives the option (a leading action's); `null` keeps its own. */
-  abstract optionId(option: UiOptionHandle): string | null;
   /** The user clicked the option. */
   abstract selectOption(value: unknown): void;
+}
+
+/**
+ * Marks the option `ui-listbox` renders for a leading action ("Add «…»", "Select all") and gives
+ * it the id of the action. The option knows it is one from the start, without reading its value.
+ * Internal.
+ */
+@Directive({ selector: 'ui-option[uiLeadingAction]' })
+export class UiLeadingActionOption {
+  readonly action = input.required<{ readonly id: string }>({ alias: 'uiLeadingAction' });
 }
 
 /**
@@ -109,8 +118,12 @@ export class UiOption<T = unknown> implements Highlightable {
    */
   readonly label = input('');
 
-  private readonly optionId = inject(_IdGenerator).getId('ui-option-');
-  protected readonly elementId = computed(() => this.parent.optionId(this) ?? this.optionId);
+  /** Set when the option renders a leading action of the list. */
+  private readonly leadingAction = inject(UiLeadingActionOption, { self: true, optional: true });
+  private readonly generatedId = inject(_IdGenerator).getId('ui-option-');
+  protected readonly elementId = computed(
+    () => this.leadingAction?.action().id ?? this.generatedId,
+  );
   protected readonly multiple = this.parent.multiple;
   /** Set by the key manager when the option itself is in it. */
   private readonly highlighted = signal(false);

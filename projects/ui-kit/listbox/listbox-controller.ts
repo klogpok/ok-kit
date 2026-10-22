@@ -458,12 +458,6 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     return this.cfg.isSelected(value);
   }
 
-  /** Id of a rendered option: the id of the leading action it renders, else its own. */
-  optionId(option: UiOptionHandle): string | null {
-    const value = option.value();
-    return value instanceof UiLeadingAction ? value.id : null;
-  }
-
   /** Only "Select all" is partly checked: while some of the options it acts on are selected. */
   isIndeterminate(option: UiOptionHandle): boolean {
     return (

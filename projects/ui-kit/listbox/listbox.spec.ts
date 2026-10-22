@@ -191,6 +191,16 @@ class Host {
   readonly value = signal<readonly string[]>([]);
 }
 
+describe('UiOption', () => {
+  // The key manager may read a new option before its required value is set.
+  it('has an id and a state before its value is set', () => {
+    TestBed.configureTestingModule({ providers: [provideUiListbox()] });
+    const option = TestBed.createComponent(UiOption).componentInstance;
+    expect(option.ɵid).toMatch(/^ui-option-/);
+    expect(option.ɵdisabled).toBe(false);
+  });
+});
+
 describe('UiListboxController', () => {
   let fixture: ComponentFixture<Host>;
   let host: Host;
