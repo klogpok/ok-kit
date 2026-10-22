@@ -600,11 +600,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
   activateValue(value: unknown): boolean {
     const list = this.listOptions();
     const index = list.findIndex(
-      (option) =>
-        !(option instanceof UiLeadingAction) &&
-        !option.ɵdisabled &&
-        !this.isHidden(option) &&
-        this.matches(option.value(), value),
+      (option) => !this.isHidden(option) && this.canPickValue(option, value),
     );
     if (index < 0) return false;
     this.keyManager.setActiveItem(index);
@@ -761,6 +757,15 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     if (active && (active.ɵdisabled || this.isHidden(active))) this.clearActive();
   }
 
+  /** Whether an option, not a leading action, has this value and can be picked now. */
+  private canPickValue(option: UiListEntry, value: unknown): boolean {
+    return (
+      !(option instanceof UiLeadingAction) &&
+      !option.ɵdisabled &&
+      this.matches(option.value(), value)
+    );
+  }
+
   private activatesOnOpen(): boolean {
     return this.config()?.activateOnOpen?.() ?? true;
   }
@@ -790,12 +795,7 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     const openAt = this.config()?.openAt?.();
     const target =
       openAt != null
-        ? list.find(
-            (option) =>
-              !(option instanceof UiLeadingAction) &&
-              !option.ɵdisabled &&
-              this.matches(option.value(), openAt),
-          )
+        ? list.find((option) => this.canPickValue(option, openAt))
         : this.selectedOptions().find((option) => !option.ɵdisabled);
     const index = target ? list.indexOf(target) : -1;
     if (!activate) {
