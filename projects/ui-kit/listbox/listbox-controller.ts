@@ -344,10 +344,14 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     this.items() ? this.leadingActions().length + this.visibleItems().length : null,
   );
 
-  /** `aria-posinset` of the n-th leading action or the n-th shown item; `null` without `items`. */
-  posInSet(part: 'action' | 'item', index: number): number | null {
-    if (this.setSize() === null) return null;
-    return (part === 'item' ? this.leadingActions().length : 0) + index + 1;
+  /** `aria-posinset` of the n-th leading action; `null` without `items`. */
+  actionPosInSet(index: number): number | null {
+    return this.setSize() === null ? null : index + 1;
+  }
+
+  /** `aria-posinset` of the n-th shown item, which follows the leading actions. */
+  itemPosInSet(index: number): number | null {
+    return this.actionPosInSet(this.leadingActions().length + index);
   }
   /** Every option the keyboard moves through. */
   private readonly listOptions = computed((): readonly UiListEntry[] => [

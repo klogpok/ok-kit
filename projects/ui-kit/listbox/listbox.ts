@@ -59,7 +59,7 @@ import { UiItemOption } from './option-items';
             [value]="action"
             [class]="'ui-listbox__' + action.slug"
             [attr.aria-setsize]="listbox.setSize()"
-            [attr.aria-posinset]="listbox.posInSet('action', i)"
+            [attr.aria-posinset]="listbox.actionPosInSet(i)"
             >{{ action.getLabel() }}</ui-option
           >
         }
@@ -111,7 +111,7 @@ import { UiItemOption } from './option-items';
         [label]="entry.item.label"
         [disabled]="entry.isDisabled()"
         [attr.aria-setsize]="listbox.setSize()"
-        [attr.aria-posinset]="listbox.posInSet('item', index)"
+        [attr.aria-posinset]="listbox.itemPosInSet(index)"
       >
         {{ entry.item.label }}
         @if (entry.item.description) {
