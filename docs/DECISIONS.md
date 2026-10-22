@@ -746,6 +746,6 @@ Agent notes (ticket 03):
 - **Leading actions are tracked by kind** in `ui-listbox`: by identity, typing that turns "Select
   all" into "Add «…»" recreated the row and logged NG0956 in dev mode.
 - **Client check:** `pnpm sync:client --check` found no client checkout next to the main kit
-  checkout (`D:\projects\client`), so whether the VPlans client styles the old classes stays
+  checkout (`D:\projects\client`), and none was found elsewhere, so whether the VPlans client styles the old classes stays
   unknown; see ticket 03. The client copy in `feat/ui-kit-pilot` gets the new classes at its next
   sync.
