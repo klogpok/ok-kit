@@ -57,8 +57,7 @@ import { UiItemOption } from './option-items';
           <ui-option
             [uiLeadingAction]="action"
             [value]="action"
-            [class.ui-listbox__create]="action.kind === 'create'"
-            [class.ui-listbox__select-all]="action.kind === 'selectAll'"
+            [class]="'ui-listbox__' + action.slug"
             [attr.aria-setsize]="listbox.setSize()"
             [attr.aria-posinset]="listbox.posInSet('action', i)"
             >{{ action.getLabel() }}</ui-option

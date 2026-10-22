@@ -18,7 +18,7 @@ import {
 } from '@angular/core';
 import { ActiveDescendantKeyManager, Highlightable } from '@angular/cdk/a11y';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { UI_FORM_FIELD, UI_LABELS } from '@vplans/ui-kit/core';
+import { UI_FORM_FIELD, UI_LABELS, type UiLabels } from '@vplans/ui-kit/core';
 import { UiListboxHost, UiOption, UiOptionHandle } from './option';
 import { UiItemEntry, UiItemEntryOwner, UiItemOption, UiOptionItem } from './option-items';
 
@@ -45,6 +45,21 @@ export interface UiListEntry<T = unknown> extends Highlightable, UiOptionHandle 
   ɵfilteredOut(): boolean;
 }
 
+/**
+ * The two leading actions and what tells them apart: the slug that ends the id of their option
+ * and names its class (`ui-listbox__<slug>`), and their label.
+ */
+const LEADING_ACTION_KINDS = {
+  /** "Add «…»", labelled with the text it adds. */
+  create: {
+    slug: 'create',
+    label: (labels: UiLabels, createText: string) => labels.create(createText),
+  },
+  selectAll: { slug: 'select-all', label: (labels: UiLabels) => labels.selectAll },
+} as const;
+
+type UiLeadingActionKind = keyof typeof LEADING_ACTION_KINDS;
+
 /** What a leading action asks of the listbox that shows it. Internal. */
 interface UiLeadingActionOwner {
   idOf(action: UiLeadingAction): string;
@@ -62,9 +77,14 @@ export class UiLeadingAction implements UiListEntry<UiLeadingAction> {
   readonly ɵdisabled = false;
 
   constructor(
-    readonly kind: 'create' | 'selectAll',
+    readonly kind: UiLeadingActionKind,
     private readonly owner: UiLeadingActionOwner,
   ) {}
+
+  /** Ends the id of the option that renders it and names its class (`ui-listbox__<slug>`). */
+  get slug(): string {
+    return LEADING_ACTION_KINDS[this.kind].slug;
+  }
 
   /** Id of the option that renders it, derived from the listbox id. */
   get id(): string {
@@ -276,9 +296,8 @@ export class UiListboxController<T = unknown> extends UiListboxHost {
     this.itemEntries().filter((entry) => !entry.ɵfilteredOut()),
   );
   private readonly actionOwner: UiLeadingActionOwner = {
-    idOf: (action) => `${this.panelId()}-${action.kind === 'create' ? 'create' : 'select-all'}`,
-    labelOf: (action) =>
-      action.kind === 'create' ? this.labels().create(this.createText()) : this.labels().selectAll,
+    idOf: (action) => `${this.panelId()}-${action.slug}`,
+    labelOf: (action) => LEADING_ACTION_KINDS[action.kind].label(this.labels(), this.createText()),
     reveal: (action) => this.reveal(action),
   };
   private readonly createEntry = new UiLeadingAction('create', this.actionOwner);
