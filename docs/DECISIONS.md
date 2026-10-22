@@ -688,3 +688,13 @@ space, and approved the pilot.
   screen starts with a new spec when the user asks for one; ticket 15 holds the survey
   (`create-quote-item-dialog` or `deadline-dialog` → `schedule-dialog`, and the
   `.cdk-overlay-pane` clash with a kit `ui-dialog`).
+
+## Visual baselines in a pinned Chromium (decided 2026-10-22)
+
+The user asked whether screenshot tests are worth keeping; they stay, and their browser is pinned.
+On 2026-10-22, 783 of the 942 baselines no longer matched the installed Edge, though it was still
+Edge 155, the version they were taken in a month earlier: only text and rounded edges
+re-rendered. `test-visual` now runs the Chromium headless shell of `playwright-core`, pinned to an
+exact version in `package.json`, with `--disable-lcd-text`, and every baseline was re-taken in it.
+A `playwright-core` bump is a deliberate change that re-takes the baselines in the same commit.
+`test-storybook` and `test-host-css` stay on Edge: they do not compare against earlier runs.

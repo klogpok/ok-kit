@@ -1,9 +1,13 @@
 // Visual regression: takes a screenshot of every story of the built Storybook in the modes of
 // `test-storybook` (light/rtl, dark/rtl, light/ltr) and compares it with the baseline in
 // `visual/`. Differences above 0.1% of the pixels fail; the diff and the new screenshot are
-// written to `dist/visual-diff/`. Uses the installed Edge through playwright-core.
+// written to `dist/visual-diff/`. Uses the Chromium build of playwright-core, not the installed
+// Edge: Edge updates itself and every update re-rendered the text of most baselines. The browser
+// changes only with the exact playwright-core version in package.json, so bump it on purpose and
+// re-take the baselines in the same commit.
 //
 // Usage:
+//   pnpm exec playwright-core install chromium-headless-shell   (once per machine and version)
 //   pnpm build-storybook && pnpm test-visual [--filter <story id part>]
 //   pnpm test-visual:update [--filter <story id part>]   (writes new or changed baselines)
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
@@ -31,7 +35,12 @@ const server = await startServer();
 await mkdir(baselineDir, { recursive: true });
 await rm(diffDir, { recursive: true, force: true });
 
-const browser = await chromium.launch({ channel: 'msedge' });
+// Grayscale text: subpixel (LCD) antialiasing follows the ClearType settings of the machine and
+// switches off on layers, so it varied between captures of the same story.
+const browser = await chromium.launch({ args: ['--disable-lcd-text'] }).catch((error) => {
+  console.error('Install the browser: pnpm exec playwright-core install chromium-headless-shell');
+  throw error;
+});
 const context = await browser.newContext({
   viewport: { width: 1024, height: 768 },
   deviceScaleFactor: 1,
