@@ -143,6 +143,17 @@ describe('UiSelect creatable', () => {
     expect(fixture.componentInstance.searches.at(-1)).toBe('');
   });
 
+  it('picks the option the search matches with Enter, not "Add «…»"', async () => {
+    type(control(), 'bal');
+    await settle(fixture);
+    expect(createOption()!.textContent!.trim()).toBe('Add «bal»');
+
+    keydown(control(), 'Enter');
+    await settle(fixture);
+    expect(fixture.componentInstance.control.value).toBe('Balcony');
+    expect(control().getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('does not offer the label of the value again', async () => {
     fixture.componentInstance.control.setValue('Attic');
     await settle(fixture);
