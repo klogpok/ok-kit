@@ -1,6 +1,6 @@
 # 01: `[uiComboboxControl]` sets the combobox ARIA of every popup listbox field
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** None (can start immediately)
 
 Spec: `../spec.md` → "Implementation Decisions": placement, field token, directive.
@@ -20,15 +20,15 @@ contract in one place.
 - The four templates apply the directive and drop those bindings. `role`, `aria-haspopup`,
   `aria-autocomplete`, `autocomplete` and `aria-readonly` stay in the templates.
 
-- [ ] The directive and the field token exist in the `listbox` entry point as internal exports.
-- [ ] All four fields (both controls of the select) use the directive; none of the eight bindings
+- [x] The directive and the field token exist in the `listbox` entry point as internal exports.
+- [x] All four fields (both controls of the select) use the directive; none of the eight bindings
       is left in a template.
-- [ ] The rendered attributes and values on the host and on the inner control are unchanged
+- [x] The rendered attributes and values on the host and on the inner control are unchanged
       (order may differ).
-- [ ] A new contract spec in `listbox` drives a minimal test field (prior art: `TestField` in the
+- [x] A new contract spec in `listbox` drives a minimal test field (prior art: `TestField` in the
       listbox spec) and covers the ARIA while closed and while open, required / invalid /
       described-by from a bound form control, and `id` / `aria-label` on the inner control.
-- [ ] The existing specs and harnesses of select, multi-select, autocomplete and time input pass
+- [x] The existing specs and harnesses of select, multi-select, autocomplete and time input pass
       without edits.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
 - [ ] One commit, `refactor(listbox): ...`.
@@ -37,7 +37,7 @@ contract in one place.
 
 # 01: `[uiComboboxControl]` ставит ARIA combobox каждого popup listbox field
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** нет (можно начинать сразу)
 
 Spec: `../spec.md` → «Решения по реализации»: размещение, токен поля, директива.
@@ -57,16 +57,16 @@ Spec: `../spec.md` → «Решения по реализации»: разме�
 - Четыре шаблона применяют директиву и убирают эти привязки. `role`, `aria-haspopup`,
   `aria-autocomplete`, `autocomplete` и `aria-readonly` остаются в шаблонах.
 
-- [ ] Директива и токен поля есть в entry point `listbox` как внутренние экспорты.
-- [ ] Все четыре поля (оба элемента управления select) используют директиву; ни одна из восьми
+- [x] Директива и токен поля есть в entry point `listbox` как внутренние экспорты.
+- [x] Все четыре поля (оба элемента управления select) используют директиву; ни одна из восьми
       привязок не осталась в шаблоне.
-- [ ] Отрисованные атрибуты и значения на хосте и на внутреннем элементе управления не изменились
+- [x] Отрисованные атрибуты и значения на хосте и на внутреннем элементе управления не изменились
       (порядок может отличаться).
-- [ ] Новый контрактный спек в `listbox` управляет минимальным тестовым полем (образец: `TestField`
+- [x] Новый контрактный спек в `listbox` управляет минимальным тестовым полем (образец: `TestField`
       в спеке listbox) и покрывает ARIA в закрытом и открытом состоянии, required / invalid /
       described-by от привязанного form control и `id` / `aria-label` на внутреннем элементе
       управления.
-- [ ] Существующие спеки и harnesses select, multi-select, autocomplete и time input проходят без
+- [x] Существующие спеки и harnesses select, multi-select, autocomplete и time input проходят без
       правок.
 - [ ] `/phase-check` проходит, визуальные baselines не меняются; `pnpm sync:client --verify`
       проходит.
