@@ -886,16 +886,24 @@ What was delivered:
 
 Agent notes (ticket 03, outside its plan):
 
-- **The popover strategy re-applies with the fitting positions.** `UiPopoverPositionStrategy
-  .apply()` lets the CDK apply first; if the block axis of some positions does not fit while
-  another's does, it applies again with only the fitting ones, then pushes. Why: the CDK picks
-  the best fallback by visible area, and a corner overlay past the viewport edge on the inline
-  axis has none (or a negative one), so the CDK kept a top corner with no room above and the push
-  then moved the popover over the trigger. The vertical flip must win, and the push only moves it
-  along the trigger. When no position fits on the block axis, all stay, as before.
+- **The position strategy re-applies with the fitting positions.** `apply()` lets the CDK apply
+  first; if the block axis of some positions does not fit while another's does, it applies again
+  with only the fitting ones, then pushes. Why: the CDK picks the best fallback by visible area,
+  and a corner overlay past the viewport edge on the inline axis has none (or a negative one), so
+  the CDK kept a top corner with no room above and the push then moved the overlay over the
+  trigger. The vertical flip must win, and the push only moves it along the trigger. When no
+  position fits on the block axis, all stay, as before. This changes sides too: a `top` or
+  `bottom` overlay whose block axis fits on one side only, but which the CDK would keep on the
+  other because both are cut at the inline edge, goes to the side that fits.
 - **A resize calls the wrapper's `apply()`,** not only `push()`: the CDK strategy applies itself
   on a resize with the positions that fitted before, so the wrapper subscribes after it and
-  applies again. A resize can flip a popover now.
+  applies again. A resize can flip a popover or a tooltip now.
+- **Review fix: the tooltip had the same bug.** Ticket 03 fixed it for the popover only; a
+  `corner-top-start` tooltip on a trigger at the top-start corner of the viewport was pushed over
+  its trigger (reproduced by the `CornerAtTheEdge` story of the tooltip). The logic moved to
+  `core/overlay.ts` (`blockFittingPositions()`, `ɵUiBlockFittingPositionStrategy`); the popover
+  extends the strategy with its own push, the tooltip uses it with the CDK push. The `CornerBridge`
+  story checks the bridge in a browser, because Vitest loads no component styles.
 - **No visual change for sides.** The new baselines are only for the corners: the stories
   `overlays-tooltip--corners`, `overlays-popover--corner` and
   `overlays-popover--corner-at-the-edge`.
