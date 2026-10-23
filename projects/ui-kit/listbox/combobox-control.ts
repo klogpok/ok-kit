@@ -26,6 +26,9 @@ export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPop
     '[id]': 'field.controlId()',
     '[attr.aria-label]': 'field.ariaLabel() || null',
     '[attr.aria-expanded]': 'listbox.shown()',
+    // A hidden list has no rendered panel or option to point at.
+    '[attr.aria-controls]': 'listbox.shown() ? listbox.panelId() : null',
+    '[attr.aria-activedescendant]': 'listbox.shown() ? listbox.activeId() : null',
   },
 })
 export class UiComboboxControl {

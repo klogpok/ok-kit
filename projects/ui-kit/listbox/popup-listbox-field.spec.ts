@@ -90,7 +90,7 @@ class TestPopupField extends UiFormControlBase<string | null> {
 @Component({
   imports: [TestPopupField, UiOption],
   template: `
-    <ui-test-popup-field [aria-label]="label()">
+    <ui-test-popup-field [id]="id()" [aria-label]="label()">
       @for (fruit of fruits; track fruit) {
         <ui-option [value]="fruit">{{ fruit }}</ui-option>
       }
@@ -99,16 +99,19 @@ class TestPopupField extends UiFormControlBase<string | null> {
 })
 class Host {
   readonly fruits = ['Apple', 'Banana'];
+  readonly id = signal('fruit');
   readonly label = signal('Fruit');
 }
 
 describe('[uiComboboxControl] on a popup listbox field', () => {
   let fixture: ComponentFixture<Host>;
+  let host: Host;
   let root: HTMLElement;
   const control = () => root.querySelector<HTMLInputElement>('.control')!;
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(Host);
+    host = fixture.componentInstance;
     root = fixture.nativeElement as HTMLElement;
     await settle(fixture);
   });
@@ -124,5 +127,32 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
     expect(control().hasAttribute('aria-required')).toBe(false);
     expect(control().hasAttribute('aria-invalid')).toBe(false);
     expect(control().hasAttribute('aria-describedby')).toBe(false);
+  });
+
+  it('points at the shown list and its active option while open, and nowhere once closed', async () => {
+    control().dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', keyCode: 40, bubbles: true }),
+    );
+    await settle(fixture);
+    expect(control().getAttribute('aria-expanded')).toBe('true');
+    expect(control().getAttribute('aria-controls')).toBe('fruit-listbox');
+    const active = document.getElementById(control().getAttribute('aria-activedescendant')!);
+    expect((active?.textContent ?? '').trim()).toBe('Apple');
+
+    control().dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }),
+    );
+    await settle(fixture);
+    expect(control().getAttribute('aria-expanded')).toBe('false');
+    expect(control().hasAttribute('aria-controls')).toBe(false);
+    expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+  });
+
+  it('follows a new id and label of the field', async () => {
+    host.label.set('');
+    host.id.set('veg');
+    await settle(fixture);
+    expect(control().id).toBe('veg-control');
+    expect(control().hasAttribute('aria-label')).toBe(false);
   });
 });
