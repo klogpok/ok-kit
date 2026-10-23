@@ -29,6 +29,8 @@ import {
   UiOption,
   type ɵUiListboxController as UiListboxController,
   type UiOptionItem,
+  ɵUI_POPUP_LISTBOX_FIELD as UI_POPUP_LISTBOX_FIELD,
+  ɵUiComboboxControl as UiComboboxControl,
   ɵUiListbox as UiListbox,
   ɵfieldListboxConfig as fieldListboxConfig,
   ɵinjectListbox as injectListbox,
@@ -69,36 +71,32 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
  */
 @Component({
   selector: 'ui-autocomplete',
-  imports: [CdkOverlayOrigin, UiDropdownPanel, UiListbox, UiSpinner],
+  imports: [CdkOverlayOrigin, UiComboboxControl, UiDropdownPanel, UiListbox, UiSpinner],
   template: `
     <div class="ui-autocomplete__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
+      <!-- uiComboboxControl sets the id, label and dynamic combobox ARIA. -->
+      <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
       <input
         #control
+        uiComboboxControl
         type="text"
         role="combobox"
         class="ui-autocomplete__input"
         autocomplete="off"
         aria-autocomplete="list"
         aria-haspopup="listbox"
-        [id]="controlId()"
         [value]="text()"
         [placeholder]="placeholder()"
         [disabled]="isDisabled()"
         [readOnly]="readonly()"
         [attr.name]="name() || null"
-        [attr.aria-label]="ariaLabel() || null"
         [attr.aria-readonly]="readonly() ? 'true' : null"
-        [attr.aria-expanded]="listbox.shown()"
-        [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
-        [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
-        [attr.aria-required]="isRequired() ? 'true' : null"
-        [attr.aria-invalid]="showError() ? 'true' : null"
-        [attr.aria-describedby]="describedBy()"
         (input)="onInput($event)"
         (keydown)="onKeydown($event)"
         (click)="open()"
         (blur)="onBlur()"
       />
+      <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
       @if (loading()) {
         <ui-spinner class="ui-autocomplete__spinner" size="sm" decorative />
       }
@@ -113,6 +111,7 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
   styleUrl: './autocomplete.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
+    { provide: UI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => UiAutocomplete) },
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiAutocomplete) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiAutocomplete), multi: true },
     provideUiListbox(),

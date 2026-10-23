@@ -22,29 +22,24 @@
       }
     </span>
   }
+  <!-- uiComboboxControl sets the id, label and dynamic combobox ARIA of both controls. -->
+  <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
   @if (searchable()) {
     <input
       #control
+      uiComboboxControl
       type="text"
       role="combobox"
       class="ui-select__control ui-select__input"
       autocomplete="off"
       aria-autocomplete="list"
       aria-haspopup="listbox"
-      [id]="controlId()"
       [value]="listbox.isOpen() ? query() : displayLabel()"
       [placeholder]="displayLabel() || placeholder()"
       [attr.maxlength]="maxLength()"
       [disabled]="isDisabled()"
       [readOnly]="readonly()"
-      [attr.aria-label]="ariaLabel() || null"
       [attr.aria-readonly]="readonly() ? 'true' : null"
-      [attr.aria-expanded]="listbox.shown()"
-      [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
-      [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
-      [attr.aria-required]="isRequired() ? 'true' : null"
-      [attr.aria-invalid]="showError() ? 'true' : null"
-      [attr.aria-describedby]="describedBy()"
       (input)="onSearch($event)"
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
@@ -52,21 +47,14 @@
   } @else {
     <button
       #control
+      uiComboboxControl
       type="button"
       role="combobox"
       class="ui-select__control ui-select__button"
       aria-haspopup="listbox"
-      [id]="controlId()"
       [disabled]="isDisabled()"
       [attr.name]="name() || null"
-      [attr.aria-label]="ariaLabel() || null"
       [attr.aria-readonly]="readonly() ? 'true' : null"
-      [attr.aria-expanded]="listbox.shown()"
-      [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
-      [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
-      [attr.aria-required]="isRequired() ? 'true' : null"
-      [attr.aria-invalid]="showError() ? 'true' : null"
-      [attr.aria-describedby]="describedBy()"
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
     >
@@ -79,6 +67,7 @@
       </span>
     </button>
   }
+  <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
   @if (showClear()) {
     <button
       type="button"

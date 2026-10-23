@@ -12,4 +12,9 @@ export {
   type UiListboxConfig as ɵUiListboxConfig,
 } from './listbox-controller';
 export { UiListbox as ɵUiListbox } from './listbox';
+export {
+  UiComboboxControl as ɵUiComboboxControl,
+  UI_POPUP_LISTBOX_FIELD as ɵUI_POPUP_LISTBOX_FIELD,
+  type UiComboboxField as ɵUiComboboxField,
+} from './combobox-control';
 export type { UiOptionHandle as ɵUiOptionHandle } from './option';

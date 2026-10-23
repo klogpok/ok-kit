@@ -25,6 +25,8 @@ import {
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
 import {
+  ɵUI_POPUP_LISTBOX_FIELD,
+  ɵUiComboboxControl,
   ɵUiListbox,
   ɵfieldListboxConfig,
   ɵinjectListbox,
@@ -73,7 +75,7 @@ interface Draft {
  */
 @Component({
   selector: 'ui-time-input',
-  imports: [CdkOverlayOrigin, UiIcon, ɵUiDropdownPanel, ɵUiListbox],
+  imports: [CdkOverlayOrigin, UiIcon, ɵUiComboboxControl, ɵUiDropdownPanel, ɵUiListbox],
   template: `
     <!-- A click anywhere in the field opens the list; the keyboard uses the arrows. -->
     <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
@@ -83,8 +85,11 @@ interface Draft {
       #origin="cdkOverlayOrigin"
       (click)="onFieldClick()"
     >
+      <!-- uiComboboxControl sets the id, label and dynamic combobox ARIA. -->
+      <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
       <input
         #control
+        uiComboboxControl
         type="text"
         role="combobox"
         class="ui-time-input__input"
@@ -93,23 +98,16 @@ interface Draft {
         dir="ltr"
         [attr.inputmode]="format().hour12 ? null : 'numeric'"
         [attr.maxlength]="format().hour12 ? null : 5"
-        [id]="controlId()"
         [value]="text()"
         [placeholder]="placeholder() || hint()"
         [disabled]="isDisabled()"
         [readOnly]="readonly()"
         [attr.name]="name() || null"
-        [attr.aria-label]="ariaLabel() || null"
-        [attr.aria-expanded]="listbox.shown()"
-        [attr.aria-controls]="listbox.shown() ? listbox.panelId() : null"
-        [attr.aria-activedescendant]="listbox.shown() ? listbox.activeId() : null"
-        [attr.aria-required]="isRequired() ? 'true' : null"
-        [attr.aria-invalid]="showError() ? 'true' : null"
-        [attr.aria-describedby]="describedBy()"
         (input)="onInput($event)"
         (keydown)="onKeydown($event)"
         (blur)="onBlur()"
       />
+      <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
       <ui-icon
         class="ui-time-input__icon"
         [icon]="clockIcon"
@@ -125,6 +123,7 @@ interface Draft {
   styleUrl: './time-input.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
+    { provide: ɵUI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => UiTimeInput) },
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiTimeInput) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiTimeInput), multi: true },
     ɵprovideUiListbox(),

@@ -3,6 +3,16 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (popup listbox field)
+
+### Changed
+
+- **listbox (internal):** the dynamic combobox ARIA of the inner control of `ui-select`,
+  `ui-multi-select`, `ui-autocomplete` and `ui-time-input` (`id`, `aria-label`,
+  `aria-expanded`, `aria-controls`, `aria-activedescendant`, `aria-required`, `aria-invalid`,
+  `aria-describedby`) is set by one internal directive, `[uiComboboxControl]`, which reads the
+  field through the new `ɵUI_POPUP_LISTBOX_FIELD` token. The rendered attributes are unchanged.
+
 ## Unreleased (file type icons)
 
 ### Added

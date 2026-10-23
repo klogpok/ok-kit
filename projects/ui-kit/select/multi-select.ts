@@ -17,6 +17,8 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
 import {
   type ɵUiListboxController as UiListboxController,
   type ɵUiOptionHandle as UiOptionHandle,
+  ɵUI_POPUP_LISTBOX_FIELD as UI_POPUP_LISTBOX_FIELD,
+  ɵUiComboboxControl as UiComboboxControl,
   ɵUiListbox as UiListbox,
   ɵinjectListbox as injectListbox,
   ɵprovideUiListbox as provideUiListbox,
@@ -55,11 +57,20 @@ import { UiSelectBase } from './select-base';
  */
 @Component({
   selector: 'ui-multi-select',
-  imports: [CdkOverlayOrigin, UiChip, UiDropdownPanel, UiIcon, UiListbox, UiSpinner],
+  imports: [
+    CdkOverlayOrigin,
+    UiChip,
+    UiComboboxControl,
+    UiDropdownPanel,
+    UiIcon,
+    UiListbox,
+    UiSpinner,
+  ],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
+    { provide: UI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => UiMultiSelect) },
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiMultiSelect) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiMultiSelect), multi: true },
     provideUiListbox(),
