@@ -124,6 +124,7 @@ const optionalNumber = (value: unknown): number | null =>
               <bdi class="ui-file-upload__name">{{ file.name }}</bdi>
               <bdi class="ui-file-upload__size">{{ size(file) }}</bdi>
               @if (progressOf(file); as percent) {
+                <span class="ui-file-upload__percent" aria-hidden="true">{{ percent.text }}</span>
                 <ui-progress-bar
                   class="ui-file-upload__progress"
                   size="sm"
@@ -180,7 +181,7 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
   readonly maxSize = input<number | null, unknown>(null, { transform: optionalNumber });
   /** Most files allowed with `multiple`. */
   readonly maxFiles = input<number | null, unknown>(null, { transform: optionalNumber });
-  /** Upload progress per file, 0–100. Files without an entry show no bar. */
+  /** Upload progress per file, 0–100: a bar and a percent. Files without an entry show neither. */
   readonly progress = input<ReadonlyMap<File, number> | null>(null);
   readonly variant = input<UiFileUploadVariant>('dropzone');
   /** Picks the icon of a file in the list; `null` from it falls back to the type icon. */
@@ -299,9 +300,16 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
     return this.fileIcon()?.(file) ?? fileTypeIcon(file);
   }
 
-  protected progressOf(file: File): { value: number } | null {
-    const value = this.progress()?.get(file);
-    return value == null ? null : { value: Math.min(100, Math.max(0, value)) };
+  protected progressOf(file: File): { value: number; text: string } | null {
+    const progress = this.progress()?.get(file);
+    if (progress == null) return null;
+    const value = Math.min(100, Math.max(0, progress));
+    // Rounded down, so the text says 100% only when the bar turns green. It is hidden from screen
+    // readers: the bar says the value already.
+    const text = new Intl.NumberFormat(this.locale(), { style: 'percent' }).format(
+      Math.floor(value) / 100,
+    );
+    return { value, text };
   }
 
   protected onPicked(event: Event): void {

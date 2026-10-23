@@ -132,6 +132,16 @@
   white-space: nowrap;
 }
 
+// At the end of the line of the name and the size, above the end of the bar. A `span`, not a
+// `bdi`: digits give a `bdi` the LTR direction, which flips its logical margin in RTL.
+.ui-file-upload__percent {
+  margin-inline-start: auto;
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .ui-file-upload__progress {
   flex-basis: 100%;
 }

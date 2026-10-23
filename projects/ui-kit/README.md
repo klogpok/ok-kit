@@ -108,7 +108,8 @@ required chip input needs a validator of its own (the playground's `uiAtLeastOne
 The value is a `File[]`. `accept`, `maxSize` (bytes) and `maxFiles` do not drop files: a file
 that breaks them stays in the list, marked, and the field says why. That message is the control's
 own: it never becomes an error of the bound form control, so the form stays as valid as your
-validators say. The kit does not upload: pass the progress per file (0–100) in `progress`.
+validators say. The kit does not upload: pass the progress per file (0–100) in `progress`, and the
+file shows a bar and the percent.
 
 ```html
 <ui-form-field label="Plans" hint="PDF, up to 10 MB">

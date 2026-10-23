@@ -827,3 +827,18 @@ User decision (ticket 03 of `.scratch/popup-listbox-field/`, option 1):
 - **`[uiComboboxControl]` owns it** (`'true'` or `null` from the field's `readonly`), like the
   rest of the dynamic combobox ARIA; no field template binds it. The native `readOnly` of the
   `<input>` fields stays in their templates.
+
+## File upload: upload percent (decided 2026-10-23)
+
+User decision, after a review of an outside upload card (icon, name, size, time left, percent,
+bar):
+
+- **Taken:** the percent as text. A file with a `progress` entry shows it at the end of the line
+  of the name and the size, above the end of the bar; muted, `--ui-font-size-xs`, tabular digits.
+  Formatted with `Intl` in the locale of `UI_LABELS` and rounded down, so it says 100% only when
+  the bar turns green.
+- **A11y:** the text is `aria-hidden`; the progress bar already says the value.
+- **Not taken:** the time left (the kit does not upload and does not know it), colored type icons
+  (a green icon reads as success), a muted card instead of the border, a slot for app text.
+- **Baselines:** `WithFiles` and `ButtonVariant` are re-taken with this change, so they also show
+  the type icons from "File upload: file type icons".

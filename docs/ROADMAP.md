@@ -400,6 +400,10 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 > **Статус (2026-10-23): сделано и одобрено.** Семь новых иконок в `icon` (контур листа с глифом): изображение, PDF, документ, таблица, презентация, архив, чертёж (CAD/BIM). `ui-file-upload` показывает у каждого файла иконку его типа: по MIME, иначе по расширению; `fileTypeIcon(file)` публичная, вход `fileIcon` переопределяет выбор; у отклонённого файла остаётся alert. Новая история `FileTypes`. Решения — в [DECISIONS.md](DECISIONS.md) («File upload: file type icons»).
 
+## Процент загрузки в file upload (решено и сделано 2026-10-23)
+
+> **Статус (2026-10-23): сделано, ждёт одобрения пользователя.** У файла с записью в `progress` рядом с полосой показан процент цифрой: в конце строки имени и размера, приглушённо, `aria-hidden` (значение озвучивает полоса), округление вниз — 100% только вместе с зелёной полосой. API не менялся. Эталоны `WithFiles`, `ButtonVariant`, `States` пересняты (заодно с иконками типов). Решения — в [DECISIONS.md](DECISIONS.md) («File upload: upload percent»).
+
 ## Popup listbox field (решено и сделано 2026-10-23)
 
 > Архитектурная работа вне фаз, кандидат 1 архитектурного обзора 2026-10-23. Спека и тикеты 01–03 — в `.scratch/popup-listbox-field/`; термин — в `GLOSSARY.md` («Popup listbox field»); решения — в [DECISIONS.md](DECISIONS.md) («Popup listbox field: time input aria-readonly»).

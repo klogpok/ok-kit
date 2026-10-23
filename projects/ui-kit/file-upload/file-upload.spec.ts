@@ -262,6 +262,24 @@ describe('UiFileUpload', () => {
     expect(bars[0].getAttribute('aria-label')).toBe('a.pdf');
   });
 
+  it('shows the upload progress as a percent, hidden from screen readers', async () => {
+    pick(root, [file('a.pdf'), file('b.pdf'), file('c.pdf')]);
+    await settle(fixture);
+    const [a, b] = host.files();
+    host.progress.set(
+      new Map([
+        [a, 44.8],
+        [b, 99.9],
+      ]),
+    );
+    await settle(fixture);
+    const percents = [...root.querySelectorAll('.ui-file-upload__percent')];
+    // 99.9 is not done yet: the text reaches 100% only with the bar.
+    expect(percents.map((p) => (p.textContent ?? '').trim())).toEqual(['44%', '99%']);
+    // The progress bar already says the value.
+    expect(percents.every((p) => p.getAttribute('aria-hidden') === 'true')).toBe(true);
+  });
+
   it('does not change while readonly or disabled', async () => {
     pick(root, [file('a.pdf')]);
     host.readonly.set(true);
