@@ -763,3 +763,22 @@ User decisions:
   component tokens, like `sm` and `lg`.
 - `sm` and `md` both draw a 16px box and differ only in the label size; current sizes are
   accepted, so this stays.
+
+## File upload: file type icons (decided 2026-10-23)
+
+User decisions:
+
+- **Look:** the outline of `file` with a glyph inside, one color, like the rest of the set. No
+  colored badges, no new tokens. No image thumbnails.
+- **Types:** image, PDF, document, spreadsheet, presentation, archive and drawing (CAD/BIM:
+  `.dwg`, `.dxf`, `.dwf`, `.dgn`, `.ifc`, `.rvt`); anything else keeps `file`. Video, audio and
+  code files were not chosen.
+- **Detection:** the MIME type first, else the extension; browsers leave the type of `.dwg`
+  empty. AutoCAD MIME types (`image/vnd.dwg`) are drawings, not images.
+- **Where:** the icons (`uiIconFileImage`, `uiIconFilePdf`, `uiIconFileText`,
+  `uiIconFileSpreadsheet`, `uiIconFilePresentation`, `uiIconFileArchive`, `uiIconFileDrawing`)
+  are public in `icon`; `fileTypeIcon(file)` is public in `file-upload`.
+- **Override:** the `fileIcon` input of `ui-file-upload` (`UiFileIconFn`); `null` from it keeps
+  the type icon.
+- **Rejected file:** keeps the alert icon instead of the type icon.
+- **A11y:** the icon stays decorative; the name already carries the extension, so no new labels.
