@@ -232,6 +232,27 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
   });
 });
 
+@Component({
+  imports: [TestPopupField],
+  template: `<ui-test-popup-field /><ui-test-popup-field />`,
+})
+class UnnamedHost {}
+
+describe('a popup listbox field without a bound id', () => {
+  it('builds a unique id from its class prefix, and the control id from it', async () => {
+    const fixture = TestBed.createComponent(UnnamedHost);
+    await settle(fixture);
+    const root = fixture.nativeElement as HTMLElement;
+    const [first, second] = [...root.querySelectorAll<HTMLElement>('ui-test-popup-field')];
+
+    expect(first.id).toMatch(/^ui-test-field-\w+$/);
+    expect(second.id).toMatch(/^ui-test-field-\w+$/);
+    expect(second.id).not.toBe(first.id);
+    expect(first.querySelector('.control')?.id).toBe(`${first.id}-control`);
+    fixture.destroy();
+  });
+});
+
 /** Reactive forms show the message of an error value that is a string. */
 const pickAFruit: ValidatorFn = (control) => (control.value ? null : { pick: 'Pick a fruit' });
 
