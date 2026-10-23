@@ -17,7 +17,16 @@ export interface UiPopoverHarnessFilters extends BaseHarnessFilters {
   label?: string | RegExp;
 }
 
-const POSITIONS: readonly UiPopoverPosition[] = ['top', 'bottom', 'start', 'end'];
+const POSITIONS: readonly UiPopoverPosition[] = [
+  'top',
+  'bottom',
+  'start',
+  'end',
+  'corner-top-start',
+  'corner-top-end',
+  'corner-bottom-start',
+  'corner-bottom-end',
+];
 
 /**
  * Harness for a popover: the element with `[uiPopoverTriggerFor]`. The popover lives in an
@@ -70,7 +79,10 @@ export class UiPopoverHarness extends UiHarness {
     return panel ? panel.text() : '';
   }
 
-  /** Side of the trigger the open popover sits on, after a flip; `null` while it is closed. */
+  /**
+   * Side or corner of the trigger the open popover sits at, after a flip; `null` while it is
+   * closed.
+   */
   async getPosition(): Promise<UiPopoverPosition | null> {
     const panel = await this.panel();
     return panel ? uiModifier(panel, 'ui-popover--', POSITIONS) : null;
