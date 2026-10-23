@@ -135,6 +135,16 @@ describe('UiDatepicker', () => {
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
+  it('replaces blank text with the empty field when the user leaves it', async () => {
+    host.value.set(new Date(2026, 8, 5));
+    await settle(fixture);
+    await type('   ');
+    expect(host.value()).toBeNull();
+    await blur();
+    expect(input().value).toBe('');
+    expect(input().getAttribute('aria-invalid')).toBeNull();
+  });
+
   it('shows an Invalid Date or a string value as empty instead of failing', async () => {
     host.value.set(new Date(Number.NaN));
     await settle(fixture);

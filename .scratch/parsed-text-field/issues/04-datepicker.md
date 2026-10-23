@@ -1,6 +1,6 @@
 # 04: `ui-datepicker` uses the typed text module
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01
 
 Spec: `../spec.md` → "Implementation Decisions": what stays in the fields, aligned edge cases.
@@ -15,19 +15,19 @@ and `setValue()`, and passes its day rules to `ɵinjectTypedText()`.
   `commit()`. Alt+ArrowDown, the calendar dialog and touched on focus-out stay in the field.
 - `ownErrors()` maps the code to `labels().invalidDate`.
 
-- [ ] No `Draft` interface, draft `linkedSignal`, `commitDraft()` or `setValue()` is left in
+- [x] No `Draft` interface, draft `linkedSignal`, `commitDraft()` or `setValue()` is left in
       `datepicker.ts`.
-- [ ] The existing datepicker spec and harness pass; any test that asserted blank commit changes in
+- [x] The existing datepicker spec and harness pass; any test that asserted blank commit changes in
       the same commit with a note in the commit body.
-- [ ] Public inputs, outputs, methods and the rendered DOM are unchanged.
+- [x] Public inputs, outputs, methods and the rendered DOM are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
-- [ ] One commit, `refactor(datepicker): typed text module in the datepicker`.
+- [x] One commit, `refactor(datepicker): typed text module in the datepicker`.
 
 ## Русский перевод
 
 # 04: `ui-datepicker` использует module typed text
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01
 
 Spec: `../spec.md` → «Решения по реализации»: что остаётся в полях, выровненные крайние случаи.
@@ -42,11 +42,11 @@ Spec: `../spec.md` → «Решения по реализации»: что ос
   вызывают `commit()`. Alt+ArrowDown, calendar dialog и touched на focus-out остаются в поле.
 - `ownErrors()` отображает код в `labels().invalidDate`.
 
-- [ ] В `datepicker.ts` не осталось interface `Draft`, draft `linkedSignal`, `commitDraft()` и
+- [x] В `datepicker.ts` не осталось interface `Draft`, draft `linkedSignal`, `commitDraft()` и
       `setValue()`.
-- [ ] Существующие spec и harness datepicker проходят; тест, проверявший commit пустого текста,
+- [x] Существующие spec и harness datepicker проходят; тест, проверявший commit пустого текста,
       меняется в том же коммите с пояснением в теле коммита.
-- [ ] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
+- [x] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились; `pnpm sync:client --verify`
       проходит.
-- [ ] Один коммит, `refactor(datepicker): typed text module in the datepicker`.
+- [x] Один коммит, `refactor(datepicker): typed text module in the datepicker`.

@@ -8,7 +8,6 @@ import {
   forwardRef,
   inject,
   input,
-  linkedSignal,
   model,
   output,
   signal,
@@ -24,6 +23,7 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  ɵinjectTypedText,
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
   ɵUiDropdownPanel,
 } from '@vplans/ui-kit/core';
@@ -40,14 +40,6 @@ import {
   startOfDay,
   validDay,
 } from './date-utils';
-
-/** Text the user is typing and the value it produced. */
-interface Draft {
-  text: string;
-  value: Date | null;
-  /** The user left the field or pressed Enter: an invalid text is now an error. */
-  committed: boolean;
-}
 
 /**
  * Date field: type a date in the locale format or pick it from a calendar.
@@ -225,24 +217,34 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
   protected readonly calendarIcon = uiIconCalendar;
 
-  /** Dropped when the value changes elsewhere, so old text does not come back. */
-  private readonly draft = linkedSignal<Date | null, Draft | null>({
-    source: () => this.value(),
-    computation: (value, previous) => {
-      const draft = previous?.value;
-      // A written Invalid Date or string also drops the text: it is a value, and it shows empty.
-      return draft && (draft.value === value || sameDay(draft.value, validDay(value)))
-        ? draft
-        : null;
-    },
-  });
-
   readonly labelStrategy = 'for' as const;
   readonly controlId = computed(() => `${this.id()}-input`);
   /** The calendar dialog, named by `aria-controls` of the button while it is open. */
   protected readonly panelId = computed(() => `${this.id()}-panel`);
 
   private readonly locale = computed(() => this.labels().locale);
+
+  /** The typed text, its commit and parse error, and writing the value. */
+  private readonly typedText = ɵinjectTypedText<Date, string, 'invalid'>({
+    value: this.value,
+    notify: (value) => this.notifyChange(value),
+    // Text that is not an allowed day sets the value to `null` with a parse error.
+    parse: (text) => {
+      if (!text.trim()) return { value: null, error: null };
+      const day = parseDay(text, this.locale());
+      return day && isDayEnabled(day, this.min(), this.max(), this.dateFilter())
+        ? { value: day, error: null }
+        : { value: null, error: 'invalid' };
+    },
+    format: (day) => (day ? formatDay(day, this.locale()) : ''),
+    // A written Invalid Date or string is a value the field shows empty.
+    valid: validDay,
+    equals: sameDay,
+  });
+
+  /** The typed text while there is one, otherwise the formatted value. */
+  protected readonly text = computed(() => this.typedText.text());
+
   protected readonly hint = computed(() => formatHint(this.locale()));
   /** Numeric keypad with a dot on phones, when the locale separates the date with dots. */
   protected readonly inputMode = computed(() =>
@@ -251,18 +253,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   /** The value when it is a valid `Date`; a string from an API or an Invalid Date is shown empty. */
   protected readonly day = computed(() => validDay(this.value()));
-
-  /** The typed text while it belongs to the current value, otherwise the formatted value. */
-  protected readonly text = computed(() => {
-    const day = this.day();
-    return this.draft()?.text ?? (day ? formatDay(day, this.locale()) : '');
-  });
-
-  /** Typed text that is not an allowed date. */
-  protected readonly parseError = computed(() => {
-    const draft = this.draft();
-    return !!draft && draft.committed && draft.text.trim() !== '' && draft.value === null;
-  });
 
   /** Whether today can be picked (inside `min`/`max` and allowed by `dateFilter`). */
   protected readonly todayAllowed = computed(() =>
@@ -274,12 +264,11 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
    * not a validation failure of the consumer's control, which only ever sees `null`.
    */
   protected override ownErrors(): readonly string[] {
-    return this.parseError() ? [this.labels().invalidDate] : [];
+    return this.typedText.error() ? [this.labels().invalidDate] : [];
   }
 
   writeValue(value: Date | null | undefined): void {
-    this.draft.set(null);
-    this.value.set(validDay(value));
+    this.typedText.write(value);
   }
 
   focus(options?: FocusOptions): void {
@@ -288,7 +277,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.commitDraft();
+    this.typedText.commit();
     this.isOpen.set(true);
     this.opened.emit();
   }
@@ -315,8 +304,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   }
 
   protected onPick(date: Date): void {
-    this.draft.set(null);
-    this.setValue(date);
+    this.typedText.set(date);
     this.close();
   }
 
@@ -326,18 +314,12 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   /** Empties the field, also when it holds text that is not a date. */
   protected onClear(): void {
-    this.draft.set(null);
-    this.setValue(null);
+    this.typedText.set(null);
     this.close();
   }
 
   protected onInput(event: Event): void {
-    const text = (event.target as HTMLInputElement).value;
-    const parsed = text.trim() ? parseDay(text, this.locale()) : null;
-    const value =
-      parsed && isDayEnabled(parsed, this.min(), this.max(), this.dateFilter()) ? parsed : null;
-    this.setValue(value);
-    this.draft.set({ text, value, committed: false });
+    this.typedText.input((event.target as HTMLInputElement).value);
   }
 
   protected onInputKeydown(event: KeyboardEvent): void {
@@ -345,12 +327,12 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
       event.preventDefault();
       this.open();
     } else if (event.key === 'Enter') {
-      this.commitDraft();
+      this.typedText.commit();
     }
   }
 
   protected onBlur(): void {
-    this.commitDraft();
+    this.typedText.commit();
   }
 
   /** Touched once focus leaves the field, its button and the calendar. */
@@ -358,18 +340,5 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
     const next = event.relatedTarget as Node | null;
     if (next && (this.host.contains(next) || this.panel()?.nativeElement.contains(next))) return;
     this.notifyTouched();
-  }
-
-  /** Shows a valid typed date in the locale format; keeps invalid text for the user to fix. */
-  private commitDraft(): void {
-    const draft = this.draft();
-    if (!draft) return;
-    this.draft.set(draft.value ? null : { ...draft, committed: true });
-  }
-
-  private setValue(value: Date | null): void {
-    if (sameDay(value, this.value()) || (value === null && this.value() === null)) return;
-    this.value.set(value);
-    this.notifyChange(value);
   }
 }
