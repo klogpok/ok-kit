@@ -298,6 +298,21 @@ describe('UiPopoverTrigger', () => {
         await settle();
       }
     });
+
+    it('flips before the push when the corner is off screen on the inline axis', async () => {
+      // A trigger in the top corner of the viewport at its inline-start edge: neither corner shows
+      // any of the popover, so the CDK keeps the preferred one; pushed down, it covered the trigger.
+      for (const dir of ['ltr', 'rtl'] as const) {
+        const x = dir === 'ltr' ? 0 : viewport.width - 80;
+        const atCorner = DOMRect.fromRect({ x, y: 10, width: 80, height: 30 });
+        const box = await open('corner-top-start', dir, atCorner);
+        expect(panel()?.classList).toContain('ui-popover--corner-bottom-start');
+        expect(dir === 'ltr' ? box.left : viewport.width - box.right).toBe(8);
+        expect(box.top).toBe(atCorner.bottom);
+        fixture.componentInstance.trigger().close();
+        await settle();
+      }
+    });
   });
 
   it('closes on Escape while focus is still on the trigger', async () => {

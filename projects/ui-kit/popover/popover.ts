@@ -61,12 +61,13 @@ class UiPopoverPositionStrategy implements PositionStrategy {
   /** The wrapped CDK strategy, for its `positionChanges`. Configure it through `configure()`. */
   readonly connected: FlexibleConnectedPositionStrategy;
   private overlayRef: OverlayRef | null = null;
+  private positions: ConnectedPosition[] = [];
   private margin = 0;
   private offsetX = 0;
   private resize = Subscription.EMPTY;
 
   constructor(
-    origin: HTMLElement,
+    private readonly origin: HTMLElement,
     private readonly injector: Injector,
   ) {
     this.connected = createFlexibleConnectedPositionStrategy(injector, origin)
@@ -79,6 +80,7 @@ class UiPopoverPositionStrategy implements PositionStrategy {
    * after a page scrollbar on the left). Read them each time the popover opens.
    */
   configure(positions: ConnectedPosition[], margin: number, offsetX: number): void {
+    this.positions = positions;
     this.margin = margin;
     this.offsetX = offsetX;
     this.connected.withPositions(positions).withViewportMargin(margin).withDefaultOffsetX(offsetX);
@@ -87,17 +89,20 @@ class UiPopoverPositionStrategy implements PositionStrategy {
   attach(overlayRef: OverlayRef): void {
     this.connected.attach(overlayRef);
     this.overlayRef = overlayRef;
-    // On a window resize the CDK strategy applies itself, not through apply() here. Subscribed
-    // after it, so the push runs after its position.
+    // On a window resize the CDK strategy applies itself, not through apply() here, with the
+    // positions that fitted before. Subscribed after it, so this apply wins.
     this.resize.unsubscribe();
     this.resize = this.injector
       .get(ViewportRuler)
       .change()
-      .subscribe(() => this.push());
+      .subscribe(() => this.apply());
   }
 
   apply(): void {
-    this.connected.apply();
+    this.connected.withPositions(this.positions).apply();
+    // The pane has its real height only once the CDK has laid out its bounding box.
+    const fitting = this.blockFitting();
+    if (fitting.length < this.positions.length) this.connected.withPositions(fitting).apply();
     this.push();
   }
 
@@ -110,6 +115,31 @@ class UiPopoverPositionStrategy implements PositionStrategy {
     this.resize.unsubscribe();
     this.connected.dispose();
     this.overlayRef = null;
+  }
+
+  /**
+   * The positions whose block axis fits, or all of them when none does: the push then only moves
+   * the popover along the trigger, never onto it. A position that fits in full is among them, so
+   * this changes only the CDK's choice when none fits. That choice compares the visible areas, and
+   * an overlay past the viewport edge on the inline axis has none (or a negative one), so the CDK
+   * kept a top corner with no room above and the push moved it over the trigger.
+   */
+  private blockFitting(): ConnectedPosition[] {
+    const pane = this.overlayRef?.overlayElement;
+    if (!pane?.isConnected) return this.positions;
+    const origin = this.origin.getBoundingClientRect();
+    const height = Math.floor(pane.getBoundingClientRect().height);
+    // The CDK's fit test: from 0 to the viewport height less both margins.
+    const limit = pane.ownerDocument.documentElement.clientHeight - 2 * this.margin;
+    const fits = ({ originY, overlayY }: ConnectedPosition) => {
+      // A start or end side is centered on the block axis; a push keeps it beside the trigger.
+      if (overlayY === 'center') return true;
+      const edge = originY === 'top' ? origin.top : origin.bottom;
+      const top = overlayY === 'bottom' ? edge - height : edge;
+      return top >= 0 && top + height <= limit;
+    };
+    const fitting = this.positions.filter(fits);
+    return fitting.length ? fitting : this.positions;
   }
 
   private push(): void {
