@@ -1,6 +1,7 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
+import { until } from '../.storybook/play';
 import { UiTooltip, UiTooltipPosition } from './tooltip';
 
 // Arg names differ from the directive's fields: Storybook writes args onto the component instance.
@@ -17,7 +18,19 @@ const meta: Meta<TooltipArgs> = {
   component: UiTooltip,
   decorators: [moduleMetadata({ imports: [UiButton, UiIconButton, UiIcon] })],
   argTypes: {
-    placement: { control: 'inline-radio', options: ['top', 'bottom', 'start', 'end'] },
+    placement: {
+      control: 'select',
+      options: [
+        'top',
+        'bottom',
+        'start',
+        'end',
+        'corner-top-start',
+        'corner-top-end',
+        'corner-bottom-start',
+        'corner-bottom-end',
+      ],
+    },
   },
 };
 
@@ -57,6 +70,34 @@ export const Bottom: Story = { ...Default, args: { ...Default.args, placement: '
 export const Start: Story = { ...Default, args: { ...Default.args, placement: 'start' } };
 export const End: Story = { ...Default, args: { ...Default.args, placement: 'end' } };
 export const Disabled: Story = { ...Default, args: { ...Default.args, off: true } };
+
+/**
+ * A corner placement opens the tooltip diagonally outside that corner of the trigger, so it does
+ * not cover the content next to it. `start`/`end` follow the direction; with no room above, a top
+ * corner flips to the bottom corner on the same side.
+ */
+export const Corners: Story = {
+  render: () => ({
+    template: `
+      <div style="padding:64px;display:grid;grid-template-columns:repeat(2,max-content);gap:96px 240px;justify-content:center">
+        <button ui-button variant="secondary" uiTooltip="Top start" uiTooltipPosition="corner-top-start" uiTooltipShowDelay="0">Plans</button>
+        <button ui-button variant="secondary" uiTooltip="Top end" uiTooltipPosition="corner-top-end" uiTooltipShowDelay="0">Owners</button>
+        <button ui-button variant="secondary" uiTooltip="Bottom start" uiTooltipPosition="corner-bottom-start" uiTooltipShowDelay="0">Files</button>
+        <button ui-button variant="secondary" uiTooltip="Bottom end" uiTooltipPosition="corner-bottom-end" uiTooltipShowDelay="0">Notes</button>
+      </div>`,
+  }),
+  // Hovers every trigger, so the four tooltips stay open together.
+  play: async ({ canvasElement }) => {
+    for (const trigger of canvasElement.querySelectorAll('button')) {
+      trigger.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    }
+    const panes = () => Array.from(document.querySelectorAll<HTMLElement>('.ui-tooltip-pane'));
+    // The CDK positions each pane after its tooltip renders.
+    const placed = () =>
+      panes().filter((pane) => [pane.style.top, pane.style.bottom].some(Boolean)).length === 4;
+    await until(placed, 'the four tooltips did not open');
+  },
+};
 
 export const LongText: Story = {
   ...Default,

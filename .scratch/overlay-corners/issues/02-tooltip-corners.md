@@ -1,6 +1,6 @@
 # 02: Tooltip opens in a corner
 
-Status: ready-for-agent
+Status: done
 Blocked by: 01
 
 Spec: `../spec.md` → "Decisions" 1–5, user stories 1, 3–7.
@@ -17,21 +17,21 @@ Spec: `../spec.md` → "Decisions" 1–5, user stories 1, 3–7.
   visual baselines cover them in light, dark and RTL.
 - README tooltip section: one sentence on corners and their flip.
 
-- [ ] Each corner opens with its panel class and sits outside the trigger's corner (spec, LTR and
+- [x] Each corner opens with its panel class and sits outside the trigger's corner (spec, LTR and
       RTL).
-- [ ] A top corner with no room above flips to the bottom corner on the same inline side; the
+- [x] A top corner with no room above flips to the bottom corner on the same inline side; the
       harness reports it.
-- [ ] The pointer moving from the trigger's corner into the tooltip across the gap keeps it open.
-- [ ] `provideUiTooltip({ position: 'corner-top-end' })` sets the default; an input still wins.
-- [ ] The harness spec covers `getPosition()` for a corner.
-- [ ] Stories and new visual baselines for the corners; existing baselines unchanged.
+- [x] The pointer moving from the trigger's corner into the tooltip across the gap keeps it open.
+- [x] `provideUiTooltip({ position: 'corner-top-end' })` sets the default; an input still wins.
+- [x] The harness spec covers `getPosition()` for a corner.
+- [x] Stories and new visual baselines for the corners; existing baselines unchanged.
 - [ ] One commit, `feat(tooltip): ...`.
 
 ## Русский перевод
 
 # 02: Tooltip открывается в углу
 
-Статус: ready-for-agent
+Статус: сделано
 Заблокирован: 01
 
 Spec: `../spec.md` → «Решения» 1–5, пользовательские истории 1, 3–7.
@@ -48,13 +48,13 @@ Spec: `../spec.md` → «Решения» 1–5, пользовательски�
   визуальные baselines покрывали их в светлой, тёмной теме и RTL.
 - Раздел tooltip в README: одно предложение про углы и их флип.
 
-- [ ] Каждый угол открывается со своим классом панели и стоит снаружи угла триггера (спек, LTR и
+- [x] Каждый угол открывается со своим классом панели и стоит снаружи угла триггера (спек, LTR и
       RTL).
-- [ ] Верхний угол без места сверху переворачивается в нижний угол на той же горизонтальной
+- [x] Верхний угол без места сверху переворачивается в нижний угол на той же горизонтальной
       стороне; харнесс это сообщает.
-- [ ] Курсор, идущий от угла триггера в tooltip через зазор, не закрывает его.
-- [ ] `provideUiTooltip({ position: 'corner-top-end' })` задаёт значение по умолчанию; input
+- [x] Курсор, идущий от угла триггера в tooltip через зазор, не закрывает его.
+- [x] `provideUiTooltip({ position: 'corner-top-end' })` задаёт значение по умолчанию; input
       по-прежнему важнее.
-- [ ] Спек харнесса покрывает `getPosition()` для угла.
-- [ ] Stories и новые визуальные baselines для углов; существующие baselines не меняются.
+- [x] Спек харнесса покрывает `getPosition()` для угла.
+- [x] Stories и новые визуальные baselines для углов; существующие baselines не меняются.
 - [ ] Один коммит, `feat(tooltip): ...`.

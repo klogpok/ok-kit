@@ -339,6 +339,9 @@ this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 <button ui-button uiTooltip="Saved as a draft" uiTooltipPosition="end" uiTooltipShowDelay="0">
   Save
 </button>
+<!-- A corner (corner-top-start, corner-top-end, corner-bottom-start, corner-bottom-end) opens the tooltip
+     diagonally outside that corner of the trigger; with no room it flips to the vertical mirror, same side: -->
+<button ui-button uiTooltip="Copied" uiTooltipPosition="corner-top-end">Copy</button>
 
 <!-- Select -->
 <ui-form-field label="Coordinator">

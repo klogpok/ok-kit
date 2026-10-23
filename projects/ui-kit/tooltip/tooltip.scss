@@ -19,11 +19,16 @@
 }
 
 // The gap to the host element. Margins are part of the pane, so positioning accounts for them.
-:host(.ui-tooltip--top) {
+// A corner has the gap only on the block axis: its inline edge meets the host's edge.
+:host(.ui-tooltip--top),
+:host(.ui-tooltip--corner-top-start),
+:host(.ui-tooltip--corner-top-end) {
   margin-block-end: var(--ui-tooltip-offset);
 }
 
-:host(.ui-tooltip--bottom) {
+:host(.ui-tooltip--bottom),
+:host(.ui-tooltip--corner-bottom-start),
+:host(.ui-tooltip--corner-bottom-end) {
   margin-block-start: var(--ui-tooltip-offset);
 }
 
@@ -42,13 +47,18 @@
   content: '';
 }
 
-:host(.ui-tooltip--top)::before {
+// A corner tooltip's bridge is the strip of `top` / `bottom`: it touches the host's corner.
+:host(.ui-tooltip--top)::before,
+:host(.ui-tooltip--corner-top-start)::before,
+:host(.ui-tooltip--corner-top-end)::before {
   inset-block-start: 100%;
   inset-inline: 0;
   block-size: var(--ui-tooltip-offset);
 }
 
-:host(.ui-tooltip--bottom)::before {
+:host(.ui-tooltip--bottom)::before,
+:host(.ui-tooltip--corner-bottom-start)::before,
+:host(.ui-tooltip--corner-bottom-end)::before {
   inset-block-end: 100%;
   inset-inline: 0;
   block-size: var(--ui-tooltip-offset);
