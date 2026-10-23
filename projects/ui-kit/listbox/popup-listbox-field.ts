@@ -18,7 +18,7 @@ import {
   UiFormFieldControl,
   UiSize,
 } from '@vplans/ui-kit/core';
-import { UI_POPUP_LISTBOX_FIELD, UiComboboxField } from './combobox-control';
+import { UI_POPUP_LISTBOX_FIELD, UiPopupListboxFieldState } from './combobox-control';
 import { UiListboxConfig, UiListboxController, provideUiListbox } from './listbox-controller';
 
 /**
@@ -45,7 +45,7 @@ import { UiListboxConfig, UiListboxController, provideUiListbox } from './listbo
 })
 export abstract class UiPopupListboxField<V>
   extends UiFormControlBase<V>
-  implements UiFormFieldControl, UiComboboxField
+  implements UiFormFieldControl, UiPopupListboxFieldState
 {
   /**
    * The popup listbox; the field creates it with `injectListbox()`. Typed by what this class

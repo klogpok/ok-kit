@@ -6,7 +6,7 @@ import { UiListboxController } from './listbox-controller';
  * Provided by `ui-select`, `ui-multi-select`, `ui-autocomplete` and `ui-time-input` with
  * `useExisting`. Internal.
  */
-export interface UiComboboxField {
+export interface UiPopupListboxFieldState {
   /** Id of the inner control, the target of `<label for>`. */
   readonly controlId: Signal<string>;
   readonly ariaLabel: Signal<string>;
@@ -22,7 +22,9 @@ export interface UiComboboxField {
   readonly ɵdescribedBy: Signal<string | null>;
 }
 
-export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPopupListboxField');
+export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiPopupListboxFieldState>(
+  'UiPopupListboxField',
+);
 
 /**
  * The dynamic combobox ARIA of the inner `<input>` or `<button>` of a popup listbox field, from
