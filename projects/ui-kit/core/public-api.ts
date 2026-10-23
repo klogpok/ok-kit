@@ -17,7 +17,10 @@ export {
   type UiOverlaySide,
 } from './overlay';
 // Internal: shared by the kit's overlays, not part of the public API.
-export { pushOnScreen as ɵpushOnScreen } from './overlay';
+export {
+  UiBlockFittingPositionStrategy as ɵUiBlockFittingPositionStrategy,
+  pushOnScreen as ɵpushOnScreen,
+} from './overlay';
 // Internal: the dropdown panel of the kit's fields, not part of the public API.
 export {
   UiDropdownPanel as ɵUiDropdownPanel,

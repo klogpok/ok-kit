@@ -458,4 +458,20 @@ describe('UiTooltip corners', () => {
       expect(tooltipCorner()).toEqual(corner);
     },
   );
+
+  it.each([
+    ['ltr', 0],
+    ['rtl', 1024 - 40],
+  ] as const)(
+    'flips a top corner off screen on the inline axis before the push, so it stays off the trigger (%s)',
+    async (dir, left) => {
+      // The trigger sits in the top corner of the viewport at its inline-start edge: neither corner
+      // shows any of the tooltip, so the CDK keeps the preferred one; pushed down, it covered the trigger.
+      trigger = { left, top: 10, width: 40, height: 20 };
+      await open('corner-top-start', dir);
+      const harness = await TestbedHarnessEnvironment.loader(fixture).getHarness(UiTooltipHarness);
+      expect(await harness.getPosition()).toBe('corner-bottom-start');
+      expect(tooltipCorner().top).toBe(30);
+    },
+  );
 });

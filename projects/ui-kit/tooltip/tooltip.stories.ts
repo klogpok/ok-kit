@@ -1,4 +1,5 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
+import { expect } from 'storybook/test';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { until } from '../.storybook/play';
@@ -96,6 +97,42 @@ export const Corners: Story = {
     const placed = () =>
       panes().filter((pane) => [pane.style.top, pane.style.bottom].some(Boolean)).length === 4;
     await until(placed, 'the four tooltips did not open');
+  },
+};
+
+/**
+ * A `corner-top-start` tooltip on a trigger at the top-start corner of the viewport: no room above
+ * and none before it. It flips to `corner-bottom-start` and is pushed back on screen, below the
+ * trigger, never over it.
+ */
+export const CornerAtTheEdge: Story = {
+  render: () => ({
+    template: `
+      <div style="margin:-1rem;min-block-size:8rem">
+        <button ui-button variant="secondary" uiTooltip="Waiting for the owner" uiTooltipPosition="corner-top-start" uiTooltipShowDelay="0">Plans</button>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector<HTMLButtonElement>('button')!;
+    trigger.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    const pane = () => document.querySelector<HTMLElement>('.ui-tooltip-pane');
+    // The CDK positions the pane after the tooltip renders.
+    const placed = () => [pane()?.style.top, pane()?.style.bottom].some(Boolean);
+    await until(placed, 'the tooltip did not open');
+    const box = pane()!.getBoundingClientRect();
+    const origin = trigger.getBoundingClientRect();
+    const covers =
+      Math.round(box.left) < origin.right &&
+      Math.round(box.right) > origin.left &&
+      Math.round(box.top) < origin.bottom &&
+      Math.round(box.bottom) > origin.top;
+    await expect({
+      covers,
+      placement: pane()!.querySelector('.ui-tooltip--corner-bottom-start') !== null,
+    }).toEqual({
+      covers: false,
+      placement: true,
+    });
   },
 };
 

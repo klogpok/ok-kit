@@ -1,6 +1,7 @@
-import type { OverlayRef } from '@angular/cdk/overlay';
+import type { ConnectedPosition, OverlayRef } from '@angular/cdk/overlay';
 import {
   UI_DROPDOWN_POSITIONS,
+  blockFittingPositions,
   overlayPlacementPositions,
   pushOnScreen,
   sideOverlayPositions,
@@ -133,6 +134,53 @@ describe('UI_DROPDOWN_POSITIONS', () => {
       { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
       { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
     ]);
+  });
+});
+
+describe('blockFittingPositions', () => {
+  // A 300 px tall viewport with an 8 px margin and a 60 px tall overlay.
+  const [topStart, bottomStart] = overlayPlacementPositions('corner-top-start', 'p');
+  const [top, bottom] = overlayPlacementPositions('top', 'p');
+  const [start, end] = overlayPlacementPositions('start', 'p');
+  const fitting = (
+    positions: ConnectedPosition[],
+    origin: { top: number; bottom: number },
+    height = 60,
+  ) => blockFittingPositions(positions, origin, height, 300, 8);
+
+  it('keeps every position that fits on the block axis', () => {
+    expect(fitting([topStart, bottomStart], { top: 120, bottom: 150 })).toEqual([
+      topStart,
+      bottomStart,
+    ]);
+  });
+
+  it('drops a position above the viewport, so the corner flips to the one below', () => {
+    expect(fitting([topStart, bottomStart], { top: 10, bottom: 40 })).toEqual([bottomStart]);
+  });
+
+  it('drops a position below the viewport margin', () => {
+    expect(fitting([bottom, top], { top: 250, bottom: 280 })).toEqual([top]);
+  });
+
+  it('keeps a position that ends exactly on the margin', () => {
+    // 224 + 60 = 284 = 300 - 2 * 8: the CDK fit test measures from 0 to the size less both margins.
+    expect(fitting([bottomStart, topStart], { top: 100, bottom: 224 })).toEqual([
+      bottomStart,
+      topStart,
+    ]);
+    expect(fitting([bottomStart, topStart], { top: 100, bottom: 225 })).toEqual([topStart]);
+  });
+
+  it('keeps all positions when none fits, so the push moves the overlay along the trigger', () => {
+    expect(fitting([topStart, bottomStart], { top: 10, bottom: 40 }, 280)).toEqual([
+      topStart,
+      bottomStart,
+    ]);
+  });
+
+  it('keeps a start or end side, which is centered on the block axis', () => {
+    expect(fitting([start, end], { top: 0, bottom: 30 })).toEqual([start, end]);
   });
 });
 

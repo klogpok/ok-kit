@@ -19,19 +19,14 @@ import {
   signal,
 } from '@angular/core';
 import { AriaDescriber, FocusMonitor } from '@angular/cdk/a11y';
-import {
-  FlexibleConnectedPositionStrategy,
-  OverlayRef,
-  createFlexibleConnectedPositionStrategy,
-  createOverlayRef,
-  createRepositionScrollStrategy,
-} from '@angular/cdk/overlay';
+import { OverlayRef, createOverlayRef, createRepositionScrollStrategy } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import {
   UiOverlayPlacement,
   overlayOffsetX,
   overlayPlacementPositions,
   syncOverlayDirection,
+  ɵUiBlockFittingPositionStrategy as UiBlockFittingPositionStrategy,
 } from '@vplans/ui-kit/core';
 
 /**
@@ -152,7 +147,7 @@ export class UiTooltip {
   );
 
   private overlayRef: OverlayRef | null = null;
-  private positionStrategy: FlexibleConnectedPositionStrategy | null = null;
+  private positionStrategy: UiBlockFittingPositionStrategy | null = null;
   private panel: ComponentRef<UiTooltipPanel> | null = null;
   /** Where the tooltip currently sits; differs from `position` when it flipped to fit. */
   private placement: UiTooltipPosition = 'top';
@@ -243,10 +238,12 @@ export class UiTooltip {
     const preferred = this.position();
     this.placement = preferred;
     syncOverlayDirection(overlayRef, this.host);
-    this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     // The margin token may change with the theme or the root font size.
-    this.positionStrategy!.withViewportMargin(this.viewportMargin());
-    this.positionStrategy!.withPositions(overlayPlacementPositions(preferred, 'ui-tooltip-pane'));
+    this.positionStrategy!.configure(
+      overlayPlacementPositions(preferred, 'ui-tooltip-pane'),
+      this.viewportMargin(),
+      overlayOffsetX(this.host.ownerDocument),
+    );
 
     const panel = overlayRef.attach(new ComponentPortal(UiTooltipPanel, null, this.injector));
     panel.instance.message.set(this.describedMessage);
@@ -313,10 +310,9 @@ export class UiTooltip {
   }
 
   private createOverlay(): OverlayRef {
-    const strategy = createFlexibleConnectedPositionStrategy(this.injector, this.host)
-      .withFlexibleDimensions(false)
-      .withPush(true)
-      .withViewportMargin(this.viewportMargin());
+    // The CDK pushes the tooltip back on screen; the strategy flips it first when the block axis
+    // has no room, so a tooltip at a viewport corner stays off its trigger.
+    const strategy = new UiBlockFittingPositionStrategy(this.host, this.injector, true);
     const overlayRef = createOverlayRef(this.injector, {
       positionStrategy: strategy,
       // autoClose: hide when the host scrolls out of view instead of pinning to the edge.
@@ -327,7 +323,7 @@ export class UiTooltip {
       panelClass: 'ui-tooltip-pane',
     });
 
-    strategy.positionChanges.subscribe(({ connectionPair }) => {
+    strategy.connected.positionChanges.subscribe(({ connectionPair }) => {
       const placement = String(connectionPair.panelClass).replace('ui-tooltip-pane--', '');
       this.placement = placement as UiTooltipPosition;
       this.panel?.instance.position.set(this.placement);
