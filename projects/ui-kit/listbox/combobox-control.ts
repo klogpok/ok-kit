@@ -10,6 +10,11 @@ export interface UiComboboxField {
   /** Id of the inner control, the target of `<label for>`. */
   readonly controlId: Signal<string>;
   readonly ariaLabel: Signal<string>;
+  readonly isRequired: Signal<boolean>;
+  /** The error state shown to the user. */
+  readonly showError: Signal<boolean>;
+  /** The app's own descriptions, then the hint or error of `ui-form-field`, or `null`. */
+  readonly describedBy: Signal<string | null>;
 }
 
 export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPopupListboxField');
@@ -29,6 +34,9 @@ export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPop
     // A hidden list has no rendered panel or option to point at.
     '[attr.aria-controls]': 'listbox.shown() ? listbox.panelId() : null',
     '[attr.aria-activedescendant]': 'listbox.shown() ? listbox.activeId() : null',
+    '[attr.aria-required]': "field.isRequired() ? 'true' : null",
+    '[attr.aria-invalid]': "field.showError() ? 'true' : null",
+    '[attr.aria-describedby]': 'field.describedBy()',
   },
 })
 export class UiComboboxControl {
