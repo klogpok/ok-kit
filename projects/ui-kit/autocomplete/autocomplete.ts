@@ -1,40 +1,29 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   booleanAttribute,
   computed,
   contentChildren,
   forwardRef,
-  inject,
   input,
   linkedSignal,
   model,
   numberAttribute,
   output,
   signal,
-  viewChild,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { _IdGenerator } from '@angular/cdk/a11y';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
-import {
-  UI_FORM_FIELD_CONTROL,
-  UiFormControlBase,
-  UiFormFieldControl,
-  UiSize,
-  ɵUiDropdownPanel as UiDropdownPanel,
-} from '@vplans/ui-kit/core';
+import { ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
 import {
   UiOption,
   type ɵUiListboxController as UiListboxController,
   type UiOptionItem,
-  ɵUI_POPUP_LISTBOX_FIELD as UI_POPUP_LISTBOX_FIELD,
   ɵUiComboboxControl as UiComboboxControl,
   ɵUiListbox as UiListbox,
-  ɵfieldListboxConfig as fieldListboxConfig,
+  ɵUiPopupListboxField as UiPopupListboxField,
   ɵinjectListbox as injectListbox,
-  ɵprovideUiListbox as provideUiListbox,
+  ɵprovideUiPopupListboxField as provideUiPopupListboxField,
 } from '@vplans/ui-kit/listbox';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 
@@ -111,35 +100,14 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
   styleUrl: './autocomplete.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    { provide: UI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => UiAutocomplete) },
-    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiAutocomplete) },
+    provideUiPopupListboxField(() => UiAutocomplete),
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiAutocomplete), multi: true },
-    provideUiListbox(),
   ],
-  host: {
-    class: 'ui-autocomplete',
-    '[attr.id]': 'id()',
-    // The inner control carries the label and descriptions; static attributes stay on the host too.
-    '[attr.aria-label]': 'null',
-    '[attr.aria-describedby]': 'null',
-    '[class]': '"ui-autocomplete--" + size()',
-    '[class.ui-autocomplete--disabled]': 'isDisabled()',
-    '[class.ui-autocomplete--readonly]': 'readonly()',
-    '[class.ui-autocomplete--invalid]': 'showError()',
-  },
+  host: { class: 'ui-autocomplete' },
 })
-export class UiAutocomplete<T = string>
-  extends UiFormControlBase<T | string | null>
-  implements UiFormFieldControl
-{
+export class UiAutocomplete<T = string> extends UiPopupListboxField<T | string | null> {
   readonly value = model<T | string | null>(null);
 
-  readonly size = input<UiSize>('md');
-  /** Host id; the input gets `${id}-control`. */
-  readonly id = input(inject(_IdGenerator).getId('ui-autocomplete-'));
-  readonly ariaLabel = input('', { alias: 'aria-label' });
-  readonly placeholder = input('');
-  readonly name = input('');
   /**
    * Options are loading (e.g. server-side search): a spinner is shown and the list is marked
    * busy.
@@ -168,15 +136,9 @@ export class UiAutocomplete<T = string>
    */
   readonly virtualThreshold = input(100, { transform: numberAttribute });
 
-  readonly opened = output();
-  readonly closed = output();
   /** Emits the text as the user types, e.g. to load options from a server. */
   readonly searchChange = output<string>();
 
-  readonly labelStrategy = 'for' as const;
-  readonly controlId = computed(() => `${this.id()}-control`);
-
-  private readonly control = viewChild.required<ElementRef<HTMLInputElement>>('control');
   /** The projected options. */
   private readonly contentOptions = contentChildren<UiOption<T>>(UiOption, { descendants: true });
 
@@ -190,7 +152,7 @@ export class UiAutocomplete<T = string>
    * pick-only field, or a spinner; no option is active until the user moves to one.
    */
   protected readonly listbox: UiListboxController<T> = injectListbox<T>({
-    ...fieldListboxConfig(this),
+    ...this.fieldListboxConfig(),
     mode: () => 'freeText',
     id: this.id,
     contentOptions: this.contentOptions,
@@ -210,16 +172,8 @@ export class UiAutocomplete<T = string>
   /** The text in the field. Follows the value, and holds the typed text in between. */
   protected readonly text = linkedSignal(() => this.displayText(this.value()));
 
-  focus(options?: FocusOptions): void {
-    this.control().nativeElement.focus(options);
-  }
-
-  open(): void {
-    this.listbox.open();
-  }
-
-  close(): void {
-    this.listbox.close();
+  protected classPrefix(): string {
+    return 'ui-autocomplete';
   }
 
   writeValue(value: T | string | null | undefined): void {
@@ -256,12 +210,13 @@ export class UiAutocomplete<T = string>
     }
   }
 
-  protected onBlur(): void {
-    this.close();
+  protected override onBlur(): void {
+    // Closes the list and marks the control touched. The text and query below emit nothing, so
+    // resetting them after the touched step keeps the order of `closed` and `touch` unchanged.
+    super.onBlur();
     // A pick-only field keeps no text that did not become a value.
     if (this.pickOnly()) this.text.set(this.displayText(this.value()));
     this.query.set('');
-    this.notifyTouched();
   }
 
   /** Empties the field and the value. */
