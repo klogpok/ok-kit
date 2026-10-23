@@ -167,6 +167,13 @@ describe('UiDateRangePicker', () => {
     expect(root.textContent).not.toContain('תאריך לא תקין');
   });
 
+  it('writes what typed text gives over a value it cannot read', async () => {
+    host.value.set({ start: 'x', end: null } as unknown as UiDateRange);
+    await settle(fixture);
+    await type(end(), '31.2.2026');
+    expect(host.value()).toBeNull();
+  });
+
   it('marks the field with text that is not an allowed date once the user leaves it', async () => {
     await type(start(), '1.9.2026');
     await type(end(), '31.2.2026');

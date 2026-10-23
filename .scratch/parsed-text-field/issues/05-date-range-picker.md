@@ -1,6 +1,6 @@
 # 05: `ui-date-range-picker` uses the typed text module
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01, 04
 
 Spec: `../spec.md` → "Implementation Decisions": generic typed text, error codes.
@@ -21,19 +21,19 @@ tickets edit the `datepicker` entry point.
 - `ownErrors()` maps `kind` to `labels().invalidDate` / `labels().invalidDateRange`; each field's
   `aria-invalid` comes from `error()?.fields`.
 
-- [ ] No `Draft` interface, draft `linkedSignal`, `commitDraft()` or `setValue()` is left in
+- [x] No `Draft` interface, draft `linkedSignal`, `commitDraft()` or `setValue()` is left in
       `date-range-picker.ts`.
-- [ ] The existing range-picker spec and harness pass; any test that asserted blank commit changes
+- [x] The existing range-picker spec and harness pass; any test that asserted blank commit changes
       in the same commit with a note in the commit body.
-- [ ] Public inputs, outputs, methods and the rendered DOM are unchanged.
+- [x] Public inputs, outputs, methods and the rendered DOM are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
-- [ ] One commit, `refactor(datepicker): typed text module in the range picker`.
+- [x] One commit, `refactor(datepicker): typed text module in the range picker`.
 
 ## Русский перевод
 
 # 05: `ui-date-range-picker` использует module typed text
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01, 04
 
 Spec: `../spec.md` → «Решения по реализации»: generic typed text, коды ошибок.
@@ -54,11 +54,11 @@ Spec: `../spec.md` → «Решения по реализации»: generic typ
 - `ownErrors()` отображает `kind` в `labels().invalidDate` / `labels().invalidDateRange`;
   `aria-invalid` каждого поля берётся из `error()?.fields`.
 
-- [ ] В `date-range-picker.ts` не осталось interface `Draft`, draft `linkedSignal`, `commitDraft()`
+- [x] В `date-range-picker.ts` не осталось interface `Draft`, draft `linkedSignal`, `commitDraft()`
       и `setValue()`.
-- [ ] Существующие spec и harness range picker проходят; тест, проверявший commit пустого текста,
+- [x] Существующие spec и harness range picker проходят; тест, проверявший commit пустого текста,
       меняется в том же коммите с пояснением в теле коммита.
-- [ ] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
+- [x] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились; `pnpm sync:client --verify`
       проходит.
-- [ ] Один коммит, `refactor(datepicker): typed text module in the range picker`.
+- [x] Один коммит, `refactor(datepicker): typed text module in the range picker`.

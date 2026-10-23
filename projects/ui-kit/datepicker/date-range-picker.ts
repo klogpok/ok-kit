@@ -8,7 +8,6 @@ import {
   forwardRef,
   inject,
   input,
-  linkedSignal,
   model,
   output,
   signal,
@@ -27,6 +26,8 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  ɵinjectTypedText,
+  type ɵUiTypedTextParse,
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
   ɵUiDropdownPanel,
   UI_BREAKPOINTS,
@@ -65,26 +66,16 @@ interface RangeText {
   edited?: Edge;
 }
 
-/** What the two texts mean. */
-interface ParsedRange {
-  value: UiDateRange | null;
-  /** Text that is not an allowed date. */
-  invalid: Record<Edge, boolean>;
-  /** The end is before the start; the field typed last gets the error and no date. */
-  order: Edge | null;
+/**
+ * Parse error of the two texts: a field holds text that is not an allowed date (`invalid`), or
+ * the end is before the start (`order`) and the field typed last gets the error and no date.
+ * `fields` marks the fields with the error.
+ */
+interface RangeParseError {
+  kind: 'invalid' | 'order';
+  fields: Record<Edge, boolean>;
 }
 
-/** Texts the user is typing and what they mean. */
-interface Draft {
-  start: string;
-  end: string;
-  parsed: ParsedRange;
-  /** The user left a field or pressed Enter: invalid text is now shown as an error. */
-  committed: boolean;
-}
-
-const hasErrors = (parsed: ParsedRange): boolean =>
-  parsed.invalid.start || parsed.invalid.end || parsed.order !== null;
 /**
  * Date range field: a start and an end field that parse typed dates, and a calendar dialog that
  * picks both.
@@ -144,7 +135,7 @@ const hasErrors = (parsed: ParsedRange): boolean =>
           [attr.aria-describedby]="describedBy()"
           (input)="onInput(edge, $event)"
           (keydown)="onInputKeydown($event)"
-          (blur)="commitDraft()"
+          (blur)="onBlur()"
         />
       }
       <button
@@ -307,19 +298,15 @@ export class UiDateRangePicker
   /** The value when it holds valid dates; anything else is shown empty. */
   protected readonly range = computed(() => validRange(this.value()));
 
-  /** Dropped when the value changes elsewhere, so old text does not come back. */
-  private readonly draft = linkedSignal<UiDateRange | null, Draft | null>({
-    source: () => this.value(),
-    computation: (value, previous) => {
-      const draft = previous?.value;
-      // A written range the picker cannot read also drops the text: it is a value, and it shows
-      // empty. Only the very object the draft produced, or the same days, keeps the text.
-      const parsed = draft?.parsed.value ?? null;
-      const written = validRange(value);
-      return draft && (parsed === value || (!!parsed && !!written && sameRange(parsed, written)))
-        ? draft
-        : null;
-    },
+  /** The typed texts, their commit and parse error, and writing the value. */
+  private readonly typedText = ɵinjectTypedText<UiDateRange, RangeText, RangeParseError>({
+    value: this.value,
+    notify: (value) => this.notifyChange(value),
+    parse: (text) => this.parse(text),
+    format: (range) => this.format(range),
+    // A written range the picker cannot read is a value it shows empty.
+    valid: validRange,
+    equals: sameRange,
   });
 
   readonly labelStrategy = 'labelledby' as const;
@@ -327,28 +314,8 @@ export class UiDateRangePicker
   /** The calendar dialog, named by `aria-controls` of the button while it is open. */
   protected readonly panelId = computed(() => `${this.id()}-panel`);
 
-  /** The typed texts while they belong to the current value, otherwise the formatted value. */
-  protected readonly texts = computed<Record<Edge, string>>(() => {
-    const draft = this.draft();
-    return draft ? { start: draft.start, end: draft.end } : this.format(this.range());
-  });
-
-  /** Fields whose committed text is not an allowed date, or is on the wrong side of the other. */
-  private readonly fieldErrors = computed<Record<Edge, boolean>>(() => {
-    const draft = this.draft();
-    if (!draft?.committed) return { start: false, end: false };
-    const { invalid, order } = draft.parsed;
-    return { start: invalid.start || order === 'start', end: invalid.end || order === 'end' };
-  });
-
-  /** Message for committed text that is not a valid range. */
-  private readonly parseMessage = computed(() => {
-    const draft = this.draft();
-    if (!draft?.committed) return null;
-    const { invalid, order } = draft.parsed;
-    if (invalid.start || invalid.end) return this.labels().invalidDate;
-    return order ? this.labels().invalidDateRange : null;
-  });
+  /** The typed texts while there are some, otherwise the formatted value. */
+  protected readonly texts = computed(() => this.typedText.text());
 
   /** The `aria-label` names the group only without a field label. */
   private readonly ownLabel = computed(() => !this.formField?.labelledBy() && !!this.ariaLabel());
@@ -367,13 +334,14 @@ export class UiDateRangePicker
    * could read.
    */
   protected override ownErrors(): readonly string[] {
-    const message = this.parseMessage();
-    return message ? [message] : [];
+    const error = this.typedText.error();
+    if (!error) return [];
+    const labels = this.labels();
+    return [error.kind === 'invalid' ? labels.invalidDate : labels.invalidDateRange];
   }
 
   writeValue(value: UiDateRange | null | undefined): void {
-    this.draft.set(null);
-    this.value.set(validRange(value));
+    this.typedText.write(value);
   }
 
   /** Focuses the start field. */
@@ -383,7 +351,7 @@ export class UiDateRangePicker
 
   open(): void {
     if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.commitDraft();
+    this.typedText.commit();
     this.isOpen.set(true);
     this.opened.emit();
   }
@@ -404,8 +372,8 @@ export class UiDateRangePicker
 
   /** A field with invalid text is marked alone; other errors (e.g. required) mark both. */
   protected invalidState(edge: Edge): boolean {
-    const errors = this.fieldErrors();
-    return errors.start || errors.end ? errors[edge] : this.showError();
+    const fields = this.typedText.error()?.fields;
+    return fields ? fields[edge] : this.showError();
   }
 
   protected inputLabelledBy(edge: Edge): string {
@@ -421,31 +389,25 @@ export class UiDateRangePicker
 
   /** The first pick sets the start; the second sets the end and closes the dialog. */
   protected onRangePick(range: UiDateRange): void {
-    this.draft.set(null);
-    this.setValue(validRange(range));
+    this.typedText.set(validRange(range));
     if (range.end) this.close();
   }
 
   protected onPreset(preset: UiDateRangePreset): void {
     const range = typeof preset.range === 'function' ? preset.range() : preset.range;
-    this.draft.set(null);
-    this.setValue(validRange(range));
+    this.typedText.set(validRange(range));
     this.close();
   }
 
   /** Empties both fields, also when they hold text that is not a date. */
   protected onClear(): void {
-    this.draft.set(null);
-    this.setValue(null);
+    this.typedText.set(null);
     this.close();
   }
 
   protected onInput(edge: Edge, event: Event): void {
     const text = (event.target as HTMLInputElement).value;
-    const raw: RangeText = { ...this.texts(), [edge]: text, edited: edge };
-    const parsed = this.parse(raw);
-    this.setValue(parsed.value);
-    this.draft.set({ start: raw.start, end: raw.end, parsed, committed: false });
+    this.typedText.input({ ...this.texts(), [edge]: text, edited: edge });
   }
 
   protected onInputKeydown(event: KeyboardEvent): void {
@@ -453,8 +415,13 @@ export class UiDateRangePicker
       event.preventDefault();
       this.open();
     } else if (event.key === 'Enter') {
-      this.commitDraft();
+      this.typedText.commit();
     }
+  }
+
+  /** Shows valid typed dates in the locale format; keeps invalid text for the user to fix. */
+  protected onBlur(): void {
+    this.typedText.commit();
   }
 
   /** Touched once focus leaves the fields, the button and the calendar. */
@@ -464,14 +431,11 @@ export class UiDateRangePicker
     this.notifyTouched();
   }
 
-  /** Shows valid typed dates in the locale format; keeps invalid text for the user to fix. */
-  protected commitDraft(): void {
-    const draft = this.draft();
-    if (!draft) return;
-    this.draft.set(hasErrors(draft.parsed) ? { ...draft, committed: true } : null);
-  }
-
-  private parse(raw: RangeText): ParsedRange {
+  /**
+   * Each text is a day like `ui-datepicker` reads it; an end before the start drops the day of the
+   * field typed last. Two blank fields give no value and no error.
+   */
+  private parse(raw: RangeText): ɵUiTypedTextParse<UiDateRange, RangeParseError> {
     const day = (text: string): { date: Date | null; invalid: boolean } => {
       if (!text.trim()) return { date: null, invalid: false };
       const date = parseDay(text, this.locale());
@@ -486,21 +450,19 @@ export class UiDateRangePicker
       order = raw.edited ?? 'end';
       (order === 'start' ? start : end).date = null;
     }
+    const fields = {
+      start: start.invalid || order === 'start',
+      end: end.invalid || order === 'end',
+    };
+    const kind = start.invalid || end.invalid ? 'invalid' : order ? 'order' : null;
     return {
       value: start.date || end.date ? { start: start.date, end: end.date } : null,
-      invalid: { start: start.invalid, end: end.invalid },
-      order,
+      error: kind ? { kind, fields } : null,
     };
   }
 
   private format(range: UiDateRange | null): RangeText {
     const text = (date: Date | null | undefined) => (date ? formatDay(date, this.locale()) : '');
     return { start: text(range?.start), end: text(range?.end) };
-  }
-
-  private setValue(value: UiDateRange | null): void {
-    if (sameRange(value, this.range())) return;
-    this.value.set(value);
-    this.notifyChange(value);
   }
 }
