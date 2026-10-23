@@ -203,6 +203,103 @@ describe('UiPopoverTrigger', () => {
     }
   });
 
+  describe('in a corner', () => {
+    // A 400×300 viewport with an 8 px margin, a 120×60 popover and an 80×30 trigger.
+    const viewport = { width: 400, height: 300 };
+    const size = { width: 120, height: 60 };
+    let triggerBox: DOMRect;
+    const pane = () => panel()!.closest<HTMLElement>('.cdk-overlay-pane')!;
+
+    /** Where the pane is drawn: from the CDK's `left`/`right`/`top`/`bottom` and the push. */
+    function paneBox(element: HTMLElement): DOMRect {
+      const { left, right, top, bottom, transform } = element.style;
+      const x = left
+        ? parseFloat(left)
+        : right
+          ? viewport.width - parseFloat(right) - size.width
+          : 0;
+      const y = top
+        ? parseFloat(top)
+        : bottom
+          ? viewport.height - parseFloat(bottom) - size.height
+          : 0;
+      const push = /translate\((-?[\d.]+)px, (-?[\d.]+)px\)/.exec(transform);
+      return DOMRect.fromRect({
+        x: x + (push ? parseFloat(push[1]) : 0),
+        y: y + (push ? parseFloat(push[2]) : 0),
+        ...size,
+      });
+    }
+
+    const open = async (corner: UiPopoverPosition, dir: 'ltr' | 'rtl', box: DOMRect) => {
+      triggerBox = box;
+      fixture.componentInstance.dir.set(dir);
+      fixture.componentInstance.position.set(corner);
+      await settle();
+      fixture.componentInstance.trigger().open();
+      await settle();
+      return paneBox(pane());
+    };
+
+    beforeEach(() => {
+      const root = document.documentElement;
+      root.style.setProperty('--ui-popover-viewport-margin', '8px');
+      vi.spyOn(root, 'clientWidth', 'get').mockReturnValue(viewport.width);
+      vi.spyOn(root, 'clientHeight', 'get').mockReturnValue(viewport.height);
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        if (this.id === 'trigger') return triggerBox;
+        if (this.classList.contains('cdk-overlay-pane')) return paneBox(this);
+        return DOMRect.fromRect();
+      });
+    });
+
+    afterEach(() => {
+      document.documentElement.style.removeProperty('--ui-popover-viewport-margin');
+      vi.restoreAllMocks();
+    });
+
+    const middle = DOMRect.fromRect({ x: 160, y: 120, width: 80, height: 30 });
+
+    it('sits diagonally outside the corner, before the start edge in LTR', async () => {
+      const topStart = await open('corner-top-start', 'ltr', middle);
+      expect([topStart.right, topStart.bottom]).toEqual([middle.left, middle.top]);
+      fixture.componentInstance.trigger().close();
+      const bottomEnd = await open('corner-bottom-end', 'ltr', middle);
+      expect([bottomEnd.left, bottomEnd.top]).toEqual([middle.right, middle.bottom]);
+    });
+
+    it('mirrors the inline side in RTL: start is on the right', async () => {
+      const topStart = await open('corner-top-start', 'rtl', middle);
+      expect([topStart.left, topStart.bottom]).toEqual([middle.right, middle.top]);
+      fixture.componentInstance.trigger().close();
+      const bottomEnd = await open('corner-bottom-end', 'rtl', middle);
+      expect([bottomEnd.right, bottomEnd.top]).toEqual([middle.left, middle.bottom]);
+    });
+
+    it('flips a top corner with no room above to the bottom corner on the same side', async () => {
+      const atTop = DOMRect.fromRect({ x: 160, y: 10, width: 80, height: 30 });
+      const box = await open('corner-top-start', 'ltr', atTop);
+      expect(panel()?.classList).toContain('ui-popover--corner-bottom-start');
+      expect([box.right, box.top]).toEqual([atTop.left, atTop.bottom]);
+    });
+
+    it('is pushed inside the viewport without covering the trigger', async () => {
+      // At the inline-start edge: no room before it, in LTR on the left, in RTL on the right.
+      for (const dir of ['ltr', 'rtl'] as const) {
+        const x = dir === 'ltr' ? 20 : viewport.width - 100;
+        const atEdge = DOMRect.fromRect({ x, y: 120, width: 80, height: 30 });
+        const box = await open('corner-top-start', dir, atEdge);
+        expect(panel()?.classList).toContain('ui-popover--corner-top-start');
+        expect(dir === 'ltr' ? box.left : viewport.width - box.right).toBe(8);
+        expect(box.bottom).toBe(atEdge.top);
+        fixture.componentInstance.trigger().close();
+        await settle();
+      }
+    });
+  });
+
   it('closes on Escape while focus is still on the trigger', async () => {
     fixture.componentInstance.trigger().open();
     await settle();
