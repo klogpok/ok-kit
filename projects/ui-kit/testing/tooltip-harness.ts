@@ -16,7 +16,16 @@ export interface UiTooltipHarnessFilters extends BaseHarnessFilters {
   label?: string | RegExp;
 }
 
-const POSITIONS: readonly UiTooltipPosition[] = ['top', 'bottom', 'start', 'end'];
+const POSITIONS: readonly UiTooltipPosition[] = [
+  'top',
+  'bottom',
+  'start',
+  'end',
+  'corner-top-start',
+  'corner-top-end',
+  'corner-bottom-start',
+  'corner-bottom-end',
+];
 
 /**
  * Harness for a tooltip: the element with `uiTooltip`. The tooltip lives in an overlay, found
@@ -77,7 +86,10 @@ export class UiTooltipHarness extends UiHarness {
     return tooltip ? tooltip.text() : '';
   }
 
-  /** Side of the trigger the shown tooltip sits on, after a flip; `null` while it is hidden. */
+  /**
+   * Side or corner of the trigger the shown tooltip sits at, after a flip; `null` while it is
+   * hidden.
+   */
   async getPosition(): Promise<UiTooltipPosition | null> {
     const tooltip = await this.tooltip();
     return tooltip ? uiModifier(tooltip, 'ui-tooltip--', POSITIONS) : null;

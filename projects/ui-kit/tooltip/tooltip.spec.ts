@@ -1,7 +1,9 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FocusMonitor } from '@angular/cdk/a11y';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { UiIconButton } from '@vplans/ui-kit/button';
+import { UiTooltipHarness } from '@vplans/ui-kit/testing';
 import { UiTooltip, UiTooltipDefaults, UiTooltipPosition, provideUiTooltip } from './tooltip';
 
 @Component({
@@ -360,7 +362,7 @@ class CornerHost {
 
 describe('UiTooltip corners', () => {
   // jsdom has no layout: a 1024x768 viewport, a 40x20 trigger and an 80x30 tooltip.
-  const trigger = { left: 400, top: 300, width: 40, height: 20 };
+  let trigger = { left: 400, top: 300, width: 40, height: 20 };
   const tooltip = { width: 80, height: 30 };
   let fixture: ComponentFixture<CornerHost>;
   let button: HTMLButtonElement;
@@ -383,6 +385,7 @@ describe('UiTooltip corners', () => {
   }
 
   beforeEach(async () => {
+    trigger = { left: 400, top: 300, width: 40, height: 20 };
     // The CDK measures the right and bottom styles from the document element.
     vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(innerWidth);
     vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(innerHeight);
@@ -427,4 +430,18 @@ describe('UiTooltip corners', () => {
     expect(panel()?.classList).toContain(`ui-tooltip--${position}`);
     expect(tooltipCorner()).toEqual(corner);
   });
+
+  it.each([
+    ['corner-top-start', 'ltr', 'corner-bottom-start', { left: 320, top: 30 }],
+    ['corner-top-end', 'rtl', 'corner-bottom-end', { left: 320, top: 30 }],
+  ] as const)(
+    'flips %s (%s) with no room above to %s on the same inline side',
+    async (position, dir, flipped, corner) => {
+      trigger.top = 10;
+      await open(position, dir);
+      const harness = await TestbedHarnessEnvironment.loader(fixture).getHarness(UiTooltipHarness);
+      expect(await harness.getPosition()).toBe(flipped);
+      expect(tooltipCorner()).toEqual(corner);
+    },
+  );
 });
