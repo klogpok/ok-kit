@@ -1,6 +1,6 @@
 # 02: `ɵUiPopupListboxField` and `ɵprovideUiPopupListboxField()` own the field shell
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01
 
 Spec: `../spec.md` → "Implementation Decisions": base class, select chain, provider helper.
@@ -25,18 +25,18 @@ and providers; consumers see no change.
   `UI_FORM_FIELD_CONTROL` and the listbox providers. Each field keeps its own
   `NG_VALUE_ACCESSOR` line.
 
-- [ ] The base class and the provider helper exist in the `listbox` entry point as internal
+- [x] The base class and the provider helper exist in the `listbox` entry point as internal
       exports; the free `fieldListboxConfig()` is gone.
-- [ ] Select, multi-select, autocomplete and time input extend the base class and use the helper;
+- [x] Select, multi-select, autocomplete and time input extend the base class and use the helper;
       none of them re-declares a member the base class owns.
-- [ ] Each field's own blur behavior is kept (autocomplete resets its text and query, time input
+- [x] Each field's own blur behavior is kept (autocomplete resets its text and query, time input
       commits its draft), in today's order.
-- [ ] Public inputs, outputs and methods of the four fields are unchanged; the rendered host and
+- [x] Public inputs, outputs and methods of the four fields are unchanged; the rendered host and
       inner-control attributes and classes are unchanged (order may differ).
-- [ ] The contract spec of ticket 01 is extended: the test field extends the base class and uses
+- [x] The contract spec of ticket 01 is extended: the test field extends the base class and uses
       the helper; it covers the host classes from the prefix, `null` host `aria-label` /
       `aria-describedby`, the `opened` / `closed` outputs and blur marking the control touched.
-- [ ] The existing specs and harnesses of the four fields pass without edits.
+- [x] The existing specs and harnesses of the four fields pass without edits.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes (the
       client compiles with `useDefineForClassFields: false`).
 - [ ] One commit, `refactor(listbox): ...`.
@@ -45,7 +45,7 @@ and providers; consumers see no change.
 
 # 02: `ɵUiPopupListboxField` и `ɵprovideUiPopupListboxField()` владеют оболочкой поля
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01
 
 Spec: `../spec.md` → «Решения по реализации»: базовый класс, цепочка select, provider-helper.
@@ -70,18 +70,18 @@ Spec: `../spec.md` → «Решения по реализации»: базов�
   `UI_FORM_FIELD_CONTROL` и providers listbox. Каждое поле сохраняет свою строку
   `NG_VALUE_ACCESSOR`.
 
-- [ ] Базовый класс и provider-helper есть в entry point `listbox` как внутренние экспорты;
+- [x] Базовый класс и provider-helper есть в entry point `listbox` как внутренние экспорты;
       свободной `fieldListboxConfig()` больше нет.
-- [ ] Select, multi-select, autocomplete и time input расширяют базовый класс и используют helper;
+- [x] Select, multi-select, autocomplete и time input расширяют базовый класс и используют helper;
       ни одно из них не объявляет заново член, которым владеет базовый класс.
-- [ ] Собственное поведение blur каждого поля сохранено (autocomplete сбрасывает текст и запрос,
+- [x] Собственное поведение blur каждого поля сохранено (autocomplete сбрасывает текст и запрос,
       time input фиксирует черновик) в нынешнем порядке.
-- [ ] Публичные inputs, outputs и методы четырёх полей не изменились; отрисованные атрибуты и
+- [x] Публичные inputs, outputs и методы четырёх полей не изменились; отрисованные атрибуты и
       классы хоста и внутреннего элемента управления не изменились (порядок может отличаться).
-- [ ] Контрактный спек из тикета 01 расширен: тестовое поле расширяет базовый класс и использует
+- [x] Контрактный спек из тикета 01 расширен: тестовое поле расширяет базовый класс и использует
       helper; спек покрывает host-классы из префикса, `null` в host `aria-label` /
       `aria-describedby`, outputs `opened` / `closed` и отметку touched при blur.
-- [ ] Существующие спеки и harnesses четырёх полей проходят без правок.
+- [x] Существующие спеки и harnesses четырёх полей проходят без правок.
 - [ ] `/phase-check` проходит, визуальные baselines не меняются; `pnpm sync:client --verify`
       проходит (клиент собирается с `useDefineForClassFields: false`).
 - [ ] Один коммит, `refactor(listbox): ...`.
