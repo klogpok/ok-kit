@@ -101,6 +101,94 @@ export const Corners: Story = {
 };
 
 /**
+ * Walks a simulated pointer along the `path`, one point per step, and fires the enter and leave
+ * events a real pointer would (a play function has no real pointer, and `elementFromPoint` is what
+ * the browser hit-tests with, including the `::before` bridge). Returns how many points are over
+ * neither the trigger nor the tooltip: the pointer is on nothing there, and a tooltip with a hide
+ * delay of 0 would close.
+ */
+function walkPointer(trigger: HTMLElement, path: { x: number; y: number }[]): number {
+  const over = { trigger: true, tooltip: false };
+  let gone = 0;
+  for (const { x, y } of path) {
+    const target = document.elementFromPoint(x, y);
+    const panel = document.querySelector('.ui-tooltip');
+    const now = {
+      trigger: !!target && trigger.contains(target),
+      tooltip: !!target && !!panel?.contains(target),
+    };
+    if (now.trigger !== over.trigger) {
+      trigger.dispatchEvent(
+        new PointerEvent(now.trigger ? 'pointerenter' : 'pointerleave', { pointerType: 'mouse' }),
+      );
+    }
+    if (now.tooltip !== over.tooltip) {
+      panel?.dispatchEvent(new MouseEvent(now.tooltip ? 'mouseenter' : 'mouseleave'));
+    }
+    Object.assign(over, now);
+    if (!now.trigger && !now.tooltip) gone++;
+  }
+  return gone;
+}
+
+/**
+ * The bridge of a corner tooltip: a pointer that leaves the trigger through its corner crosses the
+ * gap over the bridge and reaches the tooltip, which stays open (WCAG 1.4.13 hoverable). A pointer
+ * that leaves past the bridge, straight up from the trigger, is on nothing and the tooltip closes.
+ * The trigger is square: a rounded corner is not the corner of its box (see ticket 05).
+ */
+export const CornerBridge: Story = {
+  render: () => ({
+    template: `
+      <div style="padding:64px;display:flex;justify-content:center">
+        <button ui-button variant="secondary" style="border-radius:0" uiTooltip="Waiting for the owner" uiTooltipPosition="corner-top-start" uiTooltipShowDelay="0">Plans</button>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector<HTMLButtonElement>('button')!;
+    const rtl = getComputedStyle(trigger).direction === 'rtl';
+    // The centered trigger moves when the web font loads; the open tooltip would not follow it.
+    await document.fonts.ready;
+    const pane = () => document.querySelector<HTMLElement>('.ui-tooltip-pane');
+    const hover = async () => {
+      trigger.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+      // The CDK positions the pane after the tooltip renders.
+      await until(
+        () => [pane()?.style.top, pane()?.style.bottom].some(Boolean),
+        'the tooltip did not open',
+      );
+    };
+    // Points on a line from 4 px inside the trigger, across a corner of its box, to the tooltip.
+    const line = (dx: number, dy: number) => {
+      const origin = trigger.getBoundingClientRect();
+      const gap =
+        origin.top - document.querySelector('.ui-tooltip')!.getBoundingClientRect().bottom;
+      const inward = rtl ? -1 : 1;
+      const x = rtl ? origin.right : origin.left;
+      const length = gap + 6;
+      return Array.from({ length }, (_, i) => ({
+        // Half a pixel inside the edge at the corner: the right edge of a box is not part of it.
+        x: x + inward * (4.5 - i * dx),
+        y: origin.top + 4 - i * dy,
+      }));
+    };
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Past the bridge: straight up from the trigger, over the space above it.
+    await hover();
+    const lost = walkPointer(trigger, line(0, 1));
+    await settle();
+    await expect({ lost: lost > 0, open: pane() !== null }).toEqual({ lost: true, open: false });
+
+    // Through the corner: over the trigger, then over the bridge, then over the tooltip.
+    await hover();
+    const crossed = walkPointer(trigger, line(1, 1));
+    await settle();
+    await expect({ lost: crossed, open: pane() !== null }).toEqual({ lost: 0, open: true });
+  },
+};
+
+/**
  * A `corner-top-start` tooltip on a trigger at the top-start corner of the viewport: no room above
  * and none before it. It flips to `corner-bottom-start` and is pushed back on screen, below the
  * trigger, never over it.
