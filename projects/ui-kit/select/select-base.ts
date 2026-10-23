@@ -1,6 +1,5 @@
 import {
   Directive,
-  ElementRef,
   Signal,
   WritableSignal,
   booleanAttribute,
@@ -12,11 +11,9 @@ import {
   numberAttribute,
   output,
   signal,
-  viewChild,
   viewChildren,
 } from '@angular/core';
-import { _IdGenerator } from '@angular/cdk/a11y';
-import { UI_LABELS, UiFormControlBase, UiFormFieldControl, UiSize } from '@vplans/ui-kit/core';
+import { UI_LABELS } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { uiIconChevronDown, uiIconX } from '@vplans/ui-kit/icon';
 import {
@@ -24,7 +21,7 @@ import {
   type UiOptionItem,
   type ɵUiListboxController as UiListboxController,
   type ɵUiListboxConfig as UiListboxConfig,
-  ɵfieldListboxConfig as fieldListboxConfig,
+  ɵUiPopupListboxField as UiPopupListboxField,
 } from '@vplans/ui-kit/listbox';
 
 /**
@@ -32,40 +29,23 @@ import {
  * the chips, the clear button and the inputs of the list. The popup listbox is a controller that
  * each subclass creates with `injectListbox({ ...this.listboxConfig(), ... })`, adding what
  * selecting an option does. Its "Add «…»" leading action adds the search text of `creatable`.
+ * The `name` goes on the trigger button; the search field of a `searchable` select has none.
  * Internal.
  */
 @Directive({
   host: {
-    '[attr.id]': 'id()',
-    // The inner control carries the label and descriptions; static attributes stay on the host too.
-    '[attr.aria-label]': 'null',
-    '[attr.aria-describedby]': 'null',
-    '[class]': '"ui-select--" + size()',
     '[class.ui-select--open]': 'listbox.isOpen()',
-    '[class.ui-select--disabled]': 'isDisabled()',
-    '[class.ui-select--readonly]': 'readonly()',
-    '[class.ui-select--invalid]': 'showError()',
     '[class.ui-select--clearable]': 'showClear()',
     '[class.ui-select--chips]': 'chipList().length > 0',
   },
 })
-export abstract class UiSelectBase<T, V>
-  extends UiFormControlBase<V>
-  implements UiFormFieldControl
-{
+export abstract class UiSelectBase<T, V> extends UiPopupListboxField<V> {
   protected readonly labels = inject(UI_LABELS);
 
   abstract readonly value: WritableSignal<V>;
   /** The popup listbox; the subclass creates it with `injectListbox()`. */
-  protected abstract readonly listbox: UiListboxController<T>;
+  protected abstract override readonly listbox: UiListboxController<T>;
 
-  readonly size = input<UiSize>('md');
-  /** Host id; the control gets `${id}-control`. */
-  readonly id = input(inject(_IdGenerator).getId('ui-select-'));
-  readonly ariaLabel = input('', { alias: 'aria-label' });
-  readonly placeholder = input('');
-  /** `name` of the trigger button. The search field of a `searchable` select has none. */
-  readonly name = input('');
   /** Type in the trigger to filter the options. */
   readonly searchable = input(false, { transform: booleanAttribute });
   /** Shows a button that clears the value while one is selected. */
@@ -109,20 +89,14 @@ export abstract class UiSelectBase<T, V>
    */
   readonly virtualThreshold = input(100, { transform: numberAttribute });
 
-  readonly opened = output();
-  readonly closed = output();
   /**
    * Emits the search text as the user types (`searchable` only), and `''` when the list closes
    * with a search, so server-side results can be reset.
    */
   readonly searchChange = output<string>();
 
-  readonly labelStrategy = 'for' as const;
-  readonly controlId = computed(() => `${this.id()}-control`);
-
   /** The projected options. */
   private readonly contentOptions = contentChildren<UiOption<T>>(UiOption, { descendants: true });
-  protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
   private readonly chipViews = viewChildren(UiChip);
 
   protected readonly query = signal('');
@@ -150,6 +124,10 @@ export abstract class UiSelectBase<T, V>
   /** Puts the text of the "Add «…»" action into the value. */
   protected abstract addCreated(text: string): void;
 
+  protected classPrefix(): string {
+    return 'ui-select';
+  }
+
   /** No value can be added now (`maxSelections` of `ui-multi-select`). */
   protected createBlocked(): boolean {
     return false;
@@ -166,7 +144,7 @@ export abstract class UiSelectBase<T, V>
   /** What `ui-select` and `ui-multi-select` give their listbox alike. */
   protected listboxConfig(): Omit<UiListboxConfig<T>, 'isSelected' | 'select'> {
     return {
-      ...fieldListboxConfig(this),
+      ...this.fieldListboxConfig(),
       mode: () => (this.searchable() ? 'searchable' : 'trigger'),
       id: this.id,
       contentOptions: this.contentOptions,
@@ -202,19 +180,6 @@ export abstract class UiSelectBase<T, V>
     };
   }
 
-  focus(options?: FocusOptions): void {
-    this.control().nativeElement.focus(options);
-  }
-
-  /** Opens the list at the selected option, else at the first one. */
-  open(): void {
-    this.listbox.open();
-  }
-
-  close(): void {
-    this.listbox.close();
-  }
-
   // --- Template handlers ----------------------------------------------------------------
 
   protected toggle(event: MouseEvent): void {
@@ -242,11 +207,6 @@ export abstract class UiSelectBase<T, V>
   /** Keeps focus on the control when the chevron or padding of the trigger is pressed. */
   protected onTriggerMousedown(event: MouseEvent): void {
     if (event.target !== this.control().nativeElement) event.preventDefault();
-  }
-
-  protected onBlur(): void {
-    this.close();
-    this.notifyTouched();
   }
 
   protected onSearch(event: Event): void {

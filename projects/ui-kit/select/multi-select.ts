@@ -10,18 +10,17 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
-import { UI_FORM_FIELD_CONTROL, ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
+import { ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
 import { UiChip } from '@vplans/ui-kit/chip';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiSpinner } from '@vplans/ui-kit/spinner';
 import {
   type ɵUiListboxController as UiListboxController,
   type ɵUiOptionHandle as UiOptionHandle,
-  ɵUI_POPUP_LISTBOX_FIELD as UI_POPUP_LISTBOX_FIELD,
   ɵUiComboboxControl as UiComboboxControl,
   ɵUiListbox as UiListbox,
   ɵinjectListbox as injectListbox,
-  ɵprovideUiListbox as provideUiListbox,
+  ɵprovideUiPopupListboxField as provideUiPopupListboxField,
 } from '@vplans/ui-kit/listbox';
 import { UiSelectBase } from './select-base';
 
@@ -70,10 +69,8 @@ import { UiSelectBase } from './select-base';
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    { provide: UI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => UiMultiSelect) },
-    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiMultiSelect) },
+    provideUiPopupListboxField(() => UiMultiSelect),
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiMultiSelect), multi: true },
-    provideUiListbox(),
   ],
   host: { class: 'ui-select ui-multi-select' },
 })
