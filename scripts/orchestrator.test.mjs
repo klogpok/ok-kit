@@ -1,18 +1,29 @@
 // Tests of the pure logic of `orchestrator.mjs`, `orchestrator-heartbeat.mjs` and
-// `guard-tool-use.mjs`. Run with `pnpm test-scripts`.
+// `guard-tool-use.mjs`, and of the two scripts themselves on a throwaway git repo with two specs.
+// Run with `pnpm test-scripts`.
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
+  agentSpec,
   blockedForGood,
+  countInFlight,
+  featureOf,
   findStale,
   frontier,
   heartbeatFor,
   isDescendant,
   killTargets,
+  legacyMoves,
   lockStatus,
   parseTicket,
   pathsOverlap,
+  renderIndex,
   renderProgress,
   skipsGitHooks,
   validatePlan,
@@ -120,6 +131,75 @@ describe('frontier', () => {
   });
 });
 
+describe('countInFlight', () => {
+  it('counts running, review and merging tickets', () => {
+    const tickets = Object.fromEntries(
+      ['pending', 'running', 'review', 'merging', 'merged', 'failed'].map((status, i) => [
+        `0${i}`,
+        { status },
+      ]),
+    );
+    assert.equal(countInFlight({ tickets }), 3);
+    assert.equal(countInFlight(undefined), 0);
+  });
+});
+
+describe('featureOf', () => {
+  it('takes the folder name under .scratch from a name or a path', () => {
+    assert.equal(featureOf('popup-listbox-field'), 'popup-listbox-field');
+    assert.equal(featureOf('.scratch/phase-10/'), 'phase-10');
+    assert.equal(featureOf('D:\\projects\\ui-kit-20\\.scratch\\phase_10.b'), 'phase_10.b');
+  });
+
+  it('rejects what cannot be a folder name', () => {
+    assert.throws(() => featureOf(''), /not a spec/);
+    assert.throws(() => featureOf('..'), /not a spec/);
+    assert.throws(() => featureOf(undefined), /not a spec/);
+  });
+});
+
+describe('agentSpec', () => {
+  it('finds the spec whose running ticket the agent works on', () => {
+    const states = {
+      a: { tickets: { '01': { status: 'running', agent: 'a1' } } },
+      b: { tickets: { '01': { status: 'running', agent: 'b1' } } },
+      c: { tickets: { '01': { status: 'merged', agent: 'c1' } } },
+      d: {},
+    };
+    assert.equal(agentSpec(states, 'b1'), 'b');
+    assert.equal(agentSpec(states, 'a1'), 'a');
+    assert.equal(agentSpec(states, 'c1'), undefined);
+    assert.equal(agentSpec(states, 'zz'), undefined);
+    assert.equal(agentSpec(states, undefined), undefined);
+  });
+});
+
+describe('legacyMoves', () => {
+  const state = { spec: '.scratch/popup-listbox-field', phase: 'review', tickets: {} };
+
+  it('moves everything of a top-level orchestration into the folder of its spec, state last', () => {
+    const names = ['plan.json', 'lock', '01.json', 'progress.md', 'verify', 'x'];
+    assert.deepEqual(
+      legacyMoves(state, ['state.json', ...names, 'verify.lock', 'other'], ['other']),
+      { feature: 'popup-listbox-field', names: [...names, 'state.json'] },
+    );
+  });
+
+  it('finishes a move cut short: the folder of its spec without a state is not in the way', () => {
+    assert.deepEqual(legacyMoves(state, ['state.json', 'popup-listbox-field', 'x'], []), {
+      feature: 'popup-listbox-field',
+      names: ['x', 'state.json'],
+    });
+  });
+
+  it('refuses when the folder of its spec already holds an orchestration', () => {
+    assert.throws(
+      () => legacyMoves(state, ['state.json', 'popup-listbox-field'], ['popup-listbox-field']),
+      /already holds/,
+    );
+  });
+});
+
 describe('blockedForGood', () => {
   it('lists pending tickets behind a failed or skipped blocker', () => {
     const s = {
@@ -222,6 +302,30 @@ describe('renderProgress', () => {
   });
 });
 
+describe('renderIndex', () => {
+  it('lists every spec with its phase, ticket counts and a link to its progress', () => {
+    const md = renderIndex(
+      {
+        b: { phase: 'verify', tickets: { '01': { status: 'merged' } } },
+        a: {
+          phase: 'implement',
+          tickets: {
+            '01': { status: 'running' },
+            '02': { status: 'merged' },
+            '03': { status: 'failed' },
+          },
+        },
+      },
+      Date.parse('2026-10-21T12:00:00Z'),
+    );
+    assert.match(md, /updated 2026-10-21T12:00:00.000Z/);
+    assert.match(
+      md,
+      /- \[a\]\(a\/progress\.md\): phase \*\*implement\*\*; merged 1 of 3; running 1; failed 1\.\n- \[b\]\(b\/progress\.md\): phase \*\*verify\*\*; merged 1 of 1;/,
+    );
+  });
+});
+
 describe('lockStatus', () => {
   const alive = (pid) => pid === 1;
   it('tells free, own, held and stale apart', () => {
@@ -229,6 +333,12 @@ describe('lockStatus', () => {
     assert.equal(lockStatus({ session: 's', pid: 2 }, 's', alive), 'own');
     assert.equal(lockStatus({ session: 'o', pid: 1 }, 's', alive), 'held');
     assert.equal(lockStatus({ session: 'o', pid: 2 }, 's', alive), 'stale');
+  });
+
+  it('can compare another field of the lock, as the verify lock does with its spec', () => {
+    assert.equal(lockStatus({ spec: 'a', pid: 1 }, 'a', alive, 'spec'), 'own');
+    assert.equal(lockStatus({ spec: 'b', pid: 1 }, 'a', alive, 'spec'), 'held');
+    assert.equal(lockStatus({ spec: 'b', pid: 2 }, 'a', alive, 'spec'), 'stale');
   });
 });
 
@@ -308,5 +418,258 @@ describe('skipsGitHooks', () => {
     assert.ok(!skipsGitHooks('git commit -am "x"'));
     assert.ok(!skipsGitHooks('git log -n 5'));
     assert.ok(!skipsGitHooks('git push --no-verify'));
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// The scripts on a throwaway repo: specs `a` and `b`, each with tickets 01-03.
+
+describe('orchestrator.mjs and its heartbeat hook with two specs', () => {
+  const script = fileURLToPath(new URL('./orchestrator.mjs', import.meta.url));
+  const hook = fileURLToPath(new URL('./orchestrator-heartbeat.mjs', import.meta.url));
+  /** No process has this pid, so a lock that names it is stale. */
+  const DEAD = 999_999_999;
+  let root;
+
+  const env = ({ session = 's1', pid = process.pid } = {}) => ({
+    ...process.env,
+    CLAUDE_CODE_SESSION_ID: session,
+    CLAUDE_PID: String(pid),
+    CLAUDE_PROJECT_DIR: root,
+  });
+  const run = (args, who) =>
+    spawnSync(process.execPath, [script, ...args], { cwd: root, encoding: 'utf8', env: env(who) });
+  const orch = (args, who) => {
+    const result = run(args, who);
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout.trim();
+  };
+  const file = (...parts) => join(root, '.orchestrator', ...parts);
+  const json = (...parts) => JSON.parse(readFileSync(file(...parts), 'utf8'));
+  const write = (path, text) => {
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, text);
+  };
+  const init = (feature) => {
+    const plan = join(root, `${feature}-plan.json`);
+    write(
+      plan,
+      JSON.stringify({
+        spec: `.scratch/${feature}`,
+        base: 'master',
+        branch: `spec/${feature}`,
+        tickets: ['01', '02', '03'].map((id) => ({ id, files: [`${feature}/${id}`] })),
+      }),
+    );
+    orch(['init', plan, '--spec', feature]);
+  };
+  const beat = (agent) =>
+    spawnSync(process.execPath, [hook], {
+      cwd: root,
+      encoding: 'utf8',
+      env: env(),
+      input: JSON.stringify({
+        agent_id: agent,
+        hook_event_name: 'PostToolUse',
+        tool_name: 'Bash',
+        cwd: join(root, 'wt'),
+      }),
+    });
+
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), 'orchestrator-'));
+    execFileSync('git', ['init', '-q'], { cwd: root });
+    for (const feature of ['a', 'b']) {
+      for (const id of ['01', '02', '03']) {
+        write(
+          join(root, '.scratch', feature, 'issues', `${id}-t.md`),
+          `# ${id}: Ticket ${id} of ${feature}\n\n**Status:** ready-for-agent\n`,
+        );
+      }
+    }
+  });
+  afterEach(() => rmSync(root, { recursive: true, force: true }));
+
+  it('needs --spec for every command but tickets', () => {
+    assert.match(run(['next']).stderr, /--spec <feature>/);
+    assert.match(run(['status', '--spec', '..']).stderr, /not a spec/);
+    assert.equal(JSON.parse(orch(['tickets', '.scratch/a'])).length, 3);
+  });
+
+  it('keeps the state and heartbeats of two specs with the same ticket ids apart', () => {
+    init('a');
+    init('b');
+    orch(['set', '--spec', 'a', '01', 'running', '--agent', 'agent-a']);
+    orch(['set', '--spec', 'b', '01', 'running', '--agent', 'agent-b']);
+    orch(['beat', '--spec', 'b', '01', 'red: a test of b']);
+    assert.equal(beat('agent-a').status, 0);
+
+    assert.equal(json('a', 'state.json').tickets['01'].agent, 'agent-a');
+    assert.equal(json('b', 'state.json').tickets['01'].agent, 'agent-b');
+    assert.equal(json('a', '01.json').tool, 'Bash');
+    assert.equal(json('a', '01.json').step, undefined);
+    assert.equal(json('b', '01.json').step, 'red: a test of b');
+    assert.equal(json('b', '01.json').tool, undefined);
+    assert.match(readFileSync(file('a', 'progress.md'), 'utf8'), /\(Bash\)/);
+    assert.equal(
+      JSON.parse(orch(['status', '--spec', 'b'])).tickets[0].beat.step,
+      'red: a test of b',
+    );
+  });
+
+  it('locks each spec on its own: held for the same spec, stale per spec', () => {
+    assert.equal(orch(['lock', 'acquire', '--spec', 'a'], { session: 's1' }), 'acquired');
+    assert.equal(orch(['lock', 'acquire', '--spec', 'b'], { session: 's2' }), 'acquired');
+    const held = run(['lock', 'acquire', '--spec', 'a'], { session: 's2' });
+    assert.equal(held.status, 1);
+    assert.match(held.stderr, /session s1 .* holds the lock/);
+    assert.match(orch(['lock', 'status', '--spec', 'b'], { session: 's1' }), /^held: /);
+
+    orch(['lock', 'release', '--spec', 'a'], { session: 's1' });
+    orch(['lock', 'acquire', '--spec', 'a'], { session: 's3', pid: DEAD });
+    assert.equal(json('a', 'lock').session, 's3');
+    assert.match(orch(['lock', 'status', '--spec', 'a'], { session: 's1' }), /^stale: /);
+    assert.equal(
+      orch(['lock', 'acquire', '--spec', 'a'], { session: 's1' }),
+      'took over a stale lock of s3',
+    );
+    assert.match(orch(['lock', 'status', '--spec', 'b'], { session: 's1' }), /^held: /);
+    assert.equal(orch(['lock', 'release', '--spec', 'a'], { session: 's1' }), 'released');
+    assert.equal(run(['lock', 'release', '--spec', 'b'], { session: 's1' }).status, 1);
+    assert.ok(!existsSync(file('a', 'lock')));
+    assert.ok(existsSync(file('b', 'lock')));
+  });
+
+  it('shares the limit of agents in flight between specs', () => {
+    init('a');
+    init('b');
+    for (const id of ['01', '02', '03']) {
+      orch(['set', '--spec', 'a', id, 'running', '--agent', `agent-a${id}`]);
+    }
+    assert.deepEqual(JSON.parse(orch(['next', '--spec', 'b', '--max', '4'])), {
+      launch: ['01'],
+      inFlight: 0,
+      elsewhere: 3,
+      pending: 3,
+      blockedForGood: [],
+    });
+    assert.deepEqual(JSON.parse(orch(['next', '--spec', 'a'])).launch, []);
+  });
+
+  it('binds the heartbeat hook to a spec by agent id and never fails', () => {
+    assert.equal(beat('agent-b').status, 0, 'no .orchestrator folder');
+    init('a');
+    init('b');
+    orch(['set', '--spec', 'b', '02', 'running', '--agent', 'agent-b']);
+    write(file('a', 'state.json'), '{ broken');
+    assert.equal(beat('agent-b').status, 0);
+    assert.equal(json('b', '02.json').cwd, join(root, 'wt'));
+    assert.ok(!existsSync(file('a', '02.json')));
+
+    assert.equal(beat('nobody').status, 0);
+    const garbage = spawnSync(process.execPath, [hook], { cwd: root, env: env(), input: 'x' });
+    assert.equal(garbage.status, 0);
+    assert.ok(!existsSync(file('b', '01.json')));
+  });
+
+  it('beats and watches only the spec it is given', () => {
+    init('a');
+    init('b');
+    const before = readFileSync(file('b', 'state.json'), 'utf8');
+    orch(['beat', '--spec', 'a', '02', 'green: done']);
+    assert.equal(orch(['watch', '--spec', 'a', '--every', '0']), 'IDLE');
+
+    assert.ok(json('a', 'state.json').watcher);
+    assert.equal(readFileSync(file('b', 'state.json'), 'utf8'), before);
+    assert.ok(existsSync(file('a', '02.json')));
+    assert.ok(!existsSync(file('b', '02.json')));
+  });
+
+  it('lists every spec in the top-level progress.md', () => {
+    init('a');
+    init('b');
+    orch(['phase', '--spec', 'b', 'review']);
+    const index = readFileSync(file('progress.md'), 'utf8');
+    assert.match(index, /- \[a\]\(a\/progress\.md\): phase \*\*implement\*\*; merged 0 of 3/);
+    assert.match(index, /- \[b\]\(b\/progress\.md\): phase \*\*review\*\*/);
+  });
+
+  it('moves a top-level orchestration of an earlier run into the folder of its spec', () => {
+    write(
+      file('state.json'),
+      JSON.stringify({
+        spec: '.scratch/a',
+        base: 'master',
+        branch: 'spec/a',
+        phase: 'review',
+        tickets: { '01': { status: 'running', agent: 'agent-a', blockedBy: [], files: ['x'] } },
+        log: [],
+      }),
+    );
+    write(file('01.json'), JSON.stringify({ ticket: '01', at: new Date().toISOString() }));
+    write(file('lock'), JSON.stringify({ session: 's1', pid: process.pid }));
+    write(file('check-01.log'), 'ok');
+    write(file('verify', 'build.log'), 'ok');
+
+    const status = JSON.parse(orch(['status', '--spec', 'a']));
+    assert.equal(status.phase, 'review');
+    assert.equal(status.tickets[0].agent, 'agent-a');
+    for (const name of ['state.json', '01.json', 'lock', 'check-01.log', 'verify']) {
+      assert.ok(!existsSync(file(name)), `${name} left at the top level`);
+    }
+    assert.equal(json('a', 'lock').session, 's1');
+    assert.ok(existsSync(file('a', 'verify', 'build.log')));
+    assert.match(readFileSync(file('progress.md'), 'utf8'), /- \[a\]\(a\/progress\.md\)/);
+    assert.equal(beat('agent-a').status, 0);
+    assert.equal(json('a', '01.json').tool, 'Bash');
+  });
+
+  it('serializes verify between specs with the verify lock', { timeout: 30_000 }, async () => {
+    assert.equal(orch(['verify-lock', 'acquire', '--spec', 'a'], { session: 's1' }), 'acquired');
+    assert.equal(orch(['verify-lock', 'acquire', '--spec', 'a'], { session: 's1' }), 'acquired');
+    assert.match(orch(['verify-lock', 'status', '--spec', 'b'], { session: 's2' }), /^held: /);
+    assert.equal(run(['verify-lock', 'release', '--spec', 'b'], { session: 's2' }).status, 1);
+
+    const waiter = spawn(
+      process.execPath,
+      [script, 'verify-lock', 'acquire', '--spec', 'b', '--every', '0.05'],
+      { cwd: root, env: env({ session: 's2' }) },
+    );
+    let out = '';
+    const waits = new Promise((done) =>
+      waiter.stdout.on('data', (chunk) => {
+        out += chunk;
+        if (out.includes('waiting')) done();
+      }),
+    );
+    const exited = new Promise((done) => waiter.on('exit', done));
+    await waits;
+    await new Promise((done) => setTimeout(done, 200));
+    assert.equal(waiter.exitCode, null, 'b must wait while a verifies');
+    assert.match(out, /^waiting: a is in verify/);
+
+    init('a');
+    orch(['phase', '--spec', 'a', 'done'], { session: 's1' });
+    assert.equal(await exited, 0);
+    assert.match(out, /acquired\s*$/);
+    assert.equal(json('verify.lock').spec, 'b');
+
+    write(file('verify.lock'), JSON.stringify({ spec: 'b', session: 's2', pid: DEAD }));
+    assert.equal(
+      orch(['verify-lock', 'acquire', '--spec', 'a'], { session: 's1' }),
+      'took over a stale verify lock of b',
+    );
+
+    write(file('verify.lock'), '');
+    assert.equal(
+      orch(['verify-lock', 'acquire', '--spec', 'b', '--every', '0.05'], { session: 's2' }),
+      'took over a stale verify lock of an unknown spec',
+    );
+    write(file('verify.lock'), JSON.stringify({ spec: 'a', session: 's1', pid: DEAD }));
+    assert.equal(
+      orch(['verify-lock', 'release', '--spec', 'b'], { session: 's2' }),
+      'released a stale verify lock of a',
+    );
+    assert.ok(!existsSync(file('verify.lock')));
   });
 });

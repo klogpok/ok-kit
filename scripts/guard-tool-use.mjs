@@ -3,12 +3,19 @@
 // - killing a process that this Claude Code session did not start: a kill by name or pattern, a
 //   kill whose target is not a literal PID, and a PID that is not a descendant of `CLAUDE_PID`;
 // - `git commit` that skips the hooks (`--no-verify`, `-n`, a `core.hooksPath` override);
-// - starting `/orchestrate-spec` while another live session holds `.orchestrator/lock`.
+// - starting `/orchestrate-spec` on a spec while another live session holds its
+//   `.orchestrator/<feature>/lock`. Other specs stay free to orchestrate.
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { isDescendant, killTargets, lockStatus, skipsGitHooks } from './orchestrator.lib.mjs';
+import {
+  featureOf,
+  isDescendant,
+  killTargets,
+  lockStatus,
+  skipsGitHooks,
+} from './orchestrator.lib.mjs';
 
 const block = (message) => {
   process.stderr.write(`Blocked by scripts/guard-tool-use.mjs: ${message}\n`);
@@ -33,13 +40,24 @@ const isAlive = (pid) => {
 
 if (input.tool_name === 'Skill') {
   if (/(^|:)orchestrate-spec$/.test(input.tool_input?.skill ?? '')) {
+    // The spec folder is the first argument of the skill; without one there is no lock to check.
+    const spec = String(input.tool_input?.args ?? '')
+      .trim()
+      .split(/\s+/)[0];
+    if (!spec) process.exit(0);
+    let feature;
+    try {
+      feature = featureOf(spec);
+    } catch {
+      process.exit(0);
+    }
     const root = process.env.CLAUDE_PROJECT_DIR ?? input.cwd ?? '.';
-    const file = join(root, '.orchestrator', 'lock');
+    const file = join(root, '.orchestrator', feature, 'lock');
     const lock = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined;
     if (lockStatus(lock, input.session_id, isAlive) === 'held') {
       block(
         `another Claude Code session (${lock.session}, pid ${lock.pid}) has been orchestrating ` +
-          `this checkout since ${lock.at}. Wait for it to finish, or ask the user to stop it.`,
+          `${feature} since ${lock.at}. Wait for it to finish, or ask the user to stop it.`,
       );
     }
   }

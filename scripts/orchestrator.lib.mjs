@@ -46,6 +46,19 @@ export function pathsOverlap(a, b) {
 const touchesAny = (files, taken) => files.some((file) => taken.some((t) => pathsOverlap(file, t)));
 
 /**
+ * The name of a spec folder under `.scratch/`, from that name or from a path to the folder. It
+ * names the folder of the orchestration, `.orchestrator/<feature>/`. Throws when it cannot be a
+ * folder name.
+ */
+export function featureOf(spec) {
+  const name = normalize(String(spec ?? ''))
+    .split('/')
+    .pop();
+  if (!/^\w[\w.-]*$/.test(name)) throw new Error(`not a spec folder name: ${spec}`);
+  return name;
+}
+
+/**
  * Checks the selected tickets before an orchestration: every blocker is selected or closed
  * (`doneIds`), and the blockers have no cycle. Throws with the first problem.
  *
@@ -74,18 +87,23 @@ export function validatePlan(tickets, doneIds = []) {
   }
 }
 
-/** Ticket states in `.orchestrator/state.json`, in the order a ticket goes through them. */
+/** Ticket states in `.orchestrator/<feature>/state.json`, in the order a ticket passes them. */
 export const STATES = ['pending', 'running', 'review', 'merging', 'merged', 'failed', 'skipped'];
 
 /** States whose ticket holds its files: an agent works on them or a merge is under way. */
 const IN_FLIGHT = new Set(['running', 'review', 'merging']);
+
+/** The tickets of one orchestration in flight. */
+export const countInFlight = (state) =>
+  Object.values(state?.tickets ?? {}).filter((ticket) => IN_FLIGHT.has(ticket.status)).length;
 
 const byId = ([a], [b]) => a.localeCompare(b, 'en', { numeric: true });
 
 /**
  * The tickets to launch now, in ticket order: pending, every blocker merged (a blocker outside
  * the orchestration was closed before it), no predicted file overlapping a ticket in flight or
- * one picked before it, and no more than `max` tickets in flight in all.
+ * one picked before it, and no more than `max` tickets in flight in all. The other orchestrations of
+ * the checkout share the limit: the caller takes their tickets in flight off `max`.
  */
 export function frontier(state, max = Infinity) {
   const entries = Object.entries(state.tickets).sort(byId);
@@ -135,6 +153,19 @@ export function findStale(state, beats, now, maxAgeMs) {
 }
 
 /**
+ * The feature, among the orchestrations `feature → state`, that has a running ticket worked on by
+ * the agent. Agent ids are unique across specs, so the agent never has to say its spec.
+ */
+export function agentSpec(states, agentId) {
+  if (!agentId) return undefined;
+  return Object.keys(states).find((feature) =>
+    Object.values(states[feature]?.tickets ?? {}).some(
+      (ticket) => ticket.status === 'running' && ticket.agent === agentId,
+    ),
+  );
+}
+
+/**
  * The heartbeat a hook event writes. Only a tool call of the agent of a running ticket beats: it
  * records the time, the tool, whether the call is still under way and the agent's working folder,
  * and keeps the step the agent described with `beat`. Undefined for every other event.
@@ -169,10 +200,12 @@ const cell = (text) =>
     .replace(/\|/g, '\\|')
     .replace(/\n/g, ' ');
 
-/** `.orchestrator/progress.md`: what the user reads while the orchestration runs. */
+const counter = (tickets) => (status) => tickets.filter((t) => t.status === status).length;
+
+/** `.orchestrator/<feature>/progress.md`: what the user reads while the orchestration runs. */
 export function renderProgress(state, beats, now) {
   const tickets = Object.entries(state.tickets).sort(byId);
-  const count = (status) => tickets.filter(([, t]) => t.status === status).length;
+  const count = counter(tickets.map(([, t]) => t));
   const lines = [
     `# Orchestration: ${state.spec}`,
     '',
@@ -199,16 +232,55 @@ export function renderProgress(state, beats, now) {
   return `${lines.join('\n')}\n`;
 }
 
+/** `.orchestrator/progress.md`: one line per orchestration (`feature → state`) of a checkout. */
+export function renderIndex(states, now) {
+  const lines = [
+    '# Orchestrations',
+    '',
+    `One line per spec; updated ${new Date(now).toISOString()}.`,
+    '',
+  ];
+  for (const feature of Object.keys(states).sort()) {
+    const tickets = Object.values(states[feature].tickets ?? {});
+    const count = counter(tickets);
+    lines.push(
+      `- [${feature}](${feature}/progress.md): phase **${states[feature].phase}**; ` +
+        `merged ${count('merged')} of ${tickets.length}; running ${count('running')}; ` +
+        `failed ${count('failed')}.`,
+    );
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+/**
+ * Where an orchestration of an earlier run, kept at the top level of `.orchestrator/`, moves: the
+ * folder of its spec. Every top-level entry (`names`) moves there except the verify lock and the
+ * folders that already hold an orchestration (`specDirs`). `state.json` comes last: while it is
+ * at the top level, the move is unfinished. Throws when its own folder holds an orchestration.
+ */
+export function legacyMoves(state, names, specDirs) {
+  const feature = featureOf(state.spec);
+  if (specDirs.includes(feature)) {
+    throw new Error(
+      `.orchestrator/${feature}/ already holds an orchestration; ` +
+        'move the top-level .orchestrator/state.json and its files by hand',
+    );
+  }
+  const stay = new Set(['verify.lock', 'state.json', feature, ...specDirs]);
+  return { feature, names: [...names.filter((name) => !stay.has(name)), 'state.json'] };
+}
+
 // ---------------------------------------------------------------------------------------------
 // Lock
 
 /**
  * `free` (no lock), `own` (this session holds it), `stale` (its Claude Code process is gone) or
- * `held` (another live session holds it).
+ * `held` (another live session holds it). The owner is the field `key` of the lock: the session
+ * for the lock of a spec, the spec for the verify lock.
  */
-export function lockStatus(lock, sessionId, isAlive) {
+export function lockStatus(lock, owner, isAlive, key = 'session') {
   if (!lock) return 'free';
-  if (lock.session === sessionId) return 'own';
+  if (lock[key] === owner) return 'own';
   return isAlive(lock.pid) ? 'held' : 'stale';
 }
 
