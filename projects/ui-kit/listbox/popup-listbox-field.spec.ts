@@ -1,10 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   contentChildren,
   forwardRef,
-  input,
   model,
   signal,
 } from '@angular/core';
@@ -17,16 +15,13 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import {
-  UI_FORM_FIELD_CONTROL,
-  UiFormControlBase,
-  ɵUiDropdownPanel as UiDropdownPanel,
-} from '@vplans/ui-kit/core';
+import { UiSize, ɵUiDropdownPanel as UiDropdownPanel } from '@vplans/ui-kit/core';
 import { UiFormField } from '@vplans/ui-kit/form-field';
-import { UiComboboxControl, UI_POPUP_LISTBOX_FIELD } from './combobox-control';
-import { injectListbox, provideUiListbox } from './listbox-controller';
+import { UiComboboxControl } from './combobox-control';
+import { injectListbox } from './listbox-controller';
 import { UiListbox } from './listbox';
 import { UiOption } from './option';
+import { UiPopupListboxField, provideUiPopupListboxField } from './popup-listbox-field';
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
@@ -39,10 +34,8 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   selector: 'ui-test-popup-field',
   imports: [CdkOverlayOrigin, UiComboboxControl, UiDropdownPanel, UiListbox],
   providers: [
-    { provide: UI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => TestPopupField) },
-    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => TestPopupField) },
+    provideUiPopupListboxField(() => TestPopupField),
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TestPopupField), multi: true },
-    provideUiListbox(),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -50,54 +43,60 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
       <!-- uiComboboxControl sets aria-expanded and aria-controls. -->
       <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
       <input
+        #control
         uiComboboxControl
         class="control"
         role="combobox"
         (click)="listbox.open({ activate: false })"
         (keydown)="listbox.handleKeydown($event)"
+        (blur)="onBlur()"
       />
       <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
     </div>
-    <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
+    <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
       <ui-listbox><ng-content /></ui-listbox>
     </ng-template>
   `,
+  host: { class: 'ui-test-field' },
 })
-class TestPopupField extends UiFormControlBase<string | null> {
-  readonly id = input('fruit');
-  readonly ariaLabel = input('', { alias: 'aria-label' });
+class TestPopupField extends UiPopupListboxField<string | null> {
   readonly value = model<string | null>(null);
-  readonly labelStrategy = 'for' as const;
-  readonly controlId = computed(() => `${this.id()}-control`);
 
   private readonly content = contentChildren<UiOption<string>>(UiOption, { descendants: true });
 
+  protected classPrefix(): string {
+    return 'ui-test-field';
+  }
+
   readonly listbox = injectListbox<string>({
+    ...this.fieldListboxConfig(),
     mode: () => 'trigger',
     id: this.id,
-    ariaLabel: this.ariaLabel,
     contentOptions: this.content,
     isSelected: (value) => value === this.value(),
     select: (value) => {
       this.value.set(value as string);
       this.notifyChange(value as string);
-      this.listbox.close();
+      this.close();
     },
   });
 
   writeValue(value: string | null): void {
     this.value.set(value ?? null);
   }
-
-  focus(): void {
-    // Not needed by the contract spec.
-  }
 }
 
 @Component({
   imports: [TestPopupField, UiOption],
   template: `
-    <ui-test-popup-field [id]="id()" [aria-label]="label()">
+    <ui-test-popup-field
+      [id]="id()"
+      [aria-label]="label()"
+      [size]="size()"
+      [disabled]="disabled()"
+      [readonly]="readonly()"
+      [invalid]="invalid()"
+    >
       @for (fruit of fruits; track fruit) {
         <ui-option [value]="fruit">{{ fruit }}</ui-option>
       }
@@ -108,6 +107,10 @@ class Host {
   readonly fruits = ['Apple', 'Banana'];
   readonly id = signal('fruit');
   readonly label = signal('Fruit');
+  readonly size = signal<UiSize>('md');
+  readonly disabled = signal(false);
+  readonly readonly = signal(false);
+  readonly invalid = signal(false);
 }
 
 describe('[uiComboboxControl] on a popup listbox field', () => {
@@ -115,6 +118,7 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
   let host: Host;
   let root: HTMLElement;
   const control = () => root.querySelector<HTMLInputElement>('.control')!;
+  const field = () => root.querySelector<HTMLElement>('ui-test-popup-field')!;
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(Host);
@@ -161,6 +165,23 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
     await settle(fixture);
     expect(control().id).toBe('veg-control');
     expect(control().hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('builds the host classes from the field prefix', async () => {
+    expect([...field().classList].sort()).toEqual(['ui-test-field', 'ui-test-field--md']);
+
+    host.size.set('lg');
+    host.disabled.set(true);
+    host.readonly.set(true);
+    host.invalid.set(true);
+    await settle(fixture);
+    expect([...field().classList].sort()).toEqual([
+      'ui-test-field',
+      'ui-test-field--disabled',
+      'ui-test-field--invalid',
+      'ui-test-field--lg',
+      'ui-test-field--readonly',
+    ]);
   });
 });
 

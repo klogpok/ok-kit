@@ -61,8 +61,11 @@ export abstract class UiFormControlBase<T> implements ControlValueAccessor, Afte
         ? this.controlState.invalid() && this.controlState.touched()
         : this.invalid()),
   );
-  /** `aria-describedby` of the element that has the control role. */
-  protected readonly describedBy = computed(
+  /**
+   * `aria-describedby` of the element that has the control role. Public so that a directive on
+   * that element can read it (`uiComboboxControl` of the popup listbox fields).
+   */
+  readonly describedBy = computed(
     () => [this.ariaDescribedBy(), this.formField?.describedBy()].filter(Boolean).join(' ') || null,
   );
   readonly errorMessages = computed(() => [

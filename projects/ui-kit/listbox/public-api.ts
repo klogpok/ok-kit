@@ -17,4 +17,8 @@ export {
   UI_POPUP_LISTBOX_FIELD as ɵUI_POPUP_LISTBOX_FIELD,
   type UiComboboxField as ɵUiComboboxField,
 } from './combobox-control';
+export {
+  UiPopupListboxField as ɵUiPopupListboxField,
+  provideUiPopupListboxField as ɵprovideUiPopupListboxField,
+} from './popup-listbox-field';
 export type { UiOptionHandle as ɵUiOptionHandle } from './option';
