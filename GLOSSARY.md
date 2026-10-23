@@ -76,6 +76,36 @@ _Avoid_: confirm, apply, submit (a form is submitted, a field is committed)
 The message a parsed text field shows for committed typed text that does not give an allowed value. It belongs to the field, never to the bound form control, which only sees the value.
 _Avoid_: validation error (that is the form control's), invalid input
 
+## Overlays
+
+**Trigger**:
+The element a tooltip, popover or menu opens from and is placed against.
+_Avoid_: host, origin, anchor
+
+**Placement**:
+Where an overlay sits against its trigger: a side, a corner, or an aligned placement. Start and end follow the text direction.
+_Avoid_: position (for where it ended up after a flip), location
+
+**Side**:
+A placement on one edge of the trigger (top, bottom, start or end), centered along that edge.
+_Avoid_: direction, top-start (that is an aligned placement)
+
+**Corner**:
+A placement diagonally outside one corner of the trigger: above or below it, entirely before its start edge or after its end edge.
+_Avoid_: diagonal, top-start (that is an aligned placement)
+
+**Aligned placement**:
+A placement above or below the trigger with one inline edge lined up with the same edge of the trigger, as a menu opens.
+_Avoid_: corner
+
+**Flip**:
+Moving an overlay to the opposite side or the vertically mirrored corner when its placement has no room.
+_Avoid_: fallback, reposition
+
+**Push**:
+Shifting an overlay just enough to stay inside the viewport, without changing its placement.
+_Avoid_: clamp, nudge
+
 ## Layout
 
 **Density**:
