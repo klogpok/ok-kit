@@ -18,12 +18,17 @@
   animation: ui-popover-enter var(--ui-motion-duration-fast) var(--ui-motion-easing-enter);
 }
 
-// The gap to the trigger. Margins are part of the pane, so positioning accounts for them.
-:host(.ui-popover--top) {
+// The gap to the trigger. Margins are part of the pane, so positioning accounts for them. A corner
+// has it on the block axis only: its inline edge meets the trigger's.
+:host(.ui-popover--top),
+:host(.ui-popover--corner-top-start),
+:host(.ui-popover--corner-top-end) {
   margin-block-end: var(--ui-popover-offset);
 }
 
-:host(.ui-popover--bottom) {
+:host(.ui-popover--bottom),
+:host(.ui-popover--corner-bottom-start),
+:host(.ui-popover--corner-bottom-end) {
   margin-block-start: var(--ui-popover-offset);
 }
 

@@ -30,14 +30,18 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ViewportRuler } from '@angular/cdk/scrolling';
 import { Subscription } from 'rxjs';
 import {
-  UiOverlaySide,
+  UiOverlayPlacement,
   overlayOffsetX,
-  sideOverlayPositions,
+  overlayPlacementPositions,
   syncOverlayDirection,
   ɵpushOnScreen as pushOnScreen,
 } from '@vplans/ui-kit/core';
 
-export type UiPopoverPosition = UiOverlaySide;
+/**
+ * Where the popover opens against its trigger: centered on a side, or diagonally outside a corner
+ * (`corner-top-start` and the like). A corner flips to its vertical mirror.
+ */
+export type UiPopoverPosition = UiOverlayPlacement;
 
 /** Context of the popover template: `let-close="close"`. */
 export interface UiPopoverContext {
@@ -240,7 +244,7 @@ export class UiPopoverTrigger {
     syncOverlayDirection(overlayRef, this.host);
     const margin = this.viewportMargin();
     this.positionStrategy!.configure(
-      sideOverlayPositions(preferred, 'ui-popover-pane'),
+      overlayPlacementPositions(preferred, 'ui-popover-pane'),
       margin,
       overlayOffsetX(this.host.ownerDocument),
     );

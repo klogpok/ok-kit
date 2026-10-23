@@ -185,6 +185,24 @@ describe('UiPopoverTrigger', () => {
     expect(panel()).toBeNull();
   });
 
+  it('opens in each corner with its panel class', async () => {
+    const corners: UiPopoverPosition[] = [
+      'corner-top-start',
+      'corner-top-end',
+      'corner-bottom-start',
+      'corner-bottom-end',
+    ];
+    for (const corner of corners) {
+      fixture.componentInstance.position.set(corner);
+      await settle();
+      fixture.componentInstance.trigger().open();
+      await settle();
+      expect(panel()?.classList).toContain(`ui-popover--${corner}`);
+      fixture.componentInstance.trigger().close();
+      await settle();
+    }
+  });
+
   it('closes on Escape while focus is still on the trigger', async () => {
     fixture.componentInstance.trigger().open();
     await settle();
