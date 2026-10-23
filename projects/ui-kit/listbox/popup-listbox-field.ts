@@ -100,6 +100,11 @@ export abstract class UiPopupListboxField<V>
     this.control().nativeElement.focus(options);
   }
 
+  /**
+   * Opens the list. `ui-select` and `ui-multi-select` open it at the selected option, else at the
+   * first one; `ui-time-input` at the selected time, or the one nearest to now (its `openAt`).
+   * `ui-autocomplete` activates no option until an arrow key.
+   */
   open(): void {
     this.listbox.open();
   }
