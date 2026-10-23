@@ -9,7 +9,7 @@ Run every step. Report failures with their output; do not report the phase as do
 
 ## 1. Automated checks
 
-Run `pnpm phase-check` from the repo root, in the background (it takes about ten minutes). It checks that the branch contains the local `master`, then runs every check below in order and stops at the first failure with that step's error tail; full logs are in `dist/phase-check/`. On success it ends with the lines the report quotes: test counts, the four coverage numbers, story and capture counts, budget warnings. The steps are listed in `scripts/phase-check.lib.mjs`.
+Run `pnpm phase-check` from the repo root, in the background (it takes about 25 minutes; `test-storybook` and `test-host-css` are most of it). It checks that the branch contains the local `master`, then runs every check below in order and stops at the first failure with that step's error tail; full logs are in `dist/phase-check/`. On success it ends with the lines the report quotes: test counts, the four coverage numbers, story and capture counts, budget warnings. The steps are listed in `scripts/phase-check.lib.mjs`.
 
 - `pnpm test-storybook` runs axe on every story in three modes (light/rtl, dark/rtl, light/ltr).
 - `pnpm test-host-css` prepends a host app's global CSS (the fixture in `scripts/host-css/`: Bootstrap 4.6.2 and the client's html/body rules) to every story in light RTL, light LTR and with a focused button, and fails when it changes a kit element (computed styles, or the pixels of a kit component). The inherited host body `color` and `letter-spacing` are accepted. Captures of a failure are in `dist/host-css/`; put the number of captures in the report.
@@ -41,4 +41,4 @@ End the phase with a report:
 - what is left;
 - deviations from the plan in [docs/ROADMAP.md](../../../docs/ROADMAP.md) and the decisions the user must make, each filed as a `needs-info` ticket ([docs/agents/issue-tracker.md](../../../docs/agents/issue-tracker.md) → "Open review questions").
 
-Record the status in `docs/ROADMAP.md`; work outside the phases gets its own section there, like "Leading actions в popup listbox", and a mention in the "Сейчас" line. Wait for approval before starting the next phase; after approval, record the review answers in `docs/DECISIONS.md` and close their tickets.
+Every change to the public API (a new input, export, icon or class rename) gets an entry in an `Unreleased (<topic>)` section of `projects/ui-kit/CHANGELOG.md`. Record the status in `docs/ROADMAP.md`; work outside the phases gets its own section there, like "Leading actions в popup listbox", and a mention in the "Сейчас" line. Wait for approval before starting the next phase; after approval, record the review answers in `docs/DECISIONS.md` and close their tickets.
