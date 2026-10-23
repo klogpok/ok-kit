@@ -312,3 +312,22 @@ describe('UiRadioGroup readonly', () => {
     expect(courier.hasAttribute('aria-label')).toBe(false);
   });
 });
+
+@Component({
+  imports: [UiRadioGroup, UiRadio],
+  template: `
+    <ui-radio-group size="xl" aria-label="Plan">
+      <ui-radio value="basic">Basic</ui-radio>
+    </ui-radio-group>
+  `,
+})
+class XlRadioHost {}
+
+describe('UiRadioGroup size', () => {
+  it('passes the xl size to its radios', async () => {
+    const fixture = TestBed.createComponent(XlRadioHost);
+    await settle(fixture);
+    const radio = (fixture.nativeElement as HTMLElement).querySelector('ui-radio')!;
+    expect(radio.classList).toContain('ui-radio--xl');
+  });
+});

@@ -17,8 +17,8 @@ import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
   UiFormControlBase,
+  UiChoiceSize,
   UiFormFieldControl,
-  UiSize,
 } from '@vplans/ui-kit/core';
 
 /** What a radio may do with its group, kept out of the public `UiRadioGroup` API. Internal. */
@@ -82,7 +82,7 @@ export class UiRadioGroup<T = unknown>
   /** Shared native `name`; generated when omitted. */
   readonly name = input(this.ids.getId('ui-radio-group-name-'));
   readonly orientation = input<'vertical' | 'horizontal'>('vertical');
-  readonly size = input<UiSize>('md');
+  readonly size = input<UiChoiceSize>('md');
   readonly ariaLabel = input('', { alias: 'aria-label' });
   readonly ariaLabelledby = input('', { alias: 'aria-labelledby' });
   /**

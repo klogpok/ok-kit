@@ -23,6 +23,11 @@
   --_font-size: var(--ui-font-size-md);
 }
 
+:host(.ui-radio--xl) {
+  --_size: var(--ui-icon-size-lg);
+  --_font-size: var(--ui-font-size-lg);
+}
+
 .ui-radio__label {
   display: inline-flex;
   // A host reboot (`label { margin-bottom }`) must not move it.

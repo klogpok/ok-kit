@@ -10,7 +10,7 @@ const meta: Meta<RadioArgs> = {
   decorators: [moduleMetadata({ imports: [UiRadio, UiFormField, UiError] })],
   argTypes: {
     orientation: { control: 'inline-radio', options: ['vertical', 'horizontal'] },
-    size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] },
+    size: { control: 'inline-radio', options: ['sm', 'md', 'lg', 'xl'] },
     value: { control: 'inline-radio', options: [null, 'standard', 'express', 'pickup'] },
   },
   args: { value: 'standard', orientation: 'vertical', size: 'md', disabled: false, invalid: false },
@@ -52,7 +52,7 @@ export const Sizes: Story = {
   render: () => ({
     template: `
       <div style="display:grid;gap:24px">
-        @for (s of ['sm', 'md', 'lg']; track s) {
+        @for (s of ['sm', 'md', 'lg', 'xl']; track s) {
           <ui-radio-group [size]="$any(s)" value="a" orientation="horizontal" [attr.aria-label]="s">
             <ui-radio value="a">Option A</ui-radio>
             <ui-radio value="b">Option B</ui-radio>
