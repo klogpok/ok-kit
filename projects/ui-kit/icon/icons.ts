@@ -257,6 +257,52 @@ export const uiIconFileUpload = {
   ),
 } as const satisfies UiIconDefinition;
 
+// File types: the outline of `file` with a glyph inside.
+const fileSvg = (glyph: string): string =>
+  svg(
+    `<path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-10l-5-5zM14 3.5v5h5"/>${glyph}`,
+  );
+
+export const uiIconFileImage = {
+  name: 'file-image',
+  svg: fileSvg('<circle cx="9.5" cy="11.5" r="1"/><path d="M8 17.5l3-3 2 2 1.5-1.5 1.5 1.5"/>'),
+} as const satisfies UiIconDefinition;
+
+export const uiIconFilePdf = {
+  name: 'file-pdf',
+  svg: fileSvg(
+    '<path stroke-width="1.5" d="M7.5 17v-5h1.25a1.5 1.5 0 0 1 0 3H7.5M11 17v-5h.5a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2zM15.5 17v-5h1.5M15.5 14.5h1.25"/>',
+  ),
+} as const satisfies UiIconDefinition;
+
+export const uiIconFileText = {
+  name: 'file-text',
+  svg: fileSvg('<path d="M9 9.5h2M9 13h6M9 16.5h6"/>'),
+} as const satisfies UiIconDefinition;
+
+export const uiIconFileSpreadsheet = {
+  name: 'file-spreadsheet',
+  svg: fileSvg('<path d="M8.5 11.5h7v6h-7zM8.5 14.5h7M11.5 11.5v6"/>'),
+} as const satisfies UiIconDefinition;
+
+export const uiIconFilePresentation = {
+  name: 'file-presentation',
+  svg: fileSvg('<path d="M8.5 11h7v4.5h-7zM12 15.5v2M10.5 17.5h3"/>'),
+} as const satisfies UiIconDefinition;
+
+export const uiIconFileArchive = {
+  name: 'file-archive',
+  svg: fileSvg(
+    '<path d="M10 3.5v1.5M10 7v1.5M10 10.5v1.5"/><rect x="8.5" y="14" width="3" height="3.5" rx="1"/>',
+  ),
+} as const satisfies UiIconDefinition;
+
+/** A drafting triangle: drawings and models (CAD, BIM). */
+export const uiIconFileDrawing = {
+  name: 'file-drawing',
+  svg: fileSvg('<path d="M8.5 17.5v-7l7 7zM8.5 14.5H10"/>'),
+} as const satisfies UiIconDefinition;
+
 export const uiIconPaperclip = {
   name: 'paperclip',
   svg: svg(
@@ -317,6 +363,13 @@ export const UI_ICONS_ALL = [
   uiIconLogOut,
   uiIconFile,
   uiIconFileUpload,
+  uiIconFileImage,
+  uiIconFilePdf,
+  uiIconFileText,
+  uiIconFileSpreadsheet,
+  uiIconFilePresentation,
+  uiIconFileArchive,
+  uiIconFileDrawing,
   uiIconPaperclip,
   uiIconArrowsUpDown,
 ] as const satisfies readonly UiIconDefinition[];
