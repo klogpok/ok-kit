@@ -8,6 +8,7 @@ export {
   UI_DROPDOWN_POSITIONS,
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
   UI_OPPOSITE_SIDE,
+  UI_OVERLAY_PLACEMENTS,
   UI_SIDE_POSITIONS,
   overlayPlacementPositions,
   sideOverlayPositions,

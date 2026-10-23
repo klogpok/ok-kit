@@ -6,6 +6,7 @@ import {
   TestElement,
   TestKey,
 } from '@angular/cdk/testing';
+import { UI_OVERLAY_PLACEMENTS } from '@vplans/ui-kit/core';
 import type { UiPopoverPosition } from '@vplans/ui-kit/popover';
 import { UiHarness } from './harness';
 import { uiModifier } from './modifier';
@@ -16,17 +17,6 @@ export interface UiPopoverHarnessFilters extends BaseHarnessFilters {
   /** `aria-label` of the trigger (e.g. the `label` of an icon button). */
   label?: string | RegExp;
 }
-
-const POSITIONS: readonly UiPopoverPosition[] = [
-  'top',
-  'bottom',
-  'start',
-  'end',
-  'corner-top-start',
-  'corner-top-end',
-  'corner-bottom-start',
-  'corner-bottom-end',
-];
 
 /**
  * Harness for a popover: the element with `[uiPopoverTriggerFor]`. The popover lives in an
@@ -85,7 +75,7 @@ export class UiPopoverHarness extends UiHarness {
    */
   async getPosition(): Promise<UiPopoverPosition | null> {
     const panel = await this.panel();
-    return panel ? uiModifier(panel, 'ui-popover--', POSITIONS) : null;
+    return panel ? uiModifier(panel, 'ui-popover--', UI_OVERLAY_PLACEMENTS) : null;
   }
 
   /** Harnesses are loaded from the open popover. Throws while it is closed. */

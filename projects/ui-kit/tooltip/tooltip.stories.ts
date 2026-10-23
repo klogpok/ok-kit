@@ -1,6 +1,7 @@
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { expect } from 'storybook/test';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
+import { UI_OVERLAY_PLACEMENTS } from '@vplans/ui-kit/core';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { until } from '../.storybook/play';
 import { UiTooltip, UiTooltipPosition } from './tooltip';
@@ -21,16 +22,7 @@ const meta: Meta<TooltipArgs> = {
   argTypes: {
     placement: {
       control: 'select',
-      options: [
-        'top',
-        'bottom',
-        'start',
-        'end',
-        'corner-top-start',
-        'corner-top-end',
-        'corner-bottom-start',
-        'corner-bottom-end',
-      ],
+      options: UI_OVERLAY_PLACEMENTS,
     },
   },
 };

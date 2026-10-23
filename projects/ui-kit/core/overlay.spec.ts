@@ -1,6 +1,7 @@
 import type { ConnectedPosition, OverlayRef } from '@angular/cdk/overlay';
 import {
   UI_DROPDOWN_POSITIONS,
+  UI_OVERLAY_PLACEMENTS,
   blockFittingPositions,
   overlayPlacementPositions,
   pushOnScreen,
@@ -125,6 +126,29 @@ describe('overlayPlacementPositions', () => {
     expect(overlayPlacementPositions('corner-top-end', 'p')).toEqual([topEnd, bottomEnd]);
     expect(overlayPlacementPositions('corner-bottom-start', 'p')).toEqual([bottomStart, topStart]);
     expect(overlayPlacementPositions('corner-bottom-end', 'p')).toEqual([bottomEnd, topEnd]);
+  });
+});
+
+describe('UI_OVERLAY_PLACEMENTS', () => {
+  it('lists the four sides and the four corners, each once', () => {
+    expect([...UI_OVERLAY_PLACEMENTS]).toEqual([
+      'top',
+      'bottom',
+      'start',
+      'end',
+      'corner-top-start',
+      'corner-top-end',
+      'corner-bottom-start',
+      'corner-bottom-end',
+    ]);
+  });
+
+  it('has a position and a flip for every placement', () => {
+    for (const placement of UI_OVERLAY_PLACEMENTS) {
+      const [preferred, flipped] = overlayPlacementPositions(placement, 'p');
+      expect(preferred.panelClass).toBe(`p--${placement}`);
+      expect(flipped.panelClass).not.toBe(preferred.panelClass);
+    }
   });
 });
 

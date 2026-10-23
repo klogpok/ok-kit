@@ -3,6 +3,7 @@ import { expect } from 'storybook/test';
 import { until } from '../.storybook/play';
 import { UiButton } from '@vplans/ui-kit/button';
 import { UiCheckbox } from '@vplans/ui-kit/checkbox';
+import { UI_OVERLAY_PLACEMENTS } from '@vplans/ui-kit/core';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiInput } from '@vplans/ui-kit/input';
@@ -13,23 +14,12 @@ interface PopoverArgs {
   placement: UiPopoverPosition;
 }
 
-const PLACEMENTS: readonly UiPopoverPosition[] = [
-  'top',
-  'bottom',
-  'start',
-  'end',
-  'corner-top-start',
-  'corner-top-end',
-  'corner-bottom-start',
-  'corner-bottom-end',
-];
-
 const meta: Meta<PopoverArgs> = {
   title: 'Overlays/Popover',
   component: UiPopoverTrigger,
   decorators: [moduleMetadata({ imports: [UiButton, UiCheckbox, UiFormField, UiIcon, UiInput] })],
   argTypes: {
-    placement: { control: 'inline-radio', options: PLACEMENTS },
+    placement: { control: 'inline-radio', options: UI_OVERLAY_PLACEMENTS },
   },
 };
 

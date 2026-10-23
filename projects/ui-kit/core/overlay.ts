@@ -66,6 +66,18 @@ export type UiOverlayCorner =
 /** Where a tooltip or popover sits against its trigger: a side or a corner. */
 export type UiOverlayPlacement = UiOverlaySide | UiOverlayCorner;
 
+/** Every placement: the four sides, then the four corners. */
+export const UI_OVERLAY_PLACEMENTS: readonly UiOverlayPlacement[] = [
+  'top',
+  'bottom',
+  'start',
+  'end',
+  'corner-top-start',
+  'corner-top-end',
+  'corner-bottom-start',
+  'corner-bottom-end',
+];
+
 /** Position of an overlay at each placement. A corner's inline edge meets the trigger's. */
 const PLACEMENT_POSITIONS: Readonly<Record<UiOverlayPlacement, ConnectedPosition>> = {
   ...UI_SIDE_POSITIONS,

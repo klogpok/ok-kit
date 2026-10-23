@@ -5,6 +5,7 @@ import {
   TestElement,
   TestKey,
 } from '@angular/cdk/testing';
+import { UI_OVERLAY_PLACEMENTS } from '@vplans/ui-kit/core';
 import type { UiTooltipPosition } from '@vplans/ui-kit/tooltip';
 import { UiHarness } from './harness';
 import { uiModifier } from './modifier';
@@ -15,17 +16,6 @@ export interface UiTooltipHarnessFilters extends BaseHarnessFilters {
   /** `aria-label` of the trigger (e.g. the `label` of an icon button). */
   label?: string | RegExp;
 }
-
-const POSITIONS: readonly UiTooltipPosition[] = [
-  'top',
-  'bottom',
-  'start',
-  'end',
-  'corner-top-start',
-  'corner-top-end',
-  'corner-bottom-start',
-  'corner-bottom-end',
-];
 
 /**
  * Harness for a tooltip: the element with `uiTooltip`. The tooltip lives in an overlay, found
@@ -92,7 +82,7 @@ export class UiTooltipHarness extends UiHarness {
    */
   async getPosition(): Promise<UiTooltipPosition | null> {
     const tooltip = await this.tooltip();
-    return tooltip ? uiModifier(tooltip, 'ui-tooltip--', POSITIONS) : null;
+    return tooltip ? uiModifier(tooltip, 'ui-tooltip--', UI_OVERLAY_PLACEMENTS) : null;
   }
 
   /**
