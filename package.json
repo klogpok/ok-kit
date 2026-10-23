@@ -23,6 +23,7 @@
     "test-visual:update": "node scripts/check-visual.mjs --update",
     "test-host-css": "node scripts/check-host-css.mjs",
     "test-scripts": "node --test \"scripts/*.test.mjs\"",
+    "phase-check": "node scripts/phase-check.mjs",
     "sync:client": "node scripts/sync-to-client.mjs"
   },
   "private": true,

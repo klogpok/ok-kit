@@ -408,7 +408,7 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 ## Проверка (каждая фаза)
 
-1. `pnpm tokens && pnpm lint && pnpm format:check && pnpm test:coverage && pnpm test:playground && pnpm build && pnpm build:playground && pnpm build-storybook && pnpm test-storybook && pnpm test-visual`, плюс `pnpm exec ngc -p projects/ui-kit/.storybook/tsconfig.json --noEmit`.
+1. `pnpm phase-check` (шаги — в `scripts/phase-check.lib.mjs`; порядок проверки — скилл `/phase-check`).
 2. Для каждого компонента: спеки на рендер, inputs/outputs, клавиатуру и ARIA; для контролов ещё Reactive (включая `formControlName`) и ngModel. Harness из 6.0 для новых компонентов.
 3. Браузер (Edge через `playwright-core`) в light/dark/RTL: CSS-замеры и скриншоты ключевых состояний, как `browser-check.mjs` из фазы 5.
 4. Отчёт фазы: что сделано, что осталось, решения. Ждать одобрения.
