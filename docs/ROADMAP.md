@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Иконки типов файлов в file upload сделаны и одобрены (2026-10-23). Popup listbox field сделан и ждёт одобрения (2026-10-23) — раздел «Popup listbox field» ниже. Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Иконки типов файлов в file upload сделаны и одобрены (2026-10-23). Popup listbox field сделан и ждёт одобрения (2026-10-23) — раздел «Popup listbox field» ниже. Углы оверлеев у tooltip и popover (2026-10-23) сделаны и ждут проверки `/phase-check` и одобрения — раздел «Углы оверлеев» ниже. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -415,6 +415,12 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 > Архитектурная работа вне фаз, кандидат 2 архитектурного обзора 2026-10-23. Спека и тикеты 01–05 — в `.scratch/parsed-text-field/`; термины — в `GLOSSARY.md` («Typed values»); решения — в [DECISIONS.md](DECISIONS.md) («Parsed text field»).
 >
 > **Статус (2026-10-23): спека готова, тикеты `ready-for-agent`.** Идёт до спеки popup listbox field (кандидат 1, `.scratch/popup-listbox-field/`).
+
+## Углы оверлеев: tooltip и popover (решено и сделано 2026-10-23)
+
+> Работа вне фаз. Спека и тикеты 01–05 — в `.scratch/overlay-corners/`; термины — в `GLOSSARY.md` («Overlays»); решения — в [DECISIONS.md](DECISIONS.md) («Overlay corners»).
+>
+> **Статус (2026-10-23): тикеты 01–04 сделаны, ждёт `/phase-check` и одобрения пользователя.** Tooltip и popover принимают четыре угла: `corner-top-start`, `corner-top-end`, `corner-bottom-start`, `corner-bottom-end` (логические, снаружи угла триггера, зазор только по вертикали). Флип — вертикальное зеркало, затем push. `UiTooltipPosition` и `UiPopoverPosition` стали псевдонимами `UiOverlayPlacement`; в `core` публичны `overlayPlacementPositions()`, `UiOverlayCorner`, `UiOverlayPlacement`. Вне плана тикет 03 изменил стратегию popover: после CDK она повторно применяет только позиции, подходящие по вертикали, а resize вызывает `apply()`, не только push (CHANGELOG, DECISIONS). Открытый вопрос: тикет 05 (`needs-info`) о ширине мостика у углового tooltip на скруглённом триггере.
 
 ## Критичные файлы и что переиспользовать
 

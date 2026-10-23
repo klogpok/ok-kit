@@ -842,3 +842,64 @@ bar):
   (a green icon reads as success), a muted card instead of the border, a slot for app text.
 - **Baselines:** `WithFiles` and `ButtonVariant` are re-taken with this change, so they also show
   the type icons from "File upload: file type icons".
+
+## Overlay corners (decided 2026-10-23)
+
+Feature work outside the phases. Spec and tickets 01–04 are in `.scratch/overlay-corners/`; the
+terms **placement**, **side**, **corner**, **aligned placement**, **flip** and **push** are in
+`GLOSSARY.md` → "Overlays".
+
+User decisions (grilling, 2026-10-23):
+
+1. **A corner, not an aligned placement.** "Left top" means diagonally outside the corner of the
+   trigger: above (or below) it and entirely before its start edge (or after its end edge). Its
+   inline edge meets the trigger's edge. The menu's aligned `top-start` is not added to the
+   tooltip or the popover.
+2. **Logical names with a `corner-` prefix:** `corner-top-start`, `corner-top-end`,
+   `corner-bottom-start`, `corner-bottom-end`. The menu owns `top-start`, `top-end`,
+   `bottom-start` and `bottom-end` as aligned placements, so reusing them would give one value two
+   meanings. `start` and `end` follow the text direction; no physical `left` / `right` names or
+   aliases.
+3. **Tooltip and popover only.** They already share `UiOverlaySide`. The menu (CDK Menu presets)
+   and the dropdown panels (select, multi-select, autocomplete, time input, date pickers: they
+   follow the field's width) do not change.
+4. **Flip: vertical mirror, then push.** A corner flips to the corner on the other block side with
+   the same inline side (`corner-top-start` ↔ `corner-bottom-start`, `corner-top-end` ↔
+   `corner-bottom-end`). No horizontal flip: with no room on the inline axis the push moves the
+   overlay along the trigger, and the block gap keeps it off the trigger. The tooltip keeps the
+   CDK push; the popover keeps the kit's own push (ticket 31 of phase 9).
+5. **The gap is on the block axis only.** `--ui-tooltip-offset` / `--ui-popover-offset` separate
+   the overlay from the trigger vertically (block-end gap for the top corners, block-start for the
+   bottom ones). The tooltip's hover bridge is the strip of `top` / `bottom`: the width of the
+   tooltip, in the gap, touching the trigger's corner (WCAG 1.4.13 hoverable).
+
+What was delivered:
+
+- **Core:** `overlayPlacementPositions()`, `UiOverlayCorner` and `UiOverlayPlacement` are public;
+  `sideOverlayPositions()` is a wrapper. The corner connected positions and the flip table stay
+  internal to `core/overlay.ts`, so the tooltip and the popover cannot drift.
+- **Types:** `UiTooltipPosition` and `UiPopoverPosition` are aliases of `UiOverlayPlacement`. The
+  defaults stay `top` and `bottom`; `provideUiTooltip({ position })` accepts a corner.
+- **Stories:** the tooltip has `Corners` with all four; the popover has a single `Corner` and
+  `CornerAtTheEdge`, because two popovers cannot be open at once.
+- **Harnesses:** `getPosition()` of both read a corner from the panel class, after a flip too.
+
+Agent notes (ticket 03, outside its plan):
+
+- **The popover strategy re-applies with the fitting positions.** `UiPopoverPositionStrategy
+  .apply()` lets the CDK apply first; if the block axis of some positions does not fit while
+  another's does, it applies again with only the fitting ones, then pushes. Why: the CDK picks
+  the best fallback by visible area, and a corner overlay past the viewport edge on the inline
+  axis has none (or a negative one), so the CDK kept a top corner with no room above and the push
+  then moved the popover over the trigger. The vertical flip must win, and the push only moves it
+  along the trigger. When no position fits on the block axis, all stay, as before.
+- **A resize calls the wrapper's `apply()`,** not only `push()`: the CDK strategy applies itself
+  on a resize with the positions that fitted before, so the wrapper subscribes after it and
+  applies again. A resize can flip a popover now.
+- **No visual change for sides.** The new baselines are only for the corners: the stories
+  `overlays-tooltip--corners`, `overlays-popover--corner` and
+  `overlays-popover--corner-at-the-edge`.
+
+Open question (`needs-info`, ticket 05 of `.scratch/overlay-corners/`): on a rounded trigger the
+pointer crossing exactly through the corner leaves both the trigger and the corner bridge for 1–2
+px; should the bridge be wider than decision 5 says? It is not answered; decision 5 stands.

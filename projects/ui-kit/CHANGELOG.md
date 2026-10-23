@@ -3,6 +3,40 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (overlay corners)
+
+### Added
+
+- **tooltip, popover:** four corner placements, `corner-top-start`, `corner-top-end`,
+  `corner-bottom-start` and `corner-bottom-end`: the overlay opens diagonally outside that corner
+  of its trigger, above or below it and entirely before its start edge or after its end edge.
+  `start` and `end` follow the text direction. There is no inline gap; `--ui-tooltip-offset` /
+  `--ui-popover-offset` separate the overlay from the trigger on the block axis only, and a corner
+  tooltip has the same hover bridge as `top` / `bottom`. A corner with no room flips to its
+  vertical mirror on the same inline side; the push (the CDK's for the tooltip, the kit's own for
+  the popover) handles the inline axis. `provideUiTooltip({ position })` accepts a corner. The
+  defaults are unchanged (`top`, `bottom`). Stories: `Corners` (tooltip), `Corner` and
+  `CornerAtTheEdge` (popover).
+- **core:** `overlayPlacementPositions(preferred, panelClassPrefix)` returns the preferred
+  position and its flip for any placement, each with the pane class `<prefix>--<placement>`;
+  `sideOverlayPositions()` is now a wrapper over it and keeps its result for sides. New types
+  `UiOverlayCorner` and `UiOverlayPlacement` (`UiOverlaySide | UiOverlayCorner`). The corner
+  positions and the flip pairs stay internal.
+- **testing:** `UiTooltipHarness.getPosition()` and `UiPopoverHarness.getPosition()` return a
+  corner too, the one the overlay ended up in after a flip.
+
+### Changed
+
+- **tooltip, popover:** `UiTooltipPosition` and `UiPopoverPosition` are now aliases of
+  `UiOverlayPlacement`, so they accept the corners besides the four sides. Code that assigns them
+  to a narrower type of its own (`UiOverlaySide`) must widen it.
+- **popover:** `UiPopoverPositionStrategy.apply()` lets the CDK choose a position first; if the
+  block axis of some positions does not fit and another's does, it applies again with only the
+  fitting positions, then pushes. The CDK compares visible areas, and an overlay past the viewport
+  edge on the inline axis has none (or a negative one), so it kept a corner with no room above and
+  the push moved the popover over the trigger. A window resize now calls this `apply()`, not only
+  the push, so a resize flips a popover as well. Sides behave as before.
+
 ## Unreleased (popup listbox field)
 
 ### Changed

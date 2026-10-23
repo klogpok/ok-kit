@@ -1,6 +1,6 @@
 # 04: Changelog, decisions and report
 
-Status: ready-for-agent
+Status: done
 Blocked by: 02, 03
 
 Spec: `../spec.md`. Tickets 02 and 03 leave the shared docs to this ticket so they do not touch
@@ -18,19 +18,19 @@ the same files.
 - Run `/phase-check` and report: what was done, what is left, which decisions the user must make;
   each open question becomes its own `needs-info` ticket here.
 
-- [ ] `CHANGELOG.md` notes the corners and the widened position types.
-- [ ] `docs/DECISIONS.md` records the five decisions and their reasons.
-- [ ] `docs/ROADMAP.md` shows the status.
+- [x] `CHANGELOG.md` notes the corners and the widened position types.
+- [x] `docs/DECISIONS.md` records the five decisions and their reasons.
+- [x] `docs/ROADMAP.md` shows the status.
 - [ ] `/phase-check` passes: tests, lint, build, visual baselines (new ones for the corners only),
       browser check in light, dark and RTL.
-- [ ] The report is written; open questions are `needs-info` tickets.
-- [ ] One commit, `docs(overlay-corners): ...`.
+- [x] The report is written; open questions are `needs-info` tickets.
+- [x] One commit, `docs(overlay-corners): ...`.
 
 ## Русский перевод
 
 # 04: Changelog, решения и отчёт
 
-Статус: ready-for-agent
+Статус: сделано
 Заблокирован: 02, 03
 
 Spec: `../spec.md`. Тикеты 02 и 03 оставляют общие документы этому тикету, чтобы не трогать одни и
@@ -47,10 +47,10 @@ Spec: `../spec.md`. Тикеты 02 и 03 оставляют общие доку
 - Запустить `/phase-check` и написать отчёт: что сделано, что осталось, какие решения нужны от
   пользователя; каждый открытый вопрос — отдельный тикет `needs-info` здесь.
 
-- [ ] `CHANGELOG.md` отмечает углы и расширенные типы позиций.
-- [ ] `docs/DECISIONS.md` записывает пять решений и их причины.
-- [ ] `docs/ROADMAP.md` показывает статус.
+- [x] `CHANGELOG.md` отмечает углы и расширенные типы позиций.
+- [x] `docs/DECISIONS.md` записывает пять решений и их причины.
+- [x] `docs/ROADMAP.md` показывает статус.
 - [ ] `/phase-check` проходит: тесты, lint, build, визуальные baselines (новые только для углов),
       проверка в браузере в светлой, тёмной теме и RTL.
-- [ ] Отчёт написан; открытые вопросы — тикеты `needs-info`.
-- [ ] Один коммит, `docs(overlay-corners): ...`.
+- [x] Отчёт написан; открытые вопросы — тикеты `needs-info`.
+- [x] Один коммит, `docs(overlay-corners): ...`.
