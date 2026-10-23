@@ -50,6 +50,7 @@ Repeat until `ORCH next` launches nothing and nothing is in flight.
 > - At each TDD step run `node <main>/scripts/orchestrator.mjs beat <id> "<red|green|refactor>: <what>"`; it describes your progress to the user.
 > - In the ticket file tick the done items in both languages and set `Status: done` / `Статус: сделано`.
 > - Before reporting, `pnpm check` (PowerShell) must pass. Do not merge into `spec/<feature>`.
+> - A ticket item asking for `/phase-check` or a full `test-visual` / `test-host-css` run belongs to the orchestrator: its verify runs them once for the whole spec. Leave that item unticked and run the `--filter` variants for the stories you changed.
 > - Stop every process you started. Never kill one you did not start.
 > - Report: branch, worktree path, commits, test counts, deviations from the ticket, open questions.
 
@@ -74,7 +75,7 @@ Repeat until `ORCH next` launches nothing and nothing is in flight.
 
 ## 6. Verify
 
-`ORCH phase verify`. In a worktree on `spec/<feature>`, run the automated chain of section 1 of `.claude/skills/phase-check/SKILL.md` (all tests, builds, stories, visual, host CSS). On failure, a fixer agent and the merge of step 4 again; after two rounds still red, stop and report the failures with their output.
+`ORCH phase verify`. In a worktree on `spec/<feature>`, run the automated chain of section 1 of `.claude/skills/phase-check/SKILL.md` (all tests, builds, stories, visual, host CSS). On failure, a fixer agent and the merge of step 4 again; after two rounds still red, stop and report the failures with their output. Green: in that worktree tick the `/phase-check` items the ticket agents left open (both languages), commit and fast-forward `spec/<feature>`.
 
 ## 7. Report and hand over
 
