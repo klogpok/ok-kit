@@ -1,0 +1,128 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChildren,
+  forwardRef,
+  input,
+  model,
+  signal,
+} from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  UI_FORM_FIELD_CONTROL,
+  UiFormControlBase,
+  ɵUiDropdownPanel as UiDropdownPanel,
+} from '@vplans/ui-kit/core';
+import { UiComboboxControl, UI_POPUP_LISTBOX_FIELD } from './combobox-control';
+import { injectListbox, provideUiListbox } from './listbox-controller';
+import { UiListbox } from './listbox';
+import { UiOption } from './option';
+
+async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
+  fixture.detectChanges();
+  await fixture.whenStable();
+  fixture.detectChanges();
+}
+
+/** A minimal popup listbox field: a combobox input over the listbox controller. */
+@Component({
+  selector: 'ui-test-popup-field',
+  imports: [CdkOverlayOrigin, UiComboboxControl, UiDropdownPanel, UiListbox],
+  providers: [
+    { provide: UI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => TestPopupField) },
+    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => TestPopupField) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TestPopupField), multi: true },
+    provideUiListbox(),
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <div cdkOverlayOrigin #origin="cdkOverlayOrigin">
+      <!-- uiComboboxControl sets aria-expanded and aria-controls. -->
+      <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
+      <input
+        uiComboboxControl
+        class="control"
+        role="combobox"
+        (click)="listbox.open({ activate: false })"
+        (keydown)="listbox.handleKeydown($event)"
+      />
+      <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
+    </div>
+    <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="listbox.close()">
+      <ui-listbox><ng-content /></ui-listbox>
+    </ng-template>
+  `,
+})
+class TestPopupField extends UiFormControlBase<string | null> {
+  readonly id = input('fruit');
+  readonly ariaLabel = input('', { alias: 'aria-label' });
+  readonly value = model<string | null>(null);
+  readonly labelStrategy = 'for' as const;
+  readonly controlId = computed(() => `${this.id()}-control`);
+
+  private readonly content = contentChildren<UiOption<string>>(UiOption, { descendants: true });
+
+  readonly listbox = injectListbox<string>({
+    mode: () => 'trigger',
+    id: this.id,
+    ariaLabel: this.ariaLabel,
+    contentOptions: this.content,
+    isSelected: (value) => value === this.value(),
+    select: (value) => {
+      this.value.set(value as string);
+      this.notifyChange(value as string);
+      this.listbox.close();
+    },
+  });
+
+  writeValue(value: string | null): void {
+    this.value.set(value ?? null);
+  }
+
+  focus(): void {
+    // Not needed by the contract spec.
+  }
+}
+
+@Component({
+  imports: [TestPopupField, UiOption],
+  template: `
+    <ui-test-popup-field [aria-label]="label()">
+      @for (fruit of fruits; track fruit) {
+        <ui-option [value]="fruit">{{ fruit }}</ui-option>
+      }
+    </ui-test-popup-field>
+  `,
+})
+class Host {
+  readonly fruits = ['Apple', 'Banana'];
+  readonly label = signal('Fruit');
+}
+
+describe('[uiComboboxControl] on a popup listbox field', () => {
+  let fixture: ComponentFixture<Host>;
+  let root: HTMLElement;
+  const control = () => root.querySelector<HTMLInputElement>('.control')!;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(Host);
+    root = fixture.nativeElement as HTMLElement;
+    await settle(fixture);
+  });
+
+  afterEach(() => fixture.destroy());
+
+  it('names a closed combobox and points nowhere', () => {
+    expect(control().id).toBe('fruit-control');
+    expect(control().getAttribute('aria-label')).toBe('Fruit');
+    expect(control().getAttribute('aria-expanded')).toBe('false');
+    expect(control().hasAttribute('aria-controls')).toBe(false);
+    expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+    expect(control().hasAttribute('aria-required')).toBe(false);
+    expect(control().hasAttribute('aria-invalid')).toBe(false);
+    expect(control().hasAttribute('aria-describedby')).toBe(false);
+  });
+});
