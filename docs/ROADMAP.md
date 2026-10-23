@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Иконки типов файлов в file upload сделаны и одобрены (2026-10-23). Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Иконки типов файлов в file upload сделаны и одобрены (2026-10-23). Popup listbox field сделан и ждёт одобрения (2026-10-23) — раздел «Popup listbox field» ниже. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -399,6 +399,12 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 ## Иконки типов файлов в file upload (решено, сделано и одобрено 2026-10-23)
 
 > **Статус (2026-10-23): сделано и одобрено.** Семь новых иконок в `icon` (контур листа с глифом): изображение, PDF, документ, таблица, презентация, архив, чертёж (CAD/BIM). `ui-file-upload` показывает у каждого файла иконку его типа: по MIME, иначе по расширению; `fileTypeIcon(file)` публичная, вход `fileIcon` переопределяет выбор; у отклонённого файла остаётся alert. Новая история `FileTypes`. Решения — в [DECISIONS.md](DECISIONS.md) («File upload: file type icons»).
+
+## Popup listbox field (решено и сделано 2026-10-23)
+
+> Архитектурная работа вне фаз, кандидат 1 архитектурного обзора 2026-10-23. Спека и тикеты 01–03 — в `.scratch/popup-listbox-field/`; термин — в `GLOSSARY.md` («Popup listbox field»); решения — в [DECISIONS.md](DECISIONS.md) («Popup listbox field: time input aria-readonly»).
+>
+> **Статус (2026-10-23): тикеты 01–03 сделаны, ждёт одобрения пользователя.** Динамическую ARIA combobox четырёх полей (select, multi-select, autocomplete, time input) ставит внутренняя директива `[uiComboboxControl]`; общие inputs, outputs, host-классы, blur и providers — в базовом классе `ɵUiPopupListboxField` и helper `ɵprovideUiPopupListboxField()` в entry point `listbox`. DOM и публичный интерфейс полей не изменились, кроме одного: `ui-time-input` теперь ставит `aria-readonly` (решение пользователя). Клиент локально не выкачан: `pnpm sync:client --verify` не запускался.
 
 ## Parsed text field: общий typed text (решено 2026-10-23)
 

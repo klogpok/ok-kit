@@ -39,6 +39,7 @@ and providers; consumers see no change.
 - [x] The existing specs and harnesses of the four fields pass without edits.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes (the
       client compiles with `useDefineForClassFields: false`).
+  - 2026-10-23, orchestrator: `pnpm phase-check` passed on `spec/popup-listbox-field` (1017 tests, 315 stories in 3 modes, baselines unchanged). `pnpm sync:client --verify` was not run: there is no client checkout on this machine, so the item stays open.
 - [ ] One commit, `refactor(listbox): ...`.
 
 ## Русский перевод
@@ -84,4 +85,5 @@ Spec: `../spec.md` → «Решения по реализации»: базов�
 - [x] Существующие спеки и harnesses четырёх полей проходят без правок.
 - [ ] `/phase-check` проходит, визуальные baselines не меняются; `pnpm sync:client --verify`
       проходит (клиент собирается с `useDefineForClassFields: false`).
+  - 2026-10-23, оркестратор: `pnpm phase-check` прошёл на `spec/popup-listbox-field` (1017 тестов, 315 историй в 3 режимах, baselines без изменений). `pnpm sync:client --verify` не запускался: на этой машине нет копии клиента, поэтому пункт остаётся открытым.
 - [ ] Один коммит, `refactor(listbox): ...`.

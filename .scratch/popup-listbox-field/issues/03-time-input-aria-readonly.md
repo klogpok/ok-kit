@@ -35,6 +35,7 @@ and let the directive of ticket 01 own it for all four fields.
 - [x] The answer and its reason are recorded in `docs/DECISIONS.md`; `CHANGELOG.md` notes the
       time input change.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
+  - 2026-10-23, orchestrator: `pnpm phase-check` passed on `spec/popup-listbox-field` (1017 tests, 315 stories in 3 modes, baselines unchanged). `pnpm sync:client --verify` was not run: there is no client checkout on this machine, so the item stays open.
 - [x] One commit, `fix(time): ...`.
 
 ## Русский перевод
@@ -78,4 +79,5 @@ field; рефакторинг тикетов 01–02 сохраняет ныне
       time input.
 - [ ] `/phase-check` проходит, визуальные baselines не меняются; `pnpm sync:client --verify`
       проходит.
+  - 2026-10-23, оркестратор: `pnpm phase-check` прошёл на `spec/popup-listbox-field` (1017 тестов, 315 историй в 3 режимах, baselines без изменений). `pnpm sync:client --verify` не запускался: на этой машине нет копии клиента, поэтому пункт остаётся открытым.
 - [x] Один коммит, `fix(time): ...`.
