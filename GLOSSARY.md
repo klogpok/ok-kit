@@ -42,6 +42,10 @@ _Avoid_: popup, dropdown (for the surface), overlay (for this role)
 A dropdown panel that holds a list of options the user moves through with the keyboard while focus stays in the field.
 _Avoid_: option panel, select panel, menu (a menu holds commands, not values)
 
+**Popup listbox field**:
+A form field that owns a popup listbox and whose inner control is a combobox: select, multi-select, autocomplete and time input. A date picker opens a calendar, not a popup listbox, so it is not one.
+_Avoid_: combobox (for the whole field; the combobox is its inner control), dropdown field
+
 **Option**:
 One value the user can choose in a popup listbox.
 _Avoid_: item, entry
