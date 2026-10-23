@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 4 (vertical mirror, then push; the tooltip keeps the CDK push, the popover the kit's push)
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** Found in ticket 03 and the review. When no position fits, the CDK keeps the one with the
 largest visible area. For a corner off screen on the inline axis that area is 0 or negative, so
@@ -27,13 +27,15 @@ No existing visual baseline changed. `CHANGELOG.md` and `docs/DECISIONS.md` desc
 
 ## Comments
 
+- 2026-10-23: Answered by the user: option 1, the block-fit re-apply stays for every placement, sides included, and a resize may flip an open overlay. Recorded in `docs/DECISIONS.md` → "Overlay corners".
+
 ## Русский перевод
 
 # 06: повторное применение по вертикали меняет и стороны
 
 **Спека:** [../spec.md](../spec.md) → решение 4 (вертикальное зеркало, затем push; tooltip оставляет push CDK, popover — push библиотеки)
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** Найдено в тикете 03 и на ревью. Когда ни одна позиция не помещается, CDK оставляет ту,
 у которой больше видимая площадь. У угла, вышедшего за край по горизонтали, эта площадь 0 или
@@ -59,3 +61,5 @@ No existing visual baseline changed. `CHANGELOG.md` and `docs/DECISIONS.md` desc
    resize. Два пути кода в стратегии.
 
 ## Комментарии
+
+- 2026-10-23: Ответ пользователя: вариант 1, повторное применение по вертикали остаётся для любого placement, включая стороны, и resize может перевернуть открытый оверлей. Записано в `docs/DECISIONS.md` → «Overlay corners».

@@ -908,6 +908,15 @@ Agent notes (ticket 03, outside its plan):
   `overlays-tooltip--corners`, `overlays-popover--corner` and
   `overlays-popover--corner-at-the-edge`.
 
-Open question (`needs-info`, ticket 05 of `.scratch/overlay-corners/`): on a rounded trigger the
-pointer crossing exactly through the corner leaves both the trigger and the corner bridge for 1–2
-px; should the bridge be wider than decision 5 says? It is not answered; decision 5 stands.
+Review answers (approved 2026-10-23, tickets 05–07 of `.scratch/overlay-corners/`), all keeping
+the built behavior:
+
+- **The corner bridge stays as decision 5 says (05).** On a rounded trigger the pointer crossing
+  exactly through the corner leaves both the trigger and the bridge for 1–2 px; the default 100 ms
+  hide delay absorbs it. An app that sets `uiTooltipHideDelay="0"` on a corner tooltip accepts it.
+- **The block-fit re-apply is for every placement (06),** sides included: a `top` / `bottom`
+  overlay goes to the vertical side that fits, and a window resize can flip an open popover or
+  tooltip. One rule, no corner-only path.
+- **Review leftovers stay (07):** `sideOverlayPositions()` stays a one-line wrapper without
+  `@deprecated`; `tooltip.scss` and `popover.scss` keep listing the corner classes next to `--top`
+  / `--bottom`, with no block-side pane class from core.

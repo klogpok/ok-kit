@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → "Implementation Decisions" (`sideOverlayPositions()` keeps working for sides)
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** The standards review of the spec branch left two judgement calls that were not fixed,
 because they change public API or a style pattern:
@@ -25,13 +25,15 @@ because they change public API or a style pattern:
 
 ## Comments
 
+- 2026-10-23: Answered by the user: option 1, leave both as they are: `sideOverlayPositions()` stays without `@deprecated`, the SCSS keeps its selector lists. Recorded in `docs/DECISIONS.md` → "Overlay corners".
+
 ## Русский перевод
 
 # 07: остатки ревью стандартов, затрагивающие публичный API или стили
 
 **Спека:** [../spec.md](../spec.md) → «Решения по реализации» (`sideOverlayPositions()` продолжает работать для сторон)
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** Ревью стандартов ветки спеки оставило два спорных места, которые не исправлены,
 потому что меняют публичный API или приём в стилях:
@@ -53,3 +55,5 @@ because they change public API or a style pattern:
 3. Вариант 2 плюс класс панели для стороны по вертикали из core, и SCSS выбирает по нему.
 
 ## Комментарии
+
+- 2026-10-23: Ответ пользователя: вариант 1, оставить оба как есть: `sideOverlayPositions()` остаётся без `@deprecated`, SCSS сохраняет списки селекторов. Записано в `docs/DECISIONS.md` → «Overlay corners».

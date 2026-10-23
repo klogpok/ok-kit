@@ -2,7 +2,7 @@
 
 **Spec:** [../spec.md](../spec.md) → decision 5 (gap only on the block axis, the bridge of `top` / `bottom`), user story 6
 
-**Status:** needs-info
+**Status:** done
 
 **Facts:** Found in ticket 02. A corner tooltip has no inline gap, and its hover bridge is the
 strip of `top` / `bottom`: the width of the tooltip, in the block gap, touching the trigger's
@@ -24,13 +24,15 @@ that the pointer can reach the tooltip without it going away; the default delay 
 
 ## Comments
 
+- 2026-10-23: Answered by the user: option 1, keep decision 5 as it is; the default 100 ms hide delay absorbs the 1–2 px. Recorded in `docs/DECISIONS.md` → "Overlay corners".
+
 ## Русский перевод
 
 # 05: мостик для наведения у углового tooltip на скруглённом триггере
 
 **Спека:** [../spec.md](../spec.md) → решение 5 (зазор только по вертикали, мостик как у `top` / `bottom`), пользовательская история 6
 
-**Статус:** needs-info
+**Статус:** сделано
 
 **Факты:** Найдено в тикете 02. У углового tooltip нет горизонтального зазора, а его мостик для
 наведения — та же полоса, что у `top` / `bottom`: шириной с tooltip, в вертикальном зазоре,
@@ -52,3 +54,5 @@ that the pointer can reach the tooltip without it going away; the default delay 
 3. Описать ограничение в разделе tooltip в README, CSS не менять.
 
 ## Комментарии
+
+- 2026-10-23: Ответ пользователя: вариант 1, решение 5 остаётся как есть; задержка скрытия 100 мс по умолчанию поглощает 1–2 px. Записано в `docs/DECISIONS.md` → «Overlay corners».
