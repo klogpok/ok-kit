@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -391,6 +391,10 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 > Архитектурная работа вне фаз, кандидат 1 архитектурного обзора 2026-10-21. Спека и тикеты 01–03 — в `.scratch/leading-actions/`; решения — в [DECISIONS.md](DECISIONS.md) («Leading actions»).
 >
 > **Статус (2026-10-22): тикеты 01–03 сделаны, ждёт одобрения пользователя.** «Добавить «…»» и «Выбрать все» стали данными контроллера listbox (`createAction`, `selectAllAction`); `ui-select`/`ui-multi-select` на них переведены; слот `[uiListboxLeading]` и хуки `leadingOptions`, `alwaysShown`, `passedOver`, `leadingShown`, `isIndeterminate` удалены; классы `.ui-select__leading`/`__create`/`__all` → `.ui-listbox__actions`/`__create`/`__select-all` (в CHANGELOG). Публичный интерфейс select и его harness не изменились. Клиент локально не выкачан: проверить, стилизует ли он старые классы, не удалось (тикет 03).
+
+## Размер xl у checkbox и radio (решено и сделано 2026-10-23)
+
+> **Статус (2026-10-23): сделано, ждёт одобрения пользователя.** `ui-checkbox` и `ui-radio-group` принимают `size="xl"` (тип `UiChoiceSize` в core): квадрат или кружок 24px и подпись `--ui-font-size-lg`, для визуального акцента. `ui-switch` остаётся на `UiSize`; `size` перенесён из `UiCheckableBase` в подклассы. Решения — в [DECISIONS.md](DECISIONS.md) («Checkbox and radio xl size»).
 
 ## Критичные файлы и что переиспользовать
 
