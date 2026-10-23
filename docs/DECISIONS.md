@@ -782,3 +782,9 @@ User decisions:
   the type icon.
 - **Rejected file:** keeps the alert icon instead of the type icon.
 - **A11y:** the icon stays decorative; the name already carries the extension, so no new labels.
+
+Review answers (approved 2026-10-23):
+
+- **Baselines:** the `WithFiles` and `ButtonVariant` baselines of file upload are not re-taken.
+  The new icons stay under the 0.1% pixel threshold, so they still show the plain `file` icon.
+  Take them again with the next change to those stories.
