@@ -21,8 +21,10 @@ the same files.
 - [x] `CHANGELOG.md` notes the corners and the widened position types.
 - [x] `docs/DECISIONS.md` records the five decisions and their reasons.
 - [x] `docs/ROADMAP.md` shows the status.
-- [ ] `/phase-check` passes: tests, lint, build, visual baselines (new ones for the corners only),
-      browser check in light, dark and RTL.
+- [x] `/phase-check` passes: tests, lint, build, visual baselines (new ones for the corners only),
+      browser check in light, dark and RTL. (2026-10-23, `pnpm phase-check` green; the browser
+      check is the play functions and baselines of `test-storybook` / `test-visual` in light-ltr,
+      light-rtl and dark-rtl.)
 - [x] The report is written; open questions are `needs-info` tickets.
 - [x] One commit, `docs(overlay-corners): ...`.
 
@@ -50,7 +52,9 @@ Spec: `../spec.md`. Тикеты 02 и 03 оставляют общие доку
 - [x] `CHANGELOG.md` отмечает углы и расширенные типы позиций.
 - [x] `docs/DECISIONS.md` записывает пять решений и их причины.
 - [x] `docs/ROADMAP.md` показывает статус.
-- [ ] `/phase-check` проходит: тесты, lint, build, визуальные baselines (новые только для углов),
-      проверка в браузере в светлой, тёмной теме и RTL.
+- [x] `/phase-check` проходит: тесты, lint, build, визуальные baselines (новые только для углов),
+      проверка в браузере в светлой, тёмной теме и RTL. (2026-10-23, `pnpm phase-check` зелёный;
+      проверка в браузере — play-функции и baselines `test-storybook` / `test-visual` в light-ltr,
+      light-rtl и dark-rtl.)
 - [x] Отчёт написан; открытые вопросы — тикеты `needs-info`.
 - [x] Один коммит, `docs(overlay-corners): ...`.
