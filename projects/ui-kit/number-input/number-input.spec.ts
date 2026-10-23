@@ -391,4 +391,23 @@ describe('UiNumberInput with Reactive Forms', () => {
     expect(await area.getText()).toBe('');
     expect(await area.isInvalid()).toBe(false);
   });
+
+  it('tells the control once about a value that blur clamps, and not at all about a kept one', async () => {
+    const floors = await field('Floors');
+    const seen: (number | null)[] = [];
+    controls.floors.valueChanges.subscribe((value) => seen.push(value));
+
+    // The harness types one character at a time: 4, then 41.
+    await floors.setText('41');
+    const typed = seen.length;
+    await floors.blur();
+    expect(seen.slice(typed)).toEqual([40]);
+    expect(controls.floors.value).toBe(40);
+
+    await floors.setText('39');
+    const kept = seen.length;
+    await floors.blur();
+    expect(seen.slice(kept)).toEqual([]);
+    expect(controls.floors.value).toBe(39);
+  });
 });

@@ -8,7 +8,6 @@ import {
   forwardRef,
   inject,
   input,
-  linkedSignal,
   model,
   numberAttribute,
   viewChild,
@@ -21,6 +20,7 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
   UiSize,
+  ɵinjectTypedText,
 } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconMinus, uiIconPlus } from '@vplans/ui-kit/icon';
 import {
@@ -31,14 +31,6 @@ import {
   roundTo,
   validNumber,
 } from './number-utils';
-
-/** Text the user is typing and the value it produced. */
-interface Draft {
-  text: string;
-  value: number | null;
-  /** The user left the field or pressed Enter: an invalid text is now an error. */
-  committed: boolean;
-}
 
 /** Delay before a held stepper button starts repeating, and the repeat interval (ms). */
 const REPEAT_DELAY = 400;
@@ -186,13 +178,20 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
     grouping: this.grouping(),
   }));
 
-  /** Dropped when the value changes elsewhere, so old text does not come back. */
-  private readonly draft = linkedSignal<number | null, Draft | null>({
-    source: () => this.value(),
-    computation: (value, previous) => {
-      const draft = previous?.value;
-      return draft?.value === value ? draft : null;
+  private readonly typed = ɵinjectTypedText<number, string, 'invalid'>({
+    value: this.value,
+    notify: (value) => this.notifyChange(value),
+    parse: (text) => {
+      const parsed = parseNumber(text, this.locale());
+      if (parsed === null) return { value: null, error: null };
+      return Number.isNaN(parsed)
+        ? { value: null, error: 'invalid' }
+        : { value: parsed, error: null };
     },
+    format: (value) => (value === null ? '' : formatNumber(value, this.locale(), this.format())),
+    valid: validNumber,
+    equals: (a, b) => a === b,
+    commitValue: (value) => this.clamp(roundTo(value, this.maxFractionDigits())),
   });
 
   readonly labelStrategy = 'for' as const;
@@ -202,13 +201,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
   protected readonly current = computed(() => validNumber(this.value()));
 
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
-  protected readonly text = computed(() => this.draft()?.text ?? this.formatted(this.current()));
-
-  /** Typed text that is not a number. */
-  protected readonly parseError = computed(() => {
-    const draft = this.draft();
-    return !!draft && draft.committed && Number.isNaN(parseNumber(draft.text, this.locale()));
-  });
+  protected readonly text = computed(() => this.typed.text());
 
   protected readonly inputModeValue = computed(
     () => this.inputMode() ?? (this.maxFractionDigits() === 0 ? 'numeric' : 'decimal'),
@@ -228,12 +221,11 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
    * a validation failure of the consumer's control, which only ever sees `null`.
    */
   protected override ownErrors(): readonly string[] {
-    return this.parseError() ? [this.labels().invalidNumber] : [];
+    return this.typed.error() === 'invalid' ? [this.labels().invalidNumber] : [];
   }
 
   writeValue(value: number | null | undefined): void {
-    this.draft.set(null);
-    this.value.set(validNumber(value));
+    this.typed.write(value);
   }
 
   focus(options?: FocusOptions): void {
@@ -259,13 +251,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
   }
 
   protected onInput(event: Event): void {
-    const text = (event.target as HTMLInputElement).value;
-    const before = this.value();
-    const parsed = parseNumber(text, this.locale());
-    const value = parsed === null || Number.isNaN(parsed) ? null : parsed;
-    this.value.set(value);
-    this.draft.set({ text, value, committed: false });
-    if (value !== before) this.notifyChange(value);
+    this.typed.input((event.target as HTMLInputElement).value);
   }
 
   protected onKeydown(event: KeyboardEvent): void {
@@ -287,19 +273,18 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
         const limit = event.key === 'Home' ? min : max;
         if (limit === null || this.readonly()) return;
         event.preventDefault();
-        this.draft.set(null);
-        this.setValue(limit);
+        this.typed.set(limit);
         break;
       }
       case 'Enter':
-        this.commitDraft();
+        this.typed.commit();
         break;
     }
   }
 
   protected onBlur(): void {
     this.stopRepeat();
-    this.commitDraft();
+    this.typed.commit();
     this.notifyTouched();
   }
 
@@ -337,36 +322,12 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
       value === null
         ? this.clamp(this.min() ?? 0)
         : this.clamp(addStep(value, steps * this.step()));
-    this.draft.set(null);
-    this.setValue(next);
-  }
-
-  /** Shows a valid typed number in the locale format; keeps invalid text for the user to fix. */
-  private commitDraft(): void {
-    const draft = this.draft();
-    if (!draft) return;
-    if (draft.value === null) {
-      this.draft.set(draft.text.trim() ? { ...draft, committed: true } : null);
-      return;
-    }
-    this.draft.set(null);
-    this.setValue(this.clamp(roundTo(draft.value, this.maxFractionDigits())));
+    this.typed.set(next);
   }
 
   private clamp(value: number): number {
     const min = this.min();
     const max = this.max();
     return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, value));
-  }
-
-  private formatted(value: number | null): string {
-    const number = validNumber(value);
-    return number === null ? '' : formatNumber(number, this.locale(), this.format());
-  }
-
-  private setValue(value: number): void {
-    if (value === this.value()) return;
-    this.value.set(value);
-    this.notifyChange(value);
   }
 }

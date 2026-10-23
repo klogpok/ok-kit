@@ -1,6 +1,6 @@
 # 03: `ui-number-input` uses the typed text module
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01
 
 Spec: `../spec.md` → "Implementation Decisions": `commitValue`, out-of-range values stay different.
@@ -16,19 +16,19 @@ Spec: `../spec.md` → "Implementation Decisions": `commitValue`, out-of-range v
   blur call `commit()`. Repeat timers and touched stay in the field.
 - `ownErrors()` maps the code to `labels().invalidNumber`.
 
-- [ ] No `Draft` interface, draft `linkedSignal`, `commitDraft()` or `setValue()` is left in
+- [x] No `Draft` interface, draft `linkedSignal`, `commitDraft()` or `setValue()` is left in
       `number-input.ts`.
-- [ ] Clamping and rounding on commit work as today and notify once.
-- [ ] The existing number-input spec and harness pass without edits.
-- [ ] Public inputs, outputs, methods and the rendered DOM are unchanged.
+- [x] Clamping and rounding on commit work as today and notify once.
+- [x] The existing number-input spec and harness pass without edits.
+- [x] Public inputs, outputs, methods and the rendered DOM are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
-- [ ] One commit, `refactor(number-input): typed text module`.
+- [x] One commit, `refactor(number-input): typed text module`.
 
 ## Русский перевод
 
 # 03: `ui-number-input` использует module typed text
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01
 
 Spec: `../spec.md` → «Решения по реализации»: `commitValue`, значения вне границ остаются разными.
@@ -44,11 +44,11 @@ Spec: `../spec.md` → «Решения по реализации»: `commitValu
   вызывают `commit()`. Таймеры повтора и touched остаются в поле.
 - `ownErrors()` отображает код в `labels().invalidNumber`.
 
-- [ ] В `number-input.ts` не осталось interface `Draft`, draft `linkedSignal`, `commitDraft()` и
+- [x] В `number-input.ts` не осталось interface `Draft`, draft `linkedSignal`, `commitDraft()` и
       `setValue()`.
-- [ ] Clamp и округление при commit работают как сейчас и уведомляют один раз.
-- [ ] Существующие spec и harness number input проходят без правок.
-- [ ] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
+- [x] Clamp и округление при commit работают как сейчас и уведомляют один раз.
+- [x] Существующие spec и harness number input проходят без правок.
+- [x] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились; `pnpm sync:client --verify`
       проходит.
-- [ ] Один коммит, `refactor(number-input): typed text module`.
+- [x] Один коммит, `refactor(number-input): typed text module`.
