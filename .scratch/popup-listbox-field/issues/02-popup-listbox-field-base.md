@@ -40,7 +40,8 @@ and providers; consumers see no change.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes (the
       client compiles with `useDefineForClassFields: false`).
   - 2026-10-23, orchestrator: `pnpm phase-check` passed on `spec/popup-listbox-field` (1017 tests, 315 stories in 3 modes, baselines unchanged). `pnpm sync:client --verify` was not run: there is no client checkout on this machine, so the item stays open.
-- [ ] One commit, `refactor(listbox): ...`.
+- [x] One commit, `refactor(listbox): ...`.
+  - 2026-10-23: the user kept one commit per TDD step instead.
 
 ## Русский перевод
 
@@ -86,4 +87,5 @@ Spec: `../spec.md` → «Решения по реализации»: базов�
 - [ ] `/phase-check` проходит, визуальные baselines не меняются; `pnpm sync:client --verify`
       проходит (клиент собирается с `useDefineForClassFields: false`).
   - 2026-10-23, оркестратор: `pnpm phase-check` прошёл на `spec/popup-listbox-field` (1017 тестов, 315 историй в 3 режимах, baselines без изменений). `pnpm sync:client --verify` не запускался: на этой машине нет копии клиента, поэтому пункт остаётся открытым.
-- [ ] Один коммит, `refactor(listbox): ...`.
+- [x] Один коммит, `refactor(listbox): ...`.
+  - 2026-10-23: пользователь оставил по коммиту на каждый шаг TDD.
