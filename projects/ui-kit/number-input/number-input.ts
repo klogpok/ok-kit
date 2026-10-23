@@ -178,7 +178,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
     grouping: this.grouping(),
   }));
 
-  private readonly typed = ɵinjectTypedText<number, string, 'invalid'>({
+  private readonly typedText = ɵinjectTypedText<number, string, 'invalid'>({
     value: this.value,
     notify: (value) => this.notifyChange(value),
     parse: (text) => {
@@ -201,7 +201,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
   protected readonly current = computed(() => validNumber(this.value()));
 
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
-  protected readonly text = this.typed.text;
+  protected readonly text = this.typedText.text;
 
   protected readonly inputModeValue = computed(
     () => this.inputMode() ?? (this.maxFractionDigits() === 0 ? 'numeric' : 'decimal'),
@@ -221,11 +221,11 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
    * a validation failure of the consumer's control, which only ever sees `null`.
    */
   protected override ownErrors(): readonly string[] {
-    return this.typed.error() === 'invalid' ? [this.labels().invalidNumber] : [];
+    return this.typedText.error() === 'invalid' ? [this.labels().invalidNumber] : [];
   }
 
   writeValue(value: number | null | undefined): void {
-    this.typed.write(value);
+    this.typedText.write(value);
   }
 
   focus(options?: FocusOptions): void {
@@ -251,7 +251,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
   }
 
   protected onInput(event: Event): void {
-    this.typed.input((event.target as HTMLInputElement).value);
+    this.typedText.input((event.target as HTMLInputElement).value);
   }
 
   protected onKeydown(event: KeyboardEvent): void {
@@ -273,18 +273,18 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
         const limit = event.key === 'Home' ? min : max;
         if (limit === null || this.readonly()) return;
         event.preventDefault();
-        this.typed.set(limit);
+        this.typedText.set(limit);
         break;
       }
       case 'Enter':
-        this.typed.commit();
+        this.typedText.commit();
         break;
     }
   }
 
   protected onBlur(): void {
     this.stopRepeat();
-    this.typed.commit();
+    this.typedText.commit();
     this.notifyTouched();
   }
 
@@ -322,7 +322,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
       value === null
         ? this.clamp(this.min() ?? 0)
         : this.clamp(addStep(value, steps * this.step()));
-    this.typed.set(next);
+    this.typedText.set(next);
   }
 
   private clamp(value: number): number {
