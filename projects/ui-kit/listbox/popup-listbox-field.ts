@@ -61,7 +61,7 @@ export abstract class UiPopupListboxField<V>
   protected abstract classPrefix(): string;
 
   readonly size = input<UiSize>('md');
-  /** Host id; the inner control gets `${id}-control`. */
+  /** Host id; the inner control gets `${id}-control` (`controlIdSuffix`). */
   readonly id = input(inject(_IdGenerator).getId(`${this.classPrefix()}-`));
   readonly ariaLabel = input('', { alias: 'aria-label' });
   readonly placeholder = input('');
@@ -72,7 +72,9 @@ export abstract class UiPopupListboxField<V>
   readonly closed = output();
 
   readonly labelStrategy = 'for' as const;
-  readonly controlId: Signal<string> = computed(() => `${this.id()}-control`);
+  readonly controlId: Signal<string> = computed(() => `${this.id()}-${this.controlIdSuffix}`);
+  /** End of `controlId`; `ui-time-input` keeps its `-input`. */
+  protected readonly controlIdSuffix: string = 'control';
 
   /** The inner `<input>` or `<button>` that carries `uiComboboxControl`. */
   protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');

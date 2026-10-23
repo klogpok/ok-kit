@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   computed,
   forwardRef,
   inject,
@@ -9,28 +8,17 @@ import {
   linkedSignal,
   model,
   numberAttribute,
-  output,
-  viewChild,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { _IdGenerator } from '@angular/cdk/a11y';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
-import {
-  UI_FORM_FIELD_CONTROL,
-  UI_LABELS,
-  UiFormControlBase,
-  UiFormFieldControl,
-  UiSize,
-  ɵUiDropdownPanel,
-} from '@vplans/ui-kit/core';
+import { UI_LABELS, ɵUiDropdownPanel } from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
 import {
-  ɵUI_POPUP_LISTBOX_FIELD,
   ɵUiComboboxControl,
   ɵUiListbox,
-  ɵfieldListboxConfig,
+  ɵUiPopupListboxField,
   ɵinjectListbox,
-  ɵprovideUiListbox,
+  ɵprovideUiPopupListboxField,
 } from '@vplans/ui-kit/listbox';
 import {
   formatTime,
@@ -62,6 +50,7 @@ interface Draft {
  *   `minTime`/`maxTime`, sets the value to `null`; once the user leaves the field it shows
  *   `labels().invalidTime`. The message is the field's own: it never becomes an error of a bound
  *   form control.
+ * - Without a `placeholder` the field shows the expected format, e.g. "HH:MM".
  * - A click or ArrowDown/ArrowUp opens the list at the selected time, or the nearest one;
  *   Alt+ArrowDown opens it without moving. Enter picks the active time, Escape closes the list.
  *
@@ -123,24 +112,12 @@ interface Draft {
   styleUrl: './time-input.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    { provide: ɵUI_POPUP_LISTBOX_FIELD, useExisting: forwardRef(() => UiTimeInput) },
-    { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiTimeInput) },
+    ɵprovideUiPopupListboxField(() => UiTimeInput),
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiTimeInput), multi: true },
-    ɵprovideUiListbox(),
   ],
-  host: {
-    class: 'ui-time-input',
-    '[class]': '"ui-time-input--" + size()',
-    '[class.ui-time-input--disabled]': 'isDisabled()',
-    '[class.ui-time-input--readonly]': 'readonly()',
-    '[class.ui-time-input--invalid]': 'showError()',
-    '[attr.id]': 'id()',
-    // The inner control carries the label and descriptions; static attributes stay on the host too.
-    '[attr.aria-label]': 'null',
-    '[attr.aria-describedby]': 'null',
-  },
+  host: { class: 'ui-time-input' },
 })
-export class UiTimeInput extends UiFormControlBase<string | null> implements UiFormFieldControl {
+export class UiTimeInput extends ɵUiPopupListboxField<string | null> {
   protected readonly labels = inject(UI_LABELS);
 
   readonly value = model<string | null>(null);
@@ -152,23 +129,11 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
   readonly interval = input(30, {
     transform: (value: unknown) => Math.max(1, numberAttribute(value, 30)),
   });
-  /** Defaults to the expected format, e.g. "HH:MM". */
-  readonly placeholder = input('');
-  readonly size = input<UiSize>('md');
-  readonly name = input('');
-  /** Host id; the text field gets `${id}-input`. */
-  readonly id = input(inject(_IdGenerator).getId('ui-time-input-'));
-  readonly ariaLabel = input('', { alias: 'aria-label' });
-
-  readonly opened = output();
-  readonly closed = output();
-
-  private readonly control = viewChild.required<ElementRef<HTMLInputElement>>('control');
 
   protected readonly clockIcon = uiIconClock;
 
-  readonly labelStrategy = 'for' as const;
-  readonly controlId = computed(() => `${this.id()}-input`);
+  /** The text field gets `${id}-input`. */
+  protected override readonly controlIdSuffix = 'input';
 
   protected readonly format = computed(() => timeFormat(this.labels().locale));
   protected readonly hint = computed(() => timeHint(this.format()));
@@ -213,7 +178,7 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
 
   /** The list of times. Typed text is a value too: Enter without an active time commits it. */
   protected readonly listbox = ɵinjectListbox<string>({
-    ...ɵfieldListboxConfig(this),
+    ...this.fieldListboxConfig(),
     mode: () => 'freeText',
     id: this.id,
     items: this.slots,
@@ -239,17 +204,8 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     this.value.set(toMinutes(value) === null ? null : value!);
   }
 
-  focus(options?: FocusOptions): void {
-    this.control().nativeElement.focus(options);
-  }
-
-  /** Opens the list at the selected time, or the one nearest to now. */
-  open(): void {
-    this.listbox.open();
-  }
-
-  close(): void {
-    this.listbox.close();
+  protected classPrefix(): string {
+    return 'ui-time-input';
   }
 
   protected onFieldClick(): void {
@@ -285,7 +241,12 @@ export class UiTimeInput extends UiFormControlBase<string | null> implements UiF
     if (!this.listbox.handleKeydown(event) && event.key === 'Enter') this.commitDraft();
   }
 
-  protected onBlur(): void {
+  /**
+   * Commits the draft between closing and the touched step, as before the base class: a `touch`
+   * handler already sees the parse error. `super.onBlur()` closes and marks touched in one step,
+   * so it cannot be used here.
+   */
+  protected override onBlur(): void {
     this.close();
     this.commitDraft();
     this.notifyTouched();
