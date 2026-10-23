@@ -126,7 +126,8 @@ same, except the edge cases listed under "Aligned edge cases".
   - committing blank text drops it (date, range, time used to keep an invisible committed text);
   - a written value the time input cannot read drops the typed text (it used to keep it);
   - typing over a value the time input cannot read writes and notifies the parsed value (it used to
-    skip it when the parse gave `null`).
+    skip it when the parse gave `null`); the same holds for the range picker, where `sameRange`
+    against the readable `null` range used to skip the write.
 - **Unchanged public interface.** No input, output or public method of the four fields is added,
   removed or renamed; the rendered DOM and classes stay the same.
 - **Order.** This work comes before the popup listbox field spec (`.scratch/popup-listbox-field/`).
@@ -303,7 +304,8 @@ stepper и превращение кода ошибки в сообщение.
   - записанное значение, которое time input не может прочитать, сбрасывает typed text (раньше
     сохраняло);
   - ввод поверх значения, которое time input не может прочитать, пишет и уведомляет разобранное
-    значение (раньше пропускал, когда разбор давал `null`).
+    значение (раньше пропускал, когда разбор давал `null`); то же верно для range picker, где
+    `sameRange` с читаемым диапазоном `null` раньше пропускал запись.
 - **Публичный interface не меняется.** Ни один input, output или публичный метод четырёх полей не
   добавляется, не удаляется и не переименовывается; отрисованный DOM и классы остаются прежними.
 - **Порядок.** Эта работа идёт до спеки popup listbox field (`.scratch/popup-listbox-field/`).

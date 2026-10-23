@@ -815,6 +815,12 @@ User decisions (2026-10-23):
   text and its error, also for the same value.
 - **Order:** before the popup listbox field work (candidate 1).
 
+Aligned edge case, found in review (not in the spec's list):
+
+- **Typing over a value the field cannot read** writes and notifies the parsed value (including
+  `null`) in the range picker too, like the time input. Before, `sameRange` against the readable
+  `null` range skipped the write.
+
 ## Popup listbox field: time input aria-readonly (decided 2026-10-23)
 
 User decision (ticket 03 of `.scratch/popup-listbox-field/`, option 1):
