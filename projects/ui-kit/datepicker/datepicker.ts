@@ -264,7 +264,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
    * not a validation failure of the consumer's control, which only ever sees `null`.
    */
   protected override ownErrors(): readonly string[] {
-    return this.typedText.error() ? [this.labels().invalidDate] : [];
+    return this.typedText.error() === 'invalid' ? [this.labels().invalidDate] : [];
   }
 
   writeValue(value: Date | null | undefined): void {
