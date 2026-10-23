@@ -1,6 +1,6 @@
 # 01: `ɵinjectTypedText()` owns typed text, commit and the parse error
 
-**Status:** ready-for-agent
+**Status:** done
 
 Spec: `../spec.md` → "Implementation Decisions": config, the "same value" rule, result, error
 codes.
@@ -15,26 +15,26 @@ this ticket builds the module test-first.
 - Result: `text()`, `error()`, `input(text)`, `commit()`, `set(value)`, `write(value)`.
 - The typed text is kept only while `same(typed.value, value())`; `same` also guards every write.
 
-- [ ] `core/typed-text.spec.ts` is written first and drives the module in an injection context,
+- [x] `core/typed-text.spec.ts` is written first and drives the module in an injection context,
       without a component, with a string-to-number rule set.
-- [ ] Typing writes and notifies; typing the same value (by `equals`) does not notify.
-- [ ] Commit of valid text drops it and `text()` shows the format; commit of invalid text keeps it
+- [x] Typing writes and notifies; typing the same value (by `equals`) does not notify.
+- [x] Commit of valid text drops it and `text()` shows the format; commit of invalid text keeps it
       and `error()` returns the code; commit of blank text drops it.
-- [ ] `error()` is `null` before commit, even for invalid text.
-- [ ] With `commitValue`, a valid commit writes the settled value and notifies once.
-- [ ] `set()` drops typed text and its error also for the same value, and notifies only on change.
-- [ ] `write()` drops typed text and stores `valid(value)` without notifying.
-- [ ] An external write of the same value keeps the typed text; a different or unreadable value
+- [x] `error()` is `null` before commit, even for invalid text.
+- [x] With `commitValue`, a valid commit writes the settled value and notifies once.
+- [x] `set()` drops typed text and its error also for the same value, and notifies only on change.
+- [x] `write()` drops typed text and stores `valid(value)` without notifying.
+- [x] An external write of the same value keeps the typed text; a different or unreadable value
       drops it.
-- [ ] The injection call reads no class field declared after it (`useDefineForClassFields: false`).
+- [x] The injection call reads no class field declared after it (`useDefineForClassFields: false`).
 - [ ] `/phase-check` passes.
-- [ ] One commit, `feat(core): typed text of parsed text fields`.
+- [x] One commit, `feat(core): typed text of parsed text fields`.
 
 ## Русский перевод
 
 # 01: `ɵinjectTypedText()` владеет typed text, commit и parse error
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 
 Spec: `../spec.md` → «Решения по реализации»: конфиг, правило «то же значение», результат, коды
 ошибок.
@@ -50,19 +50,19 @@ Spec: `../spec.md` → «Решения по реализации»: конфи�
 - Typed text сохраняется, только пока `same(typed.value, value())`; `same` также охраняет каждую
   запись.
 
-- [ ] `core/typed-text.spec.ts` пишется первым и ведёт module в injection context, без компонента,
+- [x] `core/typed-text.spec.ts` пишется первым и ведёт module в injection context, без компонента,
       с набором правил «строка → число».
-- [ ] Ввод пишет и уведомляет; ввод того же значения (по `equals`) не уведомляет.
-- [ ] Commit валидного текста сбрасывает его, и `text()` показывает формат; commit неверного текста
+- [x] Ввод пишет и уведомляет; ввод того же значения (по `equals`) не уведомляет.
+- [x] Commit валидного текста сбрасывает его, и `text()` показывает формат; commit неверного текста
       сохраняет его, и `error()` возвращает код; commit пустого текста сбрасывает его.
-- [ ] `error()` равен `null` до commit, даже для неверного текста.
-- [ ] С `commitValue` валидный commit пишет итоговое значение и уведомляет один раз.
-- [ ] `set()` сбрасывает typed text и его ошибку и при том же значении, а уведомляет только при
+- [x] `error()` равен `null` до commit, даже для неверного текста.
+- [x] С `commitValue` валидный commit пишет итоговое значение и уведомляет один раз.
+- [x] `set()` сбрасывает typed text и его ошибку и при том же значении, а уведомляет только при
       изменении.
-- [ ] `write()` сбрасывает typed text и сохраняет `valid(value)` без уведомления.
-- [ ] Внешняя запись того же значения сохраняет typed text; другое или нечитаемое значение
+- [x] `write()` сбрасывает typed text и сохраняет `valid(value)` без уведомления.
+- [x] Внешняя запись того же значения сохраняет typed text; другое или нечитаемое значение
       сбрасывает его.
-- [ ] Вызов injection-функции не читает поля класса, объявленные после него
+- [x] Вызов injection-функции не читает поля класса, объявленные после него
       (`useDefineForClassFields: false`).
 - [ ] `/phase-check` проходит.
-- [ ] Один коммит, `feat(core): typed text of parsed text fields`.
+- [x] Один коммит, `feat(core): typed text of parsed text fields`.

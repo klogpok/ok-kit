@@ -28,6 +28,13 @@ export {
   type UiDropdownElement as ɵUiDropdownElement,
   type UiDropdownOrigin as ɵUiDropdownOrigin,
 } from './dropdown-panel';
+// Internal: the typed text of the kit's parsed text fields, not part of the public API.
+export {
+  ɵinjectTypedText,
+  type UiTypedText as ɵUiTypedText,
+  type UiTypedTextConfig as ɵUiTypedTextConfig,
+  type UiTypedTextParse as ɵUiTypedTextParse,
+} from './typed-text';
 export * from './labels';
 export * from './live-directionality';
 export * from './checked-validator';
