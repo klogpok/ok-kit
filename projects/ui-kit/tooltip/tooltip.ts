@@ -28,13 +28,17 @@ import {
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import {
-  UiOverlaySide,
+  UiOverlayPlacement,
   overlayOffsetX,
-  sideOverlayPositions,
+  overlayPlacementPositions,
   syncOverlayDirection,
 } from '@vplans/ui-kit/core';
 
-export type UiTooltipPosition = UiOverlaySide;
+/**
+ * Where a tooltip sits against its trigger: centered on a side, or diagonally outside a corner
+ * (`corner-top-start`, …). `start`/`end` follow the direction.
+ */
+export type UiTooltipPosition = UiOverlayPlacement;
 
 /**
  * Tooltip bubble. Internal. Hidden from assistive technologies: the host element gets the same
@@ -242,7 +246,7 @@ export class UiTooltip {
     this.positionStrategy!.withDefaultOffsetX(overlayOffsetX(this.host.ownerDocument));
     // The margin token may change with the theme or the root font size.
     this.positionStrategy!.withViewportMargin(this.viewportMargin());
-    this.positionStrategy!.withPositions(sideOverlayPositions(preferred, 'ui-tooltip-pane'));
+    this.positionStrategy!.withPositions(overlayPlacementPositions(preferred, 'ui-tooltip-pane'));
 
     const panel = overlayRef.attach(new ComponentPortal(UiTooltipPanel, null, this.injector));
     panel.instance.message.set(this.describedMessage);

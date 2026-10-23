@@ -2,7 +2,7 @@ import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import { UiIconButton } from '@vplans/ui-kit/button';
-import { UiTooltip, UiTooltipDefaults, provideUiTooltip } from './tooltip';
+import { UiTooltip, UiTooltipDefaults, UiTooltipPosition, provideUiTooltip } from './tooltip';
 
 @Component({
   imports: [UiTooltip],
@@ -339,5 +339,92 @@ describe('UiTooltip defaults', () => {
     button('bound').dispatchEvent(pointer('pointerleave'));
     vi.advanceTimersByTime(20);
     expect(panel()).toBeNull();
+  });
+});
+
+@Component({
+  imports: [UiTooltip],
+  template: `
+    <div [attr.dir]="dir()">
+      <button type="button" uiTooltip="Delete the plan" [uiTooltipPosition]="position()">
+        Delete
+      </button>
+    </div>
+  `,
+})
+class CornerHost {
+  readonly dir = signal<'ltr' | 'rtl'>('ltr');
+  readonly position = signal<UiTooltipPosition>('corner-top-start');
+  readonly tooltip = viewChild.required(UiTooltip);
+}
+
+describe('UiTooltip corners', () => {
+  // jsdom has no layout: a 1024x768 viewport, a 40x20 trigger and an 80x30 tooltip.
+  const trigger = { left: 400, top: 300, width: 40, height: 20 };
+  const tooltip = { width: 80, height: 30 };
+  let fixture: ComponentFixture<CornerHost>;
+  let button: HTMLButtonElement;
+  const panel = () => document.querySelector<HTMLElement>('ui-tooltip-panel');
+  const pane = () => document.querySelector<HTMLElement>('.ui-tooltip-pane')!;
+
+  /** Top-left corner of the tooltip, from the `left`/`right` and `top`/`bottom` the CDK set. */
+  const tooltipCorner = () => {
+    const { left, right, top, bottom } = pane().style;
+    return {
+      left: left ? parseFloat(left) : innerWidth - parseFloat(right) - tooltip.width,
+      top: top ? parseFloat(top) : innerHeight - parseFloat(bottom) - tooltip.height,
+    };
+  };
+
+  function rect(box: { left: number; top: number; width: number; height: number }): DOMRect {
+    const { left, top, width, height } = box;
+    const edges = { x: left, y: top, right: left + width, bottom: top + height };
+    return { left, top, width, height, ...edges, toJSON: () => edges };
+  }
+
+  beforeEach(async () => {
+    // The CDK measures the right and bottom styles from the document element.
+    vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(innerWidth);
+    vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(innerHeight);
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: Element,
+    ) {
+      if (this === button) return rect(trigger);
+      if (this.classList.contains('ui-tooltip-pane')) return rect({ left: 0, top: 0, ...tooltip });
+      return rect({ left: 0, top: 0, width: 0, height: 0 });
+    });
+    fixture = TestBed.createComponent(CornerHost);
+    document.body.appendChild(fixture.nativeElement);
+    await fixture.whenStable();
+    button = (fixture.nativeElement as HTMLElement).querySelector('button')!;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    (fixture.nativeElement as HTMLElement).remove();
+  });
+
+  async function open(position: UiTooltipPosition, dir: 'ltr' | 'rtl' = 'ltr') {
+    fixture.componentInstance.position.set(position);
+    fixture.componentInstance.dir.set(dir);
+    await fixture.whenStable();
+    fixture.componentInstance.tooltip().show();
+    await fixture.whenStable();
+  }
+
+  // Trigger: x 400-440, y 300-320. The tooltip's inline edge meets the trigger's, with no gap.
+  it.each([
+    ['corner-top-start', 'ltr', { left: 320, top: 270 }],
+    ['corner-top-end', 'ltr', { left: 440, top: 270 }],
+    ['corner-bottom-start', 'ltr', { left: 320, top: 320 }],
+    ['corner-bottom-end', 'ltr', { left: 440, top: 320 }],
+    ['corner-top-start', 'rtl', { left: 440, top: 270 }],
+    ['corner-top-end', 'rtl', { left: 320, top: 270 }],
+    ['corner-bottom-start', 'rtl', { left: 440, top: 320 }],
+    ['corner-bottom-end', 'rtl', { left: 320, top: 320 }],
+  ] as const)('opens %s (%s) outside that corner of the trigger', async (position, dir, corner) => {
+    await open(position, dir);
+    expect(panel()?.classList).toContain(`ui-tooltip--${position}`);
+    expect(tooltipCorner()).toEqual(corner);
   });
 });
