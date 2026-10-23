@@ -12,6 +12,14 @@ so versions mark review points rather than releases.
   `aria-expanded`, `aria-controls`, `aria-activedescendant`, `aria-required`, `aria-invalid`,
   `aria-describedby`) is set by one internal directive, `[uiComboboxControl]`, which reads the
   field through the new `ɵUI_POPUP_LISTBOX_FIELD` token. The rendered attributes are unchanged.
+- **listbox (internal):** the four fields extend the new base class `ɵUiPopupListboxField`,
+  which owns their shared inputs (`id`, `aria-label`, `size`, `name`, `placeholder`), the
+  `opened` / `closed` outputs, `focus()` / `open()` / `close()`, the blur step and the host id
+  and classes, and list their providers through `ɵprovideUiPopupListboxField()`. `UiSelectBase`
+  extends it. The free function `ɵfieldListboxConfig()` is removed; the base class has a
+  protected `fieldListboxConfig()` instead. Inputs, outputs and the rendered DOM are unchanged.
+- **core:** `describedBy` of `UiFormControlBase` is public (it was protected), so that
+  `[uiComboboxControl]` can read it through the field token.
 
 ## Unreleased (file type icons)
 

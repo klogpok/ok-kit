@@ -6,7 +6,6 @@ export type { UiOptionItem } from './option-items';
 // Internal: shared with the fields of the kit. Not a public API.
 export {
   UiListboxController as ɵUiListboxController,
-  fieldListboxConfig as ɵfieldListboxConfig,
   injectListbox as ɵinjectListbox,
   provideUiListbox as ɵprovideUiListbox,
   type UiListboxConfig as ɵUiListboxConfig,

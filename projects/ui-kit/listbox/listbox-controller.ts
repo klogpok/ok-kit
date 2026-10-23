@@ -3,7 +3,6 @@ import {
   DestroyRef,
   Injectable,
   Injector,
-  type OutputEmitterRef,
   type Provider,
   Signal,
   afterEveryRender,
@@ -889,28 +888,4 @@ export function injectListbox<T>(config: UiListboxConfig<T>): UiListboxControlle
   const listbox = inject<UiListboxController<T>>(UiListboxController, { self: true });
   listbox.ɵconfigure(config);
   return listbox;
-}
-
-/** What a form field of the kit is to its listbox. */
-export interface UiListboxField {
-  readonly ariaLabel: () => string;
-  readonly readonly: () => boolean;
-  readonly isDisabled: () => boolean;
-  readonly opened: OutputEmitterRef<void>;
-  readonly closed: OutputEmitterRef<void>;
-}
-
-/**
- * The configuration every form field gives its listbox alike: its `aria-label`, locked while
- * readonly or disabled, and its `opened` / `closed` outputs. Spread it into `injectListbox()`.
- */
-export function fieldListboxConfig(
-  field: UiListboxField,
-): Pick<UiListboxConfig<unknown>, 'ariaLabel' | 'locked' | 'opened' | 'closed'> {
-  return {
-    ariaLabel: () => field.ariaLabel(),
-    locked: () => field.readonly() || field.isDisabled(),
-    opened: () => field.opened.emit(),
-    closed: () => field.closed.emit(),
-  };
 }
