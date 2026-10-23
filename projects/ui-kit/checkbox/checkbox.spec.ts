@@ -314,3 +314,19 @@ describe('UiCheckbox aria-describedby', () => {
     expect(root.querySelector('ui-checkbox')!.hasAttribute('aria-describedby')).toBe(false);
   });
 });
+
+@Component({
+  imports: [UiCheckbox],
+  template: `<ui-checkbox size="xl">Featured</ui-checkbox>`,
+})
+class XlHost {}
+
+describe('UiCheckbox size', () => {
+  it('takes the xl size', async () => {
+    const fixture = TestBed.createComponent(XlHost);
+    await settle(fixture);
+    const host = (fixture.nativeElement as HTMLElement).querySelector('ui-checkbox')!;
+    expect(host.classList).toContain('ui-checkbox');
+    expect(host.classList).toContain('ui-checkbox--xl');
+  });
+});

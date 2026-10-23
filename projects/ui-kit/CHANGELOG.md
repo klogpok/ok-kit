@@ -3,6 +3,18 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (choice xl size)
+
+### Added
+
+- **checkbox, radio:** `size="xl"` on `ui-checkbox` and `ui-radio-group`: a 24px box or circle
+  and a larger label, for emphasis. The new type `UiChoiceSize` (`@vplans/ui-kit/core`) is
+  `UiSize | 'xl'`; `ui-switch` stays on `UiSize`.
+
+### Changed
+
+- **core:** `UiCheckableBase` no longer declares `size`; `UiCheckbox` and `UiSwitch` declare it.
+
 ## Unreleased (leading actions)
 
 ### Changed

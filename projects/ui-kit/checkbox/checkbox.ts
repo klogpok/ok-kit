@@ -13,6 +13,7 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   UI_FORM_FIELD_CONTROL,
   UiCheckableBase,
+  UiChoiceSize,
   provideUiCheckedValidator,
 } from '@vplans/ui-kit/core';
 
@@ -51,6 +52,7 @@ export class UiCheckbox extends UiCheckableBase {
   /** Mixed state; cleared when the user toggles the checkbox. */
   readonly indeterminate = model(false);
   readonly id = input(inject(_IdGenerator).getId('ui-checkbox-'));
+  readonly size = input<UiChoiceSize>('md');
 
   protected readonly isIndeterminate = computed(() => coerceBooleanProperty(this.indeterminate()));
 

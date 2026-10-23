@@ -61,7 +61,7 @@ How tightly the controls of a page region are packed: default or compact. It app
 _Avoid_: size (for a region), compact mode
 
 **Size**:
-The sm, md or lg scale of one control, chosen on that control.
+The sm, md or lg scale of one control, chosen on that control. A checkbox and a radio group also have xl, for emphasis.
 _Avoid_: density (for one control)
 
 **Breakpoint**:

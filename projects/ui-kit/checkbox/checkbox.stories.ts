@@ -45,7 +45,7 @@ const meta: Meta<CheckboxArgs> = {
   title: 'Forms/Checkbox',
   component: UiCheckbox,
   decorators: [moduleMetadata({ imports: [UiFormField, UiError, SelectAllStory] })],
-  argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg'] } },
+  argTypes: { size: { control: 'inline-radio', options: ['sm', 'md', 'lg', 'xl'] } },
 };
 
 export default meta;
@@ -83,6 +83,7 @@ export const Sizes: Story = {
         <ui-checkbox size="sm">Small</ui-checkbox>
         <ui-checkbox size="md" [checked]="true">Medium</ui-checkbox>
         <ui-checkbox size="lg" [indeterminate]="true">Large</ui-checkbox>
+        <ui-checkbox size="xl" [checked]="true">Extra large</ui-checkbox>
       </div>`,
   }),
 };

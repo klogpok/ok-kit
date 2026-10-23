@@ -14,13 +14,13 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { UiCheckedValidator } from './checked-validator';
 import { UiFormControlBase } from './form-control-base';
 import { UiFormFieldControl } from './form-field-control';
-import { UiSize } from './types';
 
 /**
  * Shared behavior of checkbox-like controls (`ui-checkbox`, `ui-switch`) built on a native
  * `<input type="checkbox" #input>`: the `checked` model, forms integration, readonly and focus.
  *
- * Subclasses declare `id` (with their own prefix) and provide `provideUiCheckedValidator()`.
+ * Subclasses declare `id` (with their own prefix) and `size` (the checkbox scale has `xl`, the
+ * switch scale does not) and provide `provideUiCheckedValidator()`.
  */
 @Directive()
 export abstract class UiCheckableBase
@@ -30,7 +30,6 @@ export abstract class UiCheckableBase
   private readonly inputRef = viewChild.required<ElementRef<HTMLInputElement>>('input');
 
   readonly checked = model(false);
-  readonly size = input<UiSize>('md');
   readonly name = input('');
   /** Host id; the native input gets `${id}-input`. */
   abstract readonly id: Signal<string>;

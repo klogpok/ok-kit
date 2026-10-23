@@ -11,6 +11,7 @@ import { _IdGenerator } from '@angular/cdk/a11y';
 import {
   UI_FORM_FIELD_CONTROL,
   UiCheckableBase,
+  UiSize,
   provideUiCheckedValidator,
 } from '@vplans/ui-kit/core';
 
@@ -72,6 +73,7 @@ import {
 })
 export class UiSwitch extends UiCheckableBase {
   readonly id = input(inject(_IdGenerator).getId('ui-switch-'));
+  readonly size = input<UiSize>('md');
   /** Place the label before (`start`) or after (`end`) the switch. */
   readonly labelPosition = input<'start' | 'end'>('end');
   /** Stretch the row and push the switch to the opposite edge (settings lists). */

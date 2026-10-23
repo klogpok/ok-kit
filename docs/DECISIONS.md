@@ -749,3 +749,17 @@ Agent notes (ticket 03):
   checkout (`D:\projects\client`), and none was found elsewhere, so whether the VPlans client styles the old classes stays
   unknown; see ticket 03. The client copy in `feat/ui-kit-pilot` gets the new classes at its next
   sync.
+
+## Checkbox and radio xl size (decided 2026-10-23)
+
+User decisions:
+
+- **Only `ui-checkbox` and `ui-radio-group` get `size="xl"`**, for visual emphasis (onboarding,
+  consent, cards), not as a touch target. `ui-switch` and the other controls keep `UiSize`
+  (`sm | md | lg`); the term **Size** in `GLOSSARY.md` names the exception.
+- **Type:** `UiChoiceSize = UiSize | 'xl'` in `@vplans/ui-kit/core`. `size` moved from
+  `UiCheckableBase` to `UiCheckbox` and `UiSwitch`, so the switch does not take `xl`.
+- **Look:** a 24px box or circle (`--ui-icon-size-lg`) and a `--ui-font-size-lg` label. No new
+  component tokens, like `sm` and `lg`.
+- `sm` and `md` both draw a 16px box and differ only in the label size; current sizes are
+  accepted, so this stays.
