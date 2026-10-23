@@ -788,3 +788,29 @@ Review answers (approved 2026-10-23):
 - **Baselines:** the `WithFiles` and `ButtonVariant` baselines of file upload are not re-taken.
   The new icons stay under the 0.1% pixel threshold, so they still show the plain `file` icon.
   Take them again with the next change to those stories.
+
+## Parsed text field (decided 2026-10-23)
+
+Architecture work outside the phases, candidate 2 of the architecture review of 2026-10-23. Spec
+and tickets 01–05 are in `.scratch/parsed-text-field/`; the terms **parsed text field**, **typed
+text**, **commit** and **parse error** are in `GLOSSARY.md` → "Typed values".
+
+User decisions (2026-10-23):
+
+- **All four fields** move to one module: datepicker, date range picker, time input and number
+  input. The typed text is generic, so the range picker's two texts fit.
+- **Out-of-range values stay different:** the number input clamps and rounds on commit (an
+  optional `commitValue` rule); the date and time fields give a parse error.
+- **Boundary:** the module owns the typed text, commit, the parse error and writing the value with
+  the form notification. DOM events, the time mask, keys, blur / focus-out, touched, the listbox,
+  the calendar and the stepper stay in the fields.
+- **Form:** an internal injection function in `core`, `ɵinjectTypedText()` in
+  `core/typed-text.ts`, like `ɵinjectListbox()`; no new base class.
+- **Parse:** returns `{ value, error }`; the error is a code, and each field builds its message
+  from `UI_LABELS` in `ownErrors()`, so a locale change shows the new language.
+- **One "same value" rule** from `valid()` and `equals()` keeps the typed text and skips writes; a
+  written value the field cannot read drops the typed text, as the date pickers already did.
+- **Blank text** on commit is dropped (the value is `null`), in every field.
+- **Picking a value** (calendar, list, stepper, preset, clear, Home/End) always drops the typed
+  text and its error, also for the same value.
+- **Order:** before the popup listbox field work (candidate 1).

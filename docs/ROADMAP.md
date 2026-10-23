@@ -400,6 +400,12 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 > **Статус (2026-10-23): сделано и одобрено.** Семь новых иконок в `icon` (контур листа с глифом): изображение, PDF, документ, таблица, презентация, архив, чертёж (CAD/BIM). `ui-file-upload` показывает у каждого файла иконку его типа: по MIME, иначе по расширению; `fileTypeIcon(file)` публичная, вход `fileIcon` переопределяет выбор; у отклонённого файла остаётся alert. Новая история `FileTypes`. Решения — в [DECISIONS.md](DECISIONS.md) («File upload: file type icons»).
 
+## Parsed text field: общий typed text (решено 2026-10-23)
+
+> Архитектурная работа вне фаз, кандидат 2 архитектурного обзора 2026-10-23. Спека и тикеты 01–05 — в `.scratch/parsed-text-field/`; термины — в `GLOSSARY.md` («Typed values»); решения — в [DECISIONS.md](DECISIONS.md) («Parsed text field»).
+>
+> **Статус (2026-10-23): спека готова, тикеты `ready-for-agent`.** Идёт до спеки popup listbox field (кандидат 1, `.scratch/popup-listbox-field/`).
+
 ## Критичные файлы и что переиспользовать
 
 - `select/select-base.ts`, `select/option.ts` — оверлей, `labelFor`, `matches` → общая панель (7.7), clearable и loading (6.8).

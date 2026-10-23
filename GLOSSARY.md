@@ -58,6 +58,24 @@ _Avoid_: highlighted option, focused option, selected option
 A choice at the top of a popup listbox that acts on the value instead of being one value: "Add «…»" adds the typed text, "Select all" selects or deselects every option shown. The keyboard reaches it before the options.
 _Avoid_: leading option, action option, action row
 
+## Typed values
+
+**Parsed text field**:
+A form field whose value is read from text the user types and shown back as formatted text: date picker, date range picker, time input and number input. A field may also be a popup listbox field (the time input is both).
+_Avoid_: masked input, text-entry field
+
+**Typed text**:
+The text a parsed text field shows instead of its formatted value while the user is typing; it belongs to the value it produced and is dropped when the value changes elsewhere.
+_Avoid_: draft, raw text, input text
+
+**Commit**:
+The moment the user leaves a parsed text field or presses Enter: valid typed text is replaced by the formatted value, invalid typed text stays and shows a parse error.
+_Avoid_: confirm, apply, submit (a form is submitted, a field is committed)
+
+**Parse error**:
+The message a parsed text field shows for committed typed text that does not give an allowed value. It belongs to the field, never to the bound form control, which only sees the value.
+_Avoid_: validation error (that is the form control's), invalid input
+
 ## Layout
 
 **Density**:
