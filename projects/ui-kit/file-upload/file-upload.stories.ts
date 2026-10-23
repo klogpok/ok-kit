@@ -76,6 +76,35 @@ export const WithFiles: Story = {
   render: () => ({ template: `<ui-story-file-upload dir="rtl" lang="he" [withFiles]="true" />` }),
 };
 
+/**
+ * Each file shows the icon of its type: by the MIME type, else by the extension (`.dwg` has no
+ * type in browsers). `[fileIcon]` picks other icons; `null` from it keeps the type icon.
+ */
+export const FileTypes: Story = {
+  // The files are built in code, so a docs snippet cannot show them.
+  parameters: { docs: { source: { code: null } } },
+  render: () => ({
+    props: {
+      files: [
+        sized('הדמיה.png', 1.2 * MB, 'image/png'),
+        sized('היתר בנייה.pdf', 640 * 1024),
+        sized('מפרט טכני.docx', 96 * 1024, ''),
+        sized('כתב כמויות.xlsx', 48 * 1024, ''),
+        sized('מצגת לדיירים.pptx', 3.1 * MB, ''),
+        sized('תוכניות.zip', 22 * MB, 'application/zip'),
+        sized('קומה טיפוסית.dwg', 5.4 * MB, ''),
+        sized('הערות.dat', 300, ''),
+      ],
+    },
+    template: `
+      <div dir="rtl" lang="he" style="max-inline-size:28rem">
+        <ui-form-field label="מסמכים">
+          <ui-file-upload [value]="files" multiple />
+        </ui-form-field>
+      </div>`,
+  }),
+};
+
 /** The compact look for dialogs and dense forms. */
 export const ButtonVariant: Story = {
   render: () => ({

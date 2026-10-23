@@ -7,8 +7,20 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
 import { UiFormField } from '@vplans/ui-kit/form-field';
 import { UiFileUploadHarness } from '@vplans/ui-kit/testing';
-import { UiFileUpload } from './file-upload';
-import { acceptsFile, fileProblem, formatFileSize, sameFile } from './file-utils';
+import {
+  UiIconDefinition,
+  uiIconAlertCircle,
+  uiIconFile,
+  uiIconFileArchive,
+  uiIconFileDrawing,
+  uiIconFileImage,
+  uiIconFilePdf,
+  uiIconFilePresentation,
+  uiIconFileSpreadsheet,
+  uiIconFileText,
+} from '@vplans/ui-kit/icon';
+import { UiFileIconFn, UiFileUpload } from './file-upload';
+import { acceptsFile, fileProblem, fileTypeIcon, formatFileSize, sameFile } from './file-utils';
 
 const file = (name: string, size = 1000, type = '') =>
   new File([new Uint8Array(size)], name, { type, lastModified: 1 });
@@ -55,7 +67,32 @@ describe('file utils', () => {
     expect(sameFile(file('a'), file('a'))).toBe(true);
     expect(sameFile(file('a'), file('b'))).toBe(false);
   });
+
+  it('picks the icon by MIME type, then by extension', () => {
+    expect(fileTypeIcon(file('scan', 1, 'image/jpeg'))).toBe(uiIconFileImage);
+    expect(fileTypeIcon(file('Plan.PDF'))).toBe(uiIconFilePdf);
+    expect(fileTypeIcon(file('a', 1, 'application/msword'))).toBe(uiIconFileText);
+    const xlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    expect(fileTypeIcon(file('a', 1, xlsx))).toBe(uiIconFileSpreadsheet);
+    expect(fileTypeIcon(file('data.csv'))).toBe(uiIconFileSpreadsheet);
+    expect(fileTypeIcon(file('deck.pptx'))).toBe(uiIconFilePresentation);
+    expect(fileTypeIcon(file('a.rar'))).toBe(uiIconFileArchive);
+    // AutoCAD MIME types start with `image/`, but a drawing is not a picture.
+    expect(fileTypeIcon(file('a.dwg', 1, 'image/vnd.dwg'))).toBe(uiIconFileDrawing);
+    expect(fileTypeIcon(file('model.ifc'))).toBe(uiIconFileDrawing);
+    // An unknown MIME type falls back to the extension.
+    expect(fileTypeIcon(file('a.pdf', 1, 'application/octet-stream'))).toBe(uiIconFilePdf);
+    expect(fileTypeIcon(file('a.exe'))).toBe(uiIconFile);
+    expect(fileTypeIcon(file('README'))).toBe(uiIconFile);
+  });
 });
+
+/** The markup `ui-icon` renders for an icon definition. */
+const rendered = (icon: UiIconDefinition): string => {
+  const box = document.createElement('div');
+  box.innerHTML = icon.svg;
+  return box.innerHTML;
+};
 
 @Component({
   imports: [UiFileUpload, UiFormField],
@@ -70,11 +107,13 @@ describe('file utils', () => {
         [progress]="progress()"
         [disabled]="disabled()"
         [readonly]="readonly()"
+        [fileIcon]="fileIcon()"
       />
     </ui-form-field>
   `,
 })
 class Host {
+  readonly fileIcon = signal<UiFileIconFn | null>(null);
   readonly files = signal<readonly File[]>([]);
   readonly multiple = signal(true);
   readonly maxFiles = signal<number | null>(null);
@@ -134,6 +173,24 @@ describe('UiFileUpload', () => {
     expect(host.files().map((f) => f.name)).toEqual(['a.pdf', 'b.pdf']);
     expect(names()).toEqual(['a.pdf', 'b.pdf']);
     expect(root.querySelector('.ui-file-upload__size')!.textContent).toContain('1');
+  });
+
+  it('shows the icon of each file type, and the alert icon for a rejected file', async () => {
+    drop(zone(), [file('a.pdf'), file('b.dwg')]);
+    await settle(fixture);
+    const icons = () => [...root.querySelectorAll('.ui-file-upload__file-icon')];
+    expect(icons().map((i) => i.innerHTML)).toEqual([
+      rendered(uiIconFilePdf),
+      rendered(uiIconAlertCircle),
+    ]);
+    expect(icons()[0].getAttribute('aria-hidden')).toBe('true');
+
+    host.fileIcon.set((f) => (f.name === 'a.pdf' ? uiIconFileDrawing : null));
+    await settle(fixture);
+    expect(icons()[0].innerHTML).toBe(rendered(uiIconFileDrawing));
+    host.fileIcon.set(() => null);
+    await settle(fixture);
+    expect(icons()[0].innerHTML).toBe(rendered(uiIconFilePdf));
   });
 
   it('replaces the file without multiple', async () => {

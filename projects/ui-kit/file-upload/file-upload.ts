@@ -22,12 +22,27 @@ import {
   UiFormControlBase,
   UiFormFieldControl,
 } from '@vplans/ui-kit/core';
-import { UiIcon, uiIconAlertCircle, uiIconFile, uiIconUpload, uiIconX } from '@vplans/ui-kit/icon';
+import {
+  UiIcon,
+  UiIconDefinition,
+  UiIconName,
+  uiIconAlertCircle,
+  uiIconUpload,
+  uiIconX,
+} from '@vplans/ui-kit/icon';
 import { UiProgressBar } from '@vplans/ui-kit/progress';
-import { UiFileProblem, fileProblem, formatFileSize, sameFile } from './file-utils';
+import { UiFileProblem, fileProblem, fileTypeIcon, formatFileSize, sameFile } from './file-utils';
 
 /** Look of the picker: a large drop area, or a compact button. */
 export type UiFileUploadVariant = 'dropzone' | 'button';
+
+/**
+ * The icon of a file in the list: a definition or a registered name, or `null` for the built-in
+ * one (`fileTypeIcon`).
+ */
+export type UiFileIconFn = (
+  file: File,
+) => UiIconDefinition | UiIconName | (string & Record<never, never>) | null;
 
 const optionalNumber = (value: unknown): number | null =>
   value == null || value === '' ? null : numberAttribute(value, Number.NaN);
@@ -42,6 +57,7 @@ const optionalNumber = (value: unknown): number | null =>
  *   control's own: they never become errors of a bound form control, so whether the form is
  *   invalid stays with the consumer's own validators.
  * - Without `multiple`, a new file replaces the old one.
+ * - Each file shows the icon of its type (`fileTypeIcon`); `fileIcon` picks other icons.
  * - The kit does not upload anything. Upload the files yourself and pass the progress per file
  *   (0–100) in `progress`.
  *
@@ -102,7 +118,7 @@ const optionalNumber = (value: unknown): number | null =>
           >
             <ui-icon
               class="ui-file-upload__file-icon"
-              [icon]="problems().get(file) ? icons.alert : icons.file"
+              [icon]="problems().get(file) ? icons.alert : iconOf(file)"
             />
             <span class="ui-file-upload__file-text">
               <bdi class="ui-file-upload__name">{{ file.name }}</bdi>
@@ -167,6 +183,8 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
   /** Upload progress per file, 0–100. Files without an entry show no bar. */
   readonly progress = input<ReadonlyMap<File, number> | null>(null);
   readonly variant = input<UiFileUploadVariant>('dropzone');
+  /** Picks the icon of a file in the list; `null` from it falls back to the type icon. */
+  readonly fileIcon = input<UiFileIconFn | null>(null);
   /** Host id; the drop area gets `${id}-control`. */
   readonly id = input(inject(_IdGenerator).getId('ui-file-upload-'));
   readonly ariaLabel = input('', { alias: 'aria-label' });
@@ -176,7 +194,6 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
 
   protected readonly icons = {
     upload: uiIconUpload,
-    file: uiIconFile,
     alert: uiIconAlertCircle,
     remove: uiIconX,
   };
@@ -276,6 +293,10 @@ export class UiFileUpload extends UiFormControlBase<readonly File[]> implements 
 
   protected size(file: File): string {
     return formatFileSize(file.size, this.locale());
+  }
+
+  protected iconOf(file: File): UiIconDefinition | string {
+    return this.fileIcon()?.(file) ?? fileTypeIcon(file);
   }
 
   protected progressOf(file: File): { value: number } | null {

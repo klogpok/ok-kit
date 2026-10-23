@@ -124,6 +124,13 @@ validators say. The kit does not upload: pass the progress per file (0–100) in
 
 `variant="button"` shows a compact button instead of the drop area.
 
+Each listed file shows the icon of its type: image, PDF, document, spreadsheet, presentation,
+archive or drawing (CAD/BIM: `.dwg`, `.dxf`, `.dwf`, `.dgn`, `.ifc`, `.rvt`), else a plain file.
+The type comes from the MIME type, else from the extension, since browsers leave it empty for
+`.dwg`. A rejected file shows the alert icon instead. `fileTypeIcon(file)` gives the same icon
+elsewhere (a table of attachments); `[fileIcon]="(file) => icon | null"` picks other icons, and
+`null` keeps the type icon. The icon is decorative: the name already carries the extension.
+
 `ui-slider` picks a number on a scale (`min`, `max`, `step`); the value is a `number` or
 `null`, and `null` shows the thumb at `min`. `ui-range-slider` picks a `[start, end]` tuple with
 two thumbs that do not pass each other; `null` shows the whole scale. Click the track to move the
