@@ -9,6 +9,7 @@ export {
   UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
   UI_OPPOSITE_SIDE,
   UI_SIDE_POSITIONS,
+  overlayPlacementPositions,
   sideOverlayPositions,
   syncOverlayDirection,
   type UiOverlaySide,

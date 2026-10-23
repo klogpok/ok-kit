@@ -1,6 +1,7 @@
 import type { OverlayRef } from '@angular/cdk/overlay';
 import {
   UI_DROPDOWN_POSITIONS,
+  overlayPlacementPositions,
   pushOnScreen,
   sideOverlayPositions,
   syncOverlayDirection,
@@ -58,6 +59,14 @@ describe('sideOverlayPositions', () => {
     const [top, bottom] = sideOverlayPositions('top', 'p');
     expect(top).toMatchObject({ originY: 'top', overlayY: 'bottom', originX: 'center' });
     expect(bottom).toMatchObject({ originY: 'bottom', overlayY: 'top', panelClass: 'p--bottom' });
+  });
+});
+
+describe('overlayPlacementPositions', () => {
+  it('gives a side the same positions as sideOverlayPositions', () => {
+    for (const side of ['top', 'bottom', 'start', 'end'] as const) {
+      expect(overlayPlacementPositions(side, 'p')).toEqual(sideOverlayPositions(side, 'p'));
+    }
   });
 });
 

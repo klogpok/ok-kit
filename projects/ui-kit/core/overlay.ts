@@ -51,6 +51,18 @@ export function sideOverlayPositions(
 }
 
 /**
+ * Positions for an overlay at the `preferred` placement of its trigger, then at its flip. Each
+ * one adds the pane class `<panelClassPrefix>--<placement>`, so the panel can tell where it ended
+ * up.
+ */
+export function overlayPlacementPositions(
+  preferred: UiOverlaySide,
+  panelClassPrefix: string,
+): ConnectedPosition[] {
+  return sideOverlayPositions(preferred, panelClassPrefix);
+}
+
+/**
  * Sets the overlay direction from the closest `dir` attribute of `host`. The CDK reads the
  * direction once at startup, so call it each time the overlay opens to follow runtime changes.
  */
