@@ -96,6 +96,8 @@ class TestPopupField extends UiPopupListboxField<string | null> {
       [disabled]="disabled()"
       [readonly]="readonly()"
       [invalid]="invalid()"
+      (opened)="events.push('opened')"
+      (closed)="events.push('closed')"
     >
       @for (fruit of fruits; track fruit) {
         <ui-option [value]="fruit">{{ fruit }}</ui-option>
@@ -104,6 +106,7 @@ class TestPopupField extends UiPopupListboxField<string | null> {
   `,
 })
 class Host {
+  readonly events: string[] = [];
   readonly fruits = ['Apple', 'Banana'];
   readonly id = signal('fruit');
   readonly label = signal('Fruit');
@@ -165,6 +168,27 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
     await settle(fixture);
     expect(control().id).toBe('veg-control');
     expect(control().hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('emits opened and closed as the list opens and closes', async () => {
+    control().click();
+    await settle(fixture);
+    expect(host.events).toEqual(['opened']);
+
+    control().dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }),
+    );
+    await settle(fixture);
+    expect(host.events).toEqual(['opened', 'closed']);
+  });
+
+  it('closes the list when the inner control loses focus', async () => {
+    control().click();
+    await settle(fixture);
+    control().dispatchEvent(new FocusEvent('blur'));
+    await settle(fixture);
+    expect(control().getAttribute('aria-expanded')).toBe('false');
+    expect(host.events).toEqual(['opened', 'closed']);
   });
 
   it('builds the host classes from the field prefix', async () => {
@@ -239,6 +263,15 @@ describe('[uiComboboxControl] on a popup listbox field with Reactive Forms', () 
     await settle(fixture);
     expect(control().getAttribute('aria-invalid')).toBe('true');
     expect(describedBy().map(text)).toEqual(['Seasonal', 'Pick a fruit']);
+  });
+
+  it('marks the control touched when the inner control loses focus', async () => {
+    const fruit = fixture.componentInstance.fruit;
+    expect(fruit.touched).toBe(false);
+    control().dispatchEvent(new FocusEvent('blur'));
+    await settle(fixture);
+    expect(fruit.touched).toBe(true);
+    expect(control().getAttribute('aria-invalid')).toBe('true');
   });
 
   it('keeps its id on the host and its label and descriptions on the inner control', () => {
