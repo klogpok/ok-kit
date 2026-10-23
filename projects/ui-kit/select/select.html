@@ -23,13 +23,15 @@
     </span>
   }
   <!-- uiComboboxControl sets the id, label and dynamic combobox ARIA of both controls. -->
-  <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
+  <!-- Its bindings replace the static aria-expanded and aria-controls, which the lint wants. -->
   @if (searchable()) {
     <input
       #control
       uiComboboxControl
       type="text"
       role="combobox"
+      aria-expanded="false"
+      aria-controls=""
       class="ui-select__control ui-select__input"
       autocomplete="off"
       aria-autocomplete="list"
@@ -49,6 +51,8 @@
       uiComboboxControl
       type="button"
       role="combobox"
+      aria-expanded="false"
+      aria-controls=""
       class="ui-select__control ui-select__button"
       aria-haspopup="listbox"
       [disabled]="isDisabled()"
@@ -65,7 +69,6 @@
       </span>
     </button>
   }
-  <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
   @if (showClear()) {
     <button
       type="button"

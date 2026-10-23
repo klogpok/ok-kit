@@ -41,18 +41,18 @@ async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div cdkOverlayOrigin #origin="cdkOverlayOrigin">
-      <!-- uiComboboxControl sets aria-expanded and aria-controls. -->
-      <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
+      <!-- uiComboboxControl overrides the static aria-expanded and aria-controls. -->
       <input
         #control
         uiComboboxControl
         class="control"
         role="combobox"
+        aria-expanded="false"
+        aria-controls=""
         (click)="listbox.open({ activate: false })"
         (keydown)="listbox.handleKeydown($event)"
         (blur)="onBlur()"
       />
-      <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
     </div>
     <ng-template [uiDropdownPanel]="origin" [open]="listbox.shown()" (closed)="close()">
       <ui-listbox><ng-content /></ui-listbox>
@@ -161,6 +161,16 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
     expect(control().getAttribute('aria-expanded')).toBe('false');
     expect(control().hasAttribute('aria-controls')).toBe(false);
     expect(control().hasAttribute('aria-activedescendant')).toBe(false);
+  });
+
+  it('overrides the static aria-expanded and aria-controls of the template', async () => {
+    expect(control().getAttribute('aria-expanded')).toBe('false');
+    expect(control().hasAttribute('aria-controls')).toBe(false);
+
+    control().click();
+    await settle(fixture);
+    expect(control().getAttribute('aria-expanded')).toBe('true');
+    expect(control().getAttribute('aria-controls')).toBe('fruit-listbox');
   });
 
   it('follows a new id and label of the field', async () => {

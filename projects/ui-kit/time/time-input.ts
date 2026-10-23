@@ -75,12 +75,14 @@ interface Draft {
       (click)="onFieldClick()"
     >
       <!-- uiComboboxControl sets the id, label and dynamic combobox ARIA. -->
-      <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
+      <!-- Its bindings replace the static aria-expanded and aria-controls, which the lint wants. -->
       <input
         #control
         uiComboboxControl
         type="text"
         role="combobox"
+        aria-expanded="false"
+        aria-controls=""
         class="ui-time-input__input"
         autocomplete="off"
         aria-haspopup="listbox"
@@ -96,7 +98,6 @@ interface Draft {
         (keydown)="onKeydown($event)"
         (blur)="onBlur()"
       />
-      <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
       <ui-icon
         class="ui-time-input__icon"
         [icon]="clockIcon"

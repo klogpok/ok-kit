@@ -64,12 +64,14 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
   template: `
     <div class="ui-autocomplete__field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
       <!-- uiComboboxControl sets the id, label and dynamic combobox ARIA. -->
-      <!-- eslint-disable @angular-eslint/template/role-has-required-aria -->
+      <!-- Its bindings replace the static aria-expanded and aria-controls, which the lint wants. -->
       <input
         #control
         uiComboboxControl
         type="text"
         role="combobox"
+        aria-expanded="false"
+        aria-controls=""
         class="ui-autocomplete__input"
         autocomplete="off"
         aria-autocomplete="list"
@@ -84,7 +86,6 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
         (click)="open()"
         (blur)="onBlur()"
       />
-      <!-- eslint-enable @angular-eslint/template/role-has-required-aria -->
       @if (loading()) {
         <ui-spinner class="ui-autocomplete__spinner" size="sm" decorative />
       }
