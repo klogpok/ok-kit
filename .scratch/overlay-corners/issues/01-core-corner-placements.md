@@ -1,6 +1,6 @@
 # 01: Corner placements in `core/overlay.ts`
 
-Status: ready-for-agent
+Status: done
 
 Spec: `../spec.md` → "Implementation Decisions" and "Decisions" 4. Terms: `GLOSSARY.md` →
 "Overlays".
@@ -17,18 +17,18 @@ Spec: `../spec.md` → "Implementation Decisions" and "Decisions" 4. Terms: `GLO
   and result for sides.
 - JSDoc in the kit's style; the README core row lists the new exports.
 
-- [ ] `UiOverlayCorner`, `UiOverlayPlacement` and the placement helper are exported from `core`.
-- [ ] `overlay.spec.ts` covers each corner's connected position and flip pair, and that sides give
+- [x] `UiOverlayCorner`, `UiOverlayPlacement` and the placement helper are exported from `core`.
+- [x] `overlay.spec.ts` covers each corner's connected position and flip pair, and that sides give
       the same result as before.
-- [ ] `sideOverlayPositions()` callers (tooltip, popover) compile and pass unchanged.
-- [ ] The README core row lists the new exports.
+- [x] `sideOverlayPositions()` callers (tooltip, popover) compile and pass unchanged.
+- [x] The README core row lists the new exports.
 - [ ] One commit, `feat(core): ...`.
 
 ## Русский перевод
 
 # 01: Угловые placement-ы в `core/overlay.ts`
 
-Статус: ready-for-agent
+Статус: сделано
 
 Spec: `../spec.md` → «Решения по реализации» и «Решения» 4. Термины: `GLOSSARY.md` → «Overlays».
 
@@ -44,10 +44,10 @@ Spec: `../spec.md` → «Решения по реализации» и «Реш�
   сигнатура и результат для сторон не меняются.
 - JSDoc в стиле библиотеки; строка core в README перечисляет новые экспорты.
 
-- [ ] `UiOverlayCorner`, `UiOverlayPlacement` и хелпер placement экспортируются из `core`.
-- [ ] `overlay.spec.ts` покрывает connected position и пару флипа каждого угла, а также то, что
+- [x] `UiOverlayCorner`, `UiOverlayPlacement` и хелпер placement экспортируются из `core`.
+- [x] `overlay.spec.ts` покрывает connected position и пару флипа каждого угла, а также то, что
       стороны дают тот же результат, что и раньше.
-- [ ] Места вызова `sideOverlayPositions()` (tooltip, popover) компилируются и проходят без
+- [x] Места вызова `sideOverlayPositions()` (tooltip, popover) компилируются и проходят без
       изменений.
-- [ ] Строка core в README перечисляет новые экспорты.
+- [x] Строка core в README перечисляет новые экспорты.
 - [ ] Один коммит, `feat(core): ...`.

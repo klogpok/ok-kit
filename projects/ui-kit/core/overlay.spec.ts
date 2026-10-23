@@ -63,10 +63,67 @@ describe('sideOverlayPositions', () => {
 });
 
 describe('overlayPlacementPositions', () => {
+  it('centers a side on its edge of the trigger and flips it to the opposite side', () => {
+    expect(overlayPlacementPositions('bottom', 'p')).toEqual([
+      {
+        originX: 'center',
+        originY: 'bottom',
+        overlayX: 'center',
+        overlayY: 'top',
+        panelClass: 'p--bottom',
+      },
+      {
+        originX: 'center',
+        originY: 'top',
+        overlayX: 'center',
+        overlayY: 'bottom',
+        panelClass: 'p--top',
+      },
+    ]);
+  });
+
   it('gives a side the same positions as sideOverlayPositions', () => {
     for (const side of ['top', 'bottom', 'start', 'end'] as const) {
       expect(overlayPlacementPositions(side, 'p')).toEqual(sideOverlayPositions(side, 'p'));
     }
+  });
+
+  // Each corner sits diagonally outside the trigger: its inline edge meets the trigger's opposite
+  // edge, its block edge meets the trigger's top or bottom.
+  const topStart = {
+    originX: 'start',
+    originY: 'top',
+    overlayX: 'end',
+    overlayY: 'bottom',
+    panelClass: 'p--corner-top-start',
+  };
+  const topEnd = {
+    originX: 'end',
+    originY: 'top',
+    overlayX: 'start',
+    overlayY: 'bottom',
+    panelClass: 'p--corner-top-end',
+  };
+  const bottomStart = {
+    originX: 'start',
+    originY: 'bottom',
+    overlayX: 'end',
+    overlayY: 'top',
+    panelClass: 'p--corner-bottom-start',
+  };
+  const bottomEnd = {
+    originX: 'end',
+    originY: 'bottom',
+    overlayX: 'start',
+    overlayY: 'top',
+    panelClass: 'p--corner-bottom-end',
+  };
+
+  it('places a corner outside the trigger and flips it to its vertical mirror', () => {
+    expect(overlayPlacementPositions('corner-top-start', 'p')).toEqual([topStart, bottomStart]);
+    expect(overlayPlacementPositions('corner-top-end', 'p')).toEqual([topEnd, bottomEnd]);
+    expect(overlayPlacementPositions('corner-bottom-start', 'p')).toEqual([bottomStart, topStart]);
+    expect(overlayPlacementPositions('corner-bottom-end', 'p')).toEqual([bottomEnd, topEnd]);
   });
 });
 

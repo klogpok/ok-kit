@@ -44,22 +44,53 @@ export function sideOverlayPositions(
   preferred: UiOverlaySide,
   panelClassPrefix: string,
 ): ConnectedPosition[] {
-  return [preferred, UI_OPPOSITE_SIDE[preferred]].map((side) => ({
-    ...UI_SIDE_POSITIONS[side],
-    panelClass: `${panelClassPrefix}--${side}`,
-  }));
+  return overlayPlacementPositions(preferred, panelClassPrefix);
 }
 
 /**
- * Positions for an overlay at the `preferred` placement of its trigger, then at its flip. Each
- * one adds the pane class `<panelClassPrefix>--<placement>`, so the panel can tell where it ended
- * up.
+ * Corner of the trigger a tooltip or popover opens diagonally outside of: above or below it,
+ * entirely before its start edge or after its end edge. `start`/`end` follow the direction.
+ */
+export type UiOverlayCorner =
+  'corner-top-start' | 'corner-top-end' | 'corner-bottom-start' | 'corner-bottom-end';
+
+/** Where a tooltip or popover sits against its trigger: a side or a corner. */
+export type UiOverlayPlacement = UiOverlaySide | UiOverlayCorner;
+
+/** Position of an overlay at each placement. A corner's inline edge meets the trigger's. */
+const PLACEMENT_POSITIONS: Readonly<Record<UiOverlayPlacement, ConnectedPosition>> = {
+  ...UI_SIDE_POSITIONS,
+  'corner-top-start': { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'bottom' },
+  'corner-top-end': { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
+  'corner-bottom-start': { originX: 'start', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
+  'corner-bottom-end': { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
+};
+
+/**
+ * The placement an overlay flips to when the preferred one has no room: the opposite side, or the
+ * vertical mirror of a corner (it keeps its inline side; the push handles the inline axis).
+ */
+const FLIPPED_PLACEMENT: Readonly<Record<UiOverlayPlacement, UiOverlayPlacement>> = {
+  ...UI_OPPOSITE_SIDE,
+  'corner-top-start': 'corner-bottom-start',
+  'corner-bottom-start': 'corner-top-start',
+  'corner-top-end': 'corner-bottom-end',
+  'corner-bottom-end': 'corner-top-end',
+};
+
+/**
+ * Positions for an overlay at the `preferred` placement of its trigger, then at its flip (see
+ * `UiOverlayPlacement`). Each one adds the pane class `<panelClassPrefix>--<placement>`, so the
+ * panel can tell where it ended up. For a side it equals `sideOverlayPositions()`.
  */
 export function overlayPlacementPositions(
-  preferred: UiOverlaySide,
+  preferred: UiOverlayPlacement,
   panelClassPrefix: string,
 ): ConnectedPosition[] {
-  return sideOverlayPositions(preferred, panelClassPrefix);
+  return [preferred, FLIPPED_PLACEMENT[preferred]].map((placement) => ({
+    ...PLACEMENT_POSITIONS[placement],
+    panelClass: `${panelClassPrefix}--${placement}`,
+  }));
 }
 
 /**

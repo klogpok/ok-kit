@@ -12,6 +12,8 @@ export {
   overlayPlacementPositions,
   sideOverlayPositions,
   syncOverlayDirection,
+  type UiOverlayCorner,
+  type UiOverlayPlacement,
   type UiOverlaySide,
 } from './overlay';
 // Internal: shared by the kit's overlays, not part of the public API.
