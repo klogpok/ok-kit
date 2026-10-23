@@ -814,3 +814,16 @@ User decisions (2026-10-23):
 - **Picking a value** (calendar, list, stepper, preset, clear, Home/End) always drops the typed
   text and its error, also for the same value.
 - **Order:** before the popup listbox field work (candidate 1).
+
+## Popup listbox field: time input aria-readonly (decided 2026-10-23)
+
+User decision (ticket 03 of `.scratch/popup-listbox-field/`, option 1):
+
+- **Every popup listbox field sets `aria-readonly`**, `ui-time-input` included. Select and
+  autocomplete already did; the time input only set the native `readOnly`. The native
+  `readonly` of an `<input>` already exposes the state, but the select `<button>` trigger has no
+  native readonly, so it needs `aria-readonly`; the user chose that the four fields report it
+  alike.
+- **`[uiComboboxControl]` owns it** (`'true'` or `null` from the field's `readonly`), like the
+  rest of the dynamic combobox ARIA; no field template binds it. The native `readOnly` of the
+  `<input>` fields stays in their templates.

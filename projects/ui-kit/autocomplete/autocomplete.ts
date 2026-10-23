@@ -79,7 +79,6 @@ import { UiSpinner } from '@vplans/ui-kit/spinner';
         [disabled]="isDisabled()"
         [readOnly]="readonly()"
         [attr.name]="name() || null"
-        [attr.aria-readonly]="readonly() ? 'true' : null"
         (input)="onInput($event)"
         (keydown)="onKeydown($event)"
         (click)="open()"

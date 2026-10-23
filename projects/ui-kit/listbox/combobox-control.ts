@@ -11,6 +11,8 @@ export interface UiComboboxField {
   readonly controlId: Signal<string>;
   readonly ariaLabel: Signal<string>;
   readonly isRequired: Signal<boolean>;
+  /** The field is readonly: its listbox is locked. */
+  readonly readonly: Signal<boolean>;
   /** The error state shown to the user. */
   readonly showError: Signal<boolean>;
   /** The app's own descriptions, then the hint or error of `ui-form-field`, or `null`. */
@@ -22,8 +24,9 @@ export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPop
 /**
  * The dynamic combobox ARIA of the inner `<input>` or `<button>` of a popup listbox field, from
  * the field and its listbox controller. Static attributes (`role`, `aria-haspopup`,
- * `aria-autocomplete`, `autocomplete`) and `aria-readonly` stay in the field's template, where
- * the fields differ. Internal.
+ * `aria-autocomplete`, `autocomplete`) and the native `readOnly` of an `<input>` stay in the
+ * field's template, where the fields differ. `aria-readonly` is set on every field, also on an
+ * `<input>` that already has the native `readonly`, so the four fields report it alike. Internal.
  */
 @Directive({
   selector: '[uiComboboxControl]',
@@ -35,6 +38,7 @@ export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPop
     '[attr.aria-controls]': 'listbox.shown() ? listbox.panelId() : null',
     '[attr.aria-activedescendant]': 'listbox.shown() ? listbox.activeId() : null',
     '[attr.aria-required]': "field.isRequired() ? 'true' : null",
+    '[attr.aria-readonly]': "field.readonly() ? 'true' : null",
     '[attr.aria-invalid]': "field.showError() ? 'true' : null",
     '[attr.aria-describedby]': 'field.describedBy()',
   },

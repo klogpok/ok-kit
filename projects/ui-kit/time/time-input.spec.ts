@@ -425,6 +425,17 @@ describe('UiTimeInput with Reactive Forms', () => {
     expect(await start.isOpen()).toBe(false);
   });
 
+  it('reports aria-readonly on its input only while readonly', async () => {
+    const root = fixture.nativeElement as HTMLElement;
+    const input = () => root.querySelector<HTMLInputElement>('ui-time-input input')!;
+    expect(input().hasAttribute('aria-readonly')).toBe(false);
+
+    host.locked.set(true);
+    await settle(fixture);
+    expect(input().getAttribute('aria-readonly')).toBe('true');
+    expect(input().readOnly).toBe(true);
+  });
+
   it('marks the control touched when the user leaves the field', async () => {
     const start = await field('Start');
     expect(controls.start.touched).toBe(false);

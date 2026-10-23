@@ -170,6 +170,18 @@ describe('[uiComboboxControl] on a popup listbox field', () => {
     expect(control().hasAttribute('aria-label')).toBe(false);
   });
 
+  it('reports aria-readonly only while the field is readonly', async () => {
+    expect(control().hasAttribute('aria-readonly')).toBe(false);
+
+    host.readonly.set(true);
+    await settle(fixture);
+    expect(control().getAttribute('aria-readonly')).toBe('true');
+
+    host.readonly.set(false);
+    await settle(fixture);
+    expect(control().hasAttribute('aria-readonly')).toBe(false);
+  });
+
   it('emits opened and closed as the list opens and closes', async () => {
     control().click();
     await settle(fixture);

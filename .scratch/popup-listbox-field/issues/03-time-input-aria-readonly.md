@@ -1,6 +1,6 @@
 # 03: `ui-time-input` sets `aria-readonly`; `[uiComboboxControl]` owns it
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 02
 
 Spec: `../spec.md` → "Further Notes". Found while comparing the four popup listbox fields; the
@@ -26,22 +26,22 @@ and let the directive of ticket 01 own it for all four fields.
   `aria-readonly` binding; the time input gains it through the directive. The native `readOnly` on
   the time input stays.
 
-- [ ] The directive sets `aria-readonly`; no template binds it any more.
-- [ ] `ui-time-input` renders `aria-readonly="true"` on its input while readonly and no attribute
+- [x] The directive sets `aria-readonly`; no template binds it any more.
+- [x] `ui-time-input` renders `aria-readonly="true"` on its input while readonly and no attribute
       otherwise; a time-input spec covers it.
-- [ ] The contract spec in `listbox` covers `aria-readonly` on the test field.
-- [ ] The other fields render the same `aria-readonly` as before; their existing specs pass
+- [x] The contract spec in `listbox` covers `aria-readonly` on the test field.
+- [x] The other fields render the same `aria-readonly` as before; their existing specs pass
       without edits.
-- [ ] The answer and its reason are recorded in `docs/DECISIONS.md`; `CHANGELOG.md` notes the
+- [x] The answer and its reason are recorded in `docs/DECISIONS.md`; `CHANGELOG.md` notes the
       time input change.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
-- [ ] One commit, `fix(time): ...`.
+- [x] One commit, `fix(time): ...`.
 
 ## Русский перевод
 
 # 03: `ui-time-input` ставит `aria-readonly`; им владеет `[uiComboboxControl]`
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 02
 
 Spec: `../spec.md` → «Дополнительные заметки». Обнаружено при сравнении четырёх popup listbox
@@ -68,14 +68,14 @@ field; рефакторинг тикетов 01–02 сохраняет ныне
   `aria-readonly`; time input получает его через директиву. Нативный `readOnly` у time input
   остаётся.
 
-- [ ] Директива ставит `aria-readonly`; ни один шаблон его больше не привязывает.
-- [ ] `ui-time-input` отрисовывает `aria-readonly="true"` на своём input, пока поле readonly, и не
+- [x] Директива ставит `aria-readonly`; ни один шаблон его больше не привязывает.
+- [x] `ui-time-input` отрисовывает `aria-readonly="true"` на своём input, пока поле readonly, и не
       ставит атрибут в остальных случаях; это покрыто спеком time input.
-- [ ] Контрактный спек в `listbox` покрывает `aria-readonly` на тестовом поле.
-- [ ] Остальные поля отрисовывают тот же `aria-readonly`, что и раньше; их существующие спеки
+- [x] Контрактный спек в `listbox` покрывает `aria-readonly` на тестовом поле.
+- [x] Остальные поля отрисовывают тот же `aria-readonly`, что и раньше; их существующие спеки
       проходят без правок.
-- [ ] Ответ и его причина записаны в `docs/DECISIONS.md`; в `CHANGELOG.md` отмечено изменение
+- [x] Ответ и его причина записаны в `docs/DECISIONS.md`; в `CHANGELOG.md` отмечено изменение
       time input.
 - [ ] `/phase-check` проходит, визуальные baselines не меняются; `pnpm sync:client --verify`
       проходит.
-- [ ] Один коммит, `fix(time): ...`.
+- [x] Один коммит, `fix(time): ...`.

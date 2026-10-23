@@ -21,6 +21,12 @@ so versions mark review points rather than releases.
 - **core:** `describedBy` of `UiFormControlBase` is public (it was protected), so that
   `[uiComboboxControl]` can read it through the field token.
 
+### Fixed
+
+- **time:** a readonly `ui-time-input` sets `aria-readonly="true"` on its input, like
+  `ui-select`, `ui-multi-select` and `ui-autocomplete`; it kept only the native `readonly`
+  before. `[uiComboboxControl]` now sets `aria-readonly` for all four fields.
+
 ## Unreleased (file type icons)
 
 ### Added

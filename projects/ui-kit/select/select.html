@@ -39,7 +39,6 @@
       [attr.maxlength]="maxLength()"
       [disabled]="isDisabled()"
       [readOnly]="readonly()"
-      [attr.aria-readonly]="readonly() ? 'true' : null"
       (input)="onSearch($event)"
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
@@ -54,7 +53,6 @@
       aria-haspopup="listbox"
       [disabled]="isDisabled()"
       [attr.name]="name() || null"
-      [attr.aria-readonly]="readonly() ? 'true' : null"
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
     >
