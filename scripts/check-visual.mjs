@@ -10,6 +10,8 @@
 //   pnpm exec playwright-core install chromium-headless-shell   (once per machine and version)
 //   pnpm build-storybook && pnpm test-visual [--filter <story id part>]
 //   pnpm test-visual:update [--filter <story id part>]   (writes new or changed baselines)
+//   pnpm test-visual:update --filter <story id part> --force   (also writes changes below the
+//     limit: an intended change that small, like a 16px icon, otherwise keeps the old baseline)
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import pixelmatch from 'pixelmatch';
@@ -21,6 +23,12 @@ const baselineDir = resolve('visual');
 const diffDir = resolve('dist/visual-diff');
 const filter = option('--filter');
 const update = process.argv.includes('--update');
+const force = process.argv.includes('--force');
+// Forcing every story would re-take the baselines that only drifted with the environment.
+if (force && !(update && filter)) {
+  console.error('--force needs --update and --filter <story id part>.');
+  process.exit(1);
+}
 /** Share of pixels that may differ. */
 const MAX_DIFF_RATIO = 0.001;
 /** Tallest capture Chromium takes reliably (its texture size limit). */
@@ -111,6 +119,8 @@ async function readBaseline(file) {
 const jobs = stories.flatMap((story) => MODES.map((mode) => ({ story, mode })));
 const failures = [];
 const written = [];
+/** Captures that differ from their baseline, but within the limit. */
+const small = [];
 const names = new Set();
 
 async function run(job) {
@@ -137,7 +147,13 @@ async function run(job) {
       actual = PNG.sync.read(buffer);
       differing = compare(expected, actual);
     }
-    if (expected && differing <= limit(actual)) return;
+    if (expected && differing <= limit(actual)) {
+      if (differing === 0) return;
+      if (!force) {
+        small.push(`${name}: ${differing} pixels`);
+        return;
+      }
+    }
     if (update) {
       await writeFile(file, buffer);
       written.push(name);
@@ -184,6 +200,12 @@ console.log(`Compared ${stories.length} stories in ${MODES.length} modes.`);
 if (update) {
   console.log(`Wrote ${written.length} baseline(s), removed ${stale.length} stale one(s).`);
   for (const name of written) console.log(`  ${name}`);
+  if (small.length) {
+    small.sort();
+    console.log(
+      `Kept ${small.length} baseline(s) that differ within the limit; --force writes them:\n  ${small.join('\n  ')}`,
+    );
+  }
 }
 for (const file of update ? [] : stale) failures.push(`${file}: baseline of a removed story`);
 if (failures.length) {
