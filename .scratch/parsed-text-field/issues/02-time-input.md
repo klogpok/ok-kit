@@ -1,6 +1,6 @@
 # 02: `ui-time-input` uses the typed text module
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01
 
 Spec: `../spec.md` → "Implementation Decisions": what stays in the fields, aligned edge cases.
@@ -16,19 +16,19 @@ and value writes, and passes its time rules to `ɵinjectTypedText()`.
   time and blur call `commit()`.
 - `ownErrors()` maps the code to `labels().invalidTime`.
 
-- [ ] No `Draft` interface, draft `linkedSignal` or `commitDraft()` is left in `time-input.ts`.
-- [ ] The existing time-input spec and harness pass; any test that asserted an aligned edge case
+- [x] No `Draft` interface, draft `linkedSignal` or `commitDraft()` is left in `time-input.ts`.
+- [x] The existing time-input spec and harness pass; any test that asserted an aligned edge case
       (blank commit, unreadable written value, typing over it) changes in the same commit with a
       note in the commit body.
-- [ ] Public inputs, outputs, methods and the rendered DOM are unchanged.
+- [x] Public inputs, outputs, methods and the rendered DOM are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
-- [ ] One commit, `refactor(time): typed text module`.
+- [x] One commit, `refactor(time): typed text module`.
 
 ## Русский перевод
 
 # 02: `ui-time-input` использует module typed text
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01
 
 Spec: `../spec.md` → «Решения по реализации»: что остаётся в полях, выровненные крайние случаи.
@@ -44,11 +44,11 @@ Spec: `../spec.md` → «Решения по реализации»: что ос
   активного времени и blur вызывают `commit()`.
 - `ownErrors()` отображает код в `labels().invalidTime`.
 
-- [ ] В `time-input.ts` не осталось interface `Draft`, draft `linkedSignal` и `commitDraft()`.
-- [ ] Существующие spec и harness time input проходят; тест, проверявший выровненный крайний
+- [x] В `time-input.ts` не осталось interface `Draft`, draft `linkedSignal` и `commitDraft()`.
+- [x] Существующие spec и harness time input проходят; тест, проверявший выровненный крайний
       случай (commit пустого текста, нечитаемое записанное значение, ввод поверх него), меняется в
       том же коммите с пояснением в теле коммита.
-- [ ] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
+- [x] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились; `pnpm sync:client --verify`
       проходит.
-- [ ] Один коммит, `refactor(time): typed text module`.
+- [x] Один коммит, `refactor(time): typed text module`.

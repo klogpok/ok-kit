@@ -167,6 +167,24 @@ describe('UiTimeInput', () => {
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
+  it('drops the typed text when the value changes to one the field cannot read', async () => {
+    await typeText('25:00');
+    await blur();
+    expect(input().getAttribute('aria-invalid')).toBe('true');
+
+    host.value.set('abc');
+    await settle(fixture);
+    expect(input().value).toBe('');
+    expect(input().getAttribute('aria-invalid')).toBeNull();
+  });
+
+  it('writes the parsed value when the user types over a value the field cannot read', async () => {
+    host.value.set('abc');
+    await settle(fixture);
+    await typeText('25:00');
+    expect(host.value()).toBeNull();
+  });
+
   it('lists the times between the limits and marks the selected one', async () => {
     host.value.set('10:00');
     await settle(fixture);

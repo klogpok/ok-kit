@@ -5,13 +5,17 @@ import {
   forwardRef,
   inject,
   input,
-  linkedSignal,
   model,
   numberAttribute,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
-import { UI_LABELS, ɵUiDropdownPanel } from '@vplans/ui-kit/core';
+import {
+  UI_LABELS,
+  type ɵUiTypedTextParse,
+  ɵUiDropdownPanel,
+  ɵinjectTypedText,
+} from '@vplans/ui-kit/core';
 import { UiIcon, uiIconClock } from '@vplans/ui-kit/icon';
 import {
   ɵUiComboboxControl,
@@ -30,14 +34,6 @@ import {
   toMinutes,
   uiTimeOf,
 } from './time-utils';
-
-/** Text the user is typing and the value it produced. */
-interface Draft {
-  text: string;
-  value: string | null;
-  /** The user left the field or pressed Enter: an invalid text is now an error. */
-  committed: boolean;
-}
 
 /**
  * Time field (WAI-ARIA editable combobox): type a time or pick one from a list of times every
@@ -154,28 +150,20 @@ export class UiTimeInput extends ɵUiPopupListboxField<string | null> {
   });
 
   /** The value when it is an "HH:mm" time; anything else is shown empty. */
-  private readonly time = computed(() => {
-    const value = this.value();
-    return toMinutes(value) === null ? null : value;
-  });
+  private readonly time = computed(() => readableTime(this.value()));
 
-  /** Dropped when the value changes elsewhere, so old text does not come back. */
-  private readonly draft = linkedSignal<string | null, Draft | null>({
-    source: () => this.time(),
-    computation: (value, previous) => {
-      const draft = previous?.value;
-      return draft?.value === value ? draft : null;
-    },
+  /** The typed text and its commit; the rules below are read when it is used, not now. */
+  private readonly typedText = ɵinjectTypedText<string, string, 'invalid'>({
+    value: this.value,
+    notify: (value) => this.notifyChange(value),
+    parse: (text) => this.parse(text),
+    format: (value) => this.display(value),
+    valid: readableTime,
+    equals: (a, b) => a === b,
   });
 
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
-  protected readonly text = computed(() => this.draft()?.text ?? this.display(this.time()));
-
-  /** Committed text that is not an allowed time. */
-  private readonly parseError = computed(() => {
-    const draft = this.draft();
-    return !!draft?.committed && draft.text.trim() !== '' && draft.value === null;
-  });
+  protected readonly text = computed(() => this.typedText.text());
 
   /** The list of times. Typed text is a value too: Enter without an active time commits it. */
   protected readonly listbox = ɵinjectListbox<string>({
@@ -197,12 +185,11 @@ export class UiTimeInput extends ɵUiPopupListboxField<string | null> {
    * not a validation failure of the consumer's control, which only ever sees `null`.
    */
   protected override ownErrors(): readonly string[] {
-    return this.parseError() ? [this.labels().invalidTime] : [];
+    return this.typedText.error() === 'invalid' ? [this.labels().invalidTime] : [];
   }
 
   writeValue(value: string | null | undefined): void {
-    this.draft.set(null);
-    this.value.set(toMinutes(value) === null ? null : value!);
+    this.typedText.write(value);
   }
 
   protected classPrefix(): string {
@@ -227,29 +214,26 @@ export class UiTimeInput extends ɵUiPopupListboxField<string | null> {
       text = maskTime(text, this.format());
       if (text !== input.value) input.value = text;
     }
-    const before = this.value();
-    const value = this.parse(text);
-    // Against the shown time: a value that is not a time already shows empty, so it stays.
-    if (value !== this.time()) this.value.set(value);
-    this.draft.set({ text, value, committed: false });
-    if (this.value() !== before) this.notifyChange(value);
+    this.typedText.input(text);
     this.open();
+    // The typed time is now the value, so it is the time to activate (`null` for other text).
+    const value = this.time();
     if (value !== null) this.listbox.activateValue(this.nearestSlot(value));
   }
 
   protected onKeydown(event: KeyboardEvent): void {
     // The listbox leaves Enter without an active time to the field: it commits the typed text.
-    if (!this.listbox.handleKeydown(event) && event.key === 'Enter') this.commitDraft();
+    if (!this.listbox.handleKeydown(event) && event.key === 'Enter') this.typedText.commit();
   }
 
   /**
-   * Commits the draft between closing and the touched step, as before the base class: a `touch`
-   * handler already sees the parse error. `super.onBlur()` closes and marks touched in one step,
-   * so it cannot be used here.
+   * Commits the typed text between closing and the touched step, as before the base class: a
+   * `touch` handler already sees the parse error. `super.onBlur()` closes and marks touched in one
+   * step, so it cannot be used here.
    */
   protected override onBlur(): void {
     this.close();
-    this.commitDraft();
+    this.typedText.commit();
     this.notifyTouched();
   }
 
@@ -264,31 +248,30 @@ export class UiTimeInput extends ɵUiPopupListboxField<string | null> {
   private pick(value: string): void {
     // The listbox does not select while the field is readonly or disabled.
     // Drops typed text and its message, also when the same time is picked again.
-    this.draft.set(null);
-    if (value !== this.time()) {
-      this.value.set(value);
-      this.notifyChange(value);
-    }
+    this.typedText.set(value);
     this.close();
   }
 
-  /** A typed time inside the limits, or `null`. */
-  private parse(text: string): string | null {
-    const time = text.trim() ? parseTime(text, this.format()) : null;
+  /** A typed time inside the limits; other non-blank text is the error `'invalid'`. */
+  private parse(text: string): ɵUiTypedTextParse<string, 'invalid'> {
+    if (!text.trim()) return { value: null, error: null };
+    const time = parseTime(text, this.format());
     const minutes = toMinutes(time);
-    if (time === null || minutes === null) return null;
     const { min, max } = this.limits();
-    return (min !== null && minutes < min) || (max !== null && minutes > max) ? null : time;
+    const allowed =
+      time !== null &&
+      minutes !== null &&
+      !(min !== null && minutes < min) &&
+      !(max !== null && minutes > max);
+    return allowed ? { value: time, error: null } : { value: null, error: 'invalid' };
   }
 
   private display(value: string | null): string {
-    return value === null || toMinutes(value) === null ? '' : formatTime(value, this.format());
+    return value === null ? '' : formatTime(value, this.format());
   }
+}
 
-  /** Shows a valid typed time in the locale format; keeps invalid text for the user to fix. */
-  private commitDraft(): void {
-    const draft = this.draft();
-    if (!draft) return;
-    this.draft.set(draft.value ? null : { ...draft, committed: true });
-  }
+/** The time when it is an "HH:mm" string, otherwise `null`. */
+function readableTime(value: unknown): string | null {
+  return typeof value === 'string' && toMinutes(value) !== null ? value : null;
 }
