@@ -38,7 +38,10 @@ try {
       if (next) {
         writeFileSync(join(dir, `${next.id}.json`), `${JSON.stringify(next.beat, null, 2)}\n`);
         beats[next.id] = next.beat;
-        writeFileSync(join(dir, 'progress.md'), renderProgress(state, beats, Date.now()));
+        const others = Object.entries(states)
+          .filter(([name]) => name !== feature)
+          .map(([, other]) => other);
+        writeFileSync(join(dir, 'progress.md'), renderProgress(state, beats, Date.now(), others));
       }
     }
   }

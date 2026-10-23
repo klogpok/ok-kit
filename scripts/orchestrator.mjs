@@ -200,7 +200,10 @@ function loadState() {
 
 function saveState(state) {
   writeJson(path('state.json'), state);
-  writeFileSync(path('progress.md'), renderProgress(state, readBeats(state), Date.now()));
+  const others = Object.entries(readStates())
+    .filter(([name]) => name !== feature)
+    .map(([, other]) => other);
+  writeFileSync(path('progress.md'), renderProgress(state, readBeats(state), Date.now(), others));
   renderIndexFile();
 }
 

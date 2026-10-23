@@ -24,7 +24,7 @@ Heartbeats are automatic: the hook `scripts/orchestrator-heartbeat.mjs` finds th
 1. `ORCH lock acquire`. The lock belongs to this spec only. If it fails, another session is orchestrating this spec: stop and tell the user which one. Every way this skill ends (done, stopped by the user, given up) ends with `ORCH lock release`.
 2. If `.orchestrator/<feature>/state.json` exists and its phase is not `done`, an orchestration of this spec was interrupted: go to "Resume" below instead of steps 2–3. (The first `ORCH` command moves a top-level `.orchestrator/state.json` of an earlier run into the folder of its spec.)
 3. The main checkout is on `master` with a clean `git status`. Otherwise stop and ask.
-4. Tell the user the path of `.orchestrator/<feature>/progress.md`, and of the index `.orchestrator/progress.md` when other specs are orchestrated: they can read them at any time.
+4. Tell the user the path of `.orchestrator/<feature>/progress.md`, and of the index `.orchestrator/progress.md` when other specs are orchestrated: they can read them at any time. `progress.md` also draws the dependency graph, the times and the forecast in Mermaid, and the status line of this repo (`scripts/orchestrator-statusline.mjs`) sums up every running spec.
 
 ## 2. Choose the tickets — one question
 

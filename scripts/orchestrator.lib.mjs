@@ -202,17 +202,382 @@ const cell = (text) =>
 
 const counter = (tickets) => (status) => tickets.filter((t) => t.status === status).length;
 
-/** `.orchestrator/<feature>/progress.md`: what the user reads while the orchestration runs. */
-export function renderProgress(state, beats, now) {
+/**
+ * How long a running agent may stay silent before the progress warns about it: half the 10 minutes
+ * after which the watcher reports it `STALE`, so the warning comes before the restart.
+ */
+export const QUIET_MS = 5 * 60_000;
+
+/** The mark of each ticket state in `progress.md` and the status line. */
+export const ICONS = {
+  pending: '⚪',
+  running: '🔵',
+  review: '🟡',
+  merging: '🟣',
+  merged: '🟢',
+  failed: '🔴',
+  skipped: '⚫',
+};
+const QUIET = '⚠';
+const BLOCKED = '⛔';
+
+/** A text progress bar of `width` cells: `█` for the done part, `░` for the rest. */
+export function progressBar(done, total, width) {
+  const full = total ? Math.round((done / total) * width) : 0;
+  return '█'.repeat(full) + '░'.repeat(width - full);
+}
+
+/** The tickets whose agent went quiet and the tickets that can never start. */
+function marks(state, beats, now) {
+  const quiet = new Set(findStale(state, beats, now, QUIET_MS));
+  const blocked = new Set(blockedForGood(state));
+  return { quiet, blocked };
+}
+
+/** One line of at most `max` characters, without the backticks of code spans. */
+const shortText = (text, max) => {
+  const plain = String(text ?? '')
+    .replace(/`/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return plain.length > max ? `${plain.slice(0, max - 1)}…` : plain;
+};
+
+/** Text that Mermaid shows as written inside a quoted label. */
+const mermaidText = (text, max) =>
+  shortText(text, max)
+    .replace(/#/g, '#35;')
+    .replace(/"/g, '#quot;')
+    .replace(/</g, '#lt;')
+    .replace(/>/g, '#gt;');
+
+const NODE_STYLES = {
+  pending: 'fill:#f1f3f5,stroke:#adb5bd,color:#343a40',
+  running: 'fill:#d0ebff,stroke:#1c7ed6,color:#0b3d6e',
+  review: 'fill:#fff3bf,stroke:#f08c00,color:#5c3c00',
+  merging: 'fill:#e5dbff,stroke:#7048e8,color:#2b1a6b',
+  merged: 'fill:#d3f9d8,stroke:#2f9e44,color:#1b4332',
+  failed: 'fill:#ffe3e3,stroke:#e03131,color:#6b0f0f',
+  skipped: 'fill:#e9ecef,stroke:#868e96,color:#495057,stroke-dasharray:4',
+  quiet: 'fill:#d0ebff,stroke:#e03131,stroke-width:3px,color:#0b3d6e',
+  blocked: 'fill:#f1f3f5,stroke:#e03131,stroke-dasharray:4,color:#343a40',
+};
+
+/**
+ * A Mermaid flowchart of the tickets: one node per ticket colored by its state, an arrow from each
+ * blocker to the ticket it blocks. A running ticket shows its step; a quiet agent and a ticket that
+ * can never start get a red border.
+ */
+export function renderGraph(state, beats, now) {
+  const { quiet, blocked } = marks(state, beats, now);
+  const tickets = Object.entries(state.tickets).sort(byId);
+  const lines = ['```mermaid', 'flowchart LR'];
+  for (const [id, ticket] of tickets) {
+    const kind = quiet.has(id) ? 'quiet' : blocked.has(id) ? 'blocked' : ticket.status;
+    const mark = quiet.has(id) ? QUIET : blocked.has(id) ? BLOCKED : (ICONS[ticket.status] ?? '');
+    const step = IN_FLIGHT.has(ticket.status) && beats[id]?.step;
+    const label =
+      `${mark} ${id} ${mermaidText(ticket.title, 40)}` +
+      (step ? `<br/><small>${mermaidText(step, 50)}</small>` : '');
+    lines.push(`  t${id}["${label}"]:::${NODE_STYLES[kind] ? kind : 'pending'}`);
+  }
+  for (const [id, ticket] of tickets) {
+    for (const blocker of ticket.blockedBy) {
+      if (state.tickets[blocker]) lines.push(`  t${blocker} --> t${id}`);
+    }
+  }
+  for (const [kind, style] of Object.entries(NODE_STYLES))
+    lines.push(`  classDef ${kind} ${style}`);
+  lines.push('```');
+  return lines;
+}
+
+/**
+ * The spans each ticket was in flight, read from the log (`<id> → <state>`): a span opens when the
+ * ticket enters running, review or merging and closes when it leaves them. A span still open ends
+ * at `now`. `end` is the state it closed with, undefined while open.
+ */
+export function flightSpans(state, now) {
+  const spans = [];
+  const open = {};
+  for (const entry of state.log ?? []) {
+    const match = /^(\S+) → (\w+)/.exec(entry.text);
+    const at = Date.parse(entry.at);
+    if (!match || !Number.isFinite(at)) continue;
+    const [, id, status] = match;
+    if (IN_FLIGHT.has(status)) {
+      open[id] ??= { id, start: at };
+    } else if (open[id]) {
+      spans.push({ ...open[id], stop: at, end: status });
+      delete open[id];
+    }
+  }
+  for (const span of Object.values(open)) spans.push({ ...span, stop: now });
+  return spans.sort((a, b) => byId([a.id], [b.id]) || a.start - b.start);
+}
+
+/** A Mermaid gantt of the spans in flight: done when merged, critical when it failed, active while open. */
+export function renderTimeline(state, now) {
+  const spans = flightSpans(state, now);
+  if (!spans.length) return [];
+  const lines = ['```mermaid', 'gantt', '  dateFormat X', '  axisFormat %H:%M'];
+  const tries = {};
+  for (const span of spans) {
+    tries[span.id] = (tries[span.id] ?? 0) + 1;
+    // A gantt task name ends at `:`, and `#` or `;` would start an entity.
+    const title = shortText(state.tickets[span.id]?.title?.replace(/[:;#]/g, ' '), 30);
+    const name = `${span.id} ${title}${tries[span.id] > 1 ? ` (try ${tries[span.id]})` : ''}`;
+    const tag = !span.end ? 'active, ' : span.end === 'merged' ? 'done, ' : 'crit, ';
+    const seconds = (ms) => Math.floor(ms / 1000);
+    // A span of a few seconds still gets a visible bar.
+    lines.push(
+      `  ${name} :${tag}${seconds(span.start)}, ${Math.max(seconds(span.stop), seconds(span.start) + 30)}`,
+    );
+  }
+  lines.push('```');
+  return lines;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Time
+
+/** `ms` as `45 s`, `13 min` or `1 h 44 min`; `—` when unknown. */
+export function duration(ms) {
+  if (!Number.isFinite(ms)) return '—';
+  const seconds = Math.max(0, Math.round(ms / 1000));
+  if (seconds < 60) return `${seconds} s`;
+  const minutes = Math.round(seconds / 60);
+  return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
+}
+
+/** The log as events: `{ at, id, status }` for a ticket, `{ at, phase }` for a phase. */
+function logEvents(state) {
+  return (state.log ?? []).flatMap((entry) => {
+    const at = Date.parse(entry.at);
+    if (!Number.isFinite(at)) return [];
+    const phase = /^phase: (\w+)/.exec(entry.text);
+    if (phase) return [{ at, phase: phase[1] }];
+    const ticket = /^(\S+) → (\w+)/.exec(entry.text);
+    return ticket ? [{ at, id: ticket[1], status: ticket[2] }] : [];
+  });
+}
+
+/**
+ * Where the time of each ticket went, read from the log: `work` (running or review), `merge`
+ * (merging), `tries` (starts from outside flight), `started` (the first start), `merged` (when),
+ * and `wait`, from the moment its last blocker merged (or the plan, without blockers) to its first
+ * start. `wait` is undefined while a blocker is not merged. A state still open counts up to `now`.
+ */
+export function ticketTimes(state, now) {
+  const times = Object.fromEntries(
+    Object.keys(state.tickets).map((id) => [id, { work: 0, merge: 0, tries: 0 }]),
+  );
+  const add = (time, status, ms) => {
+    if (status === 'running' || status === 'review') time.work += ms;
+    if (status === 'merging') time.merge += ms;
+  };
+  const current = {};
+  for (const event of logEvents(state)) {
+    const time = times[event.id];
+    if (!time) continue;
+    const previous = current[event.id];
+    if (previous) add(time, previous.status, event.at - previous.at);
+    if (event.status === 'running' && !IN_FLIGHT.has(previous?.status)) {
+      time.tries += 1;
+      time.started ??= event.at;
+    }
+    if (event.status === 'merged') time.merged = event.at;
+    current[event.id] = event;
+  }
+  for (const [id, event] of Object.entries(current)) add(times[id], event.status, now - event.at);
+  const planned = Date.parse(state.startedAt);
+  for (const [id, ticket] of Object.entries(state.tickets)) {
+    const blockers = (ticket.blockedBy ?? []).filter((blocker) => times[blocker]);
+    if (blockers.some((blocker) => times[blocker].merged === undefined)) continue;
+    const ready = Math.max(planned, ...blockers.map((blocker) => times[blocker].merged));
+    times[id].wait = (times[id].started ?? now) - ready;
+  }
+  return times;
+}
+
+/**
+ * The phases in order with their time: implement from the start, then each `phase: <name>` of the
+ * log until the next one; the open one counts up to `now`. `done` ends the last and has no time.
+ */
+export function phaseTimes(state, now) {
+  const marks = [
+    { phase: 'implement', at: Date.parse(state.startedAt) },
+    ...logEvents(state).filter((event) => event.phase),
+  ];
+  return marks
+    .filter((mark) => mark.phase !== 'done')
+    .map((mark) => {
+      const next = marks[marks.indexOf(mark) + 1];
+      return { phase: mark.phase, ms: (next?.at ?? now) - mark.at, open: !next };
+    });
+}
+
+/** The value at share `q` (0 to 1) of sorted numbers, between the two nearest. */
+const quantile = (sorted, q) => {
+  const at = (sorted.length - 1) * q;
+  const below = sorted[Math.floor(at)];
+  return below + (sorted[Math.ceil(at)] - below) * (at - Math.floor(at));
+};
+const median = (values) =>
+  quantile(
+    [...values].sort((a, b) => a - b),
+    0.5,
+  );
+const MIN_LEFT = 60_000;
+const AFTER_IMPLEMENT = ['review', 'verify'];
+
+/**
+ * How long the orchestration still needs, from `now`: `low` and `high` in ms, from the quartiles
+ * of the time a merged ticket took (worked and merged) in this run and in `history`, the earlier
+ * orchestrations of the checkout. A ticket in flight needs that less what it spent, at least a
+ * minute; a ticket that needs no more work needs nothing. Tickets run once their blockers are
+ * done, with no limit on agents, so the longest chain decides: `path` names it. Review and verify
+ * add the median of their earlier finished runs (`phases` says whether there were any). Undefined
+ * when no ticket has been merged yet anywhere, or when the orchestration is done.
+ */
+export function forecast(state, now, history = []) {
+  if (state.phase === 'done') return undefined;
+  const runs = [state, ...history];
+  const samples = runs
+    .flatMap((run) => Object.values(ticketTimes(run, now)))
+    .filter((time) => time.merged !== undefined)
+    .map((time) => time.work + time.merge)
+    .sort((a, b) => a - b);
+  if (!samples.length) return undefined;
+  const times = ticketTimes(state, now);
+  const dead = new Set(blockedForGood(state));
+  const left = (id, estimate) => {
+    const { status } = state.tickets[id];
+    if (status === 'pending' && !dead.has(id)) return estimate;
+    if (!IN_FLIGHT.has(status)) return 0;
+    return Math.max(estimate - times[id].work - times[id].merge, MIN_LEFT);
+  };
+  const chain = (estimate) => {
+    const finish = {};
+    const via = (id) => {
+      if (!finish[id]) {
+        const blockers = (state.tickets[id].blockedBy ?? []).filter(
+          (blocker) => state.tickets[blocker],
+        );
+        const before = blockers.map(via).sort((a, b) => b.ms - a.ms)[0];
+        const ms = (before?.ms ?? 0) + left(id, estimate);
+        finish[id] = {
+          ms,
+          path: ms > (before?.ms ?? 0) ? [...(before?.path ?? []), id] : (before?.path ?? []),
+        };
+      }
+      return finish[id];
+    };
+    return (
+      Object.keys(state.tickets)
+        .sort((a, b) => byId([a], [b]))
+        .map(via)
+        .sort((a, b) => b.ms - a.ms)[0] ?? { ms: 0, path: [] }
+    );
+  };
+  const current = phaseTimes(state, now).at(-1);
+  const order = ['implement', ...AFTER_IMPLEMENT];
+  const finished = history
+    .filter((run) => run.phase === 'done')
+    .flatMap((run) => phaseTimes(run, now));
+  let after = 0;
+  let counted = false;
+  for (const phase of AFTER_IMPLEMENT) {
+    const earlier = finished.filter((p) => p.phase === phase).map((p) => p.ms);
+    if (!earlier.length || order.indexOf(phase) < order.indexOf(current.phase)) continue;
+    counted = true;
+    after +=
+      phase === current.phase ? Math.max(median(earlier) - current.ms, MIN_LEFT) : median(earlier);
+  }
+  const [low, high] = [quantile(samples, 0.25), quantile(samples, 0.75)].map(chain);
+  return {
+    low: low.ms + after,
+    high: high.ms + after,
+    path: high.path,
+    phases: counted,
+    samples: samples.length,
+  };
+}
+
+/** A forecast as `25–60 min`, `45 s–2 min`, or `~30 min` when both ends read the same. */
+export function range({ low, high }) {
+  const [from, to] = [duration(low), duration(high)];
+  if (from === to) return `~${to}`;
+  const unit = / (s|min)$/.exec(from)?.[0];
+  return unit && to.endsWith(unit) && !to.includes(' h ')
+    ? `${from.slice(0, -unit.length)}–${to}`
+    : `${from}–${to}`;
+}
+
+/** The `## Time` section of `progress.md`. */
+export function renderTime(state, now, history = []) {
+  const times = ticketTimes(state, now);
+  const phases = phaseTimes(state, now);
+  const doneAt = logEvents(state).find((event) => event.phase === 'done')?.at;
+  const agents = Object.values(times).reduce((sum, time) => sum + time.work + time.merge, 0);
+  const implement = phases.find((phase) => phase.phase === 'implement')?.ms ?? 0;
+  const lines = [
+    '## Time',
+    '',
+    `Elapsed ${duration((doneAt ?? now) - Date.parse(state.startedAt))}; ` +
+      `agents worked and merged ${duration(agents)} in all` +
+      (implement && agents
+        ? `, ${(agents / implement).toFixed(1)} at a time while implementing.`
+        : '.'),
+  ];
+  const next = forecast(state, now, history);
+  if (next) {
+    lines.push(
+      '',
+      `Forecast: done in **${range(next)}**` +
+        (next.path.length ? `; the longest chain left is ${next.path.join(' → ')}` : '') +
+        (next.phases
+          ? ', review and verify included'
+          : ', review and verify not counted (no earlier run)') +
+        ` (by ${next.samples} merged tickets).`,
+    );
+  }
+  lines.push(
+    '',
+    '| Ticket | Waited | Worked | Merging | Tries | Start to merge |',
+    '| --- | --- | --- | --- | --- | --- |',
+  );
+  for (const [id, time] of Object.entries(times).sort(byId)) {
+    const total = time.started === undefined ? undefined : (time.merged ?? now) - time.started;
+    const show = (ms, used = ms) => (used ? duration(ms) : '—');
+    lines.push(
+      `| ${id} | ${time.wait === undefined ? '—' : duration(time.wait)} | ${show(time.work, time.tries)} | ` +
+        `${show(time.merge)} | ${time.tries || '—'} | ${total === undefined ? '—' : duration(total)} |`,
+    );
+  }
+  lines.push('', '| Phase | Time |', '| --- | --- |');
+  for (const phase of phases)
+    lines.push(`| ${phase.phase}${phase.open ? ' (now)' : ''} | ${duration(phase.ms)} |`);
+  return lines;
+}
+
+/** `.orchestrator/<feature>/progress.md`: what the user reads while the orchestration runs. The
+ * earlier orchestrations of the checkout (`history`) calibrate the forecast. */
+export function renderProgress(state, beats, now, history = []) {
   const tickets = Object.entries(state.tickets).sort(byId);
   const count = counter(tickets.map(([, t]) => t));
+  const { quiet, blocked } = marks(state, beats, now);
+  const merged = count('merged');
   const lines = [
     `# Orchestration: ${state.spec}`,
     '',
     `Integration branch \`${state.branch}\` from \`${state.base}\`. Started ${state.startedAt}, ` +
       `updated ${new Date(now).toISOString()}.`,
     '',
-    `Merged ${count('merged')} of ${tickets.length}; running ${count('running')}; ` +
+    `\`${progressBar(merged, tickets.length, 20)}\` ` +
+      `**${tickets.length ? Math.round((merged / tickets.length) * 100) : 0}%**`,
+    '',
+    `Merged ${merged} of ${tickets.length}; running ${count('running')}; ` +
       `failed ${count('failed')}. Phase: **${state.phase}**.`,
     '',
     '| Ticket | Blocked by | Status | Last heartbeat | Step | Note |',
@@ -221,15 +586,70 @@ export function renderProgress(state, beats, now) {
   for (const [id, ticket] of tickets) {
     const beat = beats[id];
     const heartbeat = beat ? `${ago(beat.at, now)}${beat.tool ? ` (${beat.tool})` : ''}` : '—';
+    const status =
+      `${ICONS[ticket.status] ?? ''} ${ticket.status}`.trim() +
+      (blocked.has(id) ? ` ${BLOCKED} blocked for good` : '');
     lines.push(
-      `| ${id} ${cell(ticket.title)} | ${ticket.blockedBy.join(', ') || '—'} | ${ticket.status} | ` +
-        `${heartbeat} | ${cell(beat?.step)} | ${cell(ticket.note)} |`,
+      `| ${id} ${cell(ticket.title)} | ${ticket.blockedBy.join(', ') || '—'} | ${status} | ` +
+        `${quiet.has(id) ? `${QUIET} ` : ''}${heartbeat} | ${cell(beat?.step)} | ${cell(ticket.note)} |`,
     );
   }
+  lines.push(
+    '',
+    `${Object.entries(ICONS)
+      .map(([status, icon]) => `${icon} ${status}`)
+      .join(' · ')} · ${QUIET} silent for ${QUIET_MS / 60_000} min · ${BLOCKED} blocker failed`,
+    '',
+    '## Graph',
+    '',
+    ...renderGraph(state, beats, now),
+    '',
+    ...renderTime(state, now, history),
+  );
+  const timeline = renderTimeline(state, now);
+  if (timeline.length) lines.push('', '## Timeline', '', ...timeline);
   if (state.log?.length) {
     lines.push('', '## Log', '', ...state.log.map((entry) => `- ${entry.at} ${entry.text}`));
   }
   return `${lines.join('\n')}\n`;
+}
+
+/**
+ * The Claude Code status line: one part per orchestration not yet done (`states` is
+ * `feature → state`, `beatsOf` is `feature → beats`), with a bar of merged tickets, the tickets in
+ * flight, the quiet and failed ones, the time since the start and the forecast. Empty when nothing
+ * runs.
+ */
+export function renderStatusLine(states, beatsOf, now) {
+  const parts = [];
+  for (const feature of Object.keys(states).sort()) {
+    const state = states[feature];
+    if (!state?.tickets || state.phase === 'done') continue;
+    const tickets = Object.values(state.tickets);
+    const count = counter(tickets);
+    const inFlight = tickets.filter((t) => IN_FLIGHT.has(t.status)).length;
+    const quiet = findStale(state, beatsOf[feature] ?? {}, now, QUIET_MS);
+    const others = Object.entries(states)
+      .filter(([name, other]) => name !== feature && other?.tickets)
+      .map(([, other]) => other);
+    const next = forecast(state, now, others);
+    parts.push(
+      [
+        `${feature} ${state.phase}`,
+        `${progressBar(count('merged'), tickets.length, 10)} ${count('merged')}/${tickets.length}`,
+        inFlight ? `${ICONS.running}${inFlight}` : '',
+        count('failed') ? `${ICONS.failed}${count('failed')}` : '',
+        quiet.length ? `${QUIET} ${quiet.join(',')} silent` : '',
+        Number.isFinite(Date.parse(state.startedAt))
+          ? `⏱ ${duration(now - Date.parse(state.startedAt))}`
+          : '',
+        next ? `ETA ${range(next)}` : '',
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    );
+  }
+  return parts.join('  │  ');
 }
 
 /** `.orchestrator/progress.md`: one line per orchestration (`feature → state`) of a checkout. */
