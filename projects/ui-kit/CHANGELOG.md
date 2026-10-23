@@ -3,6 +3,17 @@
 All notable changes to `@vplans/ui-kit`. The package is consumed from source inside the monorepo,
 so versions mark review points rather than releases.
 
+## Unreleased (file type icons)
+
+### Added
+
+- **icon:** file type icons `uiIconFileImage`, `uiIconFilePdf`, `uiIconFileText`,
+  `uiIconFileSpreadsheet`, `uiIconFilePresentation`, `uiIconFileArchive` and
+  `uiIconFileDrawing` (CAD/BIM).
+- **file-upload:** each listed file shows the icon of its type, by the MIME type, else by the
+  extension. `fileTypeIcon(file)` gives that icon; the `fileIcon` input (`UiFileIconFn`)
+  overrides it. A rejected file keeps the alert icon.
+
 ## Unreleased (choice xl size)
 
 ### Added
