@@ -332,6 +332,20 @@ describe('UiTooltip defaults', () => {
     expect(panel()?.classList).toContain('ui-tooltip--bottom');
   });
 
+  it('takes a corner as the app default, and an input still wins', async () => {
+    await render({ position: 'corner-top-end', showDelay: 0 });
+    button('plain').dispatchEvent(pointer('pointerenter'));
+    vi.advanceTimersByTime(10);
+    expect(panel()?.classList).toContain('ui-tooltip--corner-top-end');
+    button('plain').dispatchEvent(pointer('pointerleave'));
+    vi.advanceTimersByTime(110);
+    expect(panel()).toBeNull();
+
+    button('bound').dispatchEvent(pointer('pointerenter'));
+    vi.advanceTimersByTime(30);
+    expect(panel()?.classList).toContain('ui-tooltip--end');
+  });
+
   it('lets an input on the tooltip win over the provider', async () => {
     await render({ position: 'bottom', showDelay: 600, hideDelay: 400 });
     button('bound').dispatchEvent(pointer('pointerenter'));

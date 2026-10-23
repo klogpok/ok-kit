@@ -14,6 +14,7 @@ import { UiTooltipHarness } from './tooltip-harness';
     </button>
     <button ui-icon-button label="Delete" uiTooltip="Delete the plan">x</button>
     <button ui-button uiTooltip="Not shown" uiTooltipDisabled>Archive</button>
+    <button ui-button uiTooltip="Copy the plan" uiTooltipPosition="corner-top-end">Copy</button>
   `,
 })
 class Host {}
@@ -30,7 +31,7 @@ describe('UiTooltipHarness', () => {
   afterEach(() => fixture.destroy());
 
   it('filters by trigger text and label', async () => {
-    expect(await loader.getAllHarnesses(UiTooltipHarness)).toHaveLength(3);
+    expect(await loader.getAllHarnesses(UiTooltipHarness)).toHaveLength(4);
     const send = await loader.getHarness(UiTooltipHarness.with({ text: 'Send' }));
     expect(await send.getText()).toBe('Send');
     expect(await send.getLabel()).toBeNull();
@@ -65,6 +66,12 @@ describe('UiTooltipHarness', () => {
     expect(await send.isOpen()).toBe(false);
     expect(await remove.getTooltipText()).toBe('Delete the plan');
     expect(await remove.getPosition()).toBe('top');
+  });
+
+  it('reads the corner of a corner tooltip', async () => {
+    const copy = await loader.getHarness(UiTooltipHarness.with({ text: 'Copy' }));
+    await copy.show();
+    expect(await copy.getPosition()).toBe('corner-top-end');
   });
 
   it('does not show a disabled tooltip', async () => {
