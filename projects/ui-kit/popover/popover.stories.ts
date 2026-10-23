@@ -14,15 +14,6 @@ interface PopoverArgs {
   placement: UiPopoverPosition;
 }
 
-const meta: Meta<PopoverArgs> = {
-  title: 'Overlays/Popover',
-  component: UiPopoverTrigger,
-  decorators: [moduleMetadata({ imports: [UiButton, UiCheckbox, UiFormField, UiIcon, UiInput] })],
-  argTypes: {
-    placement: { control: 'inline-radio', options: UI_OVERLAY_PLACEMENTS },
-  },
-};
-
 /** The open popover's pane, once the CDK has positioned it. */
 async function openPopover(trigger: HTMLElement): Promise<HTMLElement> {
   trigger.click();
@@ -32,6 +23,15 @@ async function openPopover(trigger: HTMLElement): Promise<HTMLElement> {
   await until(placed, 'the popover did not open');
   return pane()!;
 }
+
+const meta: Meta<PopoverArgs> = {
+  title: 'Overlays/Popover',
+  component: UiPopoverTrigger,
+  decorators: [moduleMetadata({ imports: [UiButton, UiCheckbox, UiFormField, UiIcon, UiInput] })],
+  argTypes: {
+    placement: { control: 'inline-radio', options: UI_OVERLAY_PLACEMENTS },
+  },
+};
 
 export default meta;
 type Story = StoryObj<PopoverArgs>;
@@ -158,8 +158,7 @@ const edgeStory = (edge: 'start' | 'end', placement: UiPopoverPosition = 'bottom
   }),
   play: async ({ canvasElement }) => {
     const trigger = canvasElement.querySelector<HTMLButtonElement>('button')!;
-    const pane = () => document.querySelector<HTMLElement>('.ui-popover-pane');
-    await openPopover(trigger);
+    const pane = await openPopover(trigger);
     // The visible viewport starts after a page scrollbar on the left.
     const probe = document.createElement('div');
     probe.style.cssText = 'position:fixed;left:0;top:0;inline-size:1rem';
@@ -167,7 +166,7 @@ const edgeStory = (edge: 'start' | 'end', placement: UiPopoverPosition = 'bottom
     const start = probe.getBoundingClientRect().left;
     const rem = probe.getBoundingClientRect().width;
     probe.remove();
-    const rect = pane()!.getBoundingClientRect();
+    const rect = pane.getBoundingClientRect();
     const style = getComputedStyle(trigger);
     const end = start + document.documentElement.clientWidth;
     // The gap at the edge the trigger sits at: the inline-start edge is on the right in RTL.
