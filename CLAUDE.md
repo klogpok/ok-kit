@@ -34,7 +34,7 @@ Contribution rules and the component reference are in [projects/ui-kit/README.md
 
 ## Gotchas
 
-Area-specific gotchas live in `.claude/rules/` and load when you open matching files: `components.md` (Angular, focus, RTL, Storybook JIT), `forms.md`, `overlays.md`, `testing.md`, `storybook.md`, `visual.md`, `styles.md`. Add a new gotcha to the matching rule file, not here.
+Area-specific gotchas live in `.claude/rules/` and load when you open matching files: `components.md` (Angular, focus, RTL, Storybook JIT), `forms.md`, `overlays.md`, `testing.md`, `storybook.md`, `visual.md`, `styles.md`, `scripts.md`. Add a new gotcha to the matching rule file, not here.
 
 - The package is consumed through tsconfig paths, not `node_modules`.
 - pnpm 12: dependencies that need build scripts must be listed under `allowBuilds` in `pnpm-workspace.yaml`. Do not use `pnpm dlx` for such CLIs.
