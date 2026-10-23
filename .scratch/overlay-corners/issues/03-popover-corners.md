@@ -1,6 +1,6 @@
 # 03: Popover opens in a corner
 
-Status: ready-for-agent
+Status: done
 Blocked by: 01
 
 Spec: `../spec.md` → "Decisions" 1–5, user stories 2–4, 7.
@@ -18,21 +18,21 @@ Spec: `../spec.md` → "Decisions" 1–5, user stories 2–4, 7.
   visual baselines in light, dark and RTL.
 - README popover section: one sentence on corners and their flip.
 
-- [ ] Each corner opens with its panel class and sits outside the trigger's corner (spec, LTR and
+- [x] Each corner opens with its panel class and sits outside the trigger's corner (spec, LTR and
       RTL).
-- [ ] A top corner with no room above flips to the bottom corner on the same inline side; the
+- [x] A top corner with no room above flips to the bottom corner on the same inline side; the
       harness reports it.
-- [ ] A corner popover with no room on the inline axis is pushed inside the viewport and does not
+- [x] A corner popover with no room on the inline axis is pushed inside the viewport and does not
       cover the trigger.
-- [ ] The harness spec covers `getPosition()` for a corner.
-- [ ] Stories and new visual baselines for the corners; existing baselines unchanged.
+- [x] The harness spec covers `getPosition()` for a corner.
+- [x] Stories and new visual baselines for the corners; existing baselines unchanged.
 - [ ] One commit, `feat(popover): ...`.
 
 ## Русский перевод
 
 # 03: Popover открывается в углу
 
-Статус: ready-for-agent
+Статус: сделано
 Заблокирован: 01
 
 Spec: `../spec.md` → «Решения» 1–5, пользовательские истории 2–4, 7.
@@ -50,11 +50,11 @@ Spec: `../spec.md` → «Решения» 1–5, пользовательски�
   визуальными baselines в светлой, тёмной теме и RTL.
 - Раздел popover в README: одно предложение про углы и их флип.
 
-- [ ] Каждый угол открывается со своим классом панели и стоит снаружи угла триггера (спек, LTR и
+- [x] Каждый угол открывается со своим классом панели и стоит снаружи угла триггера (спек, LTR и
       RTL).
-- [ ] Верхний угол без места сверху переворачивается в нижний угол на той же горизонтальной
+- [x] Верхний угол без места сверху переворачивается в нижний угол на той же горизонтальной
       стороне; харнесс это сообщает.
-- [ ] Угловой popover без места по горизонтали сдвигается внутрь viewport и не накрывает триггер.
-- [ ] Спек харнесса покрывает `getPosition()` для угла.
-- [ ] Stories и новые визуальные baselines для углов; существующие baselines не меняются.
+- [x] Угловой popover без места по горизонтали сдвигается внутрь viewport и не накрывает триггер.
+- [x] Спек харнесса покрывает `getPosition()` для угла.
+- [x] Stories и новые визуальные baselines для углов; существующие baselines не меняются.
 - [ ] Один коммит, `feat(popover): ...`.

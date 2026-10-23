@@ -373,6 +373,10 @@ this.dialog.openDrawer<boolean>(FiltersDrawer, { position: 'end', size: 'md' });
 
 The popover focuses `[cdkFocusInitial]` or its first focusable element and closes when focus
 leaves it. Use `uiPopoverLabel` when the trigger text does not describe the content.
+`uiPopoverPosition` also takes a corner (`corner-top-start`, `corner-top-end`,
+`corner-bottom-start`, `corner-bottom-end`): the popover sits diagonally outside that corner of the
+trigger, flips to the vertical mirror (`corner-bottom-start`) when there is no room, and is pushed
+back on screen along the trigger when the inline side has none.
 
 ```html
 <!-- Menu: link items, a labelled group of radio items, a checkbox item, a position preset -->
