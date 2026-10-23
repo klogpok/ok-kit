@@ -30,7 +30,7 @@ export {
 } from './dropdown-panel';
 // Internal: the typed text of the kit's parsed text fields, not part of the public API.
 export {
-  ɵinjectTypedText,
+  injectTypedText as ɵinjectTypedText,
   type UiTypedText as ɵUiTypedText,
   type UiTypedTextConfig as ɵUiTypedTextConfig,
   type UiTypedTextParse as ɵUiTypedTextParse,

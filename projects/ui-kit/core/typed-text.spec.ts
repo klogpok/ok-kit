@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { type UiTypedText, ɵinjectTypedText } from './typed-text';
+import { type UiTypedText, injectTypedText } from './typed-text';
 
 /**
  * A small string-to-number rule set. Numbers that round to the same cent are the same value, so
@@ -10,7 +10,7 @@ function setup(options: { commitValue?: (value: number) => number } = {}) {
   const value = signal<number | null>(null);
   const notify = vi.fn<(value: number | null) => void>();
   const typed: UiTypedText<number> = TestBed.runInInjectionContext(() =>
-    ɵinjectTypedText<number>({
+    injectTypedText<number>({
       value,
       notify,
       parse: (text) => {
@@ -32,7 +32,7 @@ function setup(options: { commitValue?: (value: number) => number } = {}) {
   return { value, notify, typed };
 }
 
-describe('ɵinjectTypedText', () => {
+describe('injectTypedText', () => {
   it('writes and notifies the value of typed text, and shows the text as typed', () => {
     const { value, notify, typed } = setup();
 
@@ -231,7 +231,7 @@ describe('ɵinjectTypedText', () => {
     };
 
     TestBed.runInInjectionContext(() =>
-      ɵinjectTypedText<number>({ value: signal<number | null>(1), ...rules }),
+      injectTypedText<number>({ value: signal<number | null>(1), ...rules }),
     );
 
     for (const rule of Object.values(rules)) expect(rule).not.toHaveBeenCalled();

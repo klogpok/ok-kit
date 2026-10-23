@@ -57,7 +57,7 @@ interface Typed<V, T, E> extends UiTypedTextParse<V, E> {
  * Call it in a field initializer after the value model. It calls nothing from `config` while it is
  * created, so the rules may read fields declared after it. Internal.
  */
-export function ɵinjectTypedText<V, T = string, E = string>(
+export function injectTypedText<V, T = string, E = string>(
   config: UiTypedTextConfig<V, T, E>,
 ): UiTypedText<V, T, E> {
   /** `value` is `raw`, or both are readable and equal. */
