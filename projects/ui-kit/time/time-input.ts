@@ -163,7 +163,7 @@ export class UiTimeInput extends ɵUiPopupListboxField<string | null> {
   });
 
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
-  protected readonly text = computed(() => this.typedText.text());
+  protected readonly text = this.typedText.text;
 
   /** The list of times. Typed text is a value too: Enter without an active time commits it. */
   protected readonly listbox = ɵinjectListbox<string>({

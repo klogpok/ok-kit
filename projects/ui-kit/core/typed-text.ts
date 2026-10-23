@@ -1,4 +1,4 @@
-import { type WritableSignal, computed, linkedSignal } from '@angular/core';
+import { type Signal, type WritableSignal, computed, linkedSignal } from '@angular/core';
 
 /** What `parse` reads from typed text: a value, or the code of a parse error. Internal. */
 export interface UiTypedTextParse<V, E = string> {
@@ -23,20 +23,23 @@ export interface UiTypedTextConfig<V, T = string, E = string> {
   commitValue?(value: V): V;
 }
 
-/** The typed text of a parsed text field. Internal. */
+/**
+ * The typed text of a parsed text field. Internal. The members are properties, so a field can
+ * take `text` and `error` as its own signals and pass the functions on unbound.
+ */
 export interface UiTypedText<V, T = string, E = string> {
   /** The typed text while there is one, otherwise the formatted value. */
-  text(): T;
+  readonly text: Signal<T>;
   /** The parse error code of committed typed text, otherwise `null`. */
-  error(): E | null;
+  readonly error: Signal<E | null>;
   /** The user typed `text`: writes and notifies its value unless the field holds it already. */
-  input(text: T): void;
+  readonly input: (text: T) => void;
   /** The user left the field or pressed Enter: invalid text stays with its error, other text goes. */
-  commit(): void;
+  readonly commit: () => void;
   /** The user picked `value`: drops the typed text, then writes and notifies a new value. */
-  set(value: V | null): void;
+  readonly set: (value: V | null) => void;
   /** For `writeValue`: drops the typed text and stores the readable value without notifying. */
-  write(value: unknown): void;
+  readonly write: (value: unknown) => void;
 }
 
 /** Text the user is typing and what it parsed to. */

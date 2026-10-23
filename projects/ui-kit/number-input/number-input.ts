@@ -201,7 +201,7 @@ export class UiNumberInput extends UiFormControlBase<number | null> implements U
   protected readonly current = computed(() => validNumber(this.value()));
 
   /** The typed text while it belongs to the current value, otherwise the formatted value. */
-  protected readonly text = computed(() => this.typed.text());
+  protected readonly text = this.typed.text;
 
   protected readonly inputModeValue = computed(
     () => this.inputMode() ?? (this.maxFractionDigits() === 0 ? 'numeric' : 'decimal'),

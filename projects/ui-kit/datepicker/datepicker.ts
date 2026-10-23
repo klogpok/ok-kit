@@ -243,7 +243,7 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   });
 
   /** The typed text while there is one, otherwise the formatted value. */
-  protected readonly text = computed(() => this.typedText.text());
+  protected readonly text = this.typedText.text;
 
   protected readonly hint = computed(() => formatHint(this.locale()));
   /** Numeric keypad with a dot on phones, when the locale separates the date with dots. */

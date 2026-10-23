@@ -315,7 +315,7 @@ export class UiDateRangePicker
   protected readonly panelId = computed(() => `${this.id()}-panel`);
 
   /** The typed texts while there are some, otherwise the formatted value. */
-  protected readonly texts = computed(() => this.typedText.text());
+  protected readonly texts = this.typedText.text;
 
   /** The `aria-label` names the group only without a field label. */
   private readonly ownLabel = computed(() => !this.formField?.labelledBy() && !!this.ariaLabel());
