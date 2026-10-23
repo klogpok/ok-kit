@@ -37,6 +37,9 @@ import { UiListboxConfig, UiListboxController, provideUiListbox } from './listbo
 @Directive({
   host: {
     '[attr.id]': 'id()',
+    // The inner control carries the label and descriptions; static attributes stay on the host too.
+    '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
     '[class]': 'hostClasses()',
   },
 })

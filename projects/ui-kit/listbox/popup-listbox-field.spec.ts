@@ -192,7 +192,12 @@ const pickAFruit: ValidatorFn = (control) => (control.value ? null : { pick: 'Pi
   imports: [TestPopupField, UiOption, UiFormField, ReactiveFormsModule],
   template: `
     <ui-form-field label="Fruit" hint="Pick one">
-      <ui-test-popup-field [formControl]="fruit" aria-describedby="note">
+      <ui-test-popup-field
+        id="fruit"
+        [formControl]="fruit"
+        aria-label="Fruit"
+        aria-describedby="note"
+      >
         <ui-option value="Apple">Apple</ui-option>
       </ui-test-popup-field>
     </ui-form-field>
@@ -207,6 +212,7 @@ describe('[uiComboboxControl] on a popup listbox field with Reactive Forms', () 
   let fixture: ComponentFixture<ReactiveHost>;
   let root: HTMLElement;
   const control = () => root.querySelector<HTMLInputElement>('.control')!;
+  const field = () => root.querySelector<HTMLElement>('ui-test-popup-field')!;
   const describedBy = () => (control().getAttribute('aria-describedby') ?? '').split(' ');
   const text = (id: string) => (document.getElementById(id)?.textContent ?? '').trim();
 
@@ -233,5 +239,14 @@ describe('[uiComboboxControl] on a popup listbox field with Reactive Forms', () 
     await settle(fixture);
     expect(control().getAttribute('aria-invalid')).toBe('true');
     expect(describedBy().map(text)).toEqual(['Seasonal', 'Pick a fruit']);
+  });
+
+  it('keeps its id on the host and its label and descriptions on the inner control', () => {
+    expect(field().id).toBe('fruit');
+    expect(field().hasAttribute('aria-label')).toBe(false);
+    expect(field().hasAttribute('aria-describedby')).toBe(false);
+    expect(control().id).toBe('fruit-control');
+    expect(control().getAttribute('aria-label')).toBe('Fruit');
+    expect(root.querySelector('label')?.htmlFor).toBe('fruit-control');
   });
 });
