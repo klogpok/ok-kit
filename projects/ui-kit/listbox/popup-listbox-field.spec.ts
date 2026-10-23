@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import {
   FormControl,
@@ -284,6 +285,14 @@ describe('[uiComboboxControl] on a popup listbox field with Reactive Forms', () 
     await settle(fixture);
     expect(fruit.touched).toBe(true);
     expect(control().getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('gives the directive its descriptions without making describedBy public', () => {
+    const instance = fixture.debugElement.query(By.directive(TestPopupField))
+      .componentInstance as TestPopupField;
+    // @ts-expect-error `describedBy` stays protected on `UiFormControlBase`.
+    expect(instance.describedBy).toBeDefined();
+    expect(instance.ɵdescribedBy()?.split(' ').map(text)).toEqual(['Seasonal', 'Pick one']);
   });
 
   it('keeps its id on the host and its label and descriptions on the inner control', () => {

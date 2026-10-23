@@ -75,6 +75,12 @@ export abstract class UiPopupListboxField<V>
   readonly controlId: Signal<string> = computed(() => `${this.id()}-${this.controlIdSuffix}`);
   /** End of `controlId`; `ui-time-input` keeps its `-input`. */
   protected readonly controlIdSuffix: string = 'control';
+  /**
+   * The protected `describedBy` of `UiFormControlBase`, for `uiComboboxControl` only. It is set
+   * after the base class has built `describedBy`, also under `useDefineForClassFields: false`.
+   * Internal.
+   */
+  readonly ɵdescribedBy: Signal<string | null> = this.describedBy;
 
   /** The inner `<input>` or `<button>` that carries `uiComboboxControl`. */
   protected readonly control = viewChild.required<ElementRef<HTMLElement>>('control');

@@ -15,8 +15,11 @@ export interface UiComboboxField {
   readonly readonly: Signal<boolean>;
   /** The error state shown to the user. */
   readonly showError: Signal<boolean>;
-  /** The app's own descriptions, then the hint or error of `ui-form-field`, or `null`. */
-  readonly describedBy: Signal<string | null>;
+  /**
+   * The app's own descriptions, then the hint or error of `ui-form-field`, or `null`: the
+   * protected `describedBy` of `UiFormControlBase`, handed to the directive only.
+   */
+  readonly ɵdescribedBy: Signal<string | null>;
 }
 
 export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPopupListboxField');
@@ -40,10 +43,12 @@ export const UI_POPUP_LISTBOX_FIELD = new InjectionToken<UiComboboxField>('UiPop
     '[attr.aria-required]': "field.isRequired() ? 'true' : null",
     '[attr.aria-readonly]': "field.readonly() ? 'true' : null",
     '[attr.aria-invalid]': "field.showError() ? 'true' : null",
-    '[attr.aria-describedby]': 'field.describedBy()',
+    '[attr.aria-describedby]': 'describedBy()',
   },
 })
 export class UiComboboxControl {
   protected readonly field = inject(UI_POPUP_LISTBOX_FIELD);
   protected readonly listbox = inject(UiListboxController);
+  /** Template expressions cannot name a `ɵ` member. */
+  protected readonly describedBy = this.field.ɵdescribedBy;
 }

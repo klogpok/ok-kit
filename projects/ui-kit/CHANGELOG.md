@@ -18,8 +18,6 @@ so versions mark review points rather than releases.
   and classes, and list their providers through `ɵprovideUiPopupListboxField()`. `UiSelectBase`
   extends it. The free function `ɵfieldListboxConfig()` is removed; the base class has a
   protected `fieldListboxConfig()` instead. Inputs, outputs and the rendered DOM are unchanged.
-- **core:** `describedBy` of `UiFormControlBase` is public (it was protected), so that
-  `[uiComboboxControl]` can read it through the field token.
 
 ### Fixed
 
