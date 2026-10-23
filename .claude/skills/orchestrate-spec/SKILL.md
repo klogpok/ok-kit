@@ -12,6 +12,13 @@ You are the orchestrator. You plan, launch, watch, merge and report; ticket agen
 
 Heartbeats are automatic: the hook `scripts/orchestrator-heartbeat.mjs` writes `.orchestrator/<ticket>.json` on every tool call of the agent bound to a running ticket (`ORCH set <id> running --agent <agent id>`), with the agent's folder in `cwd`. A silent agent is a hung one.
 
+## Models
+
+- Fixer, merger and Explore agents: `model: "sonnet"`, `effort: "high"`.
+- Ticket agents: the session model by default. In the table of step 2 add a `model` column: propose `sonnet` for a mechanical ticket (one binding, a rename, docs, tests only) and the session model for one that makes design decisions; the user confirms it with the ticket choice.
+- A replacement for a `STALE` agent keeps the model of the agent it replaces.
+- A retry after a failure (a failed ticket, a merge still red after a Sonnet fixer) runs on the session model.
+
 ## 1. Lock, preconditions, resume
 
 1. `ORCH lock acquire`. If it fails, another session is orchestrating this checkout: stop and tell the user which one. Every way this skill ends (done, stopped by the user, given up) ends with `ORCH lock release`.
@@ -23,7 +30,7 @@ Heartbeats are automatic: the hook `scripts/orchestrator-heartbeat.mjs` writes `
 
 `ORCH tickets <spec folder>` lists every ticket with `status`, `open`, `deferred` and `blockedBy`.
 
-Show the open tickets as a table (number, title, status, deferred, blocked by). Deferred and `needs-info` tickets are open: list them, never drop them silently. Then ask once with AskUserQuestion: "all open tickets, deferred included" (recommended), "only ready-for-agent", "all except deferred"; the user can type numbers instead. A `needs-info` ticket the user includes still needs its answer: put the question in the same message.
+Show the open tickets as a table (number, title, status, deferred, blocked by, model — see "Models"). Deferred and `needs-info` tickets are open: list them, never drop them silently. Then ask once with AskUserQuestion: "all open tickets, deferred included" (recommended), "only ready-for-agent", "all except deferred"; the user can type numbers instead. A `needs-info` ticket the user includes still needs its answer: put the question in the same message.
 
 ## 3. Predict files and plan
 
