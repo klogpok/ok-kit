@@ -31,6 +31,16 @@ export const STEPS = [
   },
 ];
 
+/** The steps from the one named `from` on (all of them without a name). */
+export function stepsFrom(from) {
+  if (from === undefined) return STEPS;
+  const index = STEPS.findIndex((step) => step.name === from);
+  if (index < 0) {
+    throw new Error(`unknown step "${from}"; steps: ${STEPS.map((step) => step.name).join(', ')}`);
+  }
+  return STEPS.slice(index);
+}
+
 const ANSI = /\u001b\[[0-9;]*m/g;
 
 /** The output as plain lines: colours, carriage returns and trailing spaces removed. */

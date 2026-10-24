@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { STEPS, facts, tail } from './phase-check.lib.mjs';
+import { STEPS, facts, stepsFrom, tail } from './phase-check.lib.mjs';
 
 const step = (name) => STEPS.find((s) => s.name === name);
 const esc = String.fromCharCode(27);
@@ -60,6 +60,26 @@ describe('facts', () => {
 
   it('keeps nothing for a step without facts', () => {
     assert.deepEqual(facts(step('lint'), 'All files pass linting.'), []);
+  });
+});
+
+describe('stepsFrom', () => {
+  it('returns every step without a name', () => {
+    assert.deepEqual(stepsFrom(undefined), STEPS);
+  });
+
+  it('starts at the named step', () => {
+    assert.deepEqual(
+      stepsFrom('test-visual').map((s) => s.name),
+      ['test-visual', 'test-host-css'],
+    );
+  });
+
+  it('names the steps when the name is unknown', () => {
+    assert.throws(
+      () => stepsFrom('visual'),
+      /unknown step "visual"; steps: tokens, lint, .*test-host-css/,
+    );
   });
 });
 
