@@ -6,6 +6,8 @@
 //   compared, so a component that only moves (the story's own markup takes the host's
 //   `text-align` or margins) does not count, while one whose inside changes does. A few stories
 //   whose own markup inside a component changes are listed in `STORY_MARKUP`.
+// A changed capture runs a second time and only its second outcome counts, so a story caught
+// before it finished laying out does not fail the check.
 //
 // The host stylesheet is the fixture in `scripts/host-css/`: Bootstrap 4.6.2 (vendored; its
 // reboot is global) and the html/body rules of the VPlans client. Nothing is read from the client.
@@ -293,10 +295,7 @@ const jobs = stories.flatMap((story) =>
     mode,
   })),
 );
-const results = [];
-/** `element|property|before → after` → the captures and kit components it was seen in. */
-const styleChanges = new Map();
-
+/** What one capture found: its result, its changed computed styles and the crops to write. */
 async function run(page, { story, mode }) {
   const name = `${story.id}.${mode.name}`;
   const playError = await openStory(page, server.base, story.id, mode);
@@ -321,7 +320,7 @@ async function run(page, { story, mode }) {
 
   const components = [];
   const writes = [];
-  let styles = 0;
+  const styles = [];
   before.elements.forEach((b, i) => {
     const a = after.elements[i];
     const p = pinned.elements[i];
@@ -330,12 +329,7 @@ async function run(page, { story, mode }) {
     if (b.kit && rendered) {
       PROPS.forEach((prop, j) => {
         if (unchanged(b, a, prop, j)) return;
-        styles++;
-        const key = `${b.key}|${prop}|${b.values[j]} → ${a.values[j]}`;
-        const entry = styleChanges.get(key) ?? { captures: new Set(), owners: new Set() };
-        entry.captures.add(name);
-        if (b.owner) entry.owners.add(b.owner);
-        styleChanges.set(key, entry);
+        styles.push({ key: `${b.key}|${prop}|${b.values[j]} → ${a.values[j]}`, owner: b.owner });
       });
     }
     if (b.box || p.box) {
@@ -354,37 +348,72 @@ async function run(page, { story, mode }) {
   });
 
   const markup = STORY_MARKUP.get(story.id);
-  if (components.length && !markup) {
-    writes.push([`${name}.before.png`, before.png], [`${name}.after.png`, pinned.png]);
-    for (const [file, png] of writes) await writeFile(join(outDir, file), PNG.sync.write(png));
-  }
-  results.push({
-    name,
-    components: markup ? [] : components,
-    known: markup && components.length ? `${components.join(', ')}: ${markup}` : null,
+  const failed = components.length > 0 && !markup;
+  if (failed) writes.push([`${name}.before.png`, before.png], [`${name}.after.png`, pinned.png]);
+  return {
+    result: {
+      name,
+      components: markup ? [] : components,
+      known: markup && components.length ? `${components.join(', ')}: ${markup}` : null,
+      styles: styles.length,
+    },
     styles,
-  });
+    writes: failed ? writes : [],
+  };
 }
 
-await Promise.all(
-  Array.from({ length: WORKERS }, async () => {
-    const page = await context.newPage();
-    for (let job = jobs.shift(); job; job = jobs.shift()) {
-      try {
-        await run(page, job);
-      } catch (error) {
-        results.push({
-          name: `${job.story.id}.${job.mode.name}`,
-          error: error.message.split('\n')[0],
-        });
+/** Runs `list` on WORKERS pages; a job that throws gets its error as the result. */
+async function runAll(list) {
+  const queue = [...list];
+  const outcomes = [];
+  await Promise.all(
+    Array.from({ length: WORKERS }, async () => {
+      const page = await context.newPage();
+      for (let job = queue.shift(); job; job = queue.shift()) {
+        try {
+          // A focus mode without a kit button to focus captures nothing.
+          const outcome = await run(page, job);
+          if (outcome) outcomes.push({ job, ...outcome });
+        } catch (error) {
+          const name = `${job.story.id}.${job.mode.name}`;
+          outcomes.push({
+            job,
+            result: { name, error: error.message.split('\n')[0] },
+            styles: [],
+            writes: [],
+          });
+        }
       }
-    }
-    await page.close();
-  }),
-);
+      await page.close();
+    }),
+  );
+  return outcomes;
+}
+
+const changes = ({ result }) => Boolean(result.error || result.components.length || result.styles);
+const first = await runAll(jobs);
+// A capture taken before its story finished laying out (a wide table drawn in part) looks like a
+// change. A change the host stylesheet makes shows up every time, so each changed capture runs once
+// more and its second outcome counts.
+const again = await runAll(first.filter(changes).map((outcome) => outcome.job));
+const rerun = new Set(again.map((outcome) => outcome.result.name));
+const outcomes = [...first.filter((outcome) => !rerun.has(outcome.result.name)), ...again];
 
 await browser.close();
 server.close();
+
+const results = outcomes.map((outcome) => outcome.result);
+/** `element|property|before → after` → the captures and kit components it was seen in. */
+const styleChanges = new Map();
+for (const { result, styles, writes } of outcomes) {
+  for (const { key, owner } of styles) {
+    const entry = styleChanges.get(key) ?? { captures: new Set(), owners: new Set() };
+    entry.captures.add(result.name);
+    if (owner) entry.owners.add(owner);
+    styleChanges.set(key, entry);
+  }
+  for (const [file, png] of writes) await writeFile(join(outDir, file), PNG.sync.write(png));
+}
 
 const styleRows = [...styleChanges.entries()]
   .map(([key, value]) => ({
@@ -420,6 +449,11 @@ console.log(
     ? 'Strict: the host body color and letter-spacing count as changes.'
     : `Inherited from the host body in both captures: color ${accepted.color}, letter-spacing ${accepted.letterSpacing}.`,
 );
+if (again.length) {
+  console.log(
+    `Ran ${again.length} changed capture(s) again; ${again.filter(changes).length} changed again.`,
+  );
+}
 if (known.length) {
   console.log(
     `${known.length} capture(s) where only the story's own markup changes (not failures):`,
