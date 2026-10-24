@@ -1,17 +1,26 @@
 // Status line of this repo (`.claude/settings.json`): the orchestrations of `/orchestrate-spec`
 // that are not done yet, read from `.orchestrator/` of the main checkout. It finds that folder
-// upwards from the session's folder, so a session in `.claude/worktrees/<name>` shows it too. It
-// never fails: no orchestration, a half-written file or any other error prints nothing.
+// upwards from the session's folder, so a session in `.claude/worktrees/<name>` shows it too. An
+// orchestration whose lock is gone or names a dead process shows `no session`. It never fails: no orchestration, a half-written file or any other error prints nothing.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
-import { renderStatusLine } from './orchestrator.lib.mjs';
+import { lockStatus, renderStatusLine } from './orchestrator.lib.mjs';
 
 const readJson = (file) => {
   try {
     return JSON.parse(readFileSync(file, 'utf8'));
   } catch {
     return undefined;
+  }
+};
+
+const isAlive = (pid) => {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === 'EPERM';
   }
 };
 
@@ -34,11 +43,13 @@ try {
   if (base) {
     const states = {};
     const beatsOf = {};
+    const locks = {};
     for (const entry of readdirSync(base, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
       const state = readJson(join(base, entry.name, 'state.json'));
       if (!state?.tickets) continue;
       states[entry.name] = state;
+      locks[entry.name] = lockStatus(readJson(join(base, entry.name, 'lock')), undefined, isAlive);
       beatsOf[entry.name] = Object.fromEntries(
         Object.keys(state.tickets).flatMap((id) => {
           const beat = readJson(join(base, entry.name, `${id}.json`));
@@ -46,7 +57,7 @@ try {
         }),
       );
     }
-    const line = renderStatusLine(states, beatsOf, Date.now());
+    const line = renderStatusLine(states, beatsOf, Date.now(), locks);
     if (line) console.log(line);
   }
 } catch {

@@ -572,13 +572,15 @@ export function renderProgress(state, beats, now, history = []) {
     `# Orchestration: ${state.spec}`,
     '',
     `Integration branch \`${state.branch}\` from \`${state.base}\`. Started ${state.startedAt}, ` +
-      `updated ${new Date(now).toISOString()}.`,
+      `updated ${new Date(now).toISOString()}. The file changes only when the orchestrator ` +
+      'writes: whether its session still runs, `lock status` tells.',
     '',
     `\`${progressBar(merged, tickets.length, 20)}\` ` +
       `**${tickets.length ? Math.round((merged / tickets.length) * 100) : 0}%**`,
     '',
     `Merged ${merged} of ${tickets.length}; running ${count('running')}; ` +
-      `failed ${count('failed')}. Phase: **${state.phase}**.`,
+      `failed ${count('failed')}. Phase: **${state.phase}**` +
+      `${state.verifyWorktree ? `, in \`${state.verifyWorktree}\`` : ''}.`,
     '',
     '| Ticket | Blocked by | Status | Last heartbeat | Step | Note |',
     '| --- | --- | --- | --- | --- | --- |',
@@ -618,9 +620,10 @@ export function renderProgress(state, beats, now, history = []) {
  * The Claude Code status line: one part per orchestration not yet done (`states` is
  * `feature → state`, `beatsOf` is `feature → beats`), with a bar of merged tickets, the tickets in
  * flight, the quiet and failed ones, the time since the start and the forecast. Empty when nothing
- * runs.
+ * runs. `locks` is `feature → lockStatus()`; a lock that is `stale` or `free` means no session
+ * orchestrates the spec any more.
  */
-export function renderStatusLine(states, beatsOf, now) {
+export function renderStatusLine(states, beatsOf, now, locks = {}) {
   const parts = [];
   for (const feature of Object.keys(states).sort()) {
     const state = states[feature];
@@ -640,6 +643,7 @@ export function renderStatusLine(states, beatsOf, now) {
         inFlight ? `${ICONS.running}${inFlight}` : '',
         count('failed') ? `${ICONS.failed}${count('failed')}` : '',
         quiet.length ? `${QUIET} ${quiet.join(',')} silent` : '',
+        locks[feature] === 'stale' || locks[feature] === 'free' ? `${QUIET} no session` : '',
         Number.isFinite(Date.parse(state.startedAt))
           ? `⏱ ${duration(now - Date.parse(state.startedAt))}`
           : '',

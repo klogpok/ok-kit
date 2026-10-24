@@ -18,10 +18,12 @@
 //                                     unfinished orchestration without --force
 //   next [--max <n>]                  the tickets to launch now (default: at most 4 in flight,
 //                                     counted across every spec)
-//   status                            every ticket with its agent, worktree and last heartbeat
+//   status                            the lock, the verify worktree and every ticket with its
+//                                     agent, worktree and last heartbeat
 //   set <ticket> <status> [--agent <id>] [--worktree <path>] [--branch <name>] [--note <text>]
-//   phase <name>                      the current phase: implement, review, verify, done; leaving
-//                                     verify releases the verify lock
+//   phase <name> [--worktree <path>]  the current phase: implement, review, verify, done; leaving
+//                                     verify releases the verify lock; --worktree (verify only)
+//                                     records where the checks run
 //   log <text>                        adds a line to the log of progress.md
 //   beat <ticket> <step>              describes the current step of a ticket agent
 //   watch [--stale <s>] [--every <s>] waits until an agent is silent for --stale seconds (prints
@@ -348,7 +350,14 @@ switch (command) {
     }));
     console.log(
       JSON.stringify(
-        { spec: state.spec, branch: state.branch, phase: state.phase, tickets },
+        {
+          spec: state.spec,
+          branch: state.branch,
+          phase: state.phase,
+          lock: lockStatus(readJson(path('lock')), process.env.CLAUDE_CODE_SESSION_ID, isAlive),
+          verifyWorktree: state.verifyWorktree,
+          tickets,
+        },
         null,
         2,
       ),
@@ -381,16 +390,33 @@ switch (command) {
     break;
   }
 
-  case 'phase':
-  case 'log': {
-    if (!rest.length) fail(`${command} <text>`);
+  case 'phase': {
+    const { values, positionals } = parseArgs({
+      args: rest,
+      allowPositionals: true,
+      options: { worktree: { type: 'string' } },
+    });
+    const [phase] = positionals;
+    if (!phase) fail('phase <name> [--worktree <path>]');
+    if (values.worktree && phase !== 'verify') fail('--worktree is for the verify phase');
     const state = loadState();
-    const text = rest.join(' ');
-    if (command === 'phase') state.phase = text;
-    state.log.push({ at: now(), text: command === 'phase' ? `phase: ${text}` : text });
-    if (command === 'phase' && text !== 'verify' && releaseVerifyLock()) {
+    state.phase = phase;
+    if (values.worktree) state.verifyWorktree = values.worktree;
+    state.log.push({
+      at: now(),
+      text: `phase: ${phase}${values.worktree ? ` in ${values.worktree}` : ''}`,
+    });
+    if (phase !== 'verify' && releaseVerifyLock()) {
       state.log.push({ at: now(), text: 'released the verify lock' });
     }
+    saveState(state);
+    break;
+  }
+
+  case 'log': {
+    if (!rest.length) fail('log <text>');
+    const state = loadState();
+    state.log.push({ at: now(), text: rest.join(' ') });
     saveState(state);
     break;
   }

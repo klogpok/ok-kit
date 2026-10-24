@@ -337,6 +337,23 @@ describe('renderProgress', () => {
     assert.match(md, /\| 03 Three \| 02 \| ⚪ pending ⛔ blocked for good \|/);
     assert.match(md, /## Timeline\n\n```mermaid\ngantt\n/);
   });
+
+  it('names the worktree of the verify phase', () => {
+    const md = renderProgress(
+      {
+        spec: '.scratch/x',
+        branch: 'spec/x',
+        base: 'master',
+        phase: 'verify',
+        verifyWorktree: 'D:/r/.claude/worktrees/v',
+        tickets: {},
+        log: [],
+      },
+      {},
+      Date.parse('2026-10-21T12:00:00Z'),
+    );
+    assert.match(md, /Phase: \*\*verify\*\*, in `D:\/r\/\.claude\/worktrees\/v`\./);
+  });
 });
 
 describe('progressBar', () => {
@@ -582,6 +599,19 @@ describe('renderStatusLine', () => {
       now,
     );
     assert.equal(line, 'a implement · █████░░░░░ 1/2 · ⏱ 1 h 0 min · ETA ~20 min');
+  });
+
+  it('marks an orchestration whose session is gone', () => {
+    const states = {
+      a: { phase: 'verify', tickets: { '01': { status: 'merged' } } },
+      b: { phase: 'review', tickets: { '01': { status: 'merged' } } },
+      c: { phase: 'implement', tickets: { '01': { status: 'merged' } } },
+    };
+    assert.equal(
+      renderStatusLine(states, {}, now, { a: 'stale', b: 'free', c: 'held' }),
+      'a verify · ██████████ 1/1 · ⚠ no session  │  ' +
+        'b review · ██████████ 1/1 · ⚠ no session  │  c implement · ██████████ 1/1',
+    );
   });
 
   it('is empty when nothing runs', () => {
@@ -892,6 +922,7 @@ describe('orchestrator.mjs and its heartbeat hook with two specs', () => {
     assert.equal(show(JSON.stringify({ workspace: { current_dir: worktree } })).stdout, '');
     init('a');
     init('b');
+    orch(['lock', 'acquire', '--spec', 'a']);
     orch(['set', '--spec', 'a', '01', 'running', '--agent', 'agent-a']);
     orch(['phase', '--spec', 'b', 'done']);
     write(file('b', '01.json'), '{ half');
@@ -899,6 +930,24 @@ describe('orchestrator.mjs and its heartbeat hook with two specs', () => {
     assert.equal(result.status, 0);
     assert.match(result.stdout, /^a implement · ░░░░░░░░░░ 0\/3 · 🔵1 · ⏱ \d+ s\n$/);
     assert.match(show('x').stdout, /^a implement · /, 'from its own folder');
+
+    write(file('a', 'lock'), JSON.stringify({ session: 's2', pid: DEAD, at: '', root }));
+    assert.match(show('x').stdout, /^a implement · .* · ⚠ no session · ⏱/);
+  });
+
+  it('keeps the worktree of the verify phase and shows it with the lock in status', () => {
+    init('a');
+    orch(['lock', 'acquire', '--spec', 'a']);
+    orch(['phase', '--spec', 'a', 'verify', '--worktree', 'D:/wt/v']);
+    const status = JSON.parse(orch(['status', '--spec', 'a']));
+    assert.equal(status.verifyWorktree, 'D:/wt/v');
+    assert.equal(status.lock, 'own');
+    assert.equal(json('a', 'state.json').log.at(-1).text, 'phase: verify in D:/wt/v');
+    assert.equal(JSON.parse(orch(['status', '--spec', 'a'], { session: 's2' })).lock, 'held');
+
+    const review = run(['phase', '--spec', 'a', 'review', '--worktree', 'D:/wt/v']);
+    assert.equal(review.status, 1);
+    assert.match(review.stderr, /--worktree is for the verify phase/);
   });
 
   it('moves a top-level orchestration of an earlier run into the folder of its spec', () => {
