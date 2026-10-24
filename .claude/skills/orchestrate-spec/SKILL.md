@@ -79,11 +79,11 @@ Repeat until this spec has nothing in flight and nothing pending (`inFlight` and
 
 ## 5. Review and fix
 
-`ORCH phase review`. Call the Skill tool `mattpocock-skills:code-review` for the changes of `spec/<feature>` since `master`, with the spec folder as the spec: it runs the standards and the spec reviewers in parallel. Hand every finding to one foreground fixer agent (`isolation: "worktree"`, based on `spec/<feature>`, same rules as a ticket agent), then merge its branch as in step 4. Findings that need a decision of the user are not fixed: collect them for the report.
+`ORCH phase review`. Call the Skill tool `mattpocock-skills:code-review` for the changes of `spec/<feature>` since `master`, with the spec folder as the spec: it runs the standards and the spec reviewers in parallel. Hand every finding to one foreground fixer agent (`isolation: "worktree"`, based on `spec/<feature>`, same rules as a ticket agent), then merge its branch as in step 4. Findings that need a decision of the user are not fixed: collect them for the report. A **behavior change** the spec does not list (an edge case, a default, an event) is always one: tell the fixer to keep the code as built, to name the change in its report and to write it into neither `docs/DECISIONS.md` nor the spec; you ask the user in step 7.
 
 ## 6. Verify
 
-`ORCH verify-lock acquire` with the Bash tool and `run_in_background: true`: it waits while another spec is in verify, so two full visual and host-CSS runs never load the machine at once (it prints `waiting: <feature> is in verify …` meanwhile), and exits once it holds the lock, with the last line `acquired` or `took over a stale verify lock of <feature>`. Then `ORCH phase verify`. Leaving verify (`ORCH phase done`, or any other phase) releases the lock; when you stop inside verify, `ORCH verify-lock release`. In a worktree on `spec/<feature>`, run the automated chain of section 1 of `.claude/skills/phase-check/SKILL.md` (all tests, builds, stories, visual, host CSS). On failure, a fixer agent and the merge of step 4 again; after two rounds still red, stop and report the failures with their output. Green: in that worktree tick the `/phase-check` items the ticket agents left open (both languages), commit and fast-forward `spec/<feature>`.
+`ORCH verify-lock acquire` with the Bash tool and `run_in_background: true`: it waits while another spec is in verify, so two full visual and host-CSS runs never load the machine at once (it prints `waiting: <feature> is in verify …` meanwhile), and exits once it holds the lock, with the last line `acquired` or `took over a stale verify lock of <feature>`. Create a worktree on `spec/<feature>`, then `ORCH phase verify --worktree <its path>`. Leaving verify (`ORCH phase done`, or any other phase) releases the lock; when you stop inside verify, `ORCH verify-lock release`. In that worktree run the automated chain of section 1 of `.claude/skills/phase-check/SKILL.md` (all tests, builds, stories, visual, host CSS): `pnpm phase-check` from the PowerShell tool in the background, its output in `.orchestrator/<feature>/phase-check.log`. On failure, a fixer agent and the merge of step 4 again; after two rounds still red, stop and report the failures with their output. Green: in that worktree tick the `/phase-check` items the ticket agents left open (both languages), commit and fast-forward `spec/<feature>`.
 
 ## 7. Report and hand over
 
@@ -91,10 +91,10 @@ Repeat until this spec has nothing in flight and nothing pending (`inFlight` and
 
 ## Resume
 
-`ORCH status` lists every ticket with its status, agent, worktree (`cwd` of its last heartbeat) and last heartbeat. Tell the user what was done and what is left, then continue:
+`ORCH status` gives the lock, the verify worktree and every ticket with its status, agent, worktree (`cwd` of its last heartbeat) and last heartbeat. Tell the user what was done and what is left, then continue:
 
 - `running` — if `lock acquire` took over a stale lock, the previous session is gone and its agents with it: launch replacements at once, as for `STALE`. If this session already held the lock (after `/compact`), its agents may still be alive: start the watcher and let it decide.
 - `merging` or `review` — do the merge of step 4 again from its first step.
 - `pending`, `merged`, `failed` — nothing to repair; the loop picks them up.
 
-Then go on with the phase in `.orchestrator/<feature>/state.json`: step 4, 5 or 6. A resume into step 6 starts with `ORCH verify-lock acquire`; it returns at once when this spec already holds the lock.
+Then go on with the phase in `.orchestrator/<feature>/state.json`: step 4, 5 or 6. A resume into step 6 starts with `ORCH verify-lock acquire`; it returns at once when this spec already holds the lock. The checks go on in `verifyWorktree` of `ORCH status`: when its HEAD is still `spec/<feature>`, the `ok` lines of `.orchestrator/<feature>/phase-check.log` are the steps that passed, so continue with `pnpm phase-check --from <the next step>`.
