@@ -11,6 +11,7 @@
 // imports become relative `../<entry>/public-api`. The script never writes outside the target
 // and refuses a target it did not write (see sync-to-client.lib.mjs).
 import { execFileSync, spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -112,10 +113,12 @@ async function verify() {
 
   const clientConfig = join(client, 'tsconfig.json');
   const { config, error } = ts.readConfigFile(clientConfig, ts.sys.readFile);
-  if (error)
-    throw new Error(
-      `cannot read ${clientConfig}: ${ts.flattenDiagnosticMessageText(error.messageText, '\n')}`,
-    );
+  if (error) {
+    const reason = existsSync(client)
+      ? ts.flattenDiagnosticMessageText(error.messageText, '\n')
+      : `no client checkout at ${client}; name one with --client <path>`;
+    throw new Error(`cannot read ${clientConfig}: ${reason}`);
+  }
   const entries = [...files.keys()].filter((path) => /^[^/]+\/public-api\.ts$/.test(path));
   const tsconfig = {
     compilerOptions: {
