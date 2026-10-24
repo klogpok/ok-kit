@@ -416,6 +416,12 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 >
 > **Статус (2026-10-24): тикеты 01–05 и правки ревью сделаны, `/phase-check` зелёный, ждёт одобрения пользователя.** Typed text, commit и ошибку разбора четырёх полей (time input, number input, datepicker, date range picker) держит внутренний модуль `ɵinjectTypedText()` в `core`; поля больше не хранят свой draft. Публичный интерфейс и DOM не изменились; поведение изменилось только в выровненных крайних случаях из спеки. Ревью нашло ещё один такой случай: ввод поверх значения, которое range picker не может прочитать, теперь пишет и уведомляет разобранное значение, как в time input (DECISIONS → «Parsed text field»). `/phase-check`: 1075 unit-тестов, coverage 98.85/84.02/94.97/98.85, playground 8, `test-scripts` 76/76, 320 stories × 3 режима без нарушений axe, снимки без изменений, `test-host-css` 729 снимков (9 меняют только разметку самой story; `Table/WideWithStickyColumns` в LTR упал в полном прогоне из-за недорисованного эталонного снимка и прошёл повторно), предупреждение бюджета `ui-kit-embed.scss` 41.11 kB. Клиент локально не выкачан: `pnpm sync:client --verify` не запускался.
 
+## Calendar dialog field: общий calendar dialog двух date pickers (решено 2026-10-24)
+
+> Архитектурная работа вне фаз, кандидат 3 архитектурного обзора 2026-10-23. Спека и тикеты 01–03 — в `.scratch/calendar-dialog-field/`; термины — в `GLOSSARY.md` («Calendar dialog», «Calendar dialog field»); решения — в [DECISIONS.md](DECISIONS.md) («Calendar dialog field»).
+>
+> **Статус (2026-10-24): спека готова, тикеты `ready-for-agent`.** `spec/parsed-text-field` влит в `master`, можно начинать.
+
 ## Углы оверлеев: tooltip и popover (решено и сделано 2026-10-23)
 
 > Работа вне фаз. Спека и тикеты 01–07 — в `.scratch/overlay-corners/`; термины — в `GLOSSARY.md` («Overlays»); решения — в [DECISIONS.md](DECISIONS.md) («Overlay corners»).

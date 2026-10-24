@@ -926,3 +926,33 @@ the built behavior:
 - **Review leftovers stay (07):** `sideOverlayPositions()` stays a one-line wrapper without
   `@deprecated`; `tooltip.scss` and `popover.scss` keep listing the corner classes next to `--top`
   / `--bottom`, with no block-side pane class from core.
+
+## Calendar dialog field (decided 2026-10-24)
+
+Architecture work outside the phases, candidate 3 of the architecture review of 2026-10-23. Spec
+and tickets 01–03 are in `.scratch/calendar-dialog-field/`; the terms **calendar dialog** and
+**calendar dialog field** are in `GLOSSARY.md` → "Dropdowns".
+
+User decisions (2026-10-24):
+
+- **Order:** after `spec/parsed-text-field` is merged into `master`; the work builds on the
+  pickers that already use the typed text module.
+- **Limits keep their names:** `min`/`max` on `ui-datepicker`, `minDate`/`maxDate` on
+  `ui-date-range-picker`, as `.claude/rules/forms.md` says. The NG8022 reason went with Signal
+  Forms, but nothing forces a breaking rename. The limits stay in the fields.
+- **Form:** an abstract base class `UiCalendarDialogField<V>` (extends `UiFormControlBase<V>`) in
+  `datepicker/calendar-dialog-field.ts`, exported as `ɵUiCalendarDialogField`, like
+  `ɵUiPopupListboxField`. Not an injection function: the shared inputs and outputs must be class
+  fields.
+- **Moves to the base:** the open state, `open()` / `close()` / `toggle()` (disabled and readonly
+  guard, commit of the typed text on open, `opened` / `closed`, touched on close), focus on the
+  active day when the dialog attaches, Alt+ArrowDown and Enter in a field, touched on focus-out,
+  `panelId`, the panel positions and the calendar icon; the inputs `dateFilter`, `startAt`,
+  `placeholder`, `size`, `id`, `aria-label` and the outputs `opened` / `closed`; `labels`, the
+  locale, the format hint and `inputMode`.
+- **Stays in the fields:** the template (calendar button, panel, calendar, footer), what a pick
+  does (one day or a range, presets, Today, Clear), the limits, `name` (datepicker only),
+  `labelStrategy`, `controlId`, `focus()`, the value and the typed text config.
+- **Pure refactor:** no change of behavior, public API, harnesses or visual baselines.
+- **Tests:** a spec of its own for the base with a test host; the specs of both pickers stay as
+  they are and guard against regressions.

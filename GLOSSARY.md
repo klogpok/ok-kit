@@ -46,6 +46,14 @@ _Avoid_: option panel, select panel, menu (a menu holds commands, not values)
 A form field that owns a popup listbox and whose inner control is a combobox: select, multi-select, autocomplete and time input. A date picker opens a calendar, not a popup listbox, so it is not one.
 _Avoid_: combobox (for the whole field; the combobox is its inner control), dropdown field
 
+**Calendar dialog**:
+A dropdown panel that is a dialog holding a calendar: focus moves into it when it opens and stays in it until it closes, then returns to the field's calendar button.
+_Avoid_: calendar popup, picker panel, date popup
+
+**Calendar dialog field**:
+A form field that owns a calendar dialog: date picker and date range picker. It is also a parsed text field; what a pick does to the value is each field's own.
+_Avoid_: date picker field (for the pair), picker
+
 **Option**:
 One value the user can choose in a popup listbox.
 _Avoid_: item, entry
