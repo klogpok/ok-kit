@@ -27,7 +27,7 @@ this ticket builds the module test-first.
 - [x] An external write of the same value keeps the typed text; a different or unreadable value
       drops it.
 - [x] The injection call reads no class field declared after it (`useDefineForClassFields: false`).
-- [ ] `/phase-check` passes.
+- [x] `/phase-check` passes.
 - [x] One commit, `feat(core): typed text of parsed text fields`.
 
 ## Русский перевод
@@ -64,5 +64,5 @@ Spec: `../spec.md` → «Решения по реализации»: конфи�
       сбрасывает его.
 - [x] Вызов injection-функции не читает поля класса, объявленные после него
       (`useDefineForClassFields: false`).
-- [ ] `/phase-check` проходит.
+- [x] `/phase-check` проходит.
 - [x] Один коммит, `feat(core): typed text of parsed text fields`.

@@ -21,6 +21,7 @@ and `setValue()`, and passes its day rules to `ɵinjectTypedText()`.
       the same commit with a note in the commit body.
 - [x] Public inputs, outputs, methods and the rendered DOM are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged; `pnpm sync:client --verify` passes.
+  - 2026-10-24, orchestrator: `pnpm phase-check` passed on `spec/parsed-text-field` (1075 tests, 320 stories in 3 modes, baselines unchanged, host CSS 729 captures). `pnpm sync:client --verify` was not run: there is no client checkout on this machine, so the item stays open.
 - [x] One commit, `refactor(datepicker): typed text module in the datepicker`.
 
 ## Русский перевод
@@ -49,4 +50,5 @@ Spec: `../spec.md` → «Решения по реализации»: что ос
 - [x] Публичные inputs, outputs, методы и отрисованный DOM не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились; `pnpm sync:client --verify`
       проходит.
+  - 2026-10-24, оркестратор: `pnpm phase-check` прошёл на `spec/parsed-text-field` (1075 тестов, 320 историй в 3 режимах, baselines без изменений, host CSS 729 снимков). `pnpm sync:client --verify` не запускался: на этой машине нет копии клиента, поэтому пункт остаётся открытым.
 - [x] Один коммит, `refactor(datepicker): typed text module in the datepicker`.

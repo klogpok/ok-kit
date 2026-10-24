@@ -1,6 +1,6 @@
 # План фаз 6–9 @vplans/ui-kit
 
-> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Иконки типов файлов в file upload сделаны и одобрены (2026-10-23). Popup listbox field сделан и ждёт одобрения (2026-10-23) — раздел «Popup listbox field» ниже. Углы оверлеев у tooltip и popover (2026-10-23) сделаны, `/phase-check` зелёный, ждут одобрения — раздел «Углы оверлеев» ниже. Статус каждой фазы — в её разделе ниже.
+> **Сейчас (2026-10-22):** фазы 1–9, миграция на Angular 20, вид чипсов, popup listbox и пилот в client сделаны и одобрены; план и SPEC исчерпаны. Leading actions в popup listbox сделаны и ждут одобрения — раздел «Leading actions в popup listbox» ниже. Размер xl у checkbox и radio (2026-10-23) тоже ждёт одобрения. Иконки типов файлов в file upload сделаны и одобрены (2026-10-23). Popup listbox field сделан и ждёт одобрения (2026-10-23) — раздел «Popup listbox field» ниже. Углы оверлеев у tooltip и popover (2026-10-23) сделаны, `/phase-check` зелёный, ждут одобрения — раздел «Углы оверлеев» ниже. Parsed text field (общий typed text четырёх полей, 2026-10-24) сделан, `/phase-check` зелёный, ждёт одобрения — раздел «Parsed text field» ниже. Статус каждой фазы — в её разделе ниже.
 
 ## Контекст
 
@@ -410,11 +410,11 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 >
 > **Статус (2026-10-23): тикеты 01–03 сделаны, ждёт одобрения пользователя.** Динамическую ARIA combobox четырёх полей (select, multi-select, autocomplete, time input) ставит внутренняя директива `[uiComboboxControl]`; общие inputs, outputs, host-классы, blur и providers — в базовом классе `ɵUiPopupListboxField` и helper `ɵprovideUiPopupListboxField()` в entry point `listbox`. DOM и публичный интерфейс полей не изменились, кроме одного: `ui-time-input` теперь ставит `aria-readonly` (решение пользователя). Клиент локально не выкачан: `pnpm sync:client --verify` не запускался.
 
-## Parsed text field: общий typed text (решено 2026-10-23)
+## Parsed text field: общий typed text (решено 2026-10-23, сделано 2026-10-24)
 
 > Архитектурная работа вне фаз, кандидат 2 архитектурного обзора 2026-10-23. Спека и тикеты 01–05 — в `.scratch/parsed-text-field/`; термины — в `GLOSSARY.md` («Typed values»); решения — в [DECISIONS.md](DECISIONS.md) («Parsed text field»).
 >
-> **Статус (2026-10-23): спека готова, тикеты `ready-for-agent`.** Идёт до спеки popup listbox field (кандидат 1, `.scratch/popup-listbox-field/`).
+> **Статус (2026-10-24): тикеты 01–05 и правки ревью сделаны, `/phase-check` зелёный, ждёт одобрения пользователя.** Typed text, commit и ошибку разбора четырёх полей (time input, number input, datepicker, date range picker) держит внутренний модуль `ɵinjectTypedText()` в `core`; поля больше не хранят свой draft. Публичный интерфейс и DOM не изменились; поведение изменилось только в выровненных крайних случаях из спеки. Ревью нашло ещё один такой случай: ввод поверх значения, которое range picker не может прочитать, теперь пишет и уведомляет разобранное значение, как в time input (DECISIONS → «Parsed text field»). `/phase-check`: 1075 unit-тестов, coverage 98.85/84.02/94.97/98.85, playground 8, `test-scripts` 76/76, 320 stories × 3 режима без нарушений axe, снимки без изменений, `test-host-css` 729 снимков (9 меняют только разметку самой story; `Table/WideWithStickyColumns` в LTR упал в полном прогоне из-за недорисованного эталонного снимка и прошёл повторно), предупреждение бюджета `ui-kit-embed.scss` 41.11 kB. Клиент локально не выкачан: `pnpm sync:client --verify` не запускался.
 
 ## Углы оверлеев: tooltip и popover (решено и сделано 2026-10-23)
 
