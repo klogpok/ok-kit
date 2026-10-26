@@ -59,7 +59,7 @@ export abstract class UiCalendarDialogField<V>
   implements UiFormFieldControl
 {
   protected readonly labels = inject(UI_LABELS);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  protected readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
 
   /**

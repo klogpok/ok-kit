@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   computed,
   forwardRef,
   inject,
@@ -221,8 +220,6 @@ interface RangeParseError {
   },
 })
 export class UiDateRangePicker extends UiCalendarDialogField<UiDateRange | null> {
-  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-
   readonly value = model<UiDateRange | null>(null);
   /** First day that can be picked or typed. */
   readonly minDate = input<Date | null | undefined>(null);
@@ -289,7 +286,7 @@ export class UiDateRangePicker extends UiCalendarDialogField<UiDateRange | null>
 
   /** Focuses the start field. */
   focus(options?: FocusOptions): void {
-    this.element.querySelector<HTMLInputElement>('.ui-date-range-picker__input')?.focus(options);
+    this.host.querySelector<HTMLInputElement>('.ui-date-range-picker__input')?.focus(options);
   }
 
   protected classPrefix(): string {
