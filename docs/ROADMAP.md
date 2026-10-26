@@ -420,7 +420,7 @@ playground, `lint` и `format:check` чисто, обе сборки и `build-s
 
 > Архитектурная работа вне фаз, кандидат 3 архитектурного обзора 2026-10-23. Спека и тикеты 01–03 — в `.scratch/calendar-dialog-field/`; термины — в `GLOSSARY.md` («Calendar dialog», «Calendar dialog field»); решения — в [DECISIONS.md](DECISIONS.md) («Calendar dialog field»).
 >
-> **Статус (2026-10-24): спека готова, тикеты `ready-for-agent`.** `spec/parsed-text-field` влит в `master`, можно начинать.
+> **Статус (2026-10-26): тикеты 01–03 и правки ревью сделаны, ждёт одобрения пользователя.** `UiCalendarDialogField<V>` (`ɵUiCalendarDialogField` из `@vplans/ui-kit/datepicker`) владеет calendar dialog; `ui-datepicker` и `ui-date-range-picker` расширяют его, публичный interface, DOM и классы не изменились. По ревью: класс блока остался статическим host-классом поля, как у `UiPopupListboxField`; `host` базы `protected`; JSDoc range picker о `placeholder`, `id`, `aria-label` возвращён; +2 теста базы. `/phase-check`: 1094 unit-теста, coverage 98.88/84.19/94.95/98.88, playground 8, `test-scripts` 82/82, 320 stories × 3 режима без нарушений axe, `test-host-css` 729 снимков (9 меняют только разметку story), предупреждение бюджета `ui-kit-embed.scss` 41.11 kB. `test-visual` падает на 802 снимках (0.1–5.91%) и на `master` тоже — дрейф окружения; ветка рисует date pickers пиксель в пиксель как `master`. Открытый вопрос — `needs-info` в `.scratch/visual-baseline-drift/`.
 
 ## Углы оверлеев: tooltip и popover (решено и сделано 2026-10-23)
 

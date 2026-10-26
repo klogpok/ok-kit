@@ -23,7 +23,7 @@ instead of `UiFormControlBase<UiDateRange | null>` and drops every member the ba
 - [x] No member owned by the base is left in `date-range-picker.ts`.
 - [x] The existing date range picker spec and harness pass without edits.
 - [x] Public inputs, outputs, methods and the rendered DOM and classes are unchanged.
-- [ ] `/phase-check` passes, visual baselines unchanged.
+- [x] `/phase-check` passes, visual baselines unchanged. (2026-10-26: see ticket 01.)
 - [x] One commit, `refactor(datepicker): range picker on the calendar dialog field base`.
 
 ## Русский перевод
@@ -52,5 +52,5 @@ Spec: `../spec.md` → «Решения по реализации»: что ос
 - [x] В `date-range-picker.ts` не осталось членов, которыми владеет база.
 - [x] Существующие spec и harness date range picker проходят без правок.
 - [x] Публичные inputs, outputs, методы, отрисованный DOM и классы не изменились.
-- [ ] `/phase-check` проходит, visual baselines не изменились.
+- [x] `/phase-check` проходит, visual baselines не изменились. (2026-10-26: см. тикет 01.)
 - [x] Один коммит, `refactor(datepicker): range picker on the calendar dialog field base`.

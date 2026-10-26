@@ -26,8 +26,10 @@ Spec: `../spec.md` → "Implementation Decisions": what the field gives the base
 - [x] `datepicker/calendar-dialog-field.spec.ts` drives a minimal test field and covers every case
       listed in the spec under "Testing Decisions".
 - [x] README updated as above.
-- [ ] `/phase-check` passes, visual baselines unchanged.
-- [ ] One commit, `refactor(datepicker): calendar dialog field base`.
+- [x] `/phase-check` passes, visual baselines unchanged. (2026-10-26: every step green but
+      `test-visual`, which fails on `master` too; the branch renders the date pickers pixel for
+      pixel like `master`. See `.scratch/visual-baseline-drift/`.)
+- [x] One commit, `refactor(datepicker): calendar dialog field base`.
 
 ## Русский перевод
 
@@ -59,5 +61,7 @@ Spec: `../spec.md` → «Решения по реализации»: что по
 - [x] `datepicker/calendar-dialog-field.spec.ts` ведёт минимальное тестовое поле и покрывает
       каждый случай из раздела spec «Решения по тестированию».
 - [x] README обновлён, как описано выше.
-- [ ] `/phase-check` проходит, visual baselines не изменились.
-- [ ] Один коммит, `refactor(datepicker): calendar dialog field base`.
+- [x] `/phase-check` проходит, visual baselines не изменились. (2026-10-26: все шаги зелёные,
+      кроме `test-visual`, который падает и на `master`; ветка рисует date pickers пиксель в
+      пиксель как `master`. См. `.scratch/visual-baseline-drift/`.)
+- [x] Один коммит, `refactor(datepicker): calendar dialog field base`.
