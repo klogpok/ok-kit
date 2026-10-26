@@ -2,45 +2,33 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Injector,
-  afterNextRender,
   computed,
   forwardRef,
   inject,
   input,
   model,
-  output,
-  signal,
-  viewChild,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { map } from 'rxjs';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
 import {
   UI_FORM_FIELD_CONTROL,
-  UI_LABELS,
-  UiFormControlBase,
-  UiFormFieldControl,
-  UiSize,
   ɵinjectTypedText,
   type ɵUiTypedTextParse,
-  UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
   ɵUiDropdownPanel,
   UI_BREAKPOINTS,
 } from '@vplans/ui-kit/core';
-import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
+import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
+import { UiCalendarDialogField } from './calendar-dialog-field';
 import {
-  UiDateFilter,
   UiDateRange,
   compareDays,
-  datePattern,
   formatDay,
-  formatHint,
   isDayEnabled,
   parseDay,
   sameRange,
@@ -223,63 +211,26 @@ interface RangeParseError {
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDateRangePicker) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiDateRangePicker), multi: true },
   ],
+  // The base binds the block class and its modifiers, `id`, the cleared `aria-label` and
+  // `aria-describedby` (the fields carry the names and descriptions) and `(focusout)`.
   host: {
-    class: 'ui-date-range-picker',
     role: 'group',
-    '[class]': '"ui-date-range-picker--" + size()',
-    '[class.ui-date-range-picker--disabled]': 'isDisabled()',
-    '[class.ui-date-range-picker--readonly]': 'readonly()',
-    '[class.ui-date-range-picker--invalid]': 'showError()',
-    '[attr.id]': 'id()',
     '[attr.aria-labelledby]': 'groupLabelledBy()',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
-    // The fields carry the names and descriptions; static attributes stay on the host too.
-    '[attr.aria-label]': 'null',
-    '[attr.aria-describedby]': 'null',
-    '(focusout)': 'onFocusOut($event)',
   },
 })
-export class UiDateRangePicker
-  extends UiFormControlBase<UiDateRange | null>
-  implements UiFormFieldControl
-{
-  protected readonly labels = inject(UI_LABELS);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly injector = inject(Injector);
+export class UiDateRangePicker extends UiCalendarDialogField<UiDateRange | null> {
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   readonly value = model<UiDateRange | null>(null);
   /** First day that can be picked or typed. */
   readonly minDate = input<Date | null | undefined>(null);
   /** Last day that can be picked or typed. */
   readonly maxDate = input<Date | null | undefined>(null);
-  /** Return `false` for days that cannot be picked or typed. */
-  readonly dateFilter = input<UiDateFilter | null>(null);
-  /** Month shown when the calendar opens without a value. Defaults to today. */
-  readonly startAt = input<Date | null | undefined>(null);
   /** Quick picks shown next to the calendar. */
   readonly presets = input<readonly UiDateRangePreset[]>([]);
-  /** Placeholder of both fields. Defaults to the expected format, e.g. "DD.MM.YYYY". */
-  readonly placeholder = input('');
-  readonly size = input<UiSize>('md');
-  /** Host id; the fields get `${id}-start` and `${id}-end`. */
-  readonly id = input(inject(_IdGenerator).getId('ui-date-range-picker-'));
-  /** Names the group when there is no `ui-form-field` label. */
-  readonly ariaLabel = input('', { alias: 'aria-label' });
-
-  readonly opened = output();
-  readonly closed = output();
-
-  protected readonly toggleElement = viewChild.required<string, ElementRef<HTMLButtonElement>>(
-    'toggleButton',
-    { read: ElementRef },
-  );
-  private readonly calendar = viewChild(UiCalendar);
-  private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
   protected readonly edges: readonly Edge[] = ['start', 'end'];
-  protected readonly isOpen = signal(false);
-  protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
-  protected readonly calendarIcon = uiIconCalendar;
 
   private readonly breakpoints = inject(BreakpointObserver);
   /** Two months side by side, one on narrow screens. */
@@ -288,18 +239,11 @@ export class UiDateRangePicker
     { initialValue: this.breakpoints.isMatched(TWO_MONTHS_QUERY) ? 2 : 1 },
   );
 
-  private readonly locale = computed(() => this.labels().locale);
-  protected readonly hint = computed(() => formatHint(this.locale()));
-  /** Numeric keypad with a dot on phones, when the locale separates the date with dots. */
-  protected readonly inputMode = computed(() =>
-    datePattern(this.locale()).separator === '.' ? 'decimal' : null,
-  );
-
   /** The value when it holds valid dates; anything else is shown empty. */
   protected readonly range = computed(() => validRange(this.value()));
 
   /** The typed texts, their commit and parse error, and writing the value. */
-  private readonly typedText = ɵinjectTypedText<UiDateRange, RangeText, RangeParseError>({
+  protected readonly typedText = ɵinjectTypedText<UiDateRange, RangeText, RangeParseError>({
     value: this.value,
     notify: (value) => this.notifyChange(value),
     parse: (text) => this.parse(text),
@@ -311,8 +255,6 @@ export class UiDateRangePicker
 
   readonly labelStrategy = 'labelledby' as const;
   readonly controlId = computed(() => `${this.id()}-start`);
-  /** The calendar dialog, named by `aria-controls` of the button while it is open. */
-  protected readonly panelId = computed(() => `${this.id()}-panel`);
 
   /** The typed texts while there are some, otherwise the formatted value. */
   protected readonly texts = this.typedText.text;
@@ -346,28 +288,11 @@ export class UiDateRangePicker
 
   /** Focuses the start field. */
   focus(options?: FocusOptions): void {
-    this.host.querySelector<HTMLInputElement>('.ui-date-range-picker__input')?.focus(options);
+    this.element.querySelector<HTMLInputElement>('.ui-date-range-picker__input')?.focus(options);
   }
 
-  open(): void {
-    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.typedText.commit();
-    this.isOpen.set(true);
-    this.opened.emit();
-  }
-
-  close(): void {
-    if (!this.isOpen()) return;
-    // The panel returns focus that was inside it (or lost with it, after Escape) to the button.
-    this.isOpen.set(false);
-    this.closed.emit();
-    // The user has dealt with the field, even when nothing was picked.
-    this.notifyTouched();
-  }
-
-  protected toggle(): void {
-    if (this.isOpen()) this.close();
-    else this.open();
+  protected classPrefix(): string {
+    return 'ui-date-range-picker';
   }
 
   /** A field with invalid text is marked alone; other errors (e.g. required) mark both. */
@@ -378,13 +303,6 @@ export class UiDateRangePicker
 
   protected inputLabelledBy(edge: Edge): string {
     return [this.groupLabelledBy(), `${this.id()}-${edge}-name`].filter(Boolean).join(' ');
-  }
-
-  protected onAttach(): void {
-    afterNextRender(
-      { write: () => this.calendar()?.focusActiveCell() },
-      { injector: this.injector },
-    );
   }
 
   /** The first pick sets the start; the second sets the end and closes the dialog. */
@@ -408,27 +326,6 @@ export class UiDateRangePicker
   protected onInput(edge: Edge, event: Event): void {
     const text = (event.target as HTMLInputElement).value;
     this.typedText.input({ ...this.texts(), [edge]: text, edited: edge });
-  }
-
-  protected onInputKeydown(event: KeyboardEvent): void {
-    if (event.key === 'ArrowDown' && event.altKey) {
-      event.preventDefault();
-      this.open();
-    } else if (event.key === 'Enter') {
-      this.typedText.commit();
-    }
-  }
-
-  /** Shows valid typed dates in the locale format; keeps invalid text for the user to fix. */
-  protected onBlur(): void {
-    this.typedText.commit();
-  }
-
-  /** Touched once focus leaves the fields, the button and the calendar. */
-  protected onFocusOut(event: FocusEvent): void {
-    const next = event.relatedTarget as Node | null;
-    if (next && (this.host.contains(next) || this.panel()?.nativeElement.contains(next))) return;
-    this.notifyTouched();
   }
 
   /**

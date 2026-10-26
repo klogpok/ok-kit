@@ -1,6 +1,6 @@
 # 03: `ui-date-range-picker` extends the calendar dialog field base
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01
 
 Spec: `../spec.md` → "Implementation Decisions": what stays in the fields, limits keep their
@@ -20,17 +20,17 @@ instead of `UiFormControlBase<UiDateRange | null>` and drops every member the ba
 - The template keeps its `#toggleButton` and `#panel`, and calls the base's `onBlur()`,
   `onInputKeydown()`, `toggle()`, `onAttach()` and `close()`.
 
-- [ ] No member owned by the base is left in `date-range-picker.ts`.
-- [ ] The existing date range picker spec and harness pass without edits.
-- [ ] Public inputs, outputs, methods and the rendered DOM and classes are unchanged.
+- [x] No member owned by the base is left in `date-range-picker.ts`.
+- [x] The existing date range picker spec and harness pass without edits.
+- [x] Public inputs, outputs, methods and the rendered DOM and classes are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged.
-- [ ] One commit, `refactor(datepicker): range picker on the calendar dialog field base`.
+- [x] One commit, `refactor(datepicker): range picker on the calendar dialog field base`.
 
 ## Русский перевод
 
 # 03: `ui-date-range-picker` расширяет базу calendar dialog field
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01
 
 Spec: `../spec.md` → «Решения по реализации»: что остаётся в полях, пределы сохраняют имена.
@@ -49,8 +49,8 @@ Spec: `../spec.md` → «Решения по реализации»: что ос
 - Шаблон сохраняет `#toggleButton` и `#panel` и вызывает `onBlur()`, `onInputKeydown()`,
   `toggle()`, `onAttach()` и `close()` базы.
 
-- [ ] В `date-range-picker.ts` не осталось членов, которыми владеет база.
-- [ ] Существующие spec и harness date range picker проходят без правок.
-- [ ] Публичные inputs, outputs, методы, отрисованный DOM и классы не изменились.
+- [x] В `date-range-picker.ts` не осталось членов, которыми владеет база.
+- [x] Существующие spec и harness date range picker проходят без правок.
+- [x] Публичные inputs, outputs, методы, отрисованный DOM и классы не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились.
-- [ ] Один коммит, `refactor(datepicker): range picker on the calendar dialog field base`.
+- [x] Один коммит, `refactor(datepicker): range picker on the calendar dialog field base`.
