@@ -235,6 +235,25 @@ describe('a calendar dialog field', () => {
     expect(host.events).toEqual([]);
   });
 
+  it('does not open from a click on the calendar button while disabled or readonly', async () => {
+    // Like the pickers, the button is disabled in both states, so the click never reaches `toggle()`.
+    for (const state of [host.disabled, host.readonly]) {
+      state.set(true);
+      await settle(fixture);
+      expect(toggle().disabled).toBe(true);
+      toggle().click();
+      await settle(fixture);
+      expect(dialog()).toBeNull();
+      state.set(false);
+    }
+    expect(host.events).toEqual([]);
+
+    await settle(fixture);
+    toggle().click();
+    await settle(fixture);
+    expect(dialog()).not.toBeNull();
+  });
+
   it('commits the typed text when the dialog opens', async () => {
     await type(' may ');
     expect(host.value()).toBe('MAY');
@@ -412,6 +431,20 @@ describe('a calendar dialog field bound to a form control', () => {
     leave(control(), day());
     await settle(fixture);
     expect(due.touched).toBe(false);
+  });
+
+  it('is not touched while focus moves from the dialog back to the field or its button', async () => {
+    toggle().click();
+    await settle(fixture);
+
+    leave(dialog()!, control());
+    await settle(fixture);
+    expect(due.touched).toBe(false);
+
+    leave(dialog()!, toggle());
+    await settle(fixture);
+    expect(due.touched).toBe(false);
+    expect(dialog()).not.toBeNull();
   });
 
   it('is touched once focus leaves the field, its button and the dialog', async () => {
