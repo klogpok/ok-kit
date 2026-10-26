@@ -27,10 +27,12 @@ import { UiDateFilter, datePattern, formatHint } from './date-utils';
 /**
  * The calendar dialog of a date field (`ui-datepicker`, `ui-date-range-picker`): its open state,
  * opening and closing, focus on the active day, Alt+ArrowDown and Enter in a field, touched, the
- * shared inputs and outputs, and the host id and classes built from `classPrefix()`.
+ * shared inputs and outputs, and the host id and modifier classes built from `classPrefix()`.
  *
- * A field adds its value semantics, its limits and its typed text, and follows the template
- * contract:
+ * A field adds its value semantics, its limits and its typed text, and follows the template and
+ * host contract:
+ * - the host carries the block class statically, `host: { class: '<classPrefix()>' }`; the base
+ *   binds the `--size`, `--disabled`, `--readonly` and `--invalid` modifiers next to it;
  * - the calendar button carries `#toggleButton` and calls `toggle()` on click; it binds
  *   `aria-expanded` to `isOpen()` and `aria-controls` to `panelId()` while open;
  * - the `uiDropdownPanel` takes `[open]="isOpen()"`, `[positions]="positions"`,
@@ -61,8 +63,8 @@ export abstract class UiCalendarDialogField<V>
   private readonly injector = inject(Injector);
 
   /**
-   * BEM block of the host classes and prefix of the generated id, e.g. `'ui-datepicker'`. A
-   * method, not a field: the `id` default reads it while this class is built, before the field's
+   * BEM block of the host classes and prefix of the generated id, e.g. `'ui-datepicker'`; the
+   * field's static host `class` is the same block. A method, not a field: the `id` default reads it while this class is built, before the field's
    * own initializers have run.
    */
   protected abstract classPrefix(): string;
@@ -112,11 +114,10 @@ export abstract class UiCalendarDialogField<V>
     datePattern(this.locale()).separator === '.' ? 'decimal' : null,
   );
 
-  /** The block, size, disabled, readonly and invalid classes; a field binds its own next to them. */
+  /** The size, disabled, readonly and invalid classes; a field binds its own next to them. */
   protected readonly hostClasses = computed(() => {
     const prefix = this.classPrefix();
     return {
-      [prefix]: true,
       [`${prefix}--${this.size()}`]: true,
       [`${prefix}--disabled`]: this.isDisabled(),
       [`${prefix}--readonly`]: this.readonly(),

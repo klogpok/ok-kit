@@ -146,6 +146,9 @@ import { formatDay, isDayEnabled, parseDay, sameDay, startOfDay, validDay } from
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDatepicker) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiDatepicker), multi: true },
   ],
+  // The base binds the modifier classes, `id`, the cleared `aria-label` and `aria-describedby`
+  // (the input carries the label and descriptions) and `(focusout)`.
+  host: { class: 'ui-datepicker' },
 })
 export class UiDatepicker extends UiCalendarDialogField<Date | null> {
   readonly value = model<Date | null>(null);

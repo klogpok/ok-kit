@@ -52,6 +52,7 @@ function keydown(target: Element, key: string, init: KeyboardEventInit = {}): Ke
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TestCalendarField), multi: true },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'ui-test-field' },
   template: `
     <div cdkOverlayOrigin #origin="cdkOverlayOrigin">
       <input

@@ -211,9 +211,10 @@ interface RangeParseError {
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDateRangePicker) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiDateRangePicker), multi: true },
   ],
-  // The base binds the block class and its modifiers, `id`, the cleared `aria-label` and
-  // `aria-describedby` (the fields carry the names and descriptions) and `(focusout)`.
+  // The base binds the modifier classes, `id`, the cleared `aria-label` and `aria-describedby`
+  // (the fields carry the names and descriptions) and `(focusout)`.
   host: {
+    class: 'ui-date-range-picker',
     role: 'group',
     '[attr.aria-labelledby]': 'groupLabelledBy()',
     '[attr.aria-disabled]': 'isDisabled() ? "true" : null',
