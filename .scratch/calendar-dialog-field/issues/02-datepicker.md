@@ -1,6 +1,6 @@
 # 02: `ui-datepicker` extends the calendar dialog field base
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** 01
 
 Spec: `../spec.md` → "Implementation Decisions": what stays in the fields.
@@ -16,17 +16,17 @@ Spec: `../spec.md` → "Implementation Decisions": what stays in the fields.
 - The template keeps its `#toggleButton` and `#panel`, and calls the base's `onBlur()`,
   `onInputKeydown()`, `toggle()`, `onAttach()` and `close()`.
 
-- [ ] No member owned by the base is left in `datepicker.ts`.
-- [ ] The existing datepicker spec and harness pass without edits.
-- [ ] Public inputs, outputs, methods and the rendered DOM and classes are unchanged.
+- [x] No member owned by the base is left in `datepicker.ts`.
+- [x] The existing datepicker spec and harness pass without edits.
+- [x] Public inputs, outputs, methods and the rendered DOM and classes are unchanged.
 - [ ] `/phase-check` passes, visual baselines unchanged.
-- [ ] One commit, `refactor(datepicker): datepicker on the calendar dialog field base`.
+- [x] One commit, `refactor(datepicker): datepicker on the calendar dialog field base`.
 
 ## Русский перевод
 
 # 02: `ui-datepicker` расширяет базу calendar dialog field
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** 01
 
 Spec: `../spec.md` → «Решения по реализации»: что остаётся в полях.
@@ -42,8 +42,8 @@ Spec: `../spec.md` → «Решения по реализации»: что ос
 - Шаблон сохраняет `#toggleButton` и `#panel` и вызывает `onBlur()`, `onInputKeydown()`,
   `toggle()`, `onAttach()` и `close()` базы.
 
-- [ ] В `datepicker.ts` не осталось членов, которыми владеет база.
-- [ ] Существующие spec и harness datepicker проходят без правок.
-- [ ] Публичные inputs, outputs, методы, отрисованный DOM и классы не изменились.
+- [x] В `datepicker.ts` не осталось членов, которыми владеет база.
+- [x] Существующие spec и harness datepicker проходят без правок.
+- [x] Публичные inputs, outputs, методы, отрисованный DOM и классы не изменились.
 - [ ] `/phase-check` проходит, visual baselines не изменились.
-- [ ] Один коммит, `refactor(datepicker): datepicker on the calendar dialog field base`.
+- [x] Один коммит, `refactor(datepicker): datepicker on the calendar dialog field base`.

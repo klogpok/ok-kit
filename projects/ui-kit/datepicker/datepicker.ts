@@ -2,44 +2,21 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Injector,
-  afterNextRender,
   computed,
   forwardRef,
-  inject,
   input,
   model,
-  output,
-  signal,
   viewChild,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CdkTrapFocus, _IdGenerator } from '@angular/cdk/a11y';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { UiButton, UiIconButton } from '@vplans/ui-kit/button';
-import {
-  UI_FORM_FIELD_CONTROL,
-  UI_LABELS,
-  UiFormControlBase,
-  UiFormFieldControl,
-  UiSize,
-  ɵinjectTypedText,
-  UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK,
-  ɵUiDropdownPanel,
-} from '@vplans/ui-kit/core';
-import { UiIcon, uiIconCalendar } from '@vplans/ui-kit/icon';
+import { UI_FORM_FIELD_CONTROL, ɵinjectTypedText, ɵUiDropdownPanel } from '@vplans/ui-kit/core';
+import { UiIcon } from '@vplans/ui-kit/icon';
 import { UiCalendar } from './calendar';
-import {
-  UiDateFilter,
-  formatDay,
-  datePattern,
-  formatHint,
-  isDayEnabled,
-  parseDay,
-  sameDay,
-  startOfDay,
-  validDay,
-} from './date-utils';
+import { UiCalendarDialogField } from './calendar-dialog-field';
+import { formatDay, isDayEnabled, parseDay, sameDay, startOfDay, validDay } from './date-utils';
 
 /**
  * Date field: type a date in the locale format or pick it from a calendar.
@@ -169,63 +146,21 @@ import {
     { provide: UI_FORM_FIELD_CONTROL, useExisting: forwardRef(() => UiDatepicker) },
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UiDatepicker), multi: true },
   ],
-  host: {
-    class: 'ui-datepicker',
-    '[class]': '"ui-datepicker--" + size()',
-    '[class.ui-datepicker--disabled]': 'isDisabled()',
-    '[class.ui-datepicker--readonly]': 'readonly()',
-    '[class.ui-datepicker--invalid]': 'showError()',
-    '[attr.id]': 'id()',
-    // The inner control carries the label and descriptions; static attributes stay on the host too.
-    '[attr.aria-label]': 'null',
-    '[attr.aria-describedby]': 'null',
-    '(focusout)': 'onFocusOut($event)',
-  },
 })
-export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFormFieldControl {
-  protected readonly labels = inject(UI_LABELS);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly injector = inject(Injector);
-
+export class UiDatepicker extends UiCalendarDialogField<Date | null> {
   readonly value = model<Date | null>(null);
   readonly min = input<Date | null | undefined>(null);
   readonly max = input<Date | null | undefined>(null);
-  /** Return `false` for days that cannot be picked or typed. */
-  readonly dateFilter = input<UiDateFilter | null>(null);
-  /** Month shown when the calendar opens without a value. Defaults to today. */
-  readonly startAt = input<Date | null | undefined>(null);
-  /** Defaults to the expected format, e.g. "DD.MM.YYYY". */
-  readonly placeholder = input('');
-  readonly size = input<UiSize>('md');
   readonly name = input('');
-  /** Host id; the text field gets `${id}-input`. */
-  readonly id = input(inject(_IdGenerator).getId('ui-datepicker-'));
-  readonly ariaLabel = input('', { alias: 'aria-label' });
-
-  readonly opened = output();
-  readonly closed = output();
 
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
-  protected readonly toggleElement = viewChild.required<string, ElementRef<HTMLButtonElement>>(
-    'toggleButton',
-    { read: ElementRef },
-  );
-  private readonly calendar = viewChild(UiCalendar);
-  private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
-
-  protected readonly isOpen = signal(false);
-  protected readonly positions = [...UI_DROPDOWN_POSITIONS_WITH_END_FALLBACK];
-  protected readonly calendarIcon = uiIconCalendar;
 
   readonly labelStrategy = 'for' as const;
+  /** The text field: `${id}-input`. */
   readonly controlId = computed(() => `${this.id()}-input`);
-  /** The calendar dialog, named by `aria-controls` of the button while it is open. */
-  protected readonly panelId = computed(() => `${this.id()}-panel`);
-
-  private readonly locale = computed(() => this.labels().locale);
 
   /** The typed text, its commit and parse error, and writing the value. */
-  private readonly typedText = ɵinjectTypedText<Date, string, 'invalid'>({
+  protected readonly typedText = ɵinjectTypedText<Date, string, 'invalid'>({
     value: this.value,
     notify: (value) => this.notifyChange(value),
     // Text that is not an allowed day sets the value to `null` with a parse error.
@@ -245,12 +180,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   /** The typed text while there is one, otherwise the formatted value. */
   protected readonly text = this.typedText.text;
 
-  protected readonly hint = computed(() => formatHint(this.locale()));
-  /** Numeric keypad with a dot on phones, when the locale separates the date with dots. */
-  protected readonly inputMode = computed(() =>
-    datePattern(this.locale()).separator === '.' ? 'decimal' : null,
-  );
-
   /** The value when it is a valid `Date`; a string from an API or an Invalid Date is shown empty. */
   protected readonly day = computed(() => validDay(this.value()));
 
@@ -258,6 +187,10 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
   protected readonly todayAllowed = computed(() =>
     isDayEnabled(startOfDay(new Date()), this.min(), this.max(), this.dateFilter()),
   );
+
+  protected classPrefix(): string {
+    return 'ui-datepicker';
+  }
 
   /**
    * The field shows the parse message itself, bound or not: a text the user still has to fix is
@@ -273,34 +206,6 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   focus(options?: FocusOptions): void {
     this.input().nativeElement.focus(options);
-  }
-
-  open(): void {
-    if (this.isOpen() || this.isDisabled() || this.readonly()) return;
-    this.typedText.commit();
-    this.isOpen.set(true);
-    this.opened.emit();
-  }
-
-  close(): void {
-    if (!this.isOpen()) return;
-    // The panel returns focus that was inside it (or lost with it, after Escape) to the button.
-    this.isOpen.set(false);
-    this.closed.emit();
-    // The user has dealt with the field, even when no day was picked.
-    this.notifyTouched();
-  }
-
-  protected toggle(): void {
-    if (this.isOpen()) this.close();
-    else this.open();
-  }
-
-  protected onAttach(): void {
-    afterNextRender(
-      { write: () => this.calendar()?.focusActiveCell() },
-      { injector: this.injector },
-    );
   }
 
   protected onPick(date: Date): void {
@@ -320,25 +225,5 @@ export class UiDatepicker extends UiFormControlBase<Date | null> implements UiFo
 
   protected onInput(event: Event): void {
     this.typedText.input((event.target as HTMLInputElement).value);
-  }
-
-  protected onInputKeydown(event: KeyboardEvent): void {
-    if (event.key === 'ArrowDown' && event.altKey) {
-      event.preventDefault();
-      this.open();
-    } else if (event.key === 'Enter') {
-      this.typedText.commit();
-    }
-  }
-
-  protected onBlur(): void {
-    this.typedText.commit();
-  }
-
-  /** Touched once focus leaves the field, its button and the calendar. */
-  protected onFocusOut(event: FocusEvent): void {
-    const next = event.relatedTarget as Node | null;
-    if (next && (this.host.contains(next) || this.panel()?.nativeElement.contains(next))) return;
-    this.notifyTouched();
   }
 }
