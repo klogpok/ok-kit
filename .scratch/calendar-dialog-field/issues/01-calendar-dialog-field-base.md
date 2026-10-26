@@ -1,6 +1,6 @@
 # 01: `ɵUiCalendarDialogField` owns the calendar dialog of a date field
 
-**Status:** ready-for-agent
+**Status:** done
 **Blocked by:** None (can start immediately)
 
 Spec: `../spec.md` → "Implementation Decisions": what the field gives the base, what moves to it.
@@ -21,11 +21,11 @@ Spec: `../spec.md` → "Implementation Decisions": what the field gives the base
   internal, and "Adding a component" says that a calendar dialog field extends it, next to the
   popup listbox field paragraph.
 
-- [ ] `ɵUiCalendarDialogField` is exported from `@vplans/ui-kit/datepicker` and no field
+- [x] `ɵUiCalendarDialogField` is exported from `@vplans/ui-kit/datepicker` and no field
       initializer of it reads a field of a subclass.
-- [ ] `datepicker/calendar-dialog-field.spec.ts` drives a minimal test field and covers every case
+- [x] `datepicker/calendar-dialog-field.spec.ts` drives a minimal test field and covers every case
       listed in the spec under "Testing Decisions".
-- [ ] README updated as above.
+- [x] README updated as above.
 - [ ] `/phase-check` passes, visual baselines unchanged.
 - [ ] One commit, `refactor(datepicker): calendar dialog field base`.
 
@@ -33,7 +33,7 @@ Spec: `../spec.md` → "Implementation Decisions": what the field gives the base
 
 # 01: `ɵUiCalendarDialogField` владеет calendar dialog поля даты
 
-**Статус:** ready-for-agent
+**Статус:** сделано
 **Заблокирован:** нет (можно начинать сразу)
 
 Spec: `../spec.md` → «Решения по реализации»: что поле даёт базе, что в неё переезжает.
@@ -54,10 +54,10 @@ Spec: `../spec.md` → «Решения по реализации»: что по
   а «Adding a component» говорит, что calendar dialog field расширяет его, рядом с абзацем о popup
   listbox field.
 
-- [ ] `ɵUiCalendarDialogField` экспортирован из `@vplans/ui-kit/datepicker`, и ни один его field
+- [x] `ɵUiCalendarDialogField` экспортирован из `@vplans/ui-kit/datepicker`, и ни один его field
       initializer не читает поле подкласса.
-- [ ] `datepicker/calendar-dialog-field.spec.ts` ведёт минимальное тестовое поле и покрывает
+- [x] `datepicker/calendar-dialog-field.spec.ts` ведёт минимальное тестовое поле и покрывает
       каждый случай из раздела spec «Решения по тестированию».
-- [ ] README обновлён, как описано выше.
+- [x] README обновлён, как описано выше.
 - [ ] `/phase-check` проходит, visual baselines не изменились.
 - [ ] Один коммит, `refactor(datepicker): calendar dialog field base`.
