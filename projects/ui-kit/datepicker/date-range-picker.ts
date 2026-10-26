@@ -76,6 +76,8 @@ interface RangeParseError {
  *   side (one on narrow screens). The first pick sets the start, the second the end and closes
  *   the dialog; until then the day under the pointer or the focused day previews the range.
  *   `presets` add quick picks next to the calendar.
+ * - `placeholder` applies to both fields. The fields get the ids `${id}-start` and `${id}-end`.
+ *   `aria-label` names the group when there is no `ui-form-field` label.
  *
  * The value is `{ start, end }` with local dates at midnight, or `null` when both are empty. A
  * range with one open end is kept (e.g. "from September 1"); add a validator when both are
@@ -252,6 +254,7 @@ export class UiDateRangePicker extends UiCalendarDialogField<UiDateRange | null>
   });
 
   readonly labelStrategy = 'labelledby' as const;
+  /** The start field: `${id}-start`; the end field is `${id}-end`. */
   readonly controlId = computed(() => `${this.id()}-start`);
 
   /** The typed texts while there are some, otherwise the formatted value. */
